@@ -6,6 +6,8 @@ Vue.use(VueRouter);
 
 const router = new VueRouter({
     routes: [
+        { path: "/", redirect: '/welcome' },
+        { path: "/welcome", component: () => import('./components/Welcome') },
         {
             path: "/oms", component: Console, redirect: "/oms/home", children: [
                 // 二级路由

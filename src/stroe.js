@@ -5,11 +5,12 @@ Vue.use(Vuex);
 
 const store = new Vuex.Store({
     state: {
-        appId: ""
+        appInfo: {}
     },
+    // 推荐使用 mutations 改变 store中的值，调用方法：this.$store.commit('initAppInfo', xxx)
     mutations: {
-        setAppId(state, appId) {
-            state.appId = appId;
+        initAppInfo(state, appInfo) {
+            state.appInfo = appInfo;
         }
     }
 });

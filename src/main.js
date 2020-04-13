@@ -21,3 +21,15 @@ new Vue({
   store,
   render: h => h(App),
 }).$mount('#app');
+
+// 请求返回拦截，封装公共处理逻辑
+axios.interceptors.response.use((response) => {
+  if (response.data.success === true) {
+    return response.data.data;
+  }
+  console.log("request failed due to " + response.data.msg);
+  return Promise.reject(response.data.msg);
+}, (error) => {
+  console.log(error);
+  return Promise.reject(error);
+});
