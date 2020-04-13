@@ -121,7 +121,7 @@
                 this.axios.post("/appInfo/save", this.appRegisterForm).then(() => {
                    that.$message.success("应用注册成功!");
                    that.appRegisterFormVisible = false;
-                });
+                }, that.appRegisterFormVisible = false);
             },
             // 注册用户（仅用于报警通知）
             registerUser() {
@@ -129,7 +129,7 @@
                 this.axios.post("/user/save", this.userRegisterForm).then(() => {
                     that.$message.success("用户注册成功!");
                     that.userRegisterFormVisible = false;
-                })
+                }, that.userRegisterFormVisible = false);
             }
         }
     }
