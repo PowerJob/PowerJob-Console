@@ -41,7 +41,7 @@
                         <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="changeJobStatus(scope.row)"/>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作">
+                <el-table-column label="操作" width="240px">
                     <template slot-scope="scope">
                         <el-button size="mini" @click="onClickModify(scope.row)">编辑</el-button>
                         <el-button size="mini" @click="onClickRun(scope.row)">运行</el-button>
