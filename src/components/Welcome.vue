@@ -26,7 +26,7 @@
             <el-button type="success" plain @click="userRegisterFormVisible = true">用户注册</el-button>
         </div>
 
-        <el-dialog title="应用注册" :visible="appRegisterFormVisible">
+        <el-dialog title="应用注册" :visible.sync="appRegisterFormVisible">
             <el-form :model="appRegisterForm">
 
                 <el-form-item label="应用名称">
@@ -44,7 +44,7 @@
             </el-form>
         </el-dialog>
 
-        <el-dialog title="用户注册" :visible="userRegisterFormVisible">
+        <el-dialog title="用户注册" :visible.sync="userRegisterFormVisible">
             <el-form :model="userRegisterForm">
 
                 <el-form-item label="姓名">

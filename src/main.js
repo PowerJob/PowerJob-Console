@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import ElementUI from 'element-ui'
+import { Message } from 'element-ui';
 import './styles.scss'
 import './plugins/element.js'
 
@@ -11,8 +12,11 @@ import store from "./stroe";
 
 Vue.use(ElementUI);
 // Vue.use(VueCookies);
+
+/* ******* axios config ******* */
 Vue.prototype.axios = axios;
 axios.defaults.baseURL = "http://localhost:7700";
+axios.defaults.timeout = 5000;
 
 Vue.config.productionTip = false;
 
@@ -27,9 +31,9 @@ axios.interceptors.response.use((response) => {
   if (response.data.success === true) {
     return response.data.data;
   }
-  console.log("request failed due to " + response.data.msg);
+  Message.warning("错误信息：" + response.data.message);
   return Promise.reject(response.data.msg);
 }, (error) => {
-  console.log(error);
+  Message.error(error.toString());
   return Promise.reject(error);
 });

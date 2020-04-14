@@ -15,7 +15,7 @@
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" @click="listJobInfos">查询</el-button>
-                        <el-button type="cancel">重置</el-button>
+                        <el-button type="cancel" @click="onClickReset">重置</el-button>
                     </el-form-item>
                 </el-form>
             </el-col>
@@ -53,11 +53,16 @@
 
         <!-- 第三行，分页插件 -->
         <el-row>
-            <el-pagination layout="prev, pager, next" :total="this.jobInfoPageResult.totalItems" :page-size="this.jobInfoPageResult.pageSize"/>
+            <el-pagination
+                    layout="prev, pager, next"
+                    :total="this.jobInfoPageResult.totalItems"
+                    :page-size="this.jobInfoPageResult.pageSize"
+                    @current-change="onClickChangePage"
+                    :hide-on-single-page="true"/>
         </el-row>
 
 
-        <el-dialog title="新建/修改任务" :visible="modifiedJobFormVisible">
+        <el-dialog title="新建/修改任务" :visible.sync="modifiedJobFormVisible">
             <el-form :model="modifiedJobForm" label-width="80px">
 
                 <el-form-item label="任务名称">
@@ -310,7 +315,21 @@
                     that.$message.success("删除成功");
                     that.listJobInfos();
                 });
+            },
+            // 点击 换页
+            onClickChangePage(index) {
+                // 后端从0开始，前端从1开始
+                this.jobQueryContent.index = index - 1;
+                this.listJobInfos();
+            },
+            // 点击重置按钮
+            onClickReset() {
+                this.jobQueryContent.keyword = undefined;
+                this.jobQueryContent.jobId = undefined;
             }
+        },
+        mounted() {
+            this.listJobInfos();
         }
     }
 </script>
