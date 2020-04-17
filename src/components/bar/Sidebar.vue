@@ -30,7 +30,7 @@
                         <template slot="title">
                             <!-- 图标 + 文字 -->
                             <i class="el-icon-s-data"/>
-                            <span>实例管理</span>
+                            <span>运行状态</span>
                         </template>
                     </el-menu-item>
 

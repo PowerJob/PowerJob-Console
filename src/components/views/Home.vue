@@ -120,10 +120,10 @@
     }
 
     .el-table .success-row {
-        background: #f0f9eb;
+        background: darkseagreen;
     }
 
     .el-table .error-row {
-        background: red;
+        background: #ff5831;
     }
 </style>

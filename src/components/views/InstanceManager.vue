@@ -18,11 +18,11 @@
 
         <!-- 第二行，表单 -->
         <el-row>
-            <el-table :data="instancePageResult.data" style="width: 100%">
+            <el-table :data="instancePageResult.data" style="width: 100%" :row-class-name="instanceTableRowClassName">
                 <el-table-column prop="jobId" label="任务ID"/>
                 <el-table-column prop="jobName" label="任务名称"/>
                 <el-table-column prop="instanceId" label="实例ID"/>
-                <el-table-column prop="status" label="状态"/>
+                <el-table-column prop="statusStr" label="状态"/>
                 <el-table-column prop="actualTriggerTime" label="触发时间"/>
                 <el-table-column prop="finishedTime" label="结束时间"/>
 
@@ -49,9 +49,43 @@
         </el-row>
 
         <!--  任务实例详情弹出框，暂时简单显示 String... -->
-        <el-dialog title="提示" :visible.sync="instanceDetailVisible">
-            {{instanceDetail}}
-
+        <el-dialog title="任务详情" :visible.sync="instanceDetailVisible">
+            <el-row>
+                <el-col :span="24">
+                    状态: {{instanceDetail.status}}
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="24">
+                    TaskTracker地址: {{instanceDetail.taskTrackerAddress}}
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="12">
+                    开始时间: {{this.common.timestamp2Str(instanceDetail.actualTriggerTime)}}
+                </el-col>
+                <el-col :span="12">
+                    结束时间: {{this.common.timestamp2Str(instanceDetail.finishedTime)}}
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="24">
+                    运行结果: {{instanceDetail.result}}
+                </el-col>
+            </el-row>
+            <el-row id="taskDetail">
+                子任务数据: {{instanceDetail.taskDetail}}
+            </el-row>
+            <el-row>
+                最近10条秒级任务历史记录
+                <el-table  :data="instanceDetail.subInstanceDetails" style="width: 100%">
+                    <el-table-column prop="subInstanceId" label="子实例ID" width="100"/>
+                    <el-table-column prop="startTime" label="开始时间" width="160"/>
+                    <el-table-column prop="finishedTime" label="结束时间" width="160"/>
+                    <el-table-column prop="status" label="运行状态" width="100"/>
+                    <el-table-column prop="result" label="运行结果"/>
+                </el-table>
+            </el-row>
         </el-dialog>
     </div>
 </template>
@@ -119,6 +153,15 @@
                 // 后端从0开始，前端从1开始
                 this.instanceQueryContent.index = index - 1;
                 this.listInstanceInfos();
+            },
+            instanceTableRowClassName({row}) {
+                switch (row.status) {
+                    // 失败
+                    case 4: return 'error-row';
+                    // 成功
+                    case 5: return 'success-row';
+                    case 10: return 'warning-row';
+                }
             }
         },
         mounted() {

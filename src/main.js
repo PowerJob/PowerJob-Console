@@ -8,11 +8,13 @@ import './plugins/element.js'
 import axios from 'axios'
 import router from "./router";
 import store from "./stroe";
+import common from "./common";
 // import VueCookies from 'vue-cookies';
 
 Vue.use(ElementUI);
 // Vue.use(VueCookies);
 
+Vue.prototype.common = common;
 /* ******* axios config ******* */
 Vue.prototype.axios = axios;
 axios.defaults.baseURL = "http://localhost:7700";
