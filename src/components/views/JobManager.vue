@@ -33,7 +33,12 @@
             <el-table :data="jobInfoPageResult.data" style="width: 100%">
                 <el-table-column prop="id" label="任务ID"/>
                 <el-table-column prop="jobName" label="任务名称"/>
-                <el-table-column prop="timeExpressionType" label="定时类型"/>
+                <el-table-column label="定时信息">
+                    <template slot-scope="scope">
+                        {{scope.row.timeExpressionType}} <br>
+                        {{scope.row.timeExpression}}
+                    </template>
+                </el-table-column>
                 <el-table-column prop="executeType" label="执行类型"/>
                 <el-table-column prop="processorType" label="处理器类型"/>
                 <el-table-column label="状态">
@@ -250,9 +255,9 @@
                 // 时间表达式选择类型
                 timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIX_RATE", label: "固定频率（单位毫秒）"}, {key: "FIX_DELAY", label: "固定延迟（单位毫秒）"} ],
                 // 处理器类型
-                processorTypeOptions: [{key: "EMBEDDED_JAVA", label: "内置JAVA处理器"}],
+                processorTypeOptions: [{key: "EMBEDDED_JAVA", label: "内置JAVA处理器"}, {key: "SHELL", label: "Shell脚本处理器"}, {key: "PYTHON", label: "Python处理器"}],
                 // 执行方式类型
-                executeTypeOptions: [{key: "STANDALONE", label: "单机执行"}, {key: "BROADCAST", label: "广播执行"}, {key: "MAP_REDUCE", label: "MAP_REDUCE"}]
+                executeTypeOptions: [{key: "STANDALONE", label: "单机执行"}, {key: "BROADCAST", label: "广播执行"},  {key: "MAP", label: "Map执行"}, {key: "MAP_REDUCE", label: "MapReduce执行"}]
 
             }
         },
@@ -279,8 +284,15 @@
             // 修改任务状态
             changeJobStatus(data) {
                 // switch 会自动更改 enable 的值
-                this.modifiedJobForm = data;
-                this.saveJob();
+                let that = this;
+                if (data.enable === false) {
+                    // 仅有，有特殊逻辑（关闭秒级任务），走单独接口
+                    that.axios.get("/job/disable?jobId=" + data.id).then(() => that.listJobInfos());
+                }else {
+                    // 启用，则发起正常的保存操作
+                    this.modifiedJobForm = data;
+                    this.saveJob();
+                }
             },
             // 新增任务，去除旧数据
             onClickNewJob() {
@@ -304,7 +316,7 @@
             // 点击 立即运行按钮
             onClickRun(data) {
                 let that = this;
-                let url = "/job/run?jobId=" + data.id;
+                let url = "/job/run?jobId=" + data.jobId;
                 this.axios.get(url).then(() => that.$message.success("触发成功"));
             },
             // 点击 删除任务
