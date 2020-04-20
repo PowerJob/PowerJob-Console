@@ -192,7 +192,14 @@
                     </el-row>
                 </el-form-item>
                 <el-form-item label="报警配置">
-                    <label>TODO: 开发中（先完成核心功能再说）</label>
+                    <el-select v-model="modifiedJobForm.notifyUserIds" multiple filterable placeholder="选择报警通知人员">
+                        <el-option
+                                v-for="user in userList"
+                                :key="user.id"
+                                :label="user.username"
+                                :value="user.id">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
 
                 <el-form-item>
@@ -226,7 +233,7 @@
                     maxInstanceNum: 1,
                     concurrency: 5,
                     instanceTimeLimit: 0,
-                    instanceRetryNum: 1,
+                    instanceRetryNum: 0,
                     taskRetryNum: 1,
 
                     minCpuCores: 0,
@@ -235,7 +242,8 @@
 
                     enable: true,
                     designatedWorkers: "",
-                    maxWorkerCount: 0
+                    maxWorkerCount: 0,
+                    notifyUserIds: []
 
                 },
                 // 任务查询请求对象
@@ -257,7 +265,9 @@
                 // 处理器类型
                 processorTypeOptions: [{key: "EMBEDDED_JAVA", label: "内置JAVA处理器"}, {key: "SHELL", label: "Shell脚本处理器"}, {key: "PYTHON", label: "Python处理器"}],
                 // 执行方式类型
-                executeTypeOptions: [{key: "STANDALONE", label: "单机执行"}, {key: "BROADCAST", label: "广播执行"},  {key: "MAP", label: "Map执行"}, {key: "MAP_REDUCE", label: "MapReduce执行"}]
+                executeTypeOptions: [{key: "STANDALONE", label: "单机执行"}, {key: "BROADCAST", label: "广播执行"},  {key: "MAP", label: "Map执行"}, {key: "MAP_REDUCE", label: "MapReduce执行"}],
+                // 用户列表
+                userList: []
 
             }
         },
@@ -316,7 +326,7 @@
             // 点击 立即运行按钮
             onClickRun(data) {
                 let that = this;
-                let url = "/job/run?jobId=" + data.jobId;
+                let url = "/job/run?jobId=" + data.id;
                 this.axios.get(url).then(() => that.$message.success("触发成功"));
             },
             // 点击 删除任务
@@ -341,6 +351,10 @@
             }
         },
         mounted() {
+            // 加载用户信息
+            let that = this;
+            that.axios.get("/user/list").then(res => that.userList = res);
+            // 加载任务信息
             this.listJobInfos();
         }
     }

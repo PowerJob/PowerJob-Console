@@ -2,18 +2,23 @@
     <div id="instance_manager">
         <!-- 第一行，搜索区 -->
         <el-row>
-            <el-form :inline="true" :model="instanceQueryContent" class="el-form--inline">
-                <el-form-item label="实例ID">
-                    <el-input v-model="instanceQueryContent.instanceId" placeholder="实例ID"/>
-                </el-form-item>
-                <el-form-item label="任务ID">
-                    <el-input v-model="instanceQueryContent.jobId" placeholder="任务ID"/>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="listInstanceInfos">查询</el-button>
-                    <el-button type="cancel" @click = "onClickRest">重置</el-button>
-                </el-form-item>
-            </el-form>
+            <el-col :span="20">
+                <el-form :inline="true" :model="instanceQueryContent" class="el-form--inline">
+                    <el-form-item label="实例ID">
+                        <el-input v-model="instanceQueryContent.instanceId" placeholder="实例ID"/>
+                    </el-form-item>
+                    <el-form-item label="任务ID">
+                        <el-input v-model="instanceQueryContent.jobId" placeholder="任务ID"/>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="listInstanceInfos">查询</el-button>
+                        <el-button type="cancel" @click = "onClickRest">重置</el-button>
+                    </el-form-item>
+                </el-form>
+            </el-col>
+            <el-col :span="4">
+                <el-button type="primary" @click="listInstanceInfos">刷新</el-button>
+            </el-col>
         </el-row>
 
         <!-- 第二行，表单 -->
@@ -51,8 +56,11 @@
         <!--  任务实例详情弹出框，暂时简单显示 String... -->
         <el-dialog title="任务详情" :visible.sync="instanceDetailVisible">
             <el-row>
-                <el-col :span="24">
+                <el-col :span="8">
                     状态: {{instanceDetail.status}}
+                </el-col>
+                <el-col :span="16">
+                    运行次数：{{instanceDetail.runningTimes}}
                 </el-col>
             </el-row>
             <el-row>
@@ -61,10 +69,10 @@
                 </el-col>
             </el-row>
             <el-row>
-                <el-col :span="12">
+                <el-col :span="8">
                     开始时间: {{this.common.timestamp2Str(instanceDetail.actualTriggerTime)}}
                 </el-col>
-                <el-col :span="12">
+                <el-col :span="8">
                     结束时间: {{this.common.timestamp2Str(instanceDetail.finishedTime)}}
                 </el-col>
             </el-row>
