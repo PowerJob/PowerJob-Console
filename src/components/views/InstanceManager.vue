@@ -31,7 +31,7 @@
                 <el-table-column prop="actualTriggerTime" label="触发时间"/>
                 <el-table-column prop="finishedTime" label="结束时间"/>
 
-                <el-table-column label="操作">
+                <el-table-column label="操作" width="240px">
                     <template slot-scope="scope">
                         <el-button size="mini" @click="onClickShowDetail(scope.row)">详情</el-button>
                         <el-button size="mini" @click="onClickShowLog(scope.row)">日志</el-button>
@@ -96,8 +96,14 @@
                 </el-table>
             </el-row>
         </el-dialog>
+
         <!-- 任务运行日志弹出框 -->
-        <el-dialog title="日志" :visible.sync="instanceLogVisible">
+        <el-dialog title="日志" :visible.sync="instanceLogVisible" width="80%">
+            <el-row>
+                <el-col :span="4" :offset="20">
+                    <el-button size="mini" @click="onclickDownloadLog()">下载</el-button>
+                </el-col>
+            </el-row>
             <el-row>
                 <el-col :span="24">
                     <div style="white-space: pre-line;">
@@ -223,6 +229,12 @@
             onClickChangeLogPage(index) {
                 this.logQueryContent.index = index - 1;
                 this.queryLog();
+            },
+            // 下载日志
+            onclickDownloadLog() {
+                let url = "/instance/downloadLogUrl?instanceId=" + this.logQueryContent.instanceId;
+                this.axios.get(url).then(res => window.open(res));
+
             }
         },
         mounted() {
