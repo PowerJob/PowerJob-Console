@@ -34,6 +34,7 @@
                 <el-table-column label="操作">
                     <template slot-scope="scope">
                         <el-button size="mini" @click="onClickShowDetail(scope.row)">详情</el-button>
+                        <el-button size="mini" @click="onClickShowLog(scope.row)">日志</el-button>
                         <el-button size="mini" @click="onClickStop(scope.row)">停止</el-button>
                     </template>
                 </el-table-column>
@@ -48,12 +49,12 @@
                         :hide-on-single-page="true"
                         :total="this.instancePageResult.totalItems"
                         :page-size="this.instancePageResult.pageSize"
-                        @current-change="onClickChangePage"
+                        @current-change="onClickChangeInstancePage"
                         layout="prev, pager, next"/>
             </el-col>
         </el-row>
 
-        <!--  任务实例详情弹出框，暂时简单显示 String... -->
+        <!--  任务实例详情弹出框 -->
         <el-dialog title="任务详情" :visible.sync="instanceDetailVisible">
             <el-row>
                 <el-col :span="8">
@@ -95,6 +96,26 @@
                 </el-table>
             </el-row>
         </el-dialog>
+        <!-- 任务运行日志弹出框 -->
+        <el-dialog title="日志" :visible.sync="instanceLogVisible">
+            <el-row>
+                <el-col :span="24">
+                    <div style="white-space: pre-line;">
+                        {{this.paginableInstanceLog.data}}
+                    </div>
+                </el-col>
+            </el-row>
+
+            <el-row>
+                <el-col :span="24">
+                    <el-pagination
+                            :hide-on-single-page="true"
+                            :page-count="paginableInstanceLog.totalPages"
+                            @current-change="onClickChangeLogPage"
+                            layout="prev, pager, next"/>
+                </el-col>
+            </el-row>
+        </el-dialog>
     </div>
 </template>
 
@@ -120,7 +141,20 @@
                 // 某个任务的详细信息
                 instanceDetail: {},
                 // 详细信息弹出框是否可见
-                instanceDetailVisible: false
+                instanceDetailVisible: false,
+                // 日志查询对象
+                logQueryContent: {
+                    instanceId: undefined,
+                    index: 0
+                },
+                // 日志弹出框是否可见
+                instanceLogVisible: false,
+                // 日志对象
+                paginableInstanceLog: {
+                    index: 0,
+                    totalPages: 0,
+                    data: ""
+                }
             }
         },
         methods: {
@@ -157,7 +191,7 @@
                 });
             },
             // 换页
-            onClickChangePage(index) {
+            onClickChangeInstancePage(index) {
                 // 后端从0开始，前端从1开始
                 this.instanceQueryContent.index = index - 1;
                 this.listInstanceInfos();
@@ -170,6 +204,25 @@
                     case 5: return 'success-row';
                     case 10: return 'warning-row';
                 }
+            },
+            // 查看日志
+            queryLog() {
+                let that = this;
+                let url = "/instance/log?instanceId=" + this.logQueryContent.instanceId + "&index=" + this.logQueryContent.index;
+                this.axios.get(url).then((res) => {
+                    that.paginableInstanceLog = res;
+                    that.instanceLogVisible = true;
+                });
+            },
+            // 查看在线日志
+            onClickShowLog(data) {
+                this.logQueryContent.instanceId = data.instanceId;
+                this.queryLog();
+            },
+            // 查看其它页的在线日志
+            onClickChangeLogPage(index) {
+                this.logQueryContent.index = index - 1;
+                this.queryLog();
             }
         },
         mounted() {
