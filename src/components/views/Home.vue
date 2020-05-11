@@ -9,7 +9,7 @@
                         <div class="text">任务总数</div>
                         <div class="text">{{systemInfo.jobCount}}</div>
                     </div>
-                    <i class="el-icon-s-custom"/>
+                    <i class="el-icon-orange"/>
                 </div>
             </el-col>
             <el-col :span="6">
@@ -18,7 +18,7 @@
                         <div class="text">当前运行实例数</div>
                         <div class="text">{{systemInfo.runningInstanceCount}}</div>
                     </div>
-                    <i class="el-icon-s-custom"/>
+                    <i class="el-icon-loading"/>
                 </div>
             </el-col>
             <el-col :span="6">
@@ -27,7 +27,7 @@
                         <div class="text">近期失败任务数</div>
                         <div class="text">{{systemInfo.failedInstanceCount}}</div>
                     </div>
-                    <i class="el-icon-s-custom"/>
+                    <i class="el-icon-bell"/>
                 </div>
             </el-col>
             <el-col :span="6">
@@ -36,7 +36,7 @@
                         <div class="text">集群机器数</div>
                         <div class="text">{{activeWorkerCount}}</div>
                     </div>
-                    <i class="el-icon-s-custom"/>
+                    <i class="el-icon-grape"/>
                 </div>
             </el-col>
         </el-row>

@@ -101,7 +101,7 @@
         <el-dialog title="日志" :visible.sync="instanceLogVisible" width="80%">
             <el-row>
                 <el-col :span="4" :offset="20">
-                    <el-button size="mini" @click="onclickDownloadLog()">下载</el-button>
+                    <el-button type="primary" size="mini" @click="onclickDownloadLog()" icon="el-icon-download">下载</el-button>
                 </el-col>
             </el-row>
             <el-row>
@@ -223,6 +223,7 @@
             // 查看在线日志
             onClickShowLog(data) {
                 this.logQueryContent.instanceId = data.instanceId;
+                this.logQueryContent.index = 0;
                 this.queryLog();
             },
             // 查看其它页的在线日志
