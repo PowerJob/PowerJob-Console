@@ -1,8 +1,12 @@
 <template>
     <div id="welcome">
 
+
+        <el-button type="primary" plain @click="appRegisterFormVisible = true">应用注册</el-button>
+
         <div id="entrance">
             <el-select
+                    id="appSelect"
                     v-model="selectedAppInfo"
                     filterable
                     remote
@@ -20,11 +24,7 @@
             </el-select>
         </div>
 
-        <div id="register">
-
-            <el-button type="primary" plain @click="appRegisterFormVisible = true">应用注册</el-button>
-            <el-button type="success" plain @click="userRegisterFormVisible = true">用户注册</el-button>
-        </div>
+        <el-button type="success" plain @click="userRegisterFormVisible = true">用户注册</el-button>
 
         <el-dialog title="应用注册" :visible.sync="appRegisterFormVisible">
             <el-form :model="appRegisterForm">
@@ -154,6 +154,10 @@
         flex-wrap: nowrap;
         justify-content: center;
         align-items: center;
+    }
+
+    #entrance {
+        margin: 20px;
     }
 
 </style>

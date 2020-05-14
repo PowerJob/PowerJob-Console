@@ -36,7 +36,7 @@
                         <div class="text">集群机器数</div>
                         <div class="text">{{activeWorkerCount}}</div>
                     </div>
-                    <i class="el-icon-grape"/>
+                    <i class="el-icon-cpu"/>
                 </div>
             </el-col>
         </el-row>
