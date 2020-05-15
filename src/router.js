@@ -14,6 +14,8 @@ const router = new VueRouter({
                 { path: "/oms/home", meta: { title: '主页' }, component: () => import('./components/views/Home') },
                 { path: "/oms/job", meta: { title: '任务管理' }, component: () => import('./components/views/JobManager') },
                 { path: "/oms/instance", meta: { title: '实例管理' }, component: () => import('./components/views/InstanceManager') },
+                { path: "/oms/template", meta: { title: '模版生成' }, component: () => import('./components/views/ContainerTemplate') },
+                { path: "/oms/containermanage", meta: { title: '容器管理' }, component: () => import('./components/views/ContainerManager') },
             ]
         },
         // 调试用

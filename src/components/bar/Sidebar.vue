@@ -34,6 +34,15 @@
                         </template>
                     </el-menu-item>
 
+                    <el-submenu index="/oms/">
+                        <template slot="title">
+                            <i class="el-icon-data-analysis"/>
+                            <span>容器运维</span>
+                        </template>
+                        <el-menu-item index="/oms/template">模版生成</el-menu-item>
+                        <el-menu-item index="/oms/containermanage">容器管理</el-menu-item>
+                    </el-submenu>
+
                 </el-menu>
             </el-aside>
         </el-container>
