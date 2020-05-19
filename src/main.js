@@ -5,20 +5,26 @@ import { Message } from 'element-ui';
 import './styles.scss'
 import './plugins/element.js'
 
-import axios from 'axios'
+import axios from 'axios';
+import flyio from 'flyio';
 import router from "./router";
 import store from "./store";
 import common from "./common";
-// import VueCookies from 'vue-cookies';
 
 Vue.use(ElementUI);
-// Vue.use(VueCookies);
+
+let baseURL = "http://101.132.101.215:7700";
+let timeout = 5000;
 
 Vue.prototype.common = common;
 /* ******* axios config ******* */
 Vue.prototype.axios = axios;
-axios.defaults.baseURL = "http://101.132.101.215:7700";
-axios.defaults.timeout = 5000;
+axios.defaults.baseURL = baseURL;
+axios.defaults.timeout = timeout;
+/* ******* fly.io config ******* */
+Vue.prototype.flyio = flyio;
+flyio.config.baseURL = baseURL;
+flyio.config.timeout = timeout;
 
 Vue.config.productionTip = false;
 

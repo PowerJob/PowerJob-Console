@@ -10,7 +10,7 @@
                 <div class="containerText"><span>容器名称：</span> <span class='value'>{{item.containerName}}</span></div>
                 <div class="containerText"><span>地址类型：</span> <span class='value'>{{item.sourceType}}</span></div>
                 <div class="containerText"><span>文件版本：</span> <span class='value'>{{item.version}}</span></div>
-                <div style="width:240px;margin:0 auto"> 
+                <div style="width:240px;margin:0 auto">
                     <div class="btnWrap"><el-button type="primary" @click="1">部署</el-button></div>
                     <div class="btnWrap"><el-button type="primary" @click="editItem(item,key)">编辑</el-button></div>
                     <div class="btnWrap"><el-button type="primary" @click="deleteItem(item,key)">删除</el-button></div>
@@ -66,7 +66,7 @@
                 </el-form>
             </el-dialog>
     </div>
-    
+
 </template>
 
 <script>
@@ -107,13 +107,13 @@
                    data.sourceInfo = this.sourceInfo;
                    data.sourceType = 'JarFile'
                }
-               this.axios.post("container/save",data).then(res=>{
+               this.flyio.post("container/save",data).then(res=>{
                    console.log(res);
                    if(res.data.success){
                        console.log(1);
                         let appId = this.$store.state.appInfo.id;
                         appId = appId || 1 ;  // 测试默认1
-                        this.axios.get("/container/list?appId=" + appId).then(res => {
+                        this.flyio.get("/container/list?appId=" + appId).then(res => {
                             if(res.data.success){
                             this.$message('成功创建/修改容器～');
                             this.containerList = res.data.data;
@@ -131,11 +131,11 @@
             deleteItem(item,index){
                 let appId = this.$store.state.appInfo.id;
                 appId = appId || 1 ;  // 测试默认1
-                this.axios.get("/container/delete?containerId="+ item.id+'&appId='+appId).then(res => {
+                this.flyio.get("/container/delete?containerId="+ item.id+'&appId='+appId).then(res => {
                     console.log(res)
                     this.containerList.splice(index,1);
-                    this.$message(`容器${item.containerName}已删除`);   
-                });     
+                    this.$message(`容器${item.containerName}已删除`);
+                });
             },
             editItem(item){
 
@@ -154,11 +154,11 @@
         mounted() {
             let appId = this.$store.state.appInfo.id;
             appId = appId || 1 ;  // 测试默认1
-            this.axios.get("/container/list?appId=" + appId).then(res => {
+            this.flyio.get("/container/list?appId=" + appId).then(res => {
                 console.log(res)
                 if(res.data.success){
                     this.containerList = res.data.data;
-                }   
+                }
             });
         }
     }

@@ -25,9 +25,6 @@
 </template>
 
 <script>
-    //引入fly实例
-    let fly=require("flyio");
-    fly.default.config.baseURL="http://101.132.101.215:7700";
     export default {
         name: "ContainerTemplate",
         data() {
@@ -44,7 +41,7 @@
         methods: {
             onSubmit() {
                  console.log('submit!');
-                fly.post("/container/downloadContainerTemplate", this.form
+                this.flyio.post("/container/downloadContainerTemplate", this.form
                 ,{
                     responseType:'blob'//服务器返回的数据类型
                 }).then((res)=>{
