@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import ElementUI from 'element-ui'
-// import { Message } from 'element-ui'; 
+import { Message } from 'element-ui';
 import './styles.scss'
 import './plugins/element.js'
 
@@ -29,13 +29,13 @@ new Vue({
 }).$mount('#app');
 
 // 请求返回拦截，封装公共处理逻辑
-// axios.interceptors.response.use((response) => {
-//   if (response.data.success === true) {
-//     return response.data.data;
-//   }
-//   // Message.warning("错误信息：" + response.data.message);
-//   return Promise.reject(response.data.msg);
-// }, (error) => {
-//   Message.error(error.toString());
-//   return Promise.reject(error);
-// });
+axios.interceptors.response.use((response) => {
+  if (response.data.success === true) {
+    return response.data.data;
+  }
+  // Message.warning("错误信息：" + response.data.message);
+  return Promise.reject(response.data.msg);
+}, (error) => {
+  Message.error(error.toString());
+  return Promise.reject(error);
+});
