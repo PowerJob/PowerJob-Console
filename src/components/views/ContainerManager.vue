@@ -10,6 +10,8 @@
                 <div class="containerText"><span>容器名称：</span> <span class='value'>{{item.containerName}}</span></div>
                 <div class="containerText"><span>地址类型：</span> <span class='value'>{{item.sourceType}}</span></div>
                 <div class="containerText"><span>文件版本：</span> <span class='value'>{{item.version}}</span></div>
+                <div class="containerText"><span>部署日期：</span> <span class='value'>{{item.lastDeployTime}}</span></div>
+                <div class="containerText"><span>当前状态：</span> <span class='value'>{{item.status}}</span></div>
                 <div style="width:240px;margin:0 auto">
                     <div class="btnWrap"><el-button type="primary" @click="1">部署</el-button></div>
                     <div class="btnWrap"><el-button type="primary" @click="editItem(item,key)">编辑</el-button></div>
@@ -105,7 +107,7 @@
                }
                else{
                    data.sourceInfo = this.sourceInfo;
-                   data.sourceType = 'JarFile'
+                   data.sourceType = 'FatJar'
                }
                this.flyio.post("container/save",data).then(res=>{
                    console.log(res);

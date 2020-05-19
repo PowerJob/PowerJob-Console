@@ -5,6 +5,7 @@ import { Message } from 'element-ui';
 import './styles.scss'
 import './plugins/element.js'
 
+// axios 负责统一拦截处理 ResultDTO，fly 负责处理不需要拦截的请求
 import axios from 'axios';
 import flyio from 'flyio';
 import router from "./router";
@@ -13,7 +14,7 @@ import common from "./common";
 
 Vue.use(ElementUI);
 
-let baseURL = "http://101.132.101.215:7700";
+let baseURL = "http://localhost:7700";
 let timeout = 5000;
 
 Vue.prototype.common = common;
