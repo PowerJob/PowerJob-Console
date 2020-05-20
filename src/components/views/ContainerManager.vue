@@ -67,11 +67,16 @@
                     </el-form-item>
                 </el-form>
             </el-dialog>
+            <el-dialog title="部署日志" :visible.sync="arrangeVisible" v-on:close="closeArrange"  >
+                <h4 v-for="log in logs" :key="log">{{log}}</h4>
+            </el-dialog>
     </div>
 
 </template>
 
 <script>
+    let ws;
+
     export default {
         name: "ContainerManager",
         data() {
@@ -90,13 +95,15 @@
                 id:'',
                 appId:this.$store.state.appInfo.id,
                 dialogVisible:false,
+                arrangeVisible:false,
                 containerList:[],
+                logs:[],
             }
         },
         methods: {
             onSubmit() {
                 let data = {
-                    appId:1, //this.appId
+                    appId:this.appId,
                     containerName :this.form.containerName,
                     status:"ENABLE",
                     id:this.id,
@@ -110,11 +117,8 @@
                    data.sourceType = 'FatJar'
                }
                this.flyio.post("container/save",data).then(res=>{
-                   console.log(res);
                    if(res.data.success){
-                       console.log(1);
                         let appId = this.$store.state.appInfo.id;
-                        appId = appId || 1 ;  // 测试默认1
                         this.flyio.get("/container/list?appId=" + appId).then(res => {
                             if(res.data.success){
                             this.$message('成功创建/修改容器～');
@@ -139,7 +143,6 @@
             },
             deleteItem(item,index){
                 let appId = this.$store.state.appInfo.id;
-                appId = appId || 1 ;  // 测试默认1
                 this.flyio.get("/container/delete?containerId="+ item.id+'&appId='+appId).then(res => {
                     console.log(res)
                     this.containerList.splice(index,1);
@@ -147,7 +150,6 @@
                 });
             },
             editItem(item){
-
                 if(item.sourceType == 'Git'){
                     this.form.sourceType ='Git';
                     this.gitForm = JSON.parse(item.sourceInfo);
@@ -158,11 +160,34 @@
                 this.form.containerName = item.containerName;
                 this.id = item.id;
                 this.dialogVisible = true;
+            },
+            arrangeItem(item){
+                let wsBase = "ws://101.132.101.215:7700/container/deploy/";
+                let wsUrl = wsBase + item.containerName;
+                ws = new WebSocket(wsUrl);
+                ws.onopen = ()=> { 
+                    this.arrangeVisible = true;
+                        console.log("Connection open ..."); 
+                        ws.send("Hello WebSockets!");
+                    };
+                
+                ws.onmessage = (evt)=> {
+                    console.log( "Received Message: " + evt.data  );
+                    this.logs.push(evt.data);
+                };
+
+                ws.onclose = ()=>{
+                    console.log(this.logs)
+                    console.log("Connection closed.");
+                };      
+            },
+            closeArrange(){
+                ws.close();
+                this.logs = [];
             }
         },
         mounted() {
             let appId = this.$store.state.appInfo.id;
-            appId = appId || 1 ;  // 测试默认1
             this.flyio.get("/container/list?appId=" + appId).then(res => {
                 console.log(res)
                 if(res.data.success){
@@ -218,5 +243,8 @@
       display: inline-block;
       max-width: 200px;
       overflow:hidden;
+  }
+  .el-dialog{
+      height: 100vh;
   }
 </style>
