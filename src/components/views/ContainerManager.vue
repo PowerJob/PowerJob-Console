@@ -7,6 +7,7 @@
         </div>
         <div class="wrapper">
             <div v-for="(item,key) in containerList" :key="key" class="item">
+                <div class="containerText"><span>容器ID：</span><span class='value'>{{item.id}}</span></div>
                 <div class="containerText"><span>容器名称：</span><span class='value'>{{item.containerName}}</span></div>
                 <div class="containerText"><span>地址类型：</span><span class='value'>{{item.sourceType}}</span></div>
                 <div class="containerText"><span>文件版本：</span><span class='value'>{{item.version}}</span></div>
@@ -33,7 +34,7 @@
                     <el-form-item label="地址类型">
                         <el-radio-group v-model="form.sourceType">
                         <el-radio label="Git"></el-radio>
-                        <el-radio label="fatJar"></el-radio>
+                        <el-radio label="FatJar"></el-radio>
                         </el-radio-group>
                     </el-form-item>
                 <el-form  v-if="form.sourceType=='Git'" ref="gitform" :model="gitForm" label-width="150px" class="gitTable" label-position='left'>
@@ -50,12 +51,12 @@
                         <el-input v-model="gitForm.password"></el-input>
                     </el-form-item>
                 </el-form>
-                <el-form-item v-if="form.sourceType=='fatJar'">
+                <el-form-item v-if="form.sourceType=='FatJar'">
                     <el-upload
                         class="upload-demo"
                         drag
                         :on-success="onSuccess"
-                        action="http://101.132.101.215:7700/container/jarUpload"
+                        action="http://localhost:7700/container/jarUpload"
                         multiple>
                     <i class="el-icon-upload"></i>
                     <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -128,7 +129,7 @@
                             this.gitForm = {};
                             this.sourceInfo = '';
                             this.id = '';
-                            
+
                             this.containerList = res.data.data;
                         }
                      });
@@ -155,22 +156,22 @@
                     this.gitForm = JSON.parse(item.sourceInfo);
                 }
                 else{
-                    this.form.sourceType ='fatJar';
+                    this.form.sourceType ='FatJar';
                 }
                 this.form.containerName = item.containerName;
                 this.id = item.id;
                 this.dialogVisible = true;
             },
             arrangeItem(item){
-                let wsBase = "ws://101.132.101.215:7700/container/deploy/";
-                let wsUrl = wsBase + item.containerName;
+                let wsBase = "ws://localhost:7700/container/deploy/";
+                let wsUrl = wsBase + item.id;
                 ws = new WebSocket(wsUrl);
-                ws.onopen = ()=> { 
+                ws.onopen = ()=> {
                     this.arrangeVisible = true;
-                        console.log("Connection open ..."); 
+                        console.log("Connection open ...");
                         ws.send("Hello WebSockets!");
                     };
-                
+
                 ws.onmessage = (evt)=> {
                     console.log( "Received Message: " + evt.data  );
                     this.logs.push(evt.data);
@@ -179,7 +180,7 @@
                 ws.onclose = ()=>{
                     console.log(this.logs)
                     console.log("Connection closed.");
-                };      
+                };
             },
             closeArrange(){
                 ws.close();

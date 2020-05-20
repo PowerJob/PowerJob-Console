@@ -263,7 +263,7 @@
                 // 时间表达式选择类型
                 timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIX_RATE", label: "固定频率（单位毫秒）"}, {key: "FIX_DELAY", label: "固定延迟（单位毫秒）"} ],
                 // 处理器类型
-                processorTypeOptions: [{key: "EMBEDDED_JAVA", label: "内置JAVA处理器"}, {key: "SHELL", label: "Shell脚本处理器"}, {key: "PYTHON", label: "Python处理器"}],
+                processorTypeOptions: [{key: "EMBEDDED_JAVA", label: "内置JAVA处理器"}, {key: "JAVA_CONTAINER", label: "JAVA容器"}, {key: "SHELL", label: "Shell脚本处理器"}, {key: "PYTHON", label: "Python处理器"}],
                 // 执行方式类型
                 executeTypeOptions: [{key: "STANDALONE", label: "单机执行"}, {key: "BROADCAST", label: "广播执行"},  {key: "MAP", label: "Map执行"}, {key: "MAP_REDUCE", label: "MapReduce执行"}],
                 // 用户列表
