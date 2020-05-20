@@ -7,14 +7,14 @@
         </div>
         <div class="wrapper">
             <div v-for="(item,key) in containerList" :key="key" class="item">
-                <div class="containerText"><span>容器名称：</span> <span class='value'>{{item.containerName}}</span></div>
-                <div class="containerText"><span>地址类型：</span> <span class='value'>{{item.sourceType}}</span></div>
-                <div class="containerText"><span>文件版本：</span> <span class='value'>{{item.version}}</span></div>
-                <div class="containerText"><span>部署日期：</span> <span class='value'>{{item.lastDeployTime}}</span></div>
-                <div class="containerText"><span>当前状态：</span> <span class='value'>{{item.status}}</span></div>
+                <div class="containerText"><span>容器名称：</span><span class='value'>{{item.containerName}}</span></div>
+                <div class="containerText"><span>地址类型：</span><span class='value'>{{item.sourceType}}</span></div>
+                <div class="containerText"><span>文件版本：</span><span class='value'>{{item.version}}</span></div>
+                <div class="containerText"><span>部署日期：</span><span class='value'>{{item.lastDeployTime}}</span></div>
+                <div class="containerText"><span>当前状态：</span><span class='value'>{{item.status}}</span></div>
                 <div style="width:240px;margin:0 auto">
-                    <div class="btnWrap"><el-button type="primary" @click="1">部署</el-button></div>
-                    <div class="btnWrap"><el-button type="primary" @click="editItem(item,key)">编辑</el-button></div>
+                    <div class="btnWrap"><el-button type="primary" @click="arrangeItem(item)">部署</el-button></div>
+                    <div class="btnWrap"><el-button type="primary" @click="editItem(item)">编辑</el-button></div>
                     <div class="btnWrap"><el-button type="primary" @click="deleteItem(item,key)">删除</el-button></div>
                     <div class="btnWrap"><el-button type="primary" @click="1">机器列表</el-button></div>
             </div>
@@ -118,6 +118,13 @@
                         this.flyio.get("/container/list?appId=" + appId).then(res => {
                             if(res.data.success){
                             this.$message('成功创建/修改容器～');
+                            // 恢复默认表单
+                            this.dialogVisible = false;
+                            this.form.containerName = '';
+                            this.gitForm = {};
+                            this.sourceInfo = '';
+                            this.id = '';
+                            
                             this.containerList = res.data.data;
                         }
                      });
@@ -141,7 +148,7 @@
             },
             editItem(item){
 
-                if(item.sourceType == '2'){
+                if(item.sourceType == 'Git'){
                     this.form.sourceType ='Git';
                     this.gitForm = JSON.parse(item.sourceInfo);
                 }
