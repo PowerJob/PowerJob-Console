@@ -116,11 +116,11 @@
 <!-- 全局属性，解决 element-ui 的 row-class-name 不生效问题 -->
 <style>
     .el-table .warning-row {
-        color:red
+        color: darkgoldenrod;
     }
 
     .el-table .success-row {
-        color: darkseagreen;
+        color: green;
     }
 
     .el-table .error-row {
