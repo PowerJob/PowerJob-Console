@@ -1,7 +1,7 @@
 <template>
     <div id="navbar">
         <div id="logo_content">
-            <p>OhMyScheduler</p>
+            <img src="../../assets/oms-logo.png" />
         </div>
 
         <div id="right_content">
@@ -23,17 +23,20 @@
 <style scoped>
     #navbar {
         width: 100%;
-        height: 50px;
+        height: 80px;
         display: flex;
-        background-color: #ffffff;
+        background-color: #000;
         /* 子容器沿主轴均匀分布，位于首末两端的子容器与父容器相切 */
         justify-content: space-between;
+        border-bottom:2px solid #dddfe6;
     }
 
     #logo_content {
-        width: 200px;
+        padding-right: 10px;
+        box-sizing: border-box;
+        width: 220px;
         height: 100%;
-        background-color: #409EFF;
+        background-color: #000000;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -46,8 +49,6 @@
     }
 
     img {
-        width: 45px;
-        height: 45px;
-        margin-left: 10px;
+        width: 100%;
     }
 </style>

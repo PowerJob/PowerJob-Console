@@ -7,12 +7,12 @@
         </div>
         <div class="wrapper">
             <div v-for="(item,key) in containerList" :key="key" class="item">
-                <div class="containerText"><span>容器ID：</span><span class='value'>{{item.id}}</span></div>
-                <div class="containerText"><span>容器名称：</span><span class='value'>{{item.containerName}}</span></div>
-                <div class="containerText"><span>地址类型：</span><span class='value'>{{item.sourceType}}</span></div>
-                <div class="containerText"><span>文件版本：</span><span class='value'>{{item.version}}</span></div>
-                <div class="containerText"><span>部署日期：</span><span class='value'>{{item.lastDeployTime}}</span></div>
-                <div class="containerText"><span>当前状态：</span><span class='value'>{{item.status}}</span></div>
+                <div class="containerText"><span class='value'>容器ID：</span><span class='value'>{{item.id}}</span></div>
+                <div class="containerText"><span class='value'> 容器名称：</span><span class='value'>{{item.containerName}}</span></div>
+                <div class="containerText"><span class='value'>地址类型：</span><span class='value'>{{item.sourceType}}</span></div>
+                <div class="containerText"><span class='value'>文件版本：</span><span class='value'>{{item.version}}</span></div>
+                <div class="containerText"><span class='value'>部署日期：</span><span class='value'>{{item.lastDeployTime}}</span></div>
+                <div class="containerText"><span class='value'>当前状态：</span><span class='value'>{{item.status}}</span></div>
                 <div style="width:240px;margin:0 auto">
                     <div class="btnWrap"><el-button type="primary" @click="arrangeItem(item)">部署</el-button></div>
                     <div class="btnWrap"><el-button type="primary" @click="editItem(item)">编辑</el-button></div>

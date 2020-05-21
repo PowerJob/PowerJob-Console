@@ -17,7 +17,10 @@
                 </el-form>
             </el-col>
             <el-col :span="4">
-                <el-button type="primary" @click="listInstanceInfos">刷新</el-button>
+
+                <div style="float:right;padding-right:10px">
+                <el-button type="primary" @click="onClickNewJob" >刷新状态</el-button>
+                </div>
             </el-col>
         </el-row>
 
@@ -27,7 +30,7 @@
                 <el-table-column prop="jobId" label="任务ID"/>
                 <el-table-column prop="jobName" label="任务名称"/>
                 <el-table-column prop="instanceId" label="实例ID"/>
-                <el-table-column prop="statusStr" label="状态"/>
+                <el-table-column prop="statusStr" label="状态" />
                 <el-table-column prop="actualTriggerTime" label="触发时间"/>
                 <el-table-column prop="finishedTime" label="结束时间"/>
 

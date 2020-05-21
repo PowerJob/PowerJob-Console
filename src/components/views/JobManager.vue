@@ -22,9 +22,9 @@
 
             <!-- 右侧新增任务按钮，占地面积 4/24 -->
             <el-col :span="4">
-                <el-row>
-                    <el-button type="success" @click="onClickNewJob">新建任务</el-button>
-                </el-row>
+                <div style="float:right;padding-right:10px">
+                <el-button type="primary" @click="onClickNewJob" >新建任务</el-button>
+                </div>
             </el-col>
         </el-row>
 

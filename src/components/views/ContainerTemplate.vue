@@ -1,27 +1,29 @@
 <template>
-    <el-form ref="form" :model="form" label-width="150px" class="genTable" label-position='left'>
-        <el-form-item label="Group">
-            <el-input v-model="form.group"></el-input>
-        </el-form-item>
-        <el-form-item label="Artifact">
-            <el-input v-model="form.artifact"></el-input>
-        </el-form-item>
-        <el-form-item label="Name">
-            <el-input v-model="form.name"></el-input>
-        </el-form-item>
-        <el-form-item label="Package name">
-            <el-input v-model="form.packageName"></el-input>
-        </el-form-item>
-        <el-form-item label="Java Version">
-            <el-radio-group v-model="form.javaVersion">
-            <el-radio label="8"></el-radio>
-            <el-radio label= "11"></el-radio>
-            </el-radio-group>
-        </el-form-item>
-        <el-form-item>
-            <el-button type="primary" @click="onSubmit">Generate</el-button>
-        </el-form-item>
-    </el-form>
+    <el-card class="box-card">
+        <el-form ref="form" :model="form" label-width="150px" class="genTable" label-position='left'>
+            <el-form-item label="Group">
+                <el-input v-model="form.group"></el-input>
+            </el-form-item>
+            <el-form-item label="Artifact">
+                <el-input v-model="form.artifact"></el-input>
+            </el-form-item>
+            <el-form-item label="Name">
+                <el-input v-model="form.name"></el-input>
+            </el-form-item>
+            <el-form-item label="Package name">
+                <el-input v-model="form.packageName"></el-input>
+            </el-form-item>
+            <el-form-item label="Java Version">
+                <el-radio-group v-model="form.javaVersion">
+                <el-radio label="8"></el-radio>
+                <el-radio label= "11"></el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit">Generate</el-button>
+            </el-form-item>
+        </el-form>
+    </el-card>
 </template>
 
 <script>

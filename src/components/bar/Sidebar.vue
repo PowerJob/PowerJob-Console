@@ -4,9 +4,9 @@
 -->
 <template>
     <div id="sidebar">
-        <el-container style="width:200px">
+        <el-container class="left-container">
             <!--侧边栏容器-->
-            <el-aside width="200px">
+            <el-aside width="100%">
                 <!-- 菜单 -->
                 <el-menu :router="true" :default-active="default_active_index">
                     <!-- vue router，实现点击跳转 -->
@@ -70,19 +70,21 @@
     .el-menu {
         text-align: left;
     }
+    #sidebar{
+        display: flex;
+    }
+    .left-container{
+        flex-basis:220px;
+        flex-grow: 0;
+        flex-shrink: 0;
+    }
     /* view */
     .wrap {
-        position: absolute;
-        left: 200px;
-        right: 0;
-        top: 80px;
-        bottom: 0;
-        margin: auto;
-        background: #ffffff;
-        width: calc(100% - 300px);
-        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-        overflow-y: scroll;
-        transition: 1s;
+        flex:1;
+        background: #fff;
+        box-sizing: border-box;
+        padding: 20px;
+        min-height: 88vh;
     }
     .wrap::-webkit-scrollbar {
         /*滚动条整体样式*/
