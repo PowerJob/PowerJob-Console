@@ -14,7 +14,6 @@ import common from "./common";
 
 Vue.use(ElementUI);
 
-// let baseURL = "http://101.132.101.215:7700";
 let baseURL = "http://localhost:7700";
 let timeout = 5000;
 

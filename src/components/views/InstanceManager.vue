@@ -19,7 +19,7 @@
             <el-col :span="4">
 
                 <div style="float:right;padding-right:10px">
-                <el-button type="primary" @click="onClickNewJob" >刷新状态</el-button>
+                <el-button type="primary" @click="listInstanceInfos" >刷新状态</el-button>
                 </div>
             </el-col>
         </el-row>
