@@ -34,7 +34,7 @@
                     artifact: '',
                     name: '',
                     packageName: '',
-                    javaVersion: 8,
+                    javaVersion: "",
                 }
             }
         },

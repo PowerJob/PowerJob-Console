@@ -14,7 +14,7 @@ import common from "./common";
 
 Vue.use(ElementUI);
 
-let baseURL = "http://localhost:7700";
+let baseURL = "http://101.132.101.215:7700";
 let timeout = 5000;
 
 Vue.prototype.common = common;
@@ -46,3 +46,5 @@ axios.interceptors.response.use((response) => {
   Message.error(error.toString());
   return Promise.reject(error);
 });
+
+export default baseURL;

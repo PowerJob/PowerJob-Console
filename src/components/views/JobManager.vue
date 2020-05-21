@@ -81,7 +81,7 @@
                 </el-form-item>
                 <el-form-item label="定时信息">
                     <el-row>
-                        <el-col :span="5">
+                        <el-col :span="8">
                             <el-select v-model="modifiedJobForm.timeExpressionType" placeholder="时间表达式类型">
                                 <el-option
                                         v-for="item in timeExpressionTypeOptions"
@@ -91,7 +91,7 @@
                                 </el-option>
                             </el-select>
                         </el-col>
-                        <el-col :span="19">
+                        <el-col :span="16">
                             <el-input v-model="modifiedJobForm.timeExpression" placeholder="CRON填写CRON表达式，秒级任务填写整数，API无需填写" />
                         </el-col>
                     </el-row>
@@ -109,7 +109,7 @@
                             </el-select>
                         </el-col>
 
-                        <el-col :span="5">
+                        <el-col :span="6">
                             <el-select v-model="modifiedJobForm.processorType" placeholder="处理器类型">
                                 <el-option
                                         v-for="item in processorTypeOptions"
@@ -120,8 +120,8 @@
                             </el-select>
                         </el-col>
 
-                        <el-col :span="14">
-                            <el-input v-model="modifiedJobForm.processorInfo" placeholder="内置Java填写处理器的全限定类名" />
+                        <el-col :span="13">
+                            <el-input v-model="modifiedJobForm.processorInfo" :placeholder="verifyPlaceholder(modifiedJobForm.processorType)" />
                         </el-col>
                     </el-row>
                 </el-form-item>
@@ -348,6 +348,16 @@
             onClickReset() {
                 this.jobQueryContent.keyword = undefined;
                 this.jobQueryContent.jobId = undefined;
+            },
+            verifyPlaceholder(processorType){
+                let res;
+                switch(processorType){
+                    case "EMBEDDED_JAVA": res =  "全限定类名，eg：com.github.kfcfans.DemoProcessor";break
+                    case "JAVA_CONTAINER": res =  "容器ID#全限定类名，eg：1#com.github.kfcfans.DemoProcessor";break
+                    case "SHELL": res =  "SHELL脚本文件内容";break
+                    case "PYTHON" : res = "Python脚本文件内容";
+                }
+                return  res;
             }
         },
         mounted() {

@@ -17,7 +17,7 @@
                     <div class="btnWrap"><el-button type="primary" @click="arrangeItem(item)">部署</el-button></div>
                     <div class="btnWrap"><el-button type="primary" @click="editItem(item)">编辑</el-button></div>
                     <div class="btnWrap"><el-button type="primary" @click="deleteItem(item,key)">删除</el-button></div>
-                    <div class="btnWrap"><el-button type="primary" @click="1">机器列表</el-button></div>
+                    <div class="btnWrap"><el-button type="primary" @click="listOfItem(item)">机器列表</el-button></div>
             </div>
         </div>
         </div>
@@ -56,7 +56,7 @@
                         class="upload-demo"
                         drag
                         :on-success="onSuccess"
-                        action="http://localhost:7700/container/jarUpload"
+                        :action="`${baseUrl}/container/jarUpload`"
                         multiple>
                     <i class="el-icon-upload"></i>
                     <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -68,7 +68,7 @@
                     </el-form-item>
                 </el-form>
             </el-dialog>
-            <el-dialog title="部署日志" :visible.sync="arrangeVisible" v-on:close="closeArrange"  >
+            <el-dialog :title="arrangeTitle" :visible.sync="arrangeVisible" v-on:close="closeArrange"  >
                 <h4 v-for="log in logs" :key="log">{{log}}</h4>
             </el-dialog>
     </div>
@@ -76,8 +76,9 @@
 </template>
 
 <script>
+    import baseUrl from '../../main';
+ 
     let ws;
-
     export default {
         name: "ContainerManager",
         data() {
@@ -96,13 +97,16 @@
                 id:'',
                 appId:this.$store.state.appInfo.id,
                 dialogVisible:false,
+                arrangeTitle:'',
                 arrangeVisible:false,
                 containerList:[],
                 logs:[],
+                baseUrl :baseUrl
             }
         },
         methods: {
             onSubmit() {
+                // 接口参数
                 let data = {
                     appId:this.appId,
                     containerName :this.form.containerName,
@@ -129,7 +133,7 @@
                             this.gitForm = {};
                             this.sourceInfo = '';
                             this.id = '';
-
+                            // 刷新容器表单
                             this.containerList = res.data.data;
                         }
                      });
@@ -139,6 +143,7 @@
                    }
                });
             },
+            // 文件上传成功后 修改来源信息
             onSuccess(response){
                 this.sourceInfo = response.data;
             },
@@ -163,28 +168,41 @@
                 this.dialogVisible = true;
             },
             arrangeItem(item){
-                let wsBase = "ws://localhost:7700/container/deploy/";
+                let wsBase = baseUrl.replace("http","ws") + "/container/deploy/";
                 let wsUrl = wsBase + item.id;
                 ws = new WebSocket(wsUrl);
+               
                 ws.onopen = ()=> {
+                    this.arrangeTitle = "机器部署";
                     this.arrangeVisible = true;
                         console.log("Connection open ...");
                         ws.send("Hello WebSockets!");
                     };
 
                 ws.onmessage = (evt)=> {
-                    console.log( "Received Message: " + evt.data  );
                     this.logs.push(evt.data);
                 };
 
                 ws.onclose = ()=>{
-                    console.log(this.logs)
                     console.log("Connection closed.");
                 };
             },
+            // 关闭部署页面时 关闭ws避免dialog内的信息有上台机器信息
             closeArrange(){
                 ws.close();
                 this.logs = [];
+            },
+            listOfItem(item){
+                let appId = this.$store.state.appInfo.id;
+                this.flyio.get("/container/listDeployedWorker?containerId="+ item.id+'&appId='+appId).then(res => {
+                    if(res.data.data){
+                        this.logs = res.data.data.split('\n');
+                        this.arrangeTitle = "机器列表";
+                        this.arrangeVisible = true;
+                    }
+                    // this.containerList.splice(index,1);
+                    // this.$message(`容器${item.containerName}已删除`);
+                });
             }
         },
         mounted() {
