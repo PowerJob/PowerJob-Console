@@ -6,9 +6,9 @@
     <div id="sidebar">
         <el-container class="left-container">
             <!--侧边栏容器-->
-            <el-aside width="100%">
+            <el-aside width="100%" >
                 <!-- 菜单 -->
-                <el-menu :router="true" :default-active="default_active_index">
+                <el-menu :router="true" :default-active="default_active_index" class="aside">
                     <!-- vue router，实现点击跳转 -->
                     <el-menu-item index="/oms/home">
                         <template slot="title">
@@ -72,6 +72,9 @@
     }
     #sidebar{
         display: flex;
+    }
+    .aside{
+        height: 100%;
     }
     .left-container{
         flex-basis:220px;

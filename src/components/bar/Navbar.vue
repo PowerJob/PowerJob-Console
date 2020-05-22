@@ -50,5 +50,6 @@
 
     img {
         width: 100%;
+        margin-left:8px;
     }
 </style>

@@ -6,8 +6,8 @@
             <el-col :span="6">
                 <div class="wrap">
                     <div class="grid-content bg-purple">
-                        <div class="text">任务总数</div>
-                        <div class="text">{{systemInfo.jobCount}}</div>
+                        <div class="text mTitle">任务总数</div>
+                        <div class="text mText">{{systemInfo.jobCount}}</div>
                     </div>
                     <i class="el-icon-orange"/>
                 </div>
@@ -15,7 +15,7 @@
             <el-col :span="6">
                 <div class="wrap">
                     <div class="grid-content bg-purple">
-                        <div class="text">当前运行实例数</div>
+                        <div class="text mTitle">当前运行实例数</div>
                         <div class="text">{{systemInfo.runningInstanceCount}}</div>
                     </div>
                     <i class="el-icon-loading"/>
@@ -24,7 +24,7 @@
             <el-col :span="6">
                 <div class="wrap">
                     <div class="grid-content bg-purple">
-                        <div class="text">近期失败任务数</div>
+                        <div class="text mTitle">近期失败任务数</div>
                         <div class="text">{{systemInfo.failedInstanceCount}}</div>
                     </div>
                     <i class="el-icon-bell"/>
@@ -33,7 +33,7 @@
             <el-col :span="6">
                 <div class="wrap">
                     <div class="grid-content bg-purple">
-                        <div class="text">集群机器数</div>
+                        <div class="text mTitle">集群机器数</div>
                         <div class="text">{{activeWorkerCount}}</div>
                     </div>
                     <i class="el-icon-cpu"/>
@@ -109,6 +109,11 @@
         font-size: 1.5rem;
         font-weight: bolder;
         height: 131px;
+    }
+    .mTitle{
+        font-size: 20px;
+        color:#0f0f0fad;
+        margin-bottom: 8px;
     }
 
 </style>

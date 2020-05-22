@@ -31,26 +31,25 @@
         <!--第二行，任务数据表格-->
         <el-row>
             <el-table :data="jobInfoPageResult.data" style="width: 100%">
-                <el-table-column prop="id" label="任务ID"/>
-                <el-table-column prop="jobName" label="任务名称"/>
-                <el-table-column label="定时信息">
+                <el-table-column prop="id" label="任务ID" width="80"/>
+                <el-table-column prop="jobName" label="任务名称" />
+                <el-table-column label="定时信息" > 
                     <template slot-scope="scope">
-                        {{scope.row.timeExpressionType}} <br>
-                        {{scope.row.timeExpression}}
+                        {{scope.row.timeExpressionType}}  {{scope.row.timeExpression}}
                     </template>
                 </el-table-column>
                 <el-table-column prop="executeType" label="执行类型"/>
                 <el-table-column prop="processorType" label="处理器类型"/>
-                <el-table-column label="状态">
+                <el-table-column label="状态" width="80">
                     <template slot-scope="scope">
                         <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="changeJobStatus(scope.row)"/>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="240px">
+                <el-table-column label="操作" width="300">
                     <template slot-scope="scope">
-                        <el-button size="mini" @click="onClickModify(scope.row)">编辑</el-button>
-                        <el-button size="mini" @click="onClickRun(scope.row)">运行</el-button>
-                        <el-button size="mini" type="danger" @click="onClickDeleteJob(scope.row)">删除</el-button>
+                        <el-button size="medium" @click="onClickModify(scope.row)">编辑</el-button>
+                        <el-button size="medium" @click="onClickRun(scope.row)">运行</el-button>
+                        <el-button size="medium" type="danger" @click="onClickDeleteJob(scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>

@@ -1,7 +1,7 @@
 <template>
     <div id="welcome">
 
-
+        <!-- <h3 class="topBar"><span class="left">OhMy</span><span class="right">Scheduler</span></h3> -->
         <el-button type="primary" plain @click="appRegisterFormVisible = true">应用注册</el-button>
 
         <div id="entrance">
@@ -26,8 +26,8 @@
 
         <el-button type="success" plain @click="userRegisterFormVisible = true">用户注册</el-button>
 
-        <el-dialog title="应用注册" :visible.sync="appRegisterFormVisible">
-            <el-form :model="appRegisterForm">
+        <el-dialog title="应用注册" :visible.sync="appRegisterFormVisible" width="35%" >
+            <el-form :model="appRegisterForm" style="margin:0 5px">
 
                 <el-form-item label="应用名称">
                     <el-input v-model="appRegisterForm.appName"/>
@@ -44,8 +44,8 @@
             </el-form>
         </el-dialog>
 
-        <el-dialog title="用户注册" :visible.sync="userRegisterFormVisible">
-            <el-form :model="userRegisterForm">
+        <el-dialog title="用户注册" :visible.sync="userRegisterFormVisible" width="35%" >
+            <el-form :model="userRegisterForm" style="margin:0 5px">
 
                 <el-form-item label="姓名">
                     <el-input v-model="userRegisterForm.username"/>
@@ -140,7 +140,7 @@
     #welcome {
         width: 100%;
         height: 100%;
-        background-image: url("../assets/welcome_background.svg");
+        background-image: url("../assets/banner.jpg");
 
         /*
         flex布局：
@@ -155,9 +155,22 @@
         justify-content: center;
         align-items: center;
     }
-
+    .topBar{
+        position: fixed;
+        left: 30px;
+        top:10px;
+        color: #fff;
+    }
+    .right{
+        background-color: #ff9900;
+        color:#000;
+        display: inline-block;
+        box-sizing: border-box;
+        margin-left: 5px;
+        border-radius: 5px;
+        padding: 5px;
+    }
     #entrance {
         margin: 20px;
     }
-
 </style>

@@ -26,6 +26,7 @@
                 title="新增容器"
                 :visible.sync="dialogVisible"
                 width="50%"
+                v-on:close="closeEdit"
                 :before-close="handleClose">
                 <el-form ref="form" :model="form" label-width="150px" class="genTable" label-position='left'>
                     <el-form-item label="Container Name">
@@ -55,6 +56,7 @@
                     <el-upload
                         class="upload-demo"
                         drag
+                        :file-list = "fileList"
                         :on-success="onSuccess"
                         :action="`${baseUrl}/container/jarUpload`"
                         multiple>
@@ -64,7 +66,7 @@
                     </el-upload>
                 </el-form-item>
                 <el-form-item>
-                        <el-button type="primary" @click="onSubmit">Save</el-button>
+                        <el-button type="primary" @click="onSubmit" :disabled="form.sourceType=='FatJar' && !this.sourceInfo">Save</el-button>
                     </el-form-item>
                 </el-form>
             </el-dialog>
@@ -101,7 +103,8 @@
                 arrangeVisible:false,
                 containerList:[],
                 logs:[],
-                baseUrl :baseUrl
+                baseUrl :baseUrl,
+                fileList: []
             }
         },
         methods: {
@@ -191,6 +194,10 @@
             closeArrange(){
                 ws.close();
                 this.logs = [];
+            },
+            closeEdit(){
+                this.sourceInfo = '';
+                this.fileList  = [];
             },
             listOfItem(item){
                 let appId = this.$store.state.appInfo.id;

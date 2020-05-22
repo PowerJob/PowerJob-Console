@@ -27,18 +27,18 @@
         <!-- 第二行，表单 -->
         <el-row>
             <el-table :data="instancePageResult.data" style="width: 100%" :row-class-name="instanceTableRowClassName">
-                <el-table-column prop="jobId" label="任务ID"/>
+                <el-table-column prop="jobId" label="任务ID" width="80"/>
                 <el-table-column prop="jobName" label="任务名称"/>
                 <el-table-column prop="instanceId" label="实例ID"/>
-                <el-table-column prop="statusStr" label="状态" />
+                <el-table-column prop="statusStr" label="状态" width="80" />
                 <el-table-column prop="actualTriggerTime" label="触发时间"/>
                 <el-table-column prop="finishedTime" label="结束时间"/>
 
-                <el-table-column label="操作" width="240px">
+                <el-table-column label="操作" width="300">
                     <template slot-scope="scope">
-                        <el-button size="mini" @click="onClickShowDetail(scope.row)">详情</el-button>
-                        <el-button size="mini" @click="onClickShowLog(scope.row)">日志</el-button>
-                        <el-button size="mini" @click="onClickStop(scope.row)">停止</el-button>
+                        <el-button size="medium" @click="onClickShowDetail(scope.row)">详情</el-button>
+                        <el-button size="medium" @click="onClickShowLog(scope.row)">日志</el-button>
+                        <el-button size="medium" @click="onClickStop(scope.row)">停止</el-button>
                     </template>
                 </el-table-column>
 
@@ -58,38 +58,38 @@
         </el-row>
 
         <!--  任务实例详情弹出框 -->
-        <el-dialog title="任务详情" :visible.sync="instanceDetailVisible">
-            <el-row>
+        <el-dialog title="任务详情" :visible.sync="instanceDetailVisible" >
+            <el-row style="margin-top:-20px">
                 <el-col :span="8">
-                    状态: {{instanceDetail.status}}
+                    状态: <span class='title' >{{instanceDetail.status}}</span>
                 </el-col>
                 <el-col :span="16">
-                    运行次数：{{instanceDetail.runningTimes}}
+                    运行次数：<span class='title' >{{instanceDetail.runningTimes}}</span>
                 </el-col>
             </el-row>
             <el-row>
-                <el-col :span="24">
-                    TaskTracker地址: {{instanceDetail.taskTrackerAddress}}
+                <el-col :span="24" >
+                    TaskTracker地址: <span class='title' > {{instanceDetail.taskTrackerAddress}}</span>
                 </el-col>
             </el-row>
             <el-row>
                 <el-col :span="8">
-                    开始时间: {{this.common.timestamp2Str(instanceDetail.actualTriggerTime)}}
+                    开始时间: <span class='title' > {{this.common.timestamp2Str(instanceDetail.actualTriggerTime)}}</span>
                 </el-col>
                 <el-col :span="8">
-                    结束时间: {{this.common.timestamp2Str(instanceDetail.finishedTime)}}
+                    结束时间: <span class='title' >{{this.common.timestamp2Str(instanceDetail.finishedTime)}}</span>
                 </el-col>
             </el-row>
             <el-row>
                 <el-col :span="24">
-                    运行结果: {{instanceDetail.result}}
+                    运行结果: <span class='title' > {{instanceDetail.result}}</span>
                 </el-col>
             </el-row>
             <el-row id="taskDetail">
-                子任务数据: {{instanceDetail.taskDetail}}
+                子任务数据: <span class='title' >{{instanceDetail.taskDetail}}</span>
             </el-row>
             <el-row>
-                最近10条秒级任务历史记录
+                <span class="title">最近10条秒级任务历史记录:</span>
                 <el-table  :data="instanceDetail.subInstanceDetails" style="width: 100%">
                     <el-table-column prop="subInstanceId" label="子实例ID" width="100"/>
                     <el-table-column prop="startTime" label="开始时间" width="160"/>
@@ -101,17 +101,17 @@
         </el-dialog>
 
         <!-- 任务运行日志弹出框 -->
-        <el-dialog title="日志" :visible.sync="instanceLogVisible" width="80%">
+        <el-dialog title="日志" :visible.sync="instanceLogVisible" width="50%">
             <el-row>
-                <el-col :span="4" :offset="20">
+                <el-col :span="4" :offset="20" style="margin-bottom:20px">
                     <el-button type="primary" size="mini" @click="onclickDownloadLog()" icon="el-icon-download">下载</el-button>
                 </el-col>
             </el-row>
             <el-row>
                 <el-col :span="24">
-                    <div style="white-space: pre-line;">
+                    <h4 style="white-space: pre-line;">
                         {{this.paginableInstanceLog.data}}
-                    </div>
+                    </h4>
                 </el-col>
             </el-row>
 
@@ -248,5 +248,13 @@
 </script>
 
 <style scoped>
-
+.el-row{
+    margin:5px 0
+}
+.title{
+    display: inline-block;
+    margin:5px 0;
+    font-size: 16px;
+    font-weight: bold;
+}
 </style>
