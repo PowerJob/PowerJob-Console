@@ -1,4 +1,6 @@
 # oms-console
+分布式调度与计算矿机——OhMyScheduler 前端页面
+项目文档：https://www.yuque.com/xp4d3o/product
 
 ## Project setup
 ```

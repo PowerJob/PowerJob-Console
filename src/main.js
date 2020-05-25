@@ -15,12 +15,13 @@ import common from "./common";
 Vue.use(ElementUI);
 
 
-let url  =  window.location.href;
-let urlSplit= url.split('//'); // str1[0]--协议头 
-let ip = urlSplit[1].split('/')[0];
-let baseURL = urlSplit[0] + '//' + ip;
+// let url  =  window.location.href;
+// let urlSplit= url.split('//'); // str1[0]--协议头
+// let ip = urlSplit[1].split('/')[0];
+// let baseURL = urlSplit[0] + '//' + ip;
 
-baseURL = "http://101.132.101.215:7700";
+// let baseURL = "http://101.132.101.215:7700";
+let baseURL = "http://localhost:7700";
 
 let timeout = 5000;
 
