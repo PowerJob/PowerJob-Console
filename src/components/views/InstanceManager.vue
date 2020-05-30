@@ -24,7 +24,13 @@
             </el-col>
         </el-row>
 
-        <!-- 第二行，表单 -->
+        <!-- 第二行，切换器 -->
+        <el-tabs type="card" v-model="instanceQueryContent.type" @tab-click="listInstanceInfos">
+            <el-tab-pane label="普通任务实例" name="NORMAL"/>
+            <el-tab-pane label="工作流任务实例" name="WORKFLOW"/>
+        </el-tabs>
+
+        <!-- 第三行，表单 -->
         <el-row>
             <el-table :data="instancePageResult.data" style="width: 100%" :row-class-name="instanceTableRowClassName">
                 <el-table-column prop="jobId" label="任务ID" width="80"/>
@@ -45,7 +51,7 @@
             </el-table>
         </el-row>
 
-        <!-- 第三行，分页插件 -->
+        <!-- 第四行，分页插件 -->
         <el-row>
             <el-col :span="24">
                 <el-pagination
@@ -139,7 +145,8 @@
                     index: 0,
                     pageSize: 10,
                     instanceId: undefined,
-                    jobId: undefined
+                    jobId: undefined,
+                    type: "NORMAL"
                 },
                 // 实例查询结果
                 instancePageResult: {

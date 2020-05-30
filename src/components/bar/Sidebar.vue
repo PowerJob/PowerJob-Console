@@ -30,9 +30,26 @@
                         <template slot="title">
                             <!-- 图标 + 文字 -->
                             <i class="el-icon-s-data"/>
-                            <span>运行状态</span>
+                            <span>任务实例</span>
                         </template>
                     </el-menu-item>
+
+                    <el-menu-item index="/oms/workflow">
+                        <template slot="title">
+                            <!-- 图标 + 文字 -->
+                            <i class="el-icon-share"/>
+                            <span>工作流管理</span>
+                        </template>
+                    </el-menu-item>
+
+                    <el-menu-item index="/oms/wfinstance">
+                        <template slot="title">
+                            <!-- 图标 + 文字 -->
+                            <i class="el-icon-s-operation"/>
+                            <span>工作流实例</span>
+                        </template>
+                    </el-menu-item>
+
 
                     <el-submenu index="/oms/">
                         <template slot="title">
