@@ -33,7 +33,7 @@
             <el-table :data="jobInfoPageResult.data" style="width: 100%">
                 <el-table-column prop="id" label="任务ID" width="80"/>
                 <el-table-column prop="jobName" label="任务名称" />
-                <el-table-column label="定时信息" > 
+                <el-table-column label="定时信息" >
                     <template slot-scope="scope">
                         {{scope.row.timeExpressionType}}  {{scope.row.timeExpression}}
                     </template>
@@ -260,7 +260,7 @@
                     data: []
                 },
                 // 时间表达式选择类型
-                timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIX_RATE", label: "固定频率（单位毫秒）"}, {key: "FIX_DELAY", label: "固定延迟（单位毫秒）"} ],
+                timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIX_RATE", label: "固定频率（单位毫秒）"}, {key: "FIX_DELAY", label: "固定延迟（单位毫秒）"}, {key: "WORKFLOW", label: "工作流"} ],
                 // 处理器类型
                 processorTypeOptions: [{key: "EMBEDDED_JAVA", label: "内置JAVA处理器"}, {key: "JAVA_CONTAINER", label: "JAVA容器"}, {key: "SHELL", label: "Shell脚本处理器"}, {key: "PYTHON", label: "Python处理器"}],
                 // 执行方式类型

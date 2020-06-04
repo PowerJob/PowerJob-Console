@@ -7,7 +7,7 @@
         <!-- 左侧搜索栏，占地面积 20/24 -->
         <el-col :span="20">
             <el-form :inline="true" :model="workflowQueryContent" class="el-form--inline">
-                <el-form-item label="任务ID">
+                <el-form-item label="工作流ID">
                     <el-input v-model="workflowQueryContent.workflowId" placeholder="工作流ID"/>
                 </el-form-item>
                 <el-form-item label="关键字">
