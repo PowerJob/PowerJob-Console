@@ -40,8 +40,36 @@
                         <el-button size="medium" @click="onClickStop(scope.row)">停止</el-button>
                     </template>
                 </el-table-column>
-
             </el-table>
+
+            <el-dialog title="工作流实例详情" :visible.sync="instanceDetailVisible" >
+                    <el-row style="margin-top:-20px">
+                        <el-col :span="8">
+                            工作流ID: <span class='title' >{{instanceTemp.workflowId}}</span>
+                        </el-col>
+                        <el-col :span="16">
+                            工作流实例ID<span class='title' >{{instanceTemp.wfInstanceId}}</span>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="24" >
+                            状态: <span class='title' > {{instanceTemp.statusStr}}</span>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="8">
+                            触发时间: <span class='title' > {{instanceTemp.actualTriggerTime}}</span>
+                        </el-col>
+                        <el-col :span="8">
+                            结束时间: <span class='title' >{{instanceTemp.finishedTime}}</span>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="24">
+                            执行结果: <span class='title' > {{instanceTemp.result}}</span>
+                        </el-col>
+                    </el-row>
+                </el-dialog>]
         </el-row>
 
         <!-- 第三行，分页插件 -->
@@ -76,7 +104,9 @@
                     pageSize: 10,
                     totalItems: 0,
                     data: []
-                }
+                },
+                instanceDetailVisible:false,
+                instanceTemp:{},
             }
         },
         methods: {
@@ -92,6 +122,8 @@
             // 查看工作流详情
             onClickShowDetail(data) {
                 console.log(data);
+                this.instanceDetailVisible = true;
+                this.instanceTemp = data;
             },
             // 停止工作流
             onClickStop(data) {

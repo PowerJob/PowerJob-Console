@@ -77,8 +77,7 @@
                 // 新建工作流对象
                 workflowObj: {
 
-                }
-
+                },
             }
         },
         methods: {
@@ -100,7 +99,7 @@
             },
             // 编辑工作流
             onClickModifyWorkflow(data) {
-                console.log(data);
+                console.log(data)
             },
             // 立即运行工作流
             onClickRunWorkflow(data) {

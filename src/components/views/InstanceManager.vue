@@ -2,7 +2,7 @@
     <div id="instance_manager">
         <!-- 第一行，搜索区 -->
         <el-row>
-            <el-col :span="20">
+            <el-col :span="22">
                 <el-form :inline="true" :model="instanceQueryContent" class="el-form--inline">
                     <el-form-item label="实例ID">
                         <el-input v-model="instanceQueryContent.instanceId" placeholder="实例ID"/>
@@ -10,13 +10,17 @@
                     <el-form-item label="任务ID">
                         <el-input v-model="instanceQueryContent.jobId" placeholder="任务ID"/>
                     </el-form-item>
+                    <el-form-item  v-if="instanceQueryContent.type == 'WORKFLOW'" label="工作实例ID">
+                        <el-input v-model="instanceQueryContent.workflowId" placeholder="工作实例ID"/>
+                    </el-form-item>
+                   
                     <el-form-item>
                         <el-button type="primary" @click="listInstanceInfos">查询</el-button>
                         <el-button type="cancel" @click = "onClickRest">重置</el-button>
                     </el-form-item>
                 </el-form>
             </el-col>
-            <el-col :span="4">
+            <el-col :span="2">
 
                 <div style="float:right;padding-right:10px">
                 <el-button type="primary" @click="listInstanceInfos" >刷新状态</el-button>
@@ -145,6 +149,7 @@
                     index: 0,
                     pageSize: 10,
                     instanceId: undefined,
+                    workflowId:undefined,
                     jobId: undefined,
                     type: "NORMAL"
                 },
