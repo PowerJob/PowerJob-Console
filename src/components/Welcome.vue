@@ -1,4 +1,4 @@
-<template>
+ <template>
     <div id="welcome">
 
         <!-- <h3 class="topBar"><span class="left">OhMy</span><span class="right">Scheduler</span></h3> -->

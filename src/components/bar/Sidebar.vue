@@ -91,7 +91,7 @@
         display: flex;
     }
     .aside{
-        height: 100%;
+        height: 100vh;
     }
     .left-container{
         flex-basis:220px;
@@ -100,11 +100,17 @@
     }
     /* view */
     .wrap {
-        flex:1;
-        background: #fff;
         box-sizing: border-box;
         padding: 20px;
-        min-height: 88vh;
+        position: absolute;
+        left: 220px;
+        right: 0;
+        top: 80px;
+        bottom: 0;
+        background: #ffffff;
+        width: calc(100% - 200px);
+        overflow-y: scroll;
+        
     }
     .wrap::-webkit-scrollbar {
         /*滚动条整体样式*/

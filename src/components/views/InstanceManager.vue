@@ -255,9 +255,7 @@
 </script>
 
 <style scoped>
-.el-row{
-    margin:5px 0
-}
+
 .title{
     display: inline-block;
     margin:5px 0;
