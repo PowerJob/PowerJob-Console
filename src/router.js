@@ -19,7 +19,8 @@ const router = new VueRouter({
                 { path: "/oms/template", meta: { title: '模版生成' }, component: () => import('./components/views/ContainerTemplate') },
                 { path: "/oms/containermanage", meta: { title: '容器管理' }, component: () => import('./components/views/ContainerManager') },
 
-                { path: "/oms/wfInstanceDetail", name: "WorkflowInstanceDetail", meta: { title: '工作流实例详情' }, component: () => import('./components/dag/WorkflowInstanceDetail') }
+                { path: "/oms/wfInstanceDetail", name: "WorkflowInstanceDetail", meta: { title: '工作流实例详情' }, component: () => import('./components/dag/WorkflowInstanceDetail') },
+                { path: "/oms/workflowEditor", name: "workflowEditor", meta: { title: '工作流编辑器' }, component: () => import('./components/dag/WorkflowEditor') }
             ]
         },
         // 调试用

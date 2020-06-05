@@ -2,7 +2,7 @@
     <div>
         <el-row>
             <el-col :span="1">
-                <el-button type="primary" @click="goback">返回</el-button>
+                <el-button type="primary" @click="back">返回</el-button>
             </el-col>
             <el-col :span="1" :offset="22">
                 <el-button type="success" @click="fetchWfInstanceInfo">刷新</el-button>
@@ -11,34 +11,34 @@
 
         <el-row>
             <el-col :span="24">
-                工作流整体状态:
+                工作流整体状态：
                 <span class="title">{{ wfInstanceDetail.statusStr }}</span>
             </el-col>
         </el-row>
 
         <el-row>
             <el-col :span="8">
-                工作流ID:
+                工作流ID：
                 <span class="title">{{ wfInstanceDetail.workflowId }}</span>
             </el-col>
             <el-col :span="16">
-                工作流实例ID
+                工作流实例ID：
                 <span class="title">{{ wfInstanceDetail.wfInstanceId }}</span>
             </el-col>
         </el-row>
         <el-row>
             <el-col :span="8">
-                触发时间:
+                触发时间：
                 <span class="title">{{ wfInstanceDetail.actualTriggerTime }}</span>
             </el-col>
             <el-col :span="8">
-                结束时间:
+                结束时间：
                 <span class="title">{{ wfInstanceDetail.finishedTime }}</span>
             </el-col>
         </el-row>
         <el-row>
             <el-col :span="24">
-                执行结果:
+                执行结果：
                 <span class="title">{{ wfInstanceDetail.result }}</span>
             </el-col>
         </el-row>
@@ -144,7 +144,7 @@
                     console.log(code);
                 });
             },
-            goback: function () {
+            back: function () {
                 this.$router.go(-1);
             }
         },

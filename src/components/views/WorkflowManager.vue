@@ -23,7 +23,7 @@
         <!-- 右侧新增任务按钮，占地面积 4/24 -->
         <el-col :span="4">
             <div style="float:right;padding-right:10px">
-                <el-button type="primary" >新建工作流</el-button>
+                <el-button type="primary" @click="onClickNewWorkflow">新建工作流</el-button>
             </div>
         </el-col>
     </el-row>
@@ -99,7 +99,13 @@
             },
             // 编辑工作流
             onClickModifyWorkflow(data) {
-                console.log(data)
+                this.$router.push({
+                    name: 'workflowEditor',
+                    params: {
+                        modify: true,
+                        workflowInfo: data
+                    }
+                })
             },
             // 立即运行工作流
             onClickRunWorkflow(data) {
@@ -116,14 +122,14 @@
                     that.listWorkflow();
                 });
             },
-            // 保存工作流
-            saveWorkflow() {
-                const that = this;
-                this.axios.post("/workflow/save", this.workflowObj).then(() => {
-                    that.$message.success("保存成功！");
-                    // 重新加载数据
-                    that.listJobInfos();
-                }, () => that.modifiedJobFormVisible = false);
+            // 新建工作流
+            onClickNewWorkflow() {
+                this.$router.push({
+                    name: 'workflowEditor',
+                    params: {
+                        modify: false
+                    }
+                })
             }
 
         },
