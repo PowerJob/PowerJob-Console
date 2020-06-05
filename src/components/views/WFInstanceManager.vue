@@ -60,49 +60,6 @@
           </template>
         </el-table-column>
       </el-table>
-
-      <el-dialog title="工作流实例详情" :visible.sync="instanceDetailVisible">
-        <el-row style="margin-top:-20px">
-          <el-col :span="8">
-            工作流ID:
-            <span class="title">{{ instanceTemp.workflowId }}</span>
-          </el-col>
-          <el-col :span="16">
-            工作流实例ID
-            <span class="title">{{ instanceTemp.wfInstanceId }}</span>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            状态:
-            <span class="title">{{ instanceTemp.statusStr }}</span>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="8">
-            触发时间:
-            <span class="title">{{ instanceTemp.actualTriggerTime }}</span>
-          </el-col>
-          <el-col :span="8">
-            结束时间:
-            <span class="title">{{ instanceTemp.finishedTime }}</span>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            执行结果:
-            <span class="title">{{ instanceTemp.result }}</span>
-          </el-col>
-        </el-row>
-        <el-row>
-            <div>
-                <svg width="100%" height="50vh" id="svgCanvas">
-                <g />
-                <rect />
-            </svg>
-            </div>
-        </el-row>
-      </el-dialog>
     </el-row>
 
     <!-- 第三行，分页插件 -->
@@ -121,11 +78,6 @@
 </template>
 
 <script>
-import dagreD3 from "dagre-d3";
-import * as d3 from "d3";
-
-let render = new dagreD3.render();
-// import DAG from "./DAG";
 export default {
   name: "WFInstanceManager",
   data() {
@@ -143,33 +95,7 @@ export default {
         pageSize: 10,
         totalItems: 0,
         data: [],
-      },
-      instanceDetailVisible: false,
-      instanceTemp: {},
-      statePoint: 0,
-      g: "",
-      node: [
-        { id: 0, label: "根节点\n c:1\n a:@" },
-        { id: 1, label: "一级节点1" },
-        { id: 2, label: "一级节点2" },
-        { id: 3, label: "一级节点3" },
-        { id: 4, label: "一级节点4" },
-        { id: 5, label: "二级节点1" },
-        { id: 6, label: "二级节点2" },
-        { id: 7, label: "三级节点1" },
-        { id: 8, label: "三级节点2" },
-      ],
-      edge: [
-        { from: 0, to: 1 },
-        { from: 0, to: 2 },
-        { from: 0, to: 3 },
-        { from: 0, to: 4 },
-        { from: 1, to: 5 },
-        { from: 1, to: 6 },
-        { from: 6, to: 7 },
-        { from: 1, to: 7 },
-        { from: 2, to: 7 },
-      ],
+      }
     };
   },
   methods: {
@@ -187,21 +113,15 @@ export default {
     // 查看工作流详情
     onClickShowDetail(data) {
       console.log(data);
-      this.instanceDetailVisible = true;
-      this.instanceTemp = data;
-      this.node = data.peworkflowDAG.nodes.map(item=>{
-          let label = 'jobID:' + item.jobId + "\n" +  'jobName:' + item.jobName + "\n" + "result:" + item.result
-          return {
-              id: item.jobId,
-              label: label
-          }
-      });
-      this.edge = data.peworkflowDAG.edges;
-      this.init();
-      this.renderG(this.statePoint, this.node, this.edge); 
+      this.$router.push({
+        name: 'WorkflowInstanceDetail',
+        params: {
+          wfInstanceId: data.wfInstanceId
+        }
+      })
     },
+
     // 停止工作流
-    
     onClickStop(data) {
       let that = this;
       let url =
@@ -233,119 +153,36 @@ export default {
         case 10:
           return "warning-row";
       }
-    },
-    init: function(statePoint, node, edge) {
-      console.log(statePoint, node, edge);
-      this.createG();
-      this.renderG();
-    },
-    createG: function() {
-      this.g = new dagreD3.graphlib.Graph()
-        .setGraph({
-          rankdir: "LR", //方向
-        })
-        .setDefaultEdgeLabel(function() {
-          return {};
-        });
-    },
-    drawNode: function() {
-      for (let i in this.node) {
-        //画点
-        let el = this.node[i];
-        // let style = "";
-        this.g.setNode(el.id, {
-          id: el.id,
-          label: el.label,
-          class: el.class,
-          style: el.node_id,
-          node_id: el.node_id,
-        });
-      }
-      this.g.nodes().forEach((v) => {
-        //画圆角
-        var node = this.g.node(v);
-        node.rx = node.ry = 10;
-      });
-    },
-    drawEdg: function() {
-      for (let i in this.edge) {
-        // 画连线
-        let el = this.edge[i];
-        if (el.from === this.statePoint || el.to === this.statePoint) {
-          this.g.setEdge(el.from, el.to, {
-            style: "stroke: #0fb2cc; fill: none;",
-            arrowheadStyle: "fill: #0fb2cc;stroke: #0fb2cc;",
-            arrowhead: "vee",
-          });
-        } else {
-          this.g.setEdge(el.from, el.to, {
-            arrowhead: "vee",
-          });
-        }
-      }
-    },
-    renderG: function() {
-      var svg = d3.select("#svgCanvas");
-
-      svg.select("g").remove(); //删除以前的节点
-      svg.append("g");
-      var inner = svg.select("g");
-      var zoom = d3.zoom().on("zoom", function() {
-        //放大
-        inner.attr("transform", d3.event.transform);
-      });
-      svg.call(zoom);
-      this.drawNode();
-      this.drawEdg();
-      render(d3.select("svg g"), this.g); //渲染节点
-      //   var max =
-      //     svg._groups[0][0].clientWidth > svg._groups[0][0].clientHeight
-      //       ? svg._groups[0][0].clientWidth
-      //       : svg._groups[0][0].clientHeight;
-      // var initialScale = max / 779;
-      var initialScale = 1;
-      var tWidth =
-        (svg._groups[0][0].clientWidth - this.g.graph().width * initialScale) /
-        2;
-      //   var tHeight =
-      //     (svg._groups[0][0].clientHeight -
-      //       this.g.graph().height * initialScale) /
-      //     2;
-      var trans = d3.zoomIdentity.translate(tWidth, 50).scale(initialScale); //.scale(initialScale)
-      svg.call(zoom.transform, trans); //元素居中
-    },
-    changePoint: function(point) {
-      this.statePoint = point * 1.0;
-      this.renderG();
-    },
+    }
   },
   mounted() {
     this.listWfInstances();
   },
-//   components: { DAG },
 };
 </script>
 
-<style scoped>
-svg {
-  font-size: 14px;
-}
-.node rect {
-  stroke: #606266;
-  fill: #fff;
-}
+<style>
 
-.edgePath path {
-  stroke: #606266;
-  fill: #333;
-  stroke-width: 1.5px;
-}
-path:hover {
-  stroke-width: 3px;
-  cursor: pointer;
-}
-.node:hover {
-  stroke: #606266;
-  cursor: pointer;
-}
+  svg{
+    font-size: 10px;
+    border: 1px solid red;
+  }
+
+  text {
+    font-weight: 300;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+  }
+
+  .node rect {
+    stroke: #999;
+    fill: #fff;
+    stroke-width: 1.5px;
+  }
+
+  .edgePath path {
+    stroke: #333;
+    stroke-width: 1px;
+  }
+
 </style>

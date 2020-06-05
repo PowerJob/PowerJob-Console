@@ -110,7 +110,7 @@
         background: #ffffff;
         width: calc(100% - 200px);
         overflow-y: scroll;
-        
+
     }
     .wrap::-webkit-scrollbar {
         /*滚动条整体样式*/

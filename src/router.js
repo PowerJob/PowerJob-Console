@@ -18,6 +18,8 @@ const router = new VueRouter({
                 { path: "/oms/wfinstance", meta: { title: '工作流管理' }, component: () => import('./components/views/WFInstanceManager') },
                 { path: "/oms/template", meta: { title: '模版生成' }, component: () => import('./components/views/ContainerTemplate') },
                 { path: "/oms/containermanage", meta: { title: '容器管理' }, component: () => import('./components/views/ContainerManager') },
+
+                { path: "/oms/wfInstanceDetail", name: "WorkflowInstanceDetail", meta: { title: '工作流实例详情' }, component: () => import('./components/dag/WorkflowInstanceDetail') }
             ]
         },
         // 调试用
