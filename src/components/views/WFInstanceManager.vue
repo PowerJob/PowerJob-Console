@@ -95,7 +95,12 @@
           </el-col>
         </el-row>
         <el-row>
-            <DAG />
+            <div>
+                <svg width="100%" height="50vh" id="svgCanvas">
+                <g />
+                <rect />
+            </svg>
+            </div>
         </el-row>
       </el-dialog>
     </el-row>
@@ -116,7 +121,11 @@
 </template>
 
 <script>
-import DAG from "./DAG";
+import dagreD3 from "dagre-d3";
+import * as d3 from "d3";
+
+let render = new dagreD3.render();
+// import DAG from "./DAG";
 export default {
   name: "WFInstanceManager",
   data() {
@@ -137,6 +146,30 @@ export default {
       },
       instanceDetailVisible: false,
       instanceTemp: {},
+      statePoint: 0,
+      g: "",
+      node: [
+        { id: 0, label: "根节点\n c:1\n a:@" },
+        { id: 1, label: "一级节点1" },
+        { id: 2, label: "一级节点2" },
+        { id: 3, label: "一级节点3" },
+        { id: 4, label: "一级节点4" },
+        { id: 5, label: "二级节点1" },
+        { id: 6, label: "二级节点2" },
+        { id: 7, label: "三级节点1" },
+        { id: 8, label: "三级节点2" },
+      ],
+      edge: [
+        { from: 0, to: 1 },
+        { from: 0, to: 2 },
+        { from: 0, to: 3 },
+        { from: 0, to: 4 },
+        { from: 1, to: 5 },
+        { from: 1, to: 6 },
+        { from: 6, to: 7 },
+        { from: 1, to: 7 },
+        { from: 2, to: 7 },
+      ],
     };
   },
   methods: {
@@ -156,8 +189,19 @@ export default {
       console.log(data);
       this.instanceDetailVisible = true;
       this.instanceTemp = data;
+      this.node = data.peworkflowDAG.nodes.map(item=>{
+          let label = 'jobID:' + item.jobId + "\n" +  'jobName:' + item.jobName + "\n" + "result:" + item.result
+          return {
+              id: item.jobId,
+              label: label
+          }
+      });
+      this.edge = data.peworkflowDAG.edges;
+      this.init();
+      this.renderG(this.statePoint, this.node, this.edge); 
     },
     // 停止工作流
+    
     onClickStop(data) {
       let that = this;
       let url =
@@ -190,16 +234,118 @@ export default {
           return "warning-row";
       }
     },
+    init: function(statePoint, node, edge) {
+      console.log(statePoint, node, edge);
+      this.createG();
+      this.renderG();
+    },
+    createG: function() {
+      this.g = new dagreD3.graphlib.Graph()
+        .setGraph({
+          rankdir: "LR", //方向
+        })
+        .setDefaultEdgeLabel(function() {
+          return {};
+        });
+    },
+    drawNode: function() {
+      for (let i in this.node) {
+        //画点
+        let el = this.node[i];
+        // let style = "";
+        this.g.setNode(el.id, {
+          id: el.id,
+          label: el.label,
+          class: el.class,
+          style: el.node_id,
+          node_id: el.node_id,
+        });
+      }
+      this.g.nodes().forEach((v) => {
+        //画圆角
+        var node = this.g.node(v);
+        node.rx = node.ry = 10;
+      });
+    },
+    drawEdg: function() {
+      for (let i in this.edge) {
+        // 画连线
+        let el = this.edge[i];
+        if (el.from === this.statePoint || el.to === this.statePoint) {
+          this.g.setEdge(el.from, el.to, {
+            style: "stroke: #0fb2cc; fill: none;",
+            arrowheadStyle: "fill: #0fb2cc;stroke: #0fb2cc;",
+            arrowhead: "vee",
+          });
+        } else {
+          this.g.setEdge(el.from, el.to, {
+            arrowhead: "vee",
+          });
+        }
+      }
+    },
+    renderG: function() {
+      var svg = d3.select("#svgCanvas");
+
+      svg.select("g").remove(); //删除以前的节点
+      svg.append("g");
+      var inner = svg.select("g");
+      var zoom = d3.zoom().on("zoom", function() {
+        //放大
+        inner.attr("transform", d3.event.transform);
+      });
+      svg.call(zoom);
+      this.drawNode();
+      this.drawEdg();
+      render(d3.select("svg g"), this.g); //渲染节点
+      //   var max =
+      //     svg._groups[0][0].clientWidth > svg._groups[0][0].clientHeight
+      //       ? svg._groups[0][0].clientWidth
+      //       : svg._groups[0][0].clientHeight;
+      // var initialScale = max / 779;
+      var initialScale = 1;
+      var tWidth =
+        (svg._groups[0][0].clientWidth - this.g.graph().width * initialScale) /
+        2;
+      //   var tHeight =
+      //     (svg._groups[0][0].clientHeight -
+      //       this.g.graph().height * initialScale) /
+      //     2;
+      var trans = d3.zoomIdentity.translate(tWidth, 50).scale(initialScale); //.scale(initialScale)
+      svg.call(zoom.transform, trans); //元素居中
+    },
+    changePoint: function(point) {
+      this.statePoint = point * 1.0;
+      this.renderG();
+    },
   },
   mounted() {
     this.listWfInstances();
   },
-  components: { DAG },
+//   components: { DAG },
 };
 </script>
 
 <style scoped>
-    svg{
-        border: 1px solid red;
-    }
+svg {
+  font-size: 14px;
+}
+.node rect {
+  stroke: #606266;
+  fill: #fff;
+}
+
+.edgePath path {
+  stroke: #606266;
+  fill: #333;
+  stroke-width: 1.5px;
+}
+path:hover {
+  stroke-width: 3px;
+  cursor: pointer;
+}
+.node:hover {
+  stroke: #606266;
+  cursor: pointer;
+}
 </style>
