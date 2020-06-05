@@ -57,8 +57,10 @@
         <el-row>
             <el-row>
                 <el-button @click="onClickImportNode">导入任务</el-button>
-                <el-button>删除任务</el-button>
-                <el-button>新增边</el-button>
+                <el-button @click="onClickRemoveNode">删除任务</el-button>
+                <el-button @click="onClickAddFrom">新增起点</el-button>
+                <el-button @click="onClickAddTo">新增终点</el-button>
+                <el-button @click="onClickRemoveEdge">删除边</el-button>
             </el-row>
             <div>
                 <svg width="80%" height=1000px id="svgCanvas">
@@ -149,6 +151,10 @@
                     totalItems: 0,
                     data: []
                 },
+
+                // 事件（1：新增起点，2：新增终点，3：删除节点；4：删除边）
+                event: undefined,
+                from: undefined
             }
         },
         methods: {
@@ -182,19 +188,33 @@
             importNode(data) {
                 let canSave = true;
                 this.workflowInfo.peworkflowDAG.nodes.forEach(node => {
-                   if (data.id === node.id) {
+                   if (data.id === node.jobId) {
                        canSave = false;
                        console.log("nodes in workflow cannot be duplicated");
                    }
                 });
                 if (canSave) {
-                    this.workflowInfo.peworkflowDAG.nodes.push({jobId: data.id, jobName: data.jobName})
+                    console.log("add node: " + data.id);
+                    this.workflowInfo.peworkflowDAG.nodes.push({jobId: data.id, jobName: data.jobName});
                     this.draw();
                 }
             },
             // 删除任务
-            removeNode() {
-
+            onClickRemoveNode() {
+                this.event = 3;
+                this.$message.info("请点击需要删除的节点");
+            },
+            onClickAddFrom() {
+                this.event = 1;
+                this.$message.info("请点击起始节点");
+            },
+            onClickAddTo() {
+                this.event = 2;
+                this.$message.info("请点击目标节点");
+            },
+            onClickRemoveEdge() {
+                this.event = 4;
+                this.$message.info("请点击需要删除的边");
             },
             // 保存工作流
             saveWorkflow() {
@@ -221,7 +241,9 @@
                 });
                 // 链接关系
                 this.workflowInfo.peworkflowDAG.edges.forEach(item => {
-                    g.setEdge(item.from, item.to, {});
+                    g.setEdge(item.from, item.to, {
+                        style: "stroke-width: 2px;"
+                    })
                 });
                 //绘制图形
                 var svg = d3.select("svg"),
@@ -235,15 +257,83 @@
                 var render = new dagreD3.render();
                 render(inner, g);
 
-                let code;
+                // 添加节点监听
                 inner.selectAll("g.node").on("click", e => {
-                    //点击事件
-                    code = nodes.filter(item => {
-                        return item.id == e;
-                    });
-                    console.log(code);
+                    for (let i = 0; i < this.workflowInfo.peworkflowDAG.nodes.length; i++) {
+                        if (e == this.workflowInfo.peworkflowDAG.nodes[i].jobId) {
+                            console.log("onClickNode, jobId=" + e);
+                            this.onClickDAGNode(e, g);
+                        }
+                    }
                 });
+                // 添加边监听
+                inner.selectAll("path").on("click", e => {
+                    if (this.event === 4) {
+                        let oldEdges = this.workflowInfo.peworkflowDAG.edges;
+                        this.workflowInfo.peworkflowDAG.edges= [];
+                        // 删除节点相关的所有边
+                        oldEdges.forEach(edge => {
+                            if (!(edge.from === e.v && edge.to === e.w)) {
+                                this.workflowInfo.peworkflowDAG.edges.push(edge);
+                            }
+                            this.draw();
+                        });
+                    }
+                });
+            },
+            onClickDAGNode(nodeId, g) {
+                switch (this.event) {
+                    case 3: {
+                        g.removeNode(nodeId);
+                        let nodesArr = this.workflowInfo.peworkflowDAG.nodes;
+                        let oldEdges = this.workflowInfo.peworkflowDAG.edges;
+                        this.workflowInfo.peworkflowDAG.edges = [];
+                        // 删除节点
+                        nodesArr.splice(nodesArr.findIndex(item => item.jobId === nodeId), 1);
+                        // 删除节点相关的所有边
+                        oldEdges.forEach(edge => {
+                            if (edge.from !== nodeId && edge.to !== nodeId) {
+                                this.workflowInfo.peworkflowDAG.edges.push(edge);
+                            }
+                        });
+
+                        this.draw();
+                        break;
+                    }
+                    case 1: {
+                        this.from = nodeId;
+                        break;
+                    }
+                    case 2: {
+                        let to = nodeId;
+                        if (this.from === undefined) {
+                            this.$message.warning("请先添加起点！");
+                            break;
+                        }
+                        if (this.from === to) {
+                            this.$message.warning("非法操作（起点终点相同）！");
+                            break;
+                        }
+
+                        let canSave = true;
+                        this.workflowInfo.peworkflowDAG.edges.forEach(edge => {
+                            if (edge.from === this.from && edge.to === to) {
+                                canSave = false;
+                                console.log("edge(%o -> %o) already exists!", this.from, to);
+                            }
+                        });
+
+                        if (canSave) {
+                            this.workflowInfo.peworkflowDAG.edges.push({from: this.from, to: to});
+                            console.log("new edge(%o -> %o)", this.from, to);
+                        }
+                        this.draw();
+                        break;
+                    }
+                }
             }
+
+
         },
         mounted() {
 
@@ -282,7 +372,7 @@
 
     .edgePath path {
         stroke: #606266;
-        fill: #333;
-        stroke-width: 1.5px;
+        fill: #ff9900;
+        stroke-width: 3px;
     }
 </style>
