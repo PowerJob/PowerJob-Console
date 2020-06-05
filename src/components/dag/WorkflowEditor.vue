@@ -158,6 +158,7 @@
             }
         },
         methods: {
+            // 返回上一页
             back: function () {
                 this.$router.go(-1);
             },
@@ -220,10 +221,13 @@
             saveWorkflow() {
                 const that = this;
                 this.axios.post("/workflow/save", this.workflowInfo).then(() => {
-                    that.$message.success("保存成功！")
-                    });
+                    that.$message.success("保存成功！");
+                    that.back();
+                });
             },
             draw() {
+
+                console.log("draw by data: " + JSON.stringify(this.workflowInfo.peworkflowDAG));
                 //获取D3
                 var g = new dagreD3.graphlib.Graph().setGraph({});
 
@@ -242,7 +246,7 @@
                 // 链接关系
                 this.workflowInfo.peworkflowDAG.edges.forEach(item => {
                     g.setEdge(item.from, item.to, {
-                        style: "stroke-width: 2px;"
+                        // style: "stroke-width: 1.5;"
                     })
                 });
                 //绘制图形
@@ -289,10 +293,12 @@
                         let oldEdges = this.workflowInfo.peworkflowDAG.edges;
                         this.workflowInfo.peworkflowDAG.edges = [];
                         // 删除节点
-                        nodesArr.splice(nodesArr.findIndex(item => item.jobId === nodeId), 1);
+                        nodesArr.splice(nodesArr.findIndex(item => item.jobId == nodeId), 1);
                         // 删除节点相关的所有边
                         oldEdges.forEach(edge => {
-                            if (edge.from !== nodeId && edge.to !== nodeId) {
+                            if (edge.from == nodeId || edge.to == nodeId) {
+                                console.log("remove edge: " + JSON.stringify(edge));
+                            }else {
                                 this.workflowInfo.peworkflowDAG.edges.push(edge);
                             }
                         });
@@ -346,6 +352,12 @@
             if (modify) {
                 this.workflowInfo = this.$route.params.workflowInfo;
                 this.workflowInfo.appId = this.$store.state.appInfo.id;
+                // this.workflowInfo.peworkflowDAG.nodes = this.workflowInfo.peworkflowDAG.nodes.map(x => {
+                //     return {
+                //         jobId: x.jobId,
+                //         jobName: x.jobName
+                //     }
+                // });
                 this.draw();
             }
         }

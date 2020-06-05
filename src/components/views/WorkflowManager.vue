@@ -95,7 +95,13 @@
             },
             // 开关工作流
             switchWorkflow(data) {
-                console.log(data);
+                let that = this;
+                let path = data.enable ? "enable" : "disable";
+                let url = "/workflow/" + path + "?appId=" + this.$store.state.appInfo.id + "&workflowId=" + data.id;
+                this.axios.get(url, res => {
+                    console.log(res);
+                    that.listWorkflow();
+                });
             },
             // 编辑工作流
             onClickModifyWorkflow(data) {
