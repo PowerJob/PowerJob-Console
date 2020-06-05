@@ -10,10 +10,10 @@
                     <el-form-item label="任务ID">
                         <el-input v-model="instanceQueryContent.jobId" placeholder="任务ID"/>
                     </el-form-item>
-                    <el-form-item  v-if="instanceQueryContent.type == 'WORKFLOW'" label="工作实例ID">
+                    <el-form-item  v-if="instanceQueryContent.type === 'WORKFLOW'" label="工作实例ID">
                         <el-input v-model="instanceQueryContent.workflowId" placeholder="工作实例ID"/>
                     </el-form-item>
-                   
+
                     <el-form-item>
                         <el-button type="primary" @click="listInstanceInfos">查询</el-button>
                         <el-button type="cancel" @click = "onClickRest">重置</el-button>

@@ -10,6 +10,13 @@
         </el-row>
 
         <el-row>
+            <el-col :span="24">
+                工作流整体状态:
+                <span class="title">{{ wfInstanceDetail.statusStr }}</span>
+            </el-col>
+        </el-row>
+
+        <el-row>
             <el-col :span="8">
                 工作流ID:
                 <span class="title">{{ wfInstanceDetail.workflowId }}</span>
@@ -17,12 +24,6 @@
             <el-col :span="16">
                 工作流实例ID
                 <span class="title">{{ wfInstanceDetail.wfInstanceId }}</span>
-            </el-col>
-        </el-row>
-        <el-row>
-            <el-col :span="24">
-                状态:
-                <span class="title">{{ wfInstanceDetail.statusStr }}</span>
             </el-col>
         </el-row>
         <el-row>
@@ -43,7 +44,7 @@
         </el-row>
         <el-row>
             <div>
-                <svg width="100%" height="50vh" id="svgCanvas">
+                <svg width="80%" height=1000px id="svgCanvas">
                     <g />
                     <rect />
                 </svg>
@@ -87,18 +88,36 @@
 
                 // 转化节点
                 let nodes = this.wfInstanceDetail.peworkflowDAG.nodes.map(node => {
-                    let l = "jobId: " + node.jobId + "\n" +
-                             "jobName:" + node.jobName + "\n" +
-                             "instanceId:" + node.instanceId ;
+
+                    // 计算颜色 1:等待上游节点，3:运行中，4:失败，5:成功，10:手动停止
+                    let color;
+                    let statusStr;
+                    switch (node.status) {
+                        case 3: color="#3498DB"; statusStr = "运行中";break;
+                        case 4: color = "#EC7063"; statusStr = "失败";break;
+                        case 5: color = "#58D68D"; statusStr = "成功";break;
+                        case 10: color = "#F1C40F"; statusStr = "手动停止";break;
+                        default: color = "#CACFD2"; statusStr = "等待上游节点";break;
+                    }
+
+                    let l = "任务ID: " + node.jobId + "\n" +
+                             "任务名称:" + node.jobName + "\n" +
+                             "状态:" + statusStr + "\n" +
+                             "任务实例ID:" + node.instanceId ;
+
+
                     return {
                         id: node.jobId,
-                        label: l
+                        label: l,
+                        color: color
                     }
                 });
 
                 // 添加节点
                 nodes.forEach(node => {
                     g.setNode(node.id, node);
+                    // 设置颜色
+                    g.node(node.id).style = 'fill:' + node.color;
                 });
                 // 链接关系
                 this.wfInstanceDetail.peworkflowDAG.edges.forEach(item => {
@@ -142,8 +161,15 @@
         margin: 20px;
     }
 
+    .title{
+        display: inline-block;
+        margin:5px 0;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
     svg {
-        font-size: 14px;
+        font-size: 16px;
     }
 
     .node rect {
