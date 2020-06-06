@@ -58,7 +58,7 @@
                         drag
                         :file-list = "fileList"
                         :on-success="onSuccess"
-                        :action="`${baseUrl}/container/jarUpload`"
+                        :action="`${requestUrl}/container/jarUpload`"
                         multiple>
                     <i class="el-icon-upload"></i>
                     <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
@@ -79,7 +79,7 @@
 
 <script>
     import baseUrl from '../../main';
- 
+
     let ws;
     export default {
         name: "ContainerManager",
@@ -103,7 +103,7 @@
                 arrangeVisible:false,
                 containerList:[],
                 logs:[],
-                baseUrl :baseUrl,
+                requestUrl :"",
                 fileList: []
             }
         },
@@ -116,7 +116,7 @@
                     status:"ENABLE",
                     id:this.id,
                     sourceType:this.form.sourceType,
-                }
+                };
                if(this.form.sourceType =='Git'){
                    data.sourceInfo = JSON.stringify(this.gitForm)
                }
@@ -171,10 +171,10 @@
                 this.dialogVisible = true;
             },
             arrangeItem(item){
-                let wsBase = baseUrl.replace("http","ws") + "/container/deploy/";
+                let wsBase = this.requestUrl.replace("http","ws") + "/container/deploy/";
                 let wsUrl = wsBase + item.id;
                 ws = new WebSocket(wsUrl);
-               
+
                 ws.onopen = ()=> {
                     this.arrangeTitle = "机器部署";
                     this.arrangeVisible = true;
@@ -210,9 +210,23 @@
                     // this.containerList.splice(index,1);
                     // this.$message(`容器${item.containerName}已删除`);
                 });
+            },
+            // 兼容 java build in 模式下 baseURL 为 / 的情况（将当前url作为请求路径）
+            calculateRequestUrl() {
+                if (baseUrl === undefined || !baseUrl.includes("http")) {
+                    let url  =  window.location.href;
+                    let urlSplit= url.split('//'); // str1[0]--协议头
+                    let ip = urlSplit[1].split('/')[0];
+                    this.requestUrl = urlSplit[0] + '//' + ip;
+                    console.log("calculateRequestUrl: " + this.requestUrl);
+                }else {
+                    this.requestUrl = baseUrl;
+                }
             }
         },
         mounted() {
+            this.calculateRequestUrl();
+
             let appId = this.$store.state.appInfo.id;
             this.flyio.get("/container/list?appId=" + appId).then(res => {
                 console.log(res)

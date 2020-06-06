@@ -4,6 +4,5 @@
 
 # 命令
 npm run serve（使用 .env.dev ，请求 localhost:7700）
-npm run build（使用 .env.spring，请求 /，构建内置于 SpringBoot 的静态资源）
-npm run build_spring（同上）
-npm run build_docker（使用 .env.docker）
+npm run build（使用 .env.product）
+npm run build_spring（使用 .env.spring，请求 /，构建内置于 SpringBoot 的 vue project）
