@@ -21,8 +21,8 @@ Vue.use(ElementUI);
 // let ip = urlSplit[1].split('/')[0];
 // let baseURL = urlSplit[0] + '//' + ip;
 
-let baseURL = "http://139.224.83.134:7700";
-// let baseURL = "http://localhost:7700";
+// let baseURL = "http://139.224.83.134:7700";
+let baseURL = "http://localhost:7700";
 
 let timeout = 5000;
 

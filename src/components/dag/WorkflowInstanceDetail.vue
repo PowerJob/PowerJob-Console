@@ -51,6 +51,9 @@
             </div>
         </el-row>
 
+        <el-dialog title="任务实例详情" :visible.sync="instanceDetailVisible" v-if='instanceDetailVisible'>
+            <InstanceDetail :instance-id="currentInstanceId"/>
+        </el-dialog>
     </div>
 </template>
 
@@ -58,12 +61,20 @@
     import dagreD3 from "dagre-d3";
     import * as d3 from "d3";
 
+    import InstanceDetail from "../common/InstanceDetail";
+
     export default {
         name: "WorkflowInstanceDetail",
+        components: {
+            InstanceDetail
+        },
         data() {
             return {
                 wfInstanceDetail: {
-                }
+                },
+                // 任务实例详情
+                currentInstanceId: undefined,
+                instanceDetailVisible: false
             }
         },
         methods: {
@@ -135,13 +146,13 @@
                 var render = new dagreD3.render();
                 render(inner, g);
 
-                let code;
                 inner.selectAll("g.node").on("click", e => {
-                    //点击事件
-                    code = nodes.filter(item => {
-                        return item.id == e;
-                    });
-                    console.log(code);
+                    this.wfInstanceDetail.peworkflowDAG.nodes.forEach(node => {
+                        if (node.jobId == e) {
+                            this.currentInstanceId = node.instanceId;
+                            this.instanceDetailVisible = true;
+                        }
+                    })
                 });
             },
             back: function () {
