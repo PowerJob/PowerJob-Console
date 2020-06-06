@@ -11,7 +11,7 @@
                         <el-input v-model="instanceQueryContent.jobId" placeholder="任务ID"/>
                     </el-form-item>
                     <el-form-item  v-if="instanceQueryContent.type === 'WORKFLOW'" label="工作实例ID">
-                        <el-input v-model="instanceQueryContent.workflowId" placeholder="工作实例ID"/>
+                        <el-input v-model="instanceQueryContent.wfInstanceId" placeholder="工作实例ID"/>
                     </el-form-item>
 
                     <el-form-item>
@@ -39,6 +39,7 @@
             <el-table :data="instancePageResult.data" style="width: 100%" :row-class-name="instanceTableRowClassName">
                 <el-table-column prop="jobId" label="任务ID" width="80"/>
                 <el-table-column prop="jobName" label="任务名称"/>
+                <el-table-column v-if="instanceQueryContent.type === 'WORKFLOW'" prop="wfInstanceId" label="工作流实例ID"/>
                 <el-table-column prop="instanceId" label="实例ID"/>
                 <el-table-column prop="statusStr" label="状态" width="80" />
                 <el-table-column prop="actualTriggerTime" label="触发时间"/>
@@ -149,7 +150,7 @@
                     index: 0,
                     pageSize: 10,
                     instanceId: undefined,
-                    workflowId:undefined,
+                    wfInstanceId:undefined,
                     jobId: undefined,
                     type: "NORMAL"
                 },
