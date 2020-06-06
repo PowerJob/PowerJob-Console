@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "serve": "vue-cli-service serve --mode dev",
+    "build": "vue-cli-service build --mode spring",
+    "lint": "vue-cli-service lint",
+
+    "build_docker": "vue-cli-service build --mode docker",
+    "build_spring": "vue-cli-service build --mode spring"
   },
   "dependencies": {
     "axios": "^0.19.2",

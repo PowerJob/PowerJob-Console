@@ -2,25 +2,8 @@
 分布式调度与计算框架——OhMyScheduler 前端页面
 项目文档：https://www.yuque.com/ohmyscheduler/guidence
 
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+# 命令
+npm run serve（使用 .env.dev ，请求 localhost:7700）
+npm run build（使用 .env.spring，请求 /，构建内置于 SpringBoot 的静态资源）
+npm run build_spring（同上）
+npm run build_docker（使用 .env.docker）

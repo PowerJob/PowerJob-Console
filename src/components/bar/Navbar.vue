@@ -1,7 +1,9 @@
 <template>
     <div id="navbar">
         <div id="logo_content">
-            <img src="../../assets/oms-logo.png" />
+            <a href="https://github.com/KFCFans/OhMyScheduler" target="_blank">
+                <img src="../../assets/oms-logo.png" />
+            </a>
         </div>
 
         <div id="right_content">
