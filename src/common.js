@@ -3,18 +3,26 @@ let timestamp2Str = ts => {
         return "N/A";
     }
     try {
-        let date = new Date(ts);
-        let Y = date.getFullYear() + '-';
-        let M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-';
-        let D = date.getDate() + ' ';
-        let h = date.getHours() + ':';
-        let m = date.getMinutes() + ':';
-        let s = date.getSeconds();
-        return  Y+M+D+h+m+s;
+        if (ts) {
+            var time = new Date(ts);
+            var y = time.getFullYear();
+            var M = time.getMonth() + 1;
+            var d = time.getDate();
+            var h = time.getHours();
+            var m = time.getMinutes();
+            var s = time.getSeconds();
+            return y + '-' + addZero(M) + '-' + addZero(d) + ' ' + addZero(h) + ':' + addZero(m) + ':' + addZero(s);
+        } else {
+            return '';
+        }
     }catch (e) {
         return "N/A";
     }
 };
+
+function addZero(m) {
+    return m < 10 ? '0' + m : m;
+}
 
 export default {
     timestamp2Str

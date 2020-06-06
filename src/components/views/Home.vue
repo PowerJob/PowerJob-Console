@@ -1,6 +1,20 @@
 <template>
     <div id="home">
 
+        <!-- 第0行，显示时间信息 -->
+        <el-row :gutter="24">
+            <el-col :span="6">
+                <el-card shadow="always">
+                    调度中心服务器时间：{{ this.common.timestamp2Str(systemInfo.serverTime) }}
+                </el-card>
+            </el-col>
+            <el-col :span="6">
+                <el-card shadow="always">
+                    本地浏览器时间：{{ this.common.timestamp2Str(new Date().getTime()) }}
+                </el-card>
+            </el-col>
+        </el-row>
+
         <!-- 第一行，显示概览 overview -->
         <el-row :gutter="24">
             <el-col :span="6">
@@ -68,6 +82,7 @@
                     jobCount: "N/A",
                     runningInstanceCount: "N/A",
                     failedInstanceCount: "N/A",
+                    serverTime: undefined
                 },
                 activeWorkerCount: "N/A",
                 workerList: []
@@ -85,13 +100,33 @@
         mounted() {
             let that = this;
             let appId = that.$store.state.appInfo.id;
-            // 请求 Overview
-            that.axios.get("/system/overview?appId=" + appId).then(res => that.systemInfo = res);
             // 请求 Worker 列表
             that.axios.get("/system/listWorker?appId=" + appId).then(res => {
                 that.workerList = res;
                 that.activeWorkerCount = that.workerList.length;
-            })
+            });
+            // 请求 Overview
+            that.axios.get("/system/overview?appId=" + appId).then(res => {
+                that.systemInfo = res;
+
+                // 对比服务器时间和本地时间
+                let localTime=new Date().getTime();
+                let serverTime = res.serverTime;
+                console.log("localTime: %o, serverTime: %o", localTime, serverTime);
+
+                let offset = localTime - serverTime;
+                // 误差大于一分钟，弹窗告警
+                if (Math.abs(offset) > 60000) {
+                    this.$notify({
+                        title: '警告',
+                        message: '调度中心服务器与本地存在时间差，可能影响任务调度准确性，建议排查时间问题！',
+                        type: 'warning',
+                        duration: 0
+                    });
+                }
+
+
+            });
         }
     }
 </script>
@@ -116,6 +151,9 @@
         margin-bottom: 8px;
     }
 
+    .el-card {
+        margin: 10px;
+    }
 </style>
 
 <!-- 全局属性，解决 element-ui 的 row-class-name 不生效问题 -->

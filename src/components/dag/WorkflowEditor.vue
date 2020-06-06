@@ -105,8 +105,7 @@
                         layout="prev, pager, next"
                         :total="this.jobInfoPageResult.totalItems"
                         :page-size="this.jobInfoPageResult.pageSize"
-                        @current-change="onClickChangePage"
-                        :hide-on-single-page="true"/>
+                        @current-change="onClickChangePage"/>
             </el-row>
         </el-drawer>
     </div>

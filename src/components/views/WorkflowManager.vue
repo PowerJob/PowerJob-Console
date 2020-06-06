@@ -31,8 +31,8 @@
     <!--第二行，工作流数据表格-->
     <el-row>
         <el-table :data="workflowPageResult.data" style="width: 100%">
-            <el-table-column prop="id" label="工作流ID" width="80"/>
-            <el-table-column prop="wfName" label="工作流名称" />
+            <el-table-column prop="id" label="工作流ID" width="120"/>
+            <el-table-column prop="wfName" label="工作流名称"/>
             <el-table-column label="定时信息" >
                 <template slot-scope="scope">
                     {{scope.row.timeExpressionType}}  {{scope.row.timeExpression}}

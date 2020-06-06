@@ -10,8 +10,8 @@
                     <el-form-item label="任务ID">
                         <el-input v-model="instanceQueryContent.jobId" placeholder="任务ID"/>
                     </el-form-item>
-                    <el-form-item  v-if="instanceQueryContent.type === 'WORKFLOW'" label="工作实例ID">
-                        <el-input v-model="instanceQueryContent.wfInstanceId" placeholder="工作实例ID"/>
+                    <el-form-item  v-if="instanceQueryContent.type === 'WORKFLOW'" label="工作流实例ID">
+                        <el-input v-model="instanceQueryContent.wfInstanceId" placeholder="工作流实例ID"/>
                     </el-form-item>
 
                     <el-form-item>
@@ -60,7 +60,6 @@
         <el-row>
             <el-col :span="24">
                 <el-pagination
-                        :hide-on-single-page="true"
                         :total="this.instancePageResult.totalItems"
                         :page-size="this.instancePageResult.pageSize"
                         @current-change="onClickChangeInstancePage"
@@ -129,7 +128,6 @@
             <el-row>
                 <el-col :span="24">
                     <el-pagination
-                            :hide-on-single-page="true"
                             :page-count="paginableInstanceLog.totalPages"
                             @current-change="onClickChangeLogPage"
                             layout="prev, pager, next"/>

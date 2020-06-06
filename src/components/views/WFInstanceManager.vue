@@ -66,7 +66,6 @@
     <el-row>
       <el-col :span="24">
         <el-pagination
-          :hide-on-single-page="true"
           :total="this.wfInstancePageResult.totalItems"
           :page-size="this.wfInstancePageResult.pageSize"
           @current-change="onClickChangeInstancePage"
