@@ -38,7 +38,7 @@
         </el-row>
         <el-row>
             <el-col :span="24">
-                执行结果：
+                执行结果（tips：点击节点可查看任务实例详情）：
                 <span class="title">{{ wfInstanceDetail.result }}</span>
             </el-col>
         </el-row>
@@ -149,8 +149,12 @@
                 inner.selectAll("g.node").on("click", e => {
                     this.wfInstanceDetail.peworkflowDAG.nodes.forEach(node => {
                         if (node.jobId == e) {
-                            this.currentInstanceId = node.instanceId;
-                            this.instanceDetailVisible = true;
+                            if (node.instanceId == undefined) {
+                                this.$message.warning("等待上游任务中...未生成任务实例，无法查看详情！")
+                            }else {
+                                this.currentInstanceId = node.instanceId;
+                                this.instanceDetailVisible = true;
+                            }
                         }
                     })
                 });

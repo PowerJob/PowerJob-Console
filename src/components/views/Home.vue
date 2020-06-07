@@ -13,6 +13,20 @@
                     本地浏览器时间：{{ this.common.timestamp2Str(new Date().getTime()) }}
                 </el-card>
             </el-col>
+            <a href="https://github.com/KFCFans/OhMyScheduler" target="_blank">
+                <el-col :span="6">
+                    <el-card shadow="always" style="text-align:center">
+                        项目地址
+                    </el-card>
+                </el-col>
+            </a>
+            <a href="https://www.yuque.com/ohmyscheduler/guidence" target="_blank" style="text-align:center">
+                <el-col :span="6">
+                    <el-card shadow="always">
+                        文档地址
+                    </el-card>
+                </el-col>
+            </a>
         </el-row>
 
         <!-- 第一行，显示概览 overview -->

@@ -14,7 +14,7 @@
               placeholder="工作流实例ID"
             />
           </el-form-item>
-          <el-form-item label="任务ID">
+          <el-form-item label="工作流ID">
             <el-input
               v-model="wfInstanceQueryContent.workflowId"
               placeholder="工作流ID"

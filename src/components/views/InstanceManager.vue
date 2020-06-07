@@ -154,6 +154,7 @@
             onClickRest() {
                 this.instanceQueryContent.jobId = undefined;
                 this.instanceQueryContent.instanceId = undefined;
+                this.instanceQueryContent.wfInstanceId = undefined;
                 this.listInstanceInfos();
             },
             // 点击查询详情

@@ -276,7 +276,7 @@
                         this.workflowInfo.peworkflowDAG.edges= [];
                         // 删除节点相关的所有边
                         oldEdges.forEach(edge => {
-                            if (!(edge.from === e.v && edge.to === e.w)) {
+                            if (!(edge.from == e.v && edge.to == e.w)) {
                                 this.workflowInfo.peworkflowDAG.edges.push(edge);
                             }
                             this.draw();
