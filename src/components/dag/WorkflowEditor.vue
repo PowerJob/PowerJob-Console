@@ -91,9 +91,9 @@
                 </el-form>
             </el-row>
             <el-table :data="jobInfoPageResult.data">
-                <el-table-column property="id" label="任务ID" width="80"/>
-                <el-table-column property="jobName" label="任务名称" width="200"/>
-                <el-table-column label="操作" width="300">
+                <el-table-column property="id" label="任务ID"/>
+                <el-table-column property="jobName" label="任务名称"/>
+                <el-table-column label="操作">
                     <template slot-scope="scope">
                         <el-button size="medium" @click="importNode(scope.row)">导入</el-button>
                     </template>
@@ -141,7 +141,7 @@
                 jobQueryContent: {
                     appId: this.$store.state.appInfo.id,
                     index: 0,
-                    pageSize: 20,
+                    pageSize: 10,
                     jobId: undefined,
                     keyword: undefined
                 },

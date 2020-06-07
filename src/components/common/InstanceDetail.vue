@@ -5,6 +5,11 @@
                 <el-button type="primary" @click="fetchInstanceDetail">刷新</el-button>
             </el-col>
         </el-row>
+        <el-row>
+            <el-col :span="24" >
+                任务实例ID: <span class='title' >{{instanceId}}</span>
+            </el-col>
+        </el-row>
         <el-row style="margin-top:-20px">
             <el-col :span="8">
                 状态: <span class='title' >{{instanceDetail.status}}</span>
@@ -72,5 +77,10 @@
 </script>
 
 <style scoped>
-
+    .title{
+        display: inline-block;
+        margin:5px 0;
+        font-size: 16px;
+        font-weight: bold;
+    }
 </style>

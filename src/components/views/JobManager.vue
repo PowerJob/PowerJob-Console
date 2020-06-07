@@ -319,7 +319,8 @@
             },
             // 点击 编辑按钮
             onClickModify(data) {
-                this.modifiedJobForm = data;
+                // 修复点击编辑后再点击新增 行数据被清空 的问题
+                this.modifiedJobForm = JSON.parse(JSON.stringify(data));
                 this.modifiedJobFormVisible = true;
             },
             // 点击 立即运行按钮

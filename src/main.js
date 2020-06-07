@@ -14,7 +14,7 @@ import store from "./store";
 import common from "./common";
 
 Vue.use(ElementUI);
-
+// let baseURL = "http://139.224.83.134:7700";
 let baseURL = process.env.VUE_APP_BASE_URL;
 
 let timeout = 5000;
@@ -42,7 +42,7 @@ axios.interceptors.response.use((response) => {
   if (response.data.success === true) {
     return response.data.data;
   }
-  // Message.warning("错误信息：" + response.data.message);
+  Message.warning("错误信息：" + response.data.message);
   return Promise.reject(response.data.msg);
 }, (error) => {
   Message.error(error.toString());
