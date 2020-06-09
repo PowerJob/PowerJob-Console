@@ -14,7 +14,7 @@
                         <template slot="title">
                             <!-- 图标 + 文字 -->
                             <i class="el-icon-monitor"/>
-                            <span>系统首页</span>
+                            <span>{{$t('message.tabHome')}}</span>
                         </template>
                     </el-menu-item>
 
@@ -22,7 +22,7 @@
                         <template slot="title">
                             <!-- 图标 + 文字 -->
                             <i class="el-icon-data-analysis"/>
-                            <span>任务管理</span>
+                            <span>{{$t('message.tabJobManage')}}</span>
                         </template>
                     </el-menu-item>
 
@@ -30,7 +30,7 @@
                         <template slot="title">
                             <!-- 图标 + 文字 -->
                             <i class="el-icon-s-data"/>
-                            <span>任务实例</span>
+                            <span>{{$t('message.tabJobInstance')}}</span>
                         </template>
                     </el-menu-item>
 
@@ -38,7 +38,7 @@
                         <template slot="title">
                             <!-- 图标 + 文字 -->
                             <i class="el-icon-share"/>
-                            <span>工作流管理</span>
+                            <span>{{$t('message.tabWorkflowManage')}}</span>
                         </template>
                     </el-menu-item>
 
@@ -46,7 +46,7 @@
                         <template slot="title">
                             <!-- 图标 + 文字 -->
                             <i class="el-icon-s-operation"/>
-                            <span>工作流实例</span>
+                            <span>{{$t('message.tabWfInstance')}}</span>
                         </template>
                     </el-menu-item>
 
@@ -54,10 +54,10 @@
                     <el-submenu index="/oms/">
                         <template slot="title">
                             <i class="el-icon-data-analysis"/>
-                            <span>容器运维</span>
+                            <span>{{$t('message.tabContainerOps')}}</span>
                         </template>
-                        <el-menu-item index="/oms/template">模版生成</el-menu-item>
-                        <el-menu-item index="/oms/containermanage">容器管理</el-menu-item>
+                        <el-menu-item index="/oms/template">{{$t('message.tabTemplate')}}</el-menu-item>
+                        <el-menu-item index="/oms/containermanage">{{$t('message.tabContainerManager')}}</el-menu-item>
                     </el-submenu>
 
                 </el-menu>
