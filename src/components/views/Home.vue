@@ -5,25 +5,25 @@
         <el-row :gutter="24">
             <el-col :span="6">
                 <el-card shadow="always">
-                    调度中心服务器时间：{{ this.common.timestamp2Str(systemInfo.serverTime) }}
+                    {{$t('message.omsServerTime')}}：{{ this.common.timestamp2Str(systemInfo.serverTime) }}
                 </el-card>
             </el-col>
             <el-col :span="6">
                 <el-card shadow="always">
-                    本地浏览器时间：{{ this.common.timestamp2Str(new Date().getTime()) }}
+                    {{$t('message.localBrowserTime')}}：{{ this.common.timestamp2Str(new Date().getTime()) }}
                 </el-card>
             </el-col>
             <a href="https://github.com/KFCFans/OhMyScheduler" target="_blank">
                 <el-col :span="6">
                     <el-card shadow="always" style="text-align:center">
-                        项目地址
+                        {{$t('message.githubURL')}}
                     </el-card>
                 </el-col>
             </a>
             <a href="https://www.yuque.com/ohmyscheduler/guidence" target="_blank" style="text-align:center">
                 <el-col :span="6">
                     <el-card shadow="always">
-                        文档地址
+                        {{$t('message.docURL')}}
                     </el-card>
                 </el-col>
             </a>
@@ -34,7 +34,7 @@
             <el-col :span="6">
                 <div class="wrap">
                     <div class="grid-content bg-purple">
-                        <div class="text mTitle">任务总数</div>
+                        <div class="text mTitle">{{$t('message.totalJobNum')}}</div>
                         <div class="text mText">{{systemInfo.jobCount}}</div>
                     </div>
                     <i class="el-icon-orange"/>
@@ -43,7 +43,7 @@
             <el-col :span="6">
                 <div class="wrap">
                     <div class="grid-content bg-purple">
-                        <div class="text mTitle">当前运行实例数</div>
+                        <div class="text mTitle">{{$t('message.runningInstanceNum')}}</div>
                         <div class="text">{{systemInfo.runningInstanceCount}}</div>
                     </div>
                     <i class="el-icon-loading"/>
@@ -52,7 +52,7 @@
             <el-col :span="6">
                 <div class="wrap">
                     <div class="grid-content bg-purple">
-                        <div class="text mTitle">近期失败任务数</div>
+                        <div class="text mTitle">{{$t('message.recentFailedInstanceNum')}}</div>
                         <div class="text">{{systemInfo.failedInstanceCount}}</div>
                     </div>
                     <i class="el-icon-bell"/>
@@ -61,7 +61,7 @@
             <el-col :span="6">
                 <div class="wrap">
                     <div class="grid-content bg-purple">
-                        <div class="text mTitle">集群机器数</div>
+                        <div class="text mTitle">{{$t('message.workerNum')}}</div>
                         <div class="text">{{activeWorkerCount}}</div>
                     </div>
                     <i class="el-icon-cpu"/>
@@ -76,10 +76,10 @@
                 <!-- 只要在el-table元素中定义了height属性，即可实现固定表头的表格，而不需要额外的代码 -->
                 <!-- 可以通过指定 Table 组件的 row-class-name 属性来为 Table 中的某一行添加 class，表明该行处于某种状 -->
                 <el-table :data="workerList" style="width: 100%" height="400px" :row-class-name="workerTableRowClassName">
-                    <el-table-column prop="address" label="机器地址"/>
-                    <el-table-column prop="cpuLoad" label="CPU占用"/>
-                    <el-table-column prop="memoryLoad" label="内存占用"/>
-                    <el-table-column prop="diskLoad" label="磁盘占用"/>
+                    <el-table-column prop="address" :label="$t('message.workerAddress')"/>
+                    <el-table-column prop="cpuLoad" :label="$t('message.cpuLoad')"/>
+                    <el-table-column prop="memoryLoad" :label="$t('message.memoryLoad')"/>
+                    <el-table-column prop="diskLoad" :label="$t('message.diskLoad')"/>
                 </el-table>
 
             </el-col>
