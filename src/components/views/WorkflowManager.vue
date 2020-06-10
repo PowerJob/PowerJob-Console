@@ -7,15 +7,15 @@
         <!-- 左侧搜索栏，占地面积 20/24 -->
         <el-col :span="20">
             <el-form :inline="true" :model="workflowQueryContent" class="el-form--inline">
-                <el-form-item label="工作流ID">
-                    <el-input v-model="workflowQueryContent.workflowId" placeholder="工作流ID"/>
+                <el-form-item :label="$t('message.wfId')">
+                    <el-input v-model="workflowQueryContent.workflowId" :placeholder="$t('message.wfId')"/>
                 </el-form-item>
-                <el-form-item label="关键字">
-                    <el-input v-model="workflowQueryContent.keyword" placeholder="关键字"/>
+                <el-form-item :label="$t('message.keyword')">
+                    <el-input v-model="workflowQueryContent.keyword" :placeholder="$t('message.keyword')"/>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="listWorkflow">查询</el-button>
-                    <el-button type="cancel" @click="onClickReset">重置</el-button>
+                    <el-button type="primary" @click="listWorkflow">{{$t('message.query')}}</el-button>
+                    <el-button type="cancel" @click="onClickReset">{{$t('message.reset')}}</el-button>
                 </el-form-item>
             </el-form>
         </el-col>
@@ -23,7 +23,7 @@
         <!-- 右侧新增任务按钮，占地面积 4/24 -->
         <el-col :span="4">
             <div style="float:right;padding-right:10px">
-                <el-button type="primary" @click="onClickNewWorkflow">新建工作流</el-button>
+                <el-button type="primary" @click="onClickNewWorkflow">{{$t('message.newWorkflow')}}</el-button>
             </div>
         </el-col>
     </el-row>
@@ -31,23 +31,23 @@
     <!--第二行，工作流数据表格-->
     <el-row>
         <el-table :data="workflowPageResult.data" style="width: 100%">
-            <el-table-column prop="id" label="工作流ID" width="120"/>
-            <el-table-column prop="wfName" label="工作流名称"/>
-            <el-table-column label="定时信息" >
+            <el-table-column prop="id" :label="$t('message.wfId')" width="120"/>
+            <el-table-column prop="wfName" :label="$t('message.wfName')"/>
+            <el-table-column :label="$t('message.scheduleInfo')" >
                 <template slot-scope="scope">
                     {{scope.row.timeExpressionType}}  {{scope.row.timeExpression}}
                 </template>
             </el-table-column>
-            <el-table-column label="状态" width="80">
+            <el-table-column :label="$t('message.status')" width="80">
                 <template slot-scope="scope">
                     <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="switchWorkflow(scope.row)"/>
                 </template>
             </el-table-column>
-            <el-table-column label="操作" width="300">
+            <el-table-column :label="$t('message.operation')" width="300">
                 <template slot-scope="scope">
-                    <el-button size="medium" @click="onClickModifyWorkflow(scope.row)">编辑</el-button>
-                    <el-button size="medium" @click="onClickRunWorkflow(scope.row)">运行</el-button>
-                    <el-button size="medium" type="danger" @click="onClickDeleteWorkflow(scope.row)">删除</el-button>
+                    <el-button size="medium" @click="onClickModifyWorkflow(scope.row)">{{$t('message.edit')}}</el-button>
+                    <el-button size="medium" @click="onClickRunWorkflow(scope.row)">{{$t('message.run')}}</el-button>
+                    <el-button size="medium" type="danger" @click="onClickDeleteWorkflow(scope.row)">{{$t('message.delete')}}</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -117,14 +117,14 @@
             onClickRunWorkflow(data) {
                 let that = this;
                 let url = "/workflow/run?appId=" + this.$store.state.appInfo.id + "&workflowId=" + data.id;
-                this.axios.get(url).then(() => that.$message.success("触发成功"));
+                this.axios.get(url).then(() => that.$message.success(this.$t('message.success')));
             },
             // 删除工作流
             onClickDeleteWorkflow(data) {
                 let that = this;
                 let url = "/workflow/delete?appId=" + this.$store.state.appInfo.id + "&workflowId=" + data.id;
                 this.axios.get(url).then(() => {
-                    that.$message.success("删除成功");
+                    that.$message.success(this.$t('message.success'));
                     that.listWorkflow();
                 });
             },

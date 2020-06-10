@@ -12,6 +12,21 @@ const en = {
         'run': 'run',
         'edit': 'edit',
         'delete': 'delete',
+        'detail': 'detail',
+        'download': 'download',
+        'stop': 'stop',
+        'back': '返回',
+
+        // 欢迎界面
+        'appRegister': 'Application Registration',
+        'userRegister': 'User registration',
+        'appNameInputPLH': 'Please enter the appName',
+        'appName': 'AppName',
+        'appDescription': 'AppDescription',
+        'register': 'register',
+        'name': 'name',
+        'phone': 'phone',
+        'email': 'email',
 
         'tabHome': 'Home',
         'tabJobManage': 'JobManage',
@@ -35,7 +50,7 @@ const en = {
         'memoryLoad': 'Memory Load',
         'diskLoad': 'Disk Load',
 
-        // 任务管理
+        // JobManage
         'jobId': 'JobID',
         'instanceId': 'InstanceID',
         'jobName': 'JobName',
@@ -79,6 +94,60 @@ const en = {
         'fixRate': 'Fix Rate (ms)',
         'fixDelay': 'Fix Delay (ms)',
         'workflow': 'workflow',
+
+        // JobInstance
+        'wfInstanceId': 'WorkflowInstanceId',
+        'normalInstance': 'normal instance',
+        'wfInstance': 'workflow instance',
+        'triggerTime': 'trigger time',
+        'finishedTime': 'finished time',
+        'log': 'log',
+        'runningTimes': 'running times',
+        'taskTrackerAddress': 'taskTracker address',
+        'startTime': 'start time',
+        'result': 'result',
+        'subTaskInfo': 'subTask info',
+        'secondlyJobHistory': 'secondlyJobHistory',
+        'subInstanceId': 'subInstanceId',
+
+        // workflowManage
+        'wfId': 'WorkflowID',
+        'wfName': 'WorkflowName',
+        'newWorkflow': 'new workflow',
+        'wfDescription': 'description',
+        'importJob': 'import job',
+        'deleteJob': 'delete job',
+        'newStartPoint': 'new starting point',
+        'newEndPoint': 'new ending point',
+        'deleteEdge': 'delete edge',
+        'importJobTitle': "select jobs",
+        'wfTimeExpressionPLH': 'cron expression for CRON or empty for API',
+        'import': 'import',
+        'ntfClickNeedDeleteNode': 'Please click on the node you want to delete.',
+        'ntfClickStartPoint': 'Please click on the start node',
+        'ntfClickTargetPoint': 'Please click on the end node',
+        'ntfClickDeleteEdge': 'Please click on the edge you want to remove.',
+        'ntfAddStartPointFirst': 'Please add the starting point first!',
+        'ntfInvalidEdge': 'Illegal operation (same origin and destination)!',
+
+        // workflowInstance
+        'wfTips': 'tips：Click on a node to view details of a job instance',
+        'ntfClickWaitingNode': 'Waiting for the upstream instances... No instances have been generated, and details cannot be viewed!',
+
+        // 容器
+        'newContainer': 'new container',
+        'containerType': 'type',
+        'containerGitURL': 'Git URL',
+        'branchName': 'branch',
+        'username': 'username',
+        'password': 'password',
+        'containerId': 'ID',
+        'containerName': 'name',
+        'containerVersion': 'version',
+        'deployTime': 'deployed time',
+        'deploy': 'deploy',
+        'deployedWorkerList': 'worker list',
+        'uploadTips': 'Drag and drop or click on the file to upload it automatically'
     },
     ...enLocale
 };

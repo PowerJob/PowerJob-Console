@@ -2,27 +2,27 @@
     <div>
         <el-row style="margin: 20px">
             <el-col :span="1">
-                <el-button type="primary" @click="back">返回</el-button>
+                <el-button type="primary" @click="back">{{$t('message.back')}}</el-button>
             </el-col>
             <el-col :span="1" :offset="22">
-                <el-button type="success" @click="saveWorkflow">保存</el-button>
+                <el-button type="success" @click="saveWorkflow">{{$t('message.save')}}</el-button>
             </el-col>
         </el-row>
 
         <el-row>
             <el-form ref="form" :model="workflowInfo">
 
-                <el-form-item label="工作流名称">
+                <el-form-item :label="$t('message.wfName')">
                     <el-input v-model="workflowInfo.wfName"/>
                 </el-form-item>
-                <el-form-item label="工作流描述">
+                <el-form-item :label="$t('message.wfDescription')">
                     <el-input v-model="workflowInfo.wfDescription"/>
                 </el-form-item>
 
-                <el-form-item label="定时信息">
+                <el-form-item :label="$t('message.scheduleInfo')">
                     <el-row>
                         <el-col :span="6">
-                            <el-select v-model="workflowInfo.timeExpressionType" placeholder="时间表达式类型">
+                            <el-select v-model="workflowInfo.timeExpressionType" :placeholder="$t('message.timeExpressionType')">
                                 <el-option
                                         v-for="item in timeExpressionTypeOptions"
                                         :key="item.key"
@@ -32,17 +32,17 @@
                             </el-select>
                         </el-col>
                         <el-col :span="12">
-                            <el-input v-model="workflowInfo.timeExpression" placeholder="CRON填写CRON表达式，API无需填写" />
+                            <el-input v-model="workflowInfo.timeExpression" :placeholder="$t('message.wfTimeExpressionPLH')" />
                         </el-col>
                     </el-row>
                 </el-form-item>
 
-                <el-form-item label="最大实例">
+                <el-form-item :label="$t('message.maxInstanceNum')">
                     <el-input-number v-model="workflowInfo.maxWfInstanceNum"/>
                 </el-form-item>
 
-                <el-form-item label="报警配置">
-                    <el-select v-model="workflowInfo.notifyUserIds" multiple filterable placeholder="选择报警通知人员">
+                <el-form-item :label="$t('message.alarmConfig')">
+                    <el-select v-model="workflowInfo.notifyUserIds" multiple filterable :placeholder="$t('message.alarmSelectorPLH')">
                         <el-option
                                 v-for="user in userList"
                                 :key="user.id"
@@ -56,11 +56,11 @@
 
         <el-row>
             <el-row>
-                <el-button @click="onClickImportNode">导入任务</el-button>
-                <el-button @click="onClickRemoveNode">删除任务</el-button>
-                <el-button @click="onClickAddFrom">新增起点</el-button>
-                <el-button @click="onClickAddTo">新增终点</el-button>
-                <el-button @click="onClickRemoveEdge">删除边</el-button>
+                <el-button @click="onClickImportNode">{{$t('message.importJob')}}</el-button>
+                <el-button @click="onClickRemoveNode">{{$t('message.deleteJob')}}</el-button>
+                <el-button @click="onClickAddFrom">{{$t('message.newStartPoint')}}</el-button>
+                <el-button @click="onClickAddTo">{{$t('message.newEndPoint')}}</el-button>
+                <el-button @click="onClickRemoveEdge">{{$t('message.deleteEdge')}}</el-button>
             </el-row>
             <div>
                 <svg width="80%" height=1000px id="svgCanvas">
@@ -72,30 +72,30 @@
 
         <!-- 导入选择器 -->
         <el-drawer
-                title="请选择需要导入工作流的任务"
+                :title="$t('message.importJobTitle')"
                 :visible.sync="importDrawerVisible"
                 direction="rtl"
                 size="50%">
             <el-row>
                 <el-form :inline="true" :model="jobQueryContent" class="el-form--inline">
-                    <el-form-item label="任务ID">
-                        <el-input v-model="jobQueryContent.jobId" placeholder="任务ID"/>
+                    <el-form-item :label="$t('message.jobId')">
+                        <el-input v-model="jobQueryContent.jobId" :placeholder="$t('message.jobId')"/>
                     </el-form-item>
-                    <el-form-item label="关键字">
-                        <el-input v-model="jobQueryContent.keyword" placeholder="关键字"/>
+                    <el-form-item :label="$t('message.keyword')">
+                        <el-input v-model="jobQueryContent.keyword" :placeholder="$t('message.keyword')"/>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="listJobInfos">查询</el-button>
-                        <el-button type="cancel" @click="onClickReset">重置</el-button>
+                        <el-button type="primary" @click="listJobInfos">{{$t('message.query')}}</el-button>
+                        <el-button type="cancel" @click="onClickReset">{{$t('message.reset')}}</el-button>
                     </el-form-item>
                 </el-form>
             </el-row>
             <el-table :data="jobInfoPageResult.data">
-                <el-table-column property="id" label="任务ID"/>
-                <el-table-column property="jobName" label="任务名称"/>
-                <el-table-column label="操作">
+                <el-table-column property="id" :label="$t('message.jobId')"/>
+                <el-table-column property="jobName" :label="$t('message.jobName')"/>
+                <el-table-column :label="$t('message.operation')">
                     <template slot-scope="scope">
-                        <el-button size="medium" @click="importNode(scope.row)">导入</el-button>
+                        <el-button size="medium" @click="importNode(scope.row)">{{$t('message.import')}}</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -133,7 +133,7 @@
                     wfDescription: undefined,
                     wfName: undefined
                 },
-                timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON表达式"} ],
+                timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"} ],
                 userList: [],
 
                 // 导入任务相关
@@ -202,25 +202,25 @@
             // 删除任务
             onClickRemoveNode() {
                 this.event = 3;
-                this.$message.info("请点击需要删除的节点");
+                this.$message.info(this.$t('message.ntfClickNeedDeleteNode'));
             },
             onClickAddFrom() {
                 this.event = 1;
-                this.$message.info("请点击起始节点");
+                this.$message.info(this.$t('message.ntfClickStartPoint'));
             },
             onClickAddTo() {
                 this.event = 2;
-                this.$message.info("请点击目标节点");
+                this.$message.info(this.$t('message.ntfClickTargetPoint'));
             },
             onClickRemoveEdge() {
                 this.event = 4;
-                this.$message.info("请点击需要删除的边");
+                this.$message.info(this.$t('message.ntfClickDeleteEdge'));
             },
             // 保存工作流
             saveWorkflow() {
                 const that = this;
                 this.axios.post("/workflow/save", this.workflowInfo).then(() => {
-                    that.$message.success("保存成功！");
+                    that.$message.success(this.$t('message.success'));
                     that.back();
                 });
             },
@@ -312,11 +312,11 @@
                     case 2: {
                         let to = nodeId;
                         if (this.from === undefined) {
-                            this.$message.warning("请先添加起点！");
+                            this.$message.warning(this.$t('message.ntfAddStartPointFirst'));
                             break;
                         }
                         if (this.from === to) {
-                            this.$message.warning("非法操作（起点终点相同）！");
+                            this.$message.warning(this.$t('message.ntfInvalidEdge'));
                             break;
                         }
 
@@ -337,7 +337,6 @@
                     }
                 }
             }
-
 
         },
         mounted() {

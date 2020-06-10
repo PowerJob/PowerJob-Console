@@ -14,6 +14,22 @@ const cn = {
         'delete': '删除',
         'success': '成功',
         'failed': '失败',
+        'detail': '详情',
+        'download': '下载',
+        'stop': '停止',
+        'back': '返回',
+
+        // 欢迎界面
+        'appRegister': '应用注册',
+        'userRegister': '用户注册',
+        'appNameInputPLH': '请输入应用名称',
+        'appName': '应用名称',
+        'appDescription': '应用描述',
+        'register': '注册',
+        'name': '姓名',
+        'phone': '手机号',
+        'email': '邮箱地址',
+
 
         // 左侧tab栏
         'tabHome': '系统首页',
@@ -84,6 +100,59 @@ const cn = {
         'fixDelay': '固定延迟（毫秒）',
         'workflow': '工作流',
 
+        // 任务实例管理
+        'wfInstanceId': '工作流实例ID',
+        'normalInstance': '普通任务实例',
+        'wfInstance': '工作流任务实例',
+        'triggerTime': '触发时间',
+        'finishedTime': '结束时间',
+        'log': '日志',
+        'runningTimes': '运行次数',
+        'taskTrackerAddress': 'TaskTracker 地址',
+        'startTime': '开始时间',
+        'result': '运行结果',
+        'subTaskInfo': '子任务数据',
+        'secondlyJobHistory': '最近10条秒级任务历史记录',
+        'subInstanceId': '子任务实例ID',
+
+        // 工作流管理
+        'wfId': '工作流ID',
+        'wfName': '工作流名称',
+        'newWorkflow': '新建工作流',
+        'wfDescription': '工作流描述',
+        'importJob': '导入任务',
+        'deleteJob': '删除任务',
+        'newStartPoint': '新增起点',
+        'newEndPoint': '新增终点',
+        'deleteEdge': '删除边',
+        'importJobTitle': "请选择需要导入工作流的任务",
+        'wfTimeExpressionPLH': 'CRON填写CRON表达式，API无需填写',
+        'import': '导入',
+        'ntfClickNeedDeleteNode': '请点击需要删除的节点',
+        'ntfClickStartPoint': '请点击起始节点',
+        'ntfClickTargetPoint': '请点击目标节点',
+        'ntfClickDeleteEdge': '请点击需要删除的边',
+        'ntfAddStartPointFirst': '请先添加起点!',
+        'ntfInvalidEdge': '非法操作（起点终点相同）！',
+
+        // 工作流实例
+        'wfTips': 'tips：点击节点可查看任务实例详情',
+        'ntfClickWaitingNode': '等待上游任务中...未生成任务实例，无法查看详情！',
+
+        // 容器
+        'newContainer': '新增容器',
+        'containerType': '容器类型',
+        'containerGitURL': 'Git仓库地址',
+        'branchName': '分支名称',
+        'username': '用户名',
+        'password': '密码',
+        'containerId': '容器ID',
+        'containerName': '容器名称',
+        'containerVersion': '容器版本',
+        'deployTime': '部署时间',
+        'deploy': '部署',
+        'deployedWorkerList': '机器列表',
+        'uploadTips': '拖拽或点击文件后会自动上传'
 
     },
     ...zhLocale

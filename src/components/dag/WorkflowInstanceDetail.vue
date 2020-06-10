@@ -2,43 +2,43 @@
     <div>
         <el-row>
             <el-col :span="1">
-                <el-button type="primary" @click="back">返回</el-button>
+                <el-button type="primary" @click="back">{{$t('message.back')}}</el-button>
             </el-col>
             <el-col :span="1" :offset="22">
-                <el-button type="success" @click="fetchWfInstanceInfo">刷新</el-button>
+                <el-button type="success" @click="fetchWfInstanceInfo">{{$t('message.refresh')}}</el-button>
             </el-col>
         </el-row>
 
         <el-row>
             <el-col :span="24">
-                工作流整体状态：
+                {{$t('message.status')}}：
                 <span class="title">{{ wfInstanceDetail.statusStr }}</span>
             </el-col>
         </el-row>
 
         <el-row>
             <el-col :span="8">
-                工作流ID：
+                {{$t('message.wfId')}}：
                 <span class="title">{{ wfInstanceDetail.workflowId }}</span>
             </el-col>
             <el-col :span="16">
-                工作流实例ID：
+                {{$t('message.wfInstanceId')}}：
                 <span class="title">{{ wfInstanceDetail.wfInstanceId }}</span>
             </el-col>
         </el-row>
         <el-row>
             <el-col :span="8">
-                触发时间：
+                {{$t('message.triggerTime')}}：
                 <span class="title">{{ wfInstanceDetail.actualTriggerTime }}</span>
             </el-col>
             <el-col :span="8">
-                结束时间：
+                {{$t('message.finishedTime')}}：
                 <span class="title">{{ wfInstanceDetail.finishedTime }}</span>
             </el-col>
         </el-row>
         <el-row>
             <el-col :span="24">
-                执行结果（tips：点击节点可查看任务实例详情）：
+                {{$t('message.result')}}（{{$t('message.wfTips')}}）：
                 <span class="title">{{ wfInstanceDetail.result }}</span>
             </el-col>
         </el-row>
@@ -51,7 +51,7 @@
             </div>
         </el-row>
 
-        <el-dialog title="任务实例详情" :visible.sync="instanceDetailVisible" v-if='instanceDetailVisible'>
+        <el-dialog :visible.sync="instanceDetailVisible" v-if='instanceDetailVisible'>
             <InstanceDetail :instance-id="currentInstanceId"/>
         </el-dialog>
     </div>
@@ -111,10 +111,10 @@
                         default: color = "#CACFD2"; statusStr = "等待上游节点";break;
                     }
 
-                    let l = "任务ID: " + node.jobId + "\n" +
-                             "任务名称:" + node.jobName + "\n" +
-                             "状态:" + statusStr + "\n" +
-                             "任务实例ID:" + node.instanceId ;
+                    let l = this.$t('message.jobId') + ": " + node.jobId + "\n" +
+                             this.$t('message.jobName') + ": " + node.jobName + "\n" +
+                             this.$t('message.status') + ": " + statusStr + "\n" +
+                             this.$t('message.instanceId') + ": " + node.instanceId ;
 
 
                     return {
@@ -150,7 +150,7 @@
                     this.wfInstanceDetail.peworkflowDAG.nodes.forEach(node => {
                         if (node.jobId == e) {
                             if (node.instanceId == undefined) {
-                                this.$message.warning("等待上游任务中...未生成任务实例，无法查看详情！")
+                                this.$message.warning(this.$t('message.ntfClickWaitingNode'))
                             }else {
                                 this.currentInstanceId = node.instanceId;
                                 this.instanceDetailVisible = true;

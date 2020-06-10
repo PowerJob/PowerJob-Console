@@ -2,7 +2,7 @@
     <div id="welcome">
 
         <!-- <h3 class="topBar"><span class="left">OhMy</span><span class="right">Scheduler</span></h3> -->
-        <el-button type="primary" plain @click="appRegisterFormVisible = true">应用注册</el-button>
+        <el-button type="primary" plain @click="appRegisterFormVisible = true">{{$t('message.userRegister')}}</el-button>
 
         <div id="entrance">
             <el-select
@@ -11,7 +11,7 @@
                     filterable
                     remote
                     reserve-keyword
-                    placeholder="请输入应用名称"
+                    :placeholder="$t('message.appNameInputPLH')"
                     :remote-method="fetchAppNames"
                     @change="selectedApp"
                     :loading="loading">
@@ -24,44 +24,44 @@
             </el-select>
         </div>
 
-        <el-button type="success" plain @click="userRegisterFormVisible = true">用户注册</el-button>
+        <el-button type="success" plain @click="userRegisterFormVisible = true">{{$t('message.register')}}</el-button>
 
-        <el-dialog title="应用注册" :visible.sync="appRegisterFormVisible" width="35%" >
+        <el-dialog :title="$t('message.appRegister')" :visible.sync="appRegisterFormVisible" width="35%" >
             <el-form :model="appRegisterForm" style="margin:0 5px">
 
-                <el-form-item label="应用名称">
+                <el-form-item :label="$t('message.appName')">
                     <el-input v-model="appRegisterForm.appName"/>
                 </el-form-item>
 
-                <el-form-item label="应用描述">
+                <el-form-item :label="$t('message.appDescription')">
                     <el-input v-model="appRegisterForm.description"/>
                 </el-form-item>
 
                 <el-form-item>
-                    <el-button type="primary" @click="registerApp">注册</el-button>
-                    <el-button @click="appRegisterFormVisible = false">取消</el-button>
+                    <el-button type="primary" @click="registerApp">{{$t('message.register')}}</el-button>
+                    <el-button @click="appRegisterFormVisible = false">{{$t('message.cancel')}}</el-button>
                 </el-form-item>
             </el-form>
         </el-dialog>
 
-        <el-dialog title="用户注册" :visible.sync="userRegisterFormVisible" width="35%" >
+        <el-dialog :title="$t('message.userRegister')" :visible.sync="userRegisterFormVisible" width="35%" >
             <el-form :model="userRegisterForm" style="margin:0 5px">
 
-                <el-form-item label="姓名">
+                <el-form-item :label="$t('message.name')">
                     <el-input v-model="userRegisterForm.username"/>
                 </el-form-item>
 
-                <el-form-item label="手机号">
+                <el-form-item :label="$t('message.phone')">
                     <el-input v-model="userRegisterForm.phone"/>
                 </el-form-item>
 
-                <el-form-item label="邮箱地址">
+                <el-form-item :label="$t('message.mail')">
                     <el-input v-model="userRegisterForm.email"/>
                 </el-form-item>
 
                 <el-form-item>
-                    <el-button type="primary" @click="registerUser">注册</el-button>
-                    <el-button @click="userRegisterFormVisible = false">取消</el-button>
+                    <el-button type="primary" @click="registerUser">{{$t('message.register')}}</el-button>
+                    <el-button @click="userRegisterFormVisible = false">{{$t('message.cancel')}}</el-button>
                 </el-form-item>
 
             </el-form>
@@ -119,7 +119,7 @@
             registerApp() {
                 const that = this;
                 this.axios.post("/appInfo/save", this.appRegisterForm).then(() => {
-                   that.$message.success("应用注册成功!");
+                   that.$message.success(this.$t('message.success'));
                    that.appRegisterFormVisible = false;
                 }, that.appRegisterFormVisible = false);
             },
@@ -127,7 +127,7 @@
             registerUser() {
                 const that = this;
                 this.axios.post("/user/save", this.userRegisterForm).then(() => {
-                    that.$message.success("用户注册成功!");
+                    that.$message.success(this.$t('message.success'));
                     that.userRegisterFormVisible = false;
                 }, that.userRegisterFormVisible = false);
             }
