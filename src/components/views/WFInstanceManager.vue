@@ -45,7 +45,11 @@
         <el-table-column prop="workflowId" :label="$t('message.wfId')" width="160" />
         <el-table-column prop="workflowName" :label="$t('message.wfName')" />
         <el-table-column prop="wfInstanceId" :label="$t('message.wfInstanceId')" />
-        <el-table-column prop="statusStr" :label="$t('message.status')" width="80" />
+        <el-table-column prop="status" :label="$t('message.status')" width="160">
+          <template slot-scope="scope">
+            {{fetchWFStatus(scope.row.status)}}
+          </template>
+        </el-table-column>
         <el-table-column prop="actualTriggerTime" :label="$t('message.triggerTime')" />
         <el-table-column prop="finishedTime" :label="$t('message.finishedTime')" />
 
@@ -108,6 +112,7 @@ export default {
     onClickRest() {
       this.wfInstanceQueryContent.wfInstanceId = undefined;
       this.wfInstanceQueryContent.workflowId = undefined;
+      this.listWfInstances();
     },
     // 查看工作流详情
     onClickShowDetail(data) {
@@ -152,6 +157,9 @@ export default {
         case 10:
           return "warning-row";
       }
+    },
+    fetchWFStatus(status) {
+      return this.common.translateWfInstanceStatus(status);
     }
   },
   mounted() {

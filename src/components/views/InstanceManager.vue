@@ -41,7 +41,7 @@
                 <el-table-column prop="jobName" :label="$t('message.jobName')"/>
                 <el-table-column v-if="instanceQueryContent.type === 'WORKFLOW'" prop="wfInstanceId" :label="$t('message.wfInstanceId')"/>
                 <el-table-column prop="instanceId" :label="$t('message.instanceId')"/>
-                <el-table-column prop="status" :label="$t('message.status')" width="80">
+                <el-table-column prop="status" :label="$t('message.status')" width="160">
                     <template slot-scope="scope">
                         {{fetchStatus(scope.row.status)}}
                     </template>
@@ -218,7 +218,6 @@
             },
             // 获取状态
             fetchStatus(s) {
-                console.log("zz : %o", s);
                 return this.common.translateInstanceStatus(s);
             }
         },

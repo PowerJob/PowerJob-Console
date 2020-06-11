@@ -12,10 +12,12 @@ const en = {
         'run': 'run',
         'edit': 'edit',
         'delete': 'delete',
+        'success': 'success',
+        'failed': 'failed',
         'detail': 'detail',
         'download': 'download',
         'stop': 'stop',
-        'back': '返回',
+        'back': 'back',
 
         // 欢迎界面
         'appRegister': 'Application Registration',
@@ -131,7 +133,7 @@ const en = {
         'ntfInvalidEdge': 'Illegal operation (same origin and destination)!',
 
         // workflowInstance
-        'wfTips': 'tips：Click on a node to view details of a job instance',
+        'wfTips': 'tips：Click on a node to view details of the job instance',
         'ntfClickWaitingNode': 'Waiting for the upstream instances... No instances have been generated, and details cannot be viewed!',
 
         // 容器
@@ -151,10 +153,12 @@ const en = {
 
         // 任务实例状态
         'waitingDispatch': 'waiting dispatch',
-        'waitingWorkerReceive': 'waiting worker receive',
+        'waitingWorkerReceive': 'waiting receive',
         'running': 'running',
         'stopped': 'stopped',
         'wfWaiting': 'waiting',
+        'waitingUpstream': 'waiting upstream'
+
     },
     ...enLocale
 };

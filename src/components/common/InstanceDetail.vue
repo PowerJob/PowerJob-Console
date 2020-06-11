@@ -12,7 +12,7 @@
         </el-row>
         <el-row style="margin-top:-20px">
             <el-col :span="8">
-                {{$t('message.status')}}: <span class='title' >{{instanceDetail.status}}</span>
+                {{$t('message.status')}}: <span class='title' >{{this.common.translateInstanceStatus(instanceDetail.status)}}</span>
             </el-col>
             <el-col :span="16">
                 {{$t('message.runningTimes')}}：<span class='title' >{{instanceDetail.runningTimes}}</span>
@@ -45,7 +45,7 @@
                 <el-table-column prop="subInstanceId" :label="$t('message.subInstanceId')" width="120"/>
                 <el-table-column prop="startTime" :label="$t('message.startTime')" width="160"/>
                 <el-table-column prop="finishedTime" :label="$t('message.finishedTime')" width="160"/>
-                <el-table-column prop="status" :label="$t('message.status')" width="100"/>
+                <el-table-column prop="status" :label="$t('message.status')" width="160"/>
                 <el-table-column prop="result" :label="$t('message.result')"/>
             </el-table>
         </el-row>

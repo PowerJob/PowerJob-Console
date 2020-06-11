@@ -160,6 +160,7 @@ const cn = {
         'running': '运行中',
         'stopped': '手动停止',
         'wfWaiting': '等待调度',
+        'waitingUpstream': '等待上游节点'
 
     },
     ...zhLocale

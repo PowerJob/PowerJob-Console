@@ -4,7 +4,7 @@
             <el-col :span="1">
                 <el-button type="primary" @click="back">{{$t('message.back')}}</el-button>
             </el-col>
-            <el-col :span="1" :offset="22">
+            <el-col :span="1" :offset="17">
                 <el-button type="success" @click="fetchWfInstanceInfo">{{$t('message.refresh')}}</el-button>
             </el-col>
         </el-row>
@@ -12,7 +12,7 @@
         <el-row>
             <el-col :span="24">
                 {{$t('message.status')}}：
-                <span class="title">{{ wfInstanceDetail.statusStr }}</span>
+                <span class="title">{{ this.common.translateWfInstanceStatus(wfInstanceDetail.status) }}</span>
             </el-col>
         </el-row>
 
@@ -104,11 +104,11 @@
                     let color;
                     let statusStr;
                     switch (node.status) {
-                        case 3: color="#3498DB"; statusStr = "运行中";break;
-                        case 4: color = "#EC7063"; statusStr = "失败";break;
-                        case 5: color = "#58D68D"; statusStr = "成功";break;
-                        case 10: color = "#F1C40F"; statusStr = "手动停止";break;
-                        default: color = "#CACFD2"; statusStr = "等待上游节点";break;
+                        case 3: color="#3498DB"; statusStr = this.$t('message.running');break;
+                        case 4: color = "#EC7063"; statusStr = this.$t('message.failed');break;
+                        case 5: color = "#58D68D"; statusStr = this.$t('message.success');break;
+                        case 10: color = "#F1C40F"; statusStr = this.$t('message.stopped');break;
+                        default: color = "#CACFD2"; statusStr = this.$t('message.waitingUpstream');break;
                     }
 
                     let l = this.$t('message.jobId') + ": " + node.jobId + "\n" +

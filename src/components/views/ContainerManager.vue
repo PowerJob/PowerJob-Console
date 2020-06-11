@@ -129,7 +129,7 @@
                         let appId = this.$store.state.appInfo.id;
                         this.flyio.get("/container/list?appId=" + appId).then(res => {
                             if(res.data.success){
-                            this.$message(this.$t('message.success'));
+                            this.$message.info(this.$t('message.success'));
                             // 恢复默认表单
                             this.dialogVisible = false;
                             this.form.containerName = '';
@@ -142,7 +142,7 @@
                      });
                    }
                    else{
-                       this.$message(this.$t('message.failed'));
+                       this.$message.warning(this.$t('message.failed'));
                    }
                });
             },
@@ -155,7 +155,7 @@
                 this.flyio.get("/container/delete?containerId="+ item.id+'&appId='+appId).then(res => {
                     console.log(res);
                     this.containerList.splice(index,1);
-                    this.$message(this.$t('message.success'));
+                    this.$message.info(this.$t('message.success'));
                 });
             },
             editItem(item){
