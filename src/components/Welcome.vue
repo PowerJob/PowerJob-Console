@@ -1,74 +1,91 @@
  <template>
-    <div id="welcome">
+     <div id="container">
 
-        <!-- <h3 class="topBar"><span class="left">OhMy</span><span class="right">Scheduler</span></h3> -->
-        <el-button type="primary" plain @click="appRegisterFormVisible = true">{{$t('message.appRegister')}}</el-button>
+         <div id="head">
+             <el-row>
+                 <el-col :offset="22">
+                     <el-dropdown @command="this.common.switchLanguage">
+                        <span class="el-dropdown-link">
+                            <p style="color:#ffffff">Language<i class="el-icon-arrow-down el-icon--right"/></p>
+                        </span>
+                         <el-dropdown-menu slot="dropdown">
+                             <el-dropdown-item command="en">English</el-dropdown-item>
+                             <el-dropdown-item command="cn">简体中文</el-dropdown-item>
+                         </el-dropdown-menu>
+                     </el-dropdown>
+                 </el-col>
+             </el-row>
+         </div>
 
-        <div id="entrance">
-            <el-select
-                    id="appSelect"
-                    v-model="selectedAppInfo"
-                    filterable
-                    remote
-                    reserve-keyword
-                    :placeholder="$t('message.appNameInputPLH')"
-                    :remote-method="fetchAppNames"
-                    @change="selectedApp"
-                    :loading="loading">
-                <el-option
-                        v-for="appInfo in appInfoList"
-                        :key="appInfo.id"
-                        :label="appInfo.appName"
-                        :value="appInfo">
-                </el-option>
-            </el-select>
-        </div>
+         <div id="welcome">
 
-        <el-button type="success" plain @click="userRegisterFormVisible = true">{{$t('message.userRegister')}}</el-button>
+             <!-- <h3 class="topBar"><span class="left">OhMy</span><span class="right">Scheduler</span></h3> -->
+             <el-button type="primary" plain @click="appRegisterFormVisible = true">{{$t('message.appRegister')}}</el-button>
 
-        <el-dialog :title="$t('message.appRegister')" :visible.sync="appRegisterFormVisible" width="35%" >
-            <el-form :model="appRegisterForm" style="margin:0 5px">
+             <div id="entrance">
+                 <el-select
+                         id="appSelect"
+                         v-model="selectedAppInfo"
+                         filterable
+                         remote
+                         reserve-keyword
+                         :placeholder="$t('message.appNameInputPLH')"
+                         :remote-method="fetchAppNames"
+                         @change="selectedApp"
+                         :loading="loading">
+                     <el-option
+                             v-for="appInfo in appInfoList"
+                             :key="appInfo.id"
+                             :label="appInfo.appName"
+                             :value="appInfo">
+                     </el-option>
+                 </el-select>
+             </div>
 
-                <el-form-item :label="$t('message.appName')">
-                    <el-input v-model="appRegisterForm.appName"/>
-                </el-form-item>
+             <el-button type="success" plain @click="userRegisterFormVisible = true">{{$t('message.userRegister')}}</el-button>
 
-                <el-form-item :label="$t('message.appDescription')">
-                    <el-input v-model="appRegisterForm.description"/>
-                </el-form-item>
+             <el-dialog :title="$t('message.appRegister')" :visible.sync="appRegisterFormVisible" width="35%" >
+                 <el-form :model="appRegisterForm" style="margin:0 5px">
 
-                <el-form-item>
-                    <el-button type="primary" @click="registerApp">{{$t('message.register')}}</el-button>
-                    <el-button @click="appRegisterFormVisible = false">{{$t('message.cancel')}}</el-button>
-                </el-form-item>
-            </el-form>
-        </el-dialog>
+                     <el-form-item :label="$t('message.appName')">
+                         <el-input v-model="appRegisterForm.appName"/>
+                     </el-form-item>
 
-        <el-dialog :title="$t('message.userRegister')" :visible.sync="userRegisterFormVisible" width="35%" >
-            <el-form :model="userRegisterForm" style="margin:0 5px">
+                     <el-form-item :label="$t('message.appDescription')">
+                         <el-input v-model="appRegisterForm.description"/>
+                     </el-form-item>
 
-                <el-form-item :label="$t('message.name')">
-                    <el-input v-model="userRegisterForm.username"/>
-                </el-form-item>
+                     <el-form-item>
+                         <el-button type="primary" @click="registerApp">{{$t('message.register')}}</el-button>
+                         <el-button @click="appRegisterFormVisible = false">{{$t('message.cancel')}}</el-button>
+                     </el-form-item>
+                 </el-form>
+             </el-dialog>
 
-                <el-form-item :label="$t('message.phone')">
-                    <el-input v-model="userRegisterForm.phone"/>
-                </el-form-item>
+             <el-dialog :title="$t('message.userRegister')" :visible.sync="userRegisterFormVisible" width="35%" >
+                 <el-form :model="userRegisterForm" style="margin:0 5px">
 
-                <el-form-item :label="$t('message.mail')">
-                    <el-input v-model="userRegisterForm.email"/>
-                </el-form-item>
+                     <el-form-item :label="$t('message.name')">
+                         <el-input v-model="userRegisterForm.username"/>
+                     </el-form-item>
 
-                <el-form-item>
-                    <el-button type="primary" @click="registerUser">{{$t('message.register')}}</el-button>
-                    <el-button @click="userRegisterFormVisible = false">{{$t('message.cancel')}}</el-button>
-                </el-form-item>
+                     <el-form-item :label="$t('message.phone')">
+                         <el-input v-model="userRegisterForm.phone"/>
+                     </el-form-item>
 
-            </el-form>
-        </el-dialog>
+                     <el-form-item :label="$t('message.mail')">
+                         <el-input v-model="userRegisterForm.email"/>
+                     </el-form-item>
 
+                     <el-form-item>
+                         <el-button type="primary" @click="registerUser">{{$t('message.register')}}</el-button>
+                         <el-button @click="userRegisterFormVisible = false">{{$t('message.cancel')}}</el-button>
+                     </el-form-item>
 
-    </div>
+                 </el-form>
+             </el-dialog>
+         </div>
+     </div>
 </template>
 
 <script>
@@ -157,10 +174,17 @@
 
 <style scoped>
 
-    #welcome {
+    #container {
         width: 100%;
         height: 100%;
         background-image: url("../assets/banner.jpg");
+    }
+    #head {
+        width: 100%;
+    }
+    #welcome {
+        width: 100%;
+        height: 100%;
 
         /*
         flex布局：

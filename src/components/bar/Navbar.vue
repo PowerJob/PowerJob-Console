@@ -8,7 +8,7 @@
 
         <div id="right_content">
 
-            <el-dropdown @command="onClickLanguageSwitch">
+            <el-dropdown @command="this.common.switchLanguage">
                 <span class="el-dropdown-link">
                     <p style="color:#ffffff">Language<i class="el-icon-arrow-down el-icon--right"/></p>
                 </span>
@@ -37,13 +37,6 @@
             // 退出当前应用
             onClickCloseConsole: function () {
                 this.$router.push("/");
-            },
-            // 更换语言
-            onClickLanguageSwitch(cmd) {
-                console.log("switch language to %o", cmd);
-                this.$i18n.locale = cmd;
-                // 存储到LangStorage
-                window.localStorage.setItem('oms_lang', cmd)
             }
         }
     }

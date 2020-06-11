@@ -47,6 +47,14 @@ let translateWfInstanceStatus = status => {
     }
 };
 
+// 更换语言
+let switchLanguage = cmd => {
+    console.log("switch language to %o", cmd);
+    i18n.locale = cmd;
+    // 存储到LangStorage
+    window.localStorage.setItem('oms_lang', cmd)
+};
+
 function addZero(m) {
     return m < 10 ? '0' + m : m;
 }
@@ -54,5 +62,6 @@ function addZero(m) {
 export default {
     timestamp2Str,
     translateInstanceStatus,
-    translateWfInstanceStatus
+    translateWfInstanceStatus,
+    switchLanguage
 }
