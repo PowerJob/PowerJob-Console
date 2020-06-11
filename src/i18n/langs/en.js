@@ -96,6 +96,7 @@ const en = {
         'fixRate': 'Fix Rate (ms)',
         'fixDelay': 'Fix Delay (ms)',
         'workflow': 'workflow',
+        'onlineCronTool': 'online cron tool',
 
         // JobInstance
         'wfInstanceId': 'WorkflowInstanceId',

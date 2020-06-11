@@ -99,6 +99,7 @@ const cn = {
         'fixRate': '固定频率（毫秒）',
         'fixDelay': '固定延迟（毫秒）',
         'workflow': '工作流',
+        'onlineCronTool': '在线生成工具',
 
         // 任务实例管理
         'wfInstanceId': '工作流实例ID',

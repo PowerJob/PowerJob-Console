@@ -34,6 +34,9 @@
                         <el-col :span="12">
                             <el-input v-model="workflowInfo.timeExpression" :placeholder="$t('message.wfTimeExpressionPLH')" />
                         </el-col>
+                        <el-col :span="4">
+                            <el-link href="https://cron.qqe2.com/" type="success" target="_blank">{{$t('message.onlineCronTool')}}</el-link>
+                        </el-col>
                     </el-row>
                 </el-form-item>
 
