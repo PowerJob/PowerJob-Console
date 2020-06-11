@@ -77,7 +77,7 @@ const cn = {
         'runtimeConfig': '运行时配置',
         'maxInstanceNum': '最大实例数',
         'threadConcurrency': '单机线程并发度',
-        'timeout': '运行时间限制',
+        'timeout': '运行时间限制（毫秒）',
         'retryConfig': '重试配置',
         'taskRetryTimes': '任务重试次数',
         'subTaskRetryTimes': "子任务重试次数",
@@ -152,7 +152,14 @@ const cn = {
         'deployTime': '部署时间',
         'deploy': '部署',
         'deployedWorkerList': '机器列表',
-        'uploadTips': '拖拽或点击文件后会自动上传'
+        'uploadTips': '拖拽或点击文件后会自动上传',
+
+        // 任务实例状态
+        'waitingDispatch': '等待派发',
+        'waitingWorkerReceive': '等待Worker接收',
+        'running': '运行中',
+        'stopped': '手动停止',
+        'wfWaiting': '等待调度',
 
     },
     ...zhLocale

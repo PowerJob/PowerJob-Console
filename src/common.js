@@ -4,13 +4,13 @@ let timestamp2Str = ts => {
     }
     try {
         if (ts) {
-            var time = new Date(ts);
-            var y = time.getFullYear();
-            var M = time.getMonth() + 1;
-            var d = time.getDate();
-            var h = time.getHours();
-            var m = time.getMinutes();
-            var s = time.getSeconds();
+            let time = new Date(ts);
+            let y = time.getFullYear();
+            let M = time.getMonth() + 1;
+            let d = time.getDate();
+            let h = time.getHours();
+            let m = time.getMinutes();
+            let s = time.getSeconds();
             return y + '-' + addZero(M) + '-' + addZero(d) + ' ' + addZero(h) + ':' + addZero(m) + ':' + addZero(s);
         } else {
             return '';
@@ -20,10 +20,36 @@ let timestamp2Str = ts => {
     }
 };
 
+let translateInstanceStatus = status => {
+    console.log("zzzzzzzz %o", status);
+    switch (status) {
+        case 1: return this.$t('message.waitingDispatch');
+        case 2: return this.$t('message.waitingWorkerReceive');
+        case 3: return this.$t('message.running');
+        case 4: return this.$t('message.failed');
+        case 5: return this.$t('message.success');
+        case 10: return this.$t('message.stopped');
+        default: return "unknown";
+    }
+};
+
+let translteWfInstanceStatus = status => {
+    switch (status) {
+        case 1: return this.$t('message.wfWaiting');
+        case 2: return this.$t('message.running');
+        case 3: return this.$t('message.failed');
+        case 4: return this.$t('message.success');
+        case 10: return this.$t('message.stopped');
+        default: return "unknown";
+    }
+};
+
 function addZero(m) {
     return m < 10 ? '0' + m : m;
 }
 
 export default {
-    timestamp2Str
+    timestamp2Str,
+    translateInstanceStatus,
+    translteWfInstanceStatus
 }

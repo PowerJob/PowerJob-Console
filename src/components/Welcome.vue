@@ -2,7 +2,7 @@
     <div id="welcome">
 
         <!-- <h3 class="topBar"><span class="left">OhMy</span><span class="right">Scheduler</span></h3> -->
-        <el-button type="primary" plain @click="appRegisterFormVisible = true">{{$t('message.userRegister')}}</el-button>
+        <el-button type="primary" plain @click="appRegisterFormVisible = true">{{$t('message.appRegister')}}</el-button>
 
         <div id="entrance">
             <el-select
@@ -24,7 +24,7 @@
             </el-select>
         </div>
 
-        <el-button type="success" plain @click="userRegisterFormVisible = true">{{$t('message.register')}}</el-button>
+        <el-button type="success" plain @click="userRegisterFormVisible = true">{{$t('message.userRegister')}}</el-button>
 
         <el-dialog :title="$t('message.appRegister')" :visible.sync="appRegisterFormVisible" width="35%" >
             <el-form :model="appRegisterForm" style="margin:0 5px">
@@ -130,6 +130,26 @@
                     that.$message.success(this.$t('message.success'));
                     that.userRegisterFormVisible = false;
                 }, that.userRegisterFormVisible = false);
+            }
+        },
+        mounted() {
+            // 加载默认语言配置文件
+            let localLang = window.localStorage.getItem('oms_lang');
+            console.log("language from localStorage is %o", localLang);
+            if (localLang != null) {
+                this.$i18n.locale = localLang;
+                return;
+            }
+
+            let lang = navigator.language;
+            console.log("language from system is %o", lang);
+            switch (lang) {
+                case "zh-HK":
+                case "zh-TW":
+                case "zh-SG":
+                case "zh-CN": this.$i18n.locale = "cn"; break;
+                default:
+                    this.$i18n.locale = "en";
             }
         }
     }

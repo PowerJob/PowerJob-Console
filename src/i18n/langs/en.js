@@ -19,8 +19,8 @@ const en = {
 
         // 欢迎界面
         'appRegister': 'Application Registration',
-        'userRegister': 'User registration',
-        'appNameInputPLH': 'Please enter the appName',
+        'userRegister': 'User Registration',
+        'appNameInputPLH': 'Enter The AppName',
         'appName': 'AppName',
         'appDescription': 'AppDescription',
         'register': 'register',
@@ -69,14 +69,14 @@ const en = {
         'containerProcessorInfoPLH': 'containerID#classname, eg: 1#com.github.kfcfans.DemoProcessor',
         'shellProcessorInfoPLH': 'shell script',
         'pythonProcessorInfoPLH': 'python script',
-        'runtimeConfig': 'RuntimeCfg',
+        'runtimeConfig': 'RuntimeConfig',
         'maxInstanceNum': 'MaxInstanceNum',
         'threadConcurrency': 'ThreadConcurrency',
-        'timeout': 'TimeLimit',
+        'timeout': 'TimeLimit (ms)',
         'retryConfig': 'RetryConfig',
         'taskRetryTimes': 'TaskRetryTimes',
         'subTaskRetryTimes': "SubTaskRetryTimes",
-        'workerConfig': 'Worker',
+        'workerConfig': 'WorkerConfig',
         'minCPU': 'MinAvailableCPUCores',
         'minMemory': 'MinMemory(GB)',
         'minDisk': 'MinDisk(GB)',
@@ -147,7 +147,14 @@ const en = {
         'deployTime': 'deployed time',
         'deploy': 'deploy',
         'deployedWorkerList': 'worker list',
-        'uploadTips': 'Drag and drop or click on the file to upload it automatically'
+        'uploadTips': 'Drag and drop or click on the file to upload it automatically',
+
+        // 任务实例状态
+        'waitingDispatch': 'waiting dispatch',
+        'waitingWorkerReceive': 'waiting worker receive',
+        'running': 'running',
+        'stopped': 'stopped',
+        'wfWaiting': 'waiting',
     },
     ...enLocale
 };

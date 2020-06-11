@@ -41,7 +41,9 @@
             // 更换语言
             onClickLanguageSwitch(cmd) {
                 console.log("switch language to %o", cmd);
-                this.$i18n.locale = cmd
+                this.$i18n.locale = cmd;
+                // 存储到LangStorage
+                window.localStorage.setItem('oms_lang', cmd)
             }
         }
     }

@@ -66,8 +66,8 @@
         </el-row>
 
 
-        <el-dialog :visible.sync="modifiedJobFormVisible">
-            <el-form :model="modifiedJobForm" label-width="80px">
+        <el-dialog :visible.sync="modifiedJobFormVisible" width="60%">
+            <el-form :model="modifiedJobForm" label-width="120px">
 
                 <el-form-item :label="$t('message.jobName')">
                     <el-input v-model="modifiedJobForm.jobName"/>
@@ -348,6 +348,7 @@
             onClickReset() {
                 this.jobQueryContent.keyword = undefined;
                 this.jobQueryContent.jobId = undefined;
+                this.listJobInfos();
             },
             verifyPlaceholder(processorType){
                 let res;
