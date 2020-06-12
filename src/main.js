@@ -39,6 +39,27 @@ new Vue({
   render: h => h(App),
 }).$mount('#app');
 
+//请求发送拦截，没有 appId 要求重新 "登录"
+axios.interceptors.request.use((request) => {
+
+  let url = request.url;
+  console.log(url.search("/appInfo/list"));
+  let needIntercept = url.search("/appInfo/list") === -1;
+  if (needIntercept) {
+
+    let appId = store.state.appInfo.id;
+    if (appId === undefined || appId === null) {
+      router.push("/");
+      return Promise.reject("no appId");
+    }
+  }
+  return request;
+
+}, function (error) {
+  // Do something with request error
+  return Promise.reject(error);
+});
+
 // 请求返回拦截，封装公共处理逻辑
 axios.interceptors.response.use((response) => {
   if (response.data.success === true) {
