@@ -69,7 +69,7 @@ axios.interceptors.response.use((response) => {
   if (response.data.success === true) {
     return response.data.data;
   }
-  Message.warning("错误信息：" + response.data.message);
+  Message.warning("ERROR：" + response.data.message);
   return Promise.reject(response.data.msg);
 }, (error) => {
   Message.error(error.toString());
