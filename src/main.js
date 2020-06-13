@@ -4,6 +4,7 @@ import ElementUI from 'element-ui'
 import { Message } from 'element-ui';
 import './styles.scss'
 import './plugins/element.js'
+import i18n from './i18n/i18n'
 
 
 // axios 负责统一拦截处理 ResultDTO，fly 负责处理不需要拦截的请求
@@ -34,8 +35,34 @@ Vue.config.productionTip = false;
 new Vue({
   router,
   store,
+  i18n,
   render: h => h(App),
 }).$mount('#app');
+
+//请求发送拦截，没有 appId 要求重新 "登录"
+axios.interceptors.request.use((request) => {
+
+  let url = request.url;
+  let isListAppInfo = url.search("/appInfo/list") !== -1;
+  let isAppRegister = url.search("/appInfo/save") !== -1;
+  let isUserRegister = url.search("/user/save") !== -1;
+
+  if (isListAppInfo || isAppRegister || isUserRegister) {
+    return request;
+  }
+
+  let appId = store.state.appInfo.id;
+  if (appId === undefined || appId === null) {
+    router.push("/");
+    return Promise.reject("no appId");
+  }
+
+  return request;
+
+}, function (error) {
+  // Do something with request error
+  return Promise.reject(error);
+});
 
 // 请求返回拦截，封装公共处理逻辑
 axios.interceptors.response.use((response) => {

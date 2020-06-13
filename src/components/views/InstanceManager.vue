@@ -4,52 +4,56 @@
         <el-row>
             <el-col :span="22">
                 <el-form :inline="true" :model="instanceQueryContent" class="el-form--inline">
-                    <el-form-item label="实例ID">
-                        <el-input v-model="instanceQueryContent.instanceId" placeholder="实例ID"/>
+                    <el-form-item :label="$t('message.instanceId')">
+                        <el-input v-model="instanceQueryContent.instanceId" :placeholder="$t('message.instanceId')"/>
                     </el-form-item>
-                    <el-form-item label="任务ID">
-                        <el-input v-model="instanceQueryContent.jobId" placeholder="任务ID"/>
+                    <el-form-item :label="$t('message.jobId')">
+                        <el-input v-model="instanceQueryContent.jobId" :placeholder="$t('message.jobId')"/>
                     </el-form-item>
-                    <el-form-item  v-if="instanceQueryContent.type === 'WORKFLOW'" label="工作流实例ID">
-                        <el-input v-model="instanceQueryContent.wfInstanceId" placeholder="工作流实例ID"/>
+                    <el-form-item  v-if="instanceQueryContent.type === 'WORKFLOW'" :label="$t('message.wfInstanceId')">
+                        <el-input v-model="instanceQueryContent.wfInstanceId" :placeholder="$t('message.wfInstanceId')"/>
                     </el-form-item>
 
                     <el-form-item>
-                        <el-button type="primary" @click="listInstanceInfos">查询</el-button>
-                        <el-button type="cancel" @click = "onClickRest">重置</el-button>
+                        <el-button type="primary" @click="listInstanceInfos">{{$t('message.query')}}</el-button>
+                        <el-button type="cancel" @click = "onClickRest">{{$t('message.reset')}}</el-button>
                     </el-form-item>
                 </el-form>
             </el-col>
             <el-col :span="2">
 
                 <div style="float:right;padding-right:10px">
-                <el-button type="primary" @click="listInstanceInfos" >刷新状态</el-button>
+                <el-button type="primary" @click="listInstanceInfos" >{{$t('message.refresh')}}</el-button>
                 </div>
             </el-col>
         </el-row>
 
         <!-- 第二行，切换器 -->
         <el-tabs type="card" v-model="instanceQueryContent.type" @tab-click="listInstanceInfos">
-            <el-tab-pane label="普通任务实例" name="NORMAL"/>
-            <el-tab-pane label="工作流任务实例" name="WORKFLOW"/>
+            <el-tab-pane :label="$t('message.normalInstance')" name="NORMAL"/>
+            <el-tab-pane :label="$t('message.wfInstance')" name="WORKFLOW"/>
         </el-tabs>
 
         <!-- 第三行，表单 -->
         <el-row>
             <el-table :data="instancePageResult.data" style="width: 100%" :row-class-name="instanceTableRowClassName">
-                <el-table-column prop="jobId" label="任务ID" width="80"/>
-                <el-table-column prop="jobName" label="任务名称"/>
-                <el-table-column v-if="instanceQueryContent.type === 'WORKFLOW'" prop="wfInstanceId" label="工作流实例ID"/>
-                <el-table-column prop="instanceId" label="实例ID"/>
-                <el-table-column prop="statusStr" label="状态" width="80" />
-                <el-table-column prop="actualTriggerTime" label="触发时间"/>
-                <el-table-column prop="finishedTime" label="结束时间"/>
+                <el-table-column prop="jobId" :label="$t('message.jobId')" width="80"/>
+                <el-table-column prop="jobName" :label="$t('message.jobName')"/>
+                <el-table-column v-if="instanceQueryContent.type === 'WORKFLOW'" prop="wfInstanceId" :label="$t('message.wfInstanceId')"/>
+                <el-table-column prop="instanceId" :label="$t('message.instanceId')"/>
+                <el-table-column prop="status" :label="$t('message.status')" width="160">
+                    <template slot-scope="scope">
+                        {{fetchStatus(scope.row.status)}}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="actualTriggerTime" :label="$t('message.triggerTime')"/>
+                <el-table-column prop="finishedTime" :label="$t('message.finishedTime')"/>
 
                 <el-table-column label="操作" width="300">
                     <template slot-scope="scope">
-                        <el-button size="medium" @click="onClickShowDetail(scope.row)">详情</el-button>
-                        <el-button size="medium" @click="onClickShowLog(scope.row)">日志</el-button>
-                        <el-button size="medium" @click="onClickStop(scope.row)">停止</el-button>
+                        <el-button size="medium" @click="onClickShowDetail(scope.row)">{{$t('message.detail')}}</el-button>
+                        <el-button size="medium" @click="onClickShowLog(scope.row)">{{$t('message.log')}}</el-button>
+                        <el-button size="medium" @click="onClickStop(scope.row)">{{$t('message.stop')}}</el-button>
                     </template>
                 </el-table-column>
 
@@ -68,15 +72,15 @@
         </el-row>
 
         <!--  任务实例详情弹出框 -->
-        <el-dialog title="任务实例详情" :visible.sync="instanceDetailVisible" v-if='instanceDetailVisible'>
+        <el-dialog :visible.sync="instanceDetailVisible" v-if='instanceDetailVisible'>
             <InstanceDetail :instance-id="currentInstanceId"/>
         </el-dialog>
 
         <!-- 任务运行日志弹出框 -->
-        <el-dialog title="日志" :visible.sync="instanceLogVisible" width="50%">
+        <el-dialog :visible.sync="instanceLogVisible" width="50%">
             <el-row>
                 <el-col :span="4" :offset="20" style="margin-bottom:20px">
-                    <el-button type="primary" size="mini" @click="onclickDownloadLog()" icon="el-icon-download">下载</el-button>
+                    <el-button type="primary" size="mini" @click="onclickDownloadLog()" icon="el-icon-download">{{$t('message.download')}}</el-button>
                 </el-col>
             </el-row>
             <el-row>
@@ -167,7 +171,7 @@
                 let that = this;
                 let url = "/instance/stop?instanceId=" + data.instanceId;
                 this.axios.get(url).then(() => {
-                    that.$message.success("停止成功");
+                    that.$message.success(this.$t('message.success'));
                     // 重新加载列表
                     that.listInstanceInfos();
                 });
@@ -211,7 +215,10 @@
             onclickDownloadLog() {
                 let url = "/instance/downloadLogUrl?instanceId=" + this.logQueryContent.instanceId;
                 this.axios.get(url).then(res => window.open(res));
-
+            },
+            // 获取状态
+            fetchStatus(s) {
+                return this.common.translateInstanceStatus(s);
             }
         },
         mounted() {

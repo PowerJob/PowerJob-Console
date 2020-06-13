@@ -2,51 +2,51 @@
     <div>
         <el-row>
             <el-col :offset="20">
-                <el-button type="primary" @click="fetchInstanceDetail">刷新</el-button>
+                <el-button type="primary" @click="fetchInstanceDetail">{{$t('message.refresh')}}</el-button>
             </el-col>
         </el-row>
         <el-row>
             <el-col :span="24" >
-                任务实例ID: <span class='title' >{{instanceId}}</span>
+                {{$t('message.instanceId')}}: <span class='title' >{{instanceId}}</span>
             </el-col>
         </el-row>
         <el-row style="margin-top:-20px">
             <el-col :span="8">
-                状态: <span class='title' >{{instanceDetail.status}}</span>
+                {{$t('message.status')}}: <span class='title' >{{this.common.translateInstanceStatus(instanceDetail.status)}}</span>
             </el-col>
             <el-col :span="16">
-                运行次数：<span class='title' >{{instanceDetail.runningTimes}}</span>
+                {{$t('message.runningTimes')}}：<span class='title' >{{instanceDetail.runningTimes}}</span>
             </el-col>
         </el-row>
         <el-row>
             <el-col :span="24" >
-                TaskTracker地址: <span class='title' > {{instanceDetail.taskTrackerAddress}}</span>
+                {{$t('message.taskTrackerAddress')}}: <span class='title' > {{instanceDetail.taskTrackerAddress}}</span>
             </el-col>
         </el-row>
         <el-row>
             <el-col :span="8">
-                开始时间: <span class='title' > {{this.common.timestamp2Str(instanceDetail.actualTriggerTime)}}</span>
+                {{$t('message.startTime')}}: <span class='title' > {{this.common.timestamp2Str(instanceDetail.actualTriggerTime)}}</span>
             </el-col>
             <el-col :span="8">
-                结束时间: <span class='title' >{{this.common.timestamp2Str(instanceDetail.finishedTime)}}</span>
+                {{$t('message.finishedTime')}}: <span class='title' >{{this.common.timestamp2Str(instanceDetail.finishedTime)}}</span>
             </el-col>
         </el-row>
         <el-row>
             <el-col :span="24">
-                运行结果: <span class='title' > {{instanceDetail.result}}</span>
+                {{$t('message.result')}}: <span class='title' > {{instanceDetail.result}}</span>
             </el-col>
         </el-row>
         <el-row id="taskDetail">
-            子任务数据: <span class='title' >{{instanceDetail.taskDetail}}</span>
+            {{$t('message.subTaskInfo')}}: <span class='title' >{{instanceDetail.taskDetail}}</span>
         </el-row>
         <el-row>
-            <span class="title">最近10条秒级任务历史记录:</span>
+            <span class="title">{{$t('message.secondlyJobHistory')}}:</span>
             <el-table  :data="instanceDetail.subInstanceDetails" style="width: 100%">
-                <el-table-column prop="subInstanceId" label="子实例ID" width="100"/>
-                <el-table-column prop="startTime" label="开始时间" width="160"/>
-                <el-table-column prop="finishedTime" label="结束时间" width="160"/>
-                <el-table-column prop="status" label="运行状态" width="100"/>
-                <el-table-column prop="result" label="运行结果"/>
+                <el-table-column prop="subInstanceId" :label="$t('message.subInstanceId')" width="120"/>
+                <el-table-column prop="startTime" :label="$t('message.startTime')" width="160"/>
+                <el-table-column prop="finishedTime" :label="$t('message.finishedTime')" width="160"/>
+                <el-table-column prop="status" :label="$t('message.status')" width="160"/>
+                <el-table-column prop="result" :label="$t('message.result')"/>
             </el-table>
         </el-row>
     </div>

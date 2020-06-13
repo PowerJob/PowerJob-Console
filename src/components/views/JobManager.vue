@@ -7,15 +7,15 @@
             <!-- 左侧搜索栏，占地面积 20/24 -->
             <el-col :span="20">
                 <el-form :inline="true" :model="jobQueryContent" class="el-form--inline">
-                    <el-form-item label="任务ID">
-                        <el-input v-model="jobQueryContent.jobId" placeholder="任务ID"/>
+                    <el-form-item :label="$t('message.jobId')">
+                        <el-input v-model="jobQueryContent.jobId" :placeholder="$t('message.jobId')"/>
                     </el-form-item>
-                    <el-form-item label="关键字">
-                        <el-input v-model="jobQueryContent.keyword" placeholder="关键字"/>
+                    <el-form-item :label="$t('message.keyword')">
+                        <el-input v-model="jobQueryContent.keyword" :placeholder="$t('message.keyword')"/>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="listJobInfos">查询</el-button>
-                        <el-button type="cancel" @click="onClickReset">重置</el-button>
+                        <el-button type="primary" @click="listJobInfos">{{$t('message.query')}}</el-button>
+                        <el-button type="cancel" @click="onClickReset">{{$t('message.reset')}}</el-button>
                     </el-form-item>
                 </el-form>
             </el-col>
@@ -23,7 +23,7 @@
             <!-- 右侧新增任务按钮，占地面积 4/24 -->
             <el-col :span="4">
                 <div style="float:right;padding-right:10px">
-                <el-button type="primary" @click="onClickNewJob" >新建任务</el-button>
+                <el-button type="primary" @click="onClickNewJob" >{{$t('message.newJob')}}</el-button>
                 </div>
             </el-col>
         </el-row>
@@ -31,25 +31,33 @@
         <!--第二行，任务数据表格-->
         <el-row>
             <el-table :data="jobInfoPageResult.data" style="width: 100%">
-                <el-table-column prop="id" label="任务ID" width="80"/>
-                <el-table-column prop="jobName" label="任务名称" />
-                <el-table-column label="定时信息" >
+                <el-table-column prop="id" :label="$t('message.jobId')" width="80"/>
+                <el-table-column prop="jobName" :label="$t('message.jobName')" />
+                <el-table-column :label="$t('message.scheduleInfo')" >
                     <template slot-scope="scope">
                         {{scope.row.timeExpressionType}}  {{scope.row.timeExpression}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="executeType" label="执行类型"/>
-                <el-table-column prop="processorType" label="处理器类型"/>
-                <el-table-column label="状态" width="80">
+                <el-table-column :label="$t('message.executeType')">
+                    <template slot-scope="scope">
+                        {{translateExecuteType(scope.row.executeType)}}
+                    </template>
+                </el-table-column>
+                <el-table-column :label="$t('message.processorType')">
+                    <template slot-scope="scope">
+                        {{translateProcessorType(scope.row.processorType)}}
+                    </template>
+                </el-table-column>
+                <el-table-column :label="$t('message.status')" width="80">
                     <template slot-scope="scope">
                         <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="changeJobStatus(scope.row)"/>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="300">
+                <el-table-column :label="$t('message.operation')" width="300">
                     <template slot-scope="scope">
-                        <el-button size="medium" @click="onClickModify(scope.row)">编辑</el-button>
-                        <el-button size="medium" @click="onClickRun(scope.row)">运行</el-button>
-                        <el-button size="medium" type="danger" @click="onClickDeleteJob(scope.row)">删除</el-button>
+                        <el-button size="medium" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
+                        <el-button size="medium" @click="onClickRun(scope.row)">{{$t('message.run')}}</el-button>
+                        <el-button size="medium" type="danger" @click="onClickDeleteJob(scope.row)">{{$t('message.delete')}}</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -66,22 +74,22 @@
         </el-row>
 
 
-        <el-dialog title="新建/修改任务" :visible.sync="modifiedJobFormVisible">
-            <el-form :model="modifiedJobForm" label-width="80px">
+        <el-dialog :visible.sync="modifiedJobFormVisible" width="60%">
+            <el-form :model="modifiedJobForm" label-width="120px">
 
-                <el-form-item label="任务名称">
+                <el-form-item :label="$t('message.jobName')">
                     <el-input v-model="modifiedJobForm.jobName"/>
                 </el-form-item>
-                <el-form-item label="任务描述">
+                <el-form-item :label="$t('message.jobDescription')">
                     <el-input v-model="modifiedJobForm.jobDescription"/>
                 </el-form-item>
-                <el-form-item label="任务参数">
+                <el-form-item :label="$t('message.jobParams')">
                     <el-input v-model="modifiedJobForm.jobParams"/>
                 </el-form-item>
-                <el-form-item label="定时信息">
+                <el-form-item :label="$t('message.scheduleInfo')">
                     <el-row>
                         <el-col :span="8">
-                            <el-select v-model="modifiedJobForm.timeExpressionType" placeholder="时间表达式类型">
+                            <el-select v-model="modifiedJobForm.timeExpressionType" :placeholder="$t('message.timeExpressionType')">
                                 <el-option
                                         v-for="item in timeExpressionTypeOptions"
                                         :key="item.key"
@@ -90,15 +98,18 @@
                                 </el-option>
                             </el-select>
                         </el-col>
-                        <el-col :span="16">
-                            <el-input v-model="modifiedJobForm.timeExpression" placeholder="CRON填写CRON表达式，秒级任务填写整数，API无需填写" />
+                        <el-col :span="12">
+                            <el-input v-model="modifiedJobForm.timeExpression" :placeholder="$t('message.timeExpressionPlaceHolder')" />
+                        </el-col>
+                        <el-col :span="4">
+                            <el-link href="https://cron.qqe2.com/" type="success" target="_blank">{{$t('message.onlineCronTool')}}</el-link>
                         </el-col>
                     </el-row>
                 </el-form-item>
-                <el-form-item label="执行配置">
+                <el-form-item :label="$t('message.executeConfig')">
                     <el-row>
                         <el-col :span="5">
-                            <el-select v-model="modifiedJobForm.executeType" placeholder="执行类型">
+                            <el-select v-model="modifiedJobForm.executeType" :placeholder="$t('message.executeType')">
                                 <el-option
                                         v-for="item in executeTypeOptions"
                                         :key="item.key"
@@ -109,7 +120,7 @@
                         </el-col>
 
                         <el-col :span="6">
-                            <el-select v-model="modifiedJobForm.processorType" placeholder="处理器类型">
+                            <el-select v-model="modifiedJobForm.processorType" :placeholder="$t('message.processorType')">
                                 <el-option
                                         v-for="item in processorTypeOptions"
                                         :key="item.key"
@@ -124,74 +135,74 @@
                         </el-col>
                     </el-row>
                 </el-form-item>
-                <el-form-item label="运行配置">
+                <el-form-item :label="$t('message.runtimeConfig')">
                     <el-row>
                         <el-col :span="8">
-                            <el-input placeholder="最大实例数" v-model="modifiedJobForm.maxInstanceNum" class="ruleContent">
-                                <template slot="prepend">最大实例数</template>
+                            <el-input :placeholder="$t('message.maxInstanceNum')" v-model="modifiedJobForm.maxInstanceNum" class="ruleContent">
+                                <template slot="prepend">{{$t('message.maxInstanceNum')}}</template>
                             </el-input>
                         </el-col>
                         <el-col :span="8">
-                            <el-input placeholder="单机线程并发度" v-model="modifiedJobForm.concurrency" class="ruleContent">
-                                <template slot="prepend">单机线程并发度</template>
+                            <el-input :placeholder="$t('message.threadConcurrency')" v-model="modifiedJobForm.concurrency" class="ruleContent">
+                                <template slot="prepend">{{$t('message.threadConcurrency')}}</template>
                             </el-input>
                         </el-col>
                         <el-col :span="8">
-                            <el-input placeholder="运行时间限制" v-model="modifiedJobForm.instanceTimeLimit" class="ruleContent">
-                                <template slot="prepend">运行时间限制</template>
+                            <el-input :placeholder="$t('message.timeout')" v-model="modifiedJobForm.instanceTimeLimit" class="ruleContent">
+                                <template slot="prepend">{{$t('message.timeout')}}</template>
                             </el-input>
                         </el-col>
                     </el-row>
                 </el-form-item>
-                <el-form-item label="重试配置">
+                <el-form-item :label="$t('message.retryConfig')">
                     <el-row>
                         <el-col :span="12">
-                            <el-input placeholder="任务重试次数" v-model="modifiedJobForm.instanceRetryNum" class="ruleContent">
-                                <template slot="prepend">任务重试次数</template>
+                            <el-input :placeholder="$t('message.taskRetryTimes')" v-model="modifiedJobForm.instanceRetryNum" class="ruleContent">
+                                <template slot="prepend">{{$t('message.taskRetryTimes')}}</template>
                             </el-input>
                         </el-col>
                         <el-col :span="12">
-                            <el-input placeholder="仅MR和广播执行模式下生效" v-model="modifiedJobForm.taskRetryNum" class="ruleContent">
-                                <template slot="prepend">子任务重试次数</template>
+                            <el-input :placeholder="$t('message.subTaskRetryTimes')" v-model="modifiedJobForm.taskRetryNum" class="ruleContent">
+                                <template slot="prepend">{{$t('message.subTaskRetryTimes')}}</template>
                             </el-input>
                         </el-col>
                     </el-row>
                 </el-form-item>
-                <el-form-item label="机器配置">
+                <el-form-item :label="$t('message.workerConfig')">
                     <el-row>
                         <el-col :span="8">
-                            <el-input placeholder="最低CPU核心数" v-model="modifiedJobForm.minCpuCores" class="ruleContent">
-                                <template slot="prepend">最低CPU核心数</template>
+                            <el-input :placeholder="$t('message.minCPU')" v-model="modifiedJobForm.minCpuCores" class="ruleContent">
+                                <template slot="prepend">{{$t('message.minCPU')}}</template>
                             </el-input>
                         </el-col>
                         <el-col :span="8">
-                            <el-input placeholder="最低内存(GB)" v-model="modifiedJobForm.minMemorySpace" class="ruleContent">
-                                <template slot="prepend">最低内存（GB</template>
+                            <el-input :placeholder="$t('message.minMemory')" v-model="modifiedJobForm.minMemorySpace" class="ruleContent">
+                                <template slot="prepend">{{$t('message.minMemory')}}</template>
                             </el-input>
                         </el-col>
                         <el-col :span="8">
-                            <el-input placeholder="最低磁盘空间(GB)" v-model="modifiedJobForm.minDiskSpace" class="ruleContent">
-                                <template slot="prepend">最低磁盘空间</template>
+                            <el-input :placeholder="$t('message.minDisk')" v-model="modifiedJobForm.minDiskSpace" class="ruleContent">
+                                <template slot="prepend">{{$t('message.minDisk')}}</template>
                             </el-input>
                         </el-col>
                     </el-row>
                 </el-form-item>
-                <el-form-item label="集群配置">
+                <el-form-item :label="$t('message.clusterConfig')">
                     <el-row>
                         <el-col :span="16">
-                            <el-input placeholder="执行机器地址（可选，不指定代表全部；多值英文逗号分割）" v-model="modifiedJobForm.designatedWorkers" class="ruleContent">
-                                <template slot="prepend">执行机器地址</template>
+                            <el-input :placeholder="$t('message.designatedWorkerAddressPLH')" v-model="modifiedJobForm.designatedWorkers" class="ruleContent">
+                                <template slot="prepend">{{$t('message.designatedWorkerAddress')}}</template>
                             </el-input>
                         </el-col>
                         <el-col :span="8">
-                            <el-input placeholder="最大执行机器数量（0代表不限）" v-model="modifiedJobForm.maxWorkerCount" class="ruleContent">
-                                <template slot="prepend">最大执行机器数量</template>
+                            <el-input :placeholder="$t('message.maxWorkerNumPLH')" v-model="modifiedJobForm.maxWorkerCount" class="ruleContent">
+                                <template slot="prepend">{{$t('message.maxWorkerNum')}}</template>
                             </el-input>
                         </el-col>
                     </el-row>
                 </el-form-item>
-                <el-form-item label="报警配置">
-                    <el-select v-model="modifiedJobForm.notifyUserIds" multiple filterable placeholder="选择报警通知人员">
+                <el-form-item :label="$t('message.alarmConfig')">
+                    <el-select v-model="modifiedJobForm.notifyUserIds" multiple filterable :placeholder="$t('message.alarmSelectorPLH')">
                         <el-option
                                 v-for="user in userList"
                                 :key="user.id"
@@ -202,8 +213,8 @@
                 </el-form-item>
 
                 <el-form-item>
-                    <el-button type="primary" @click="saveJob">保存</el-button>
-                    <el-button @click="modifiedJobFormVisible = false">取消</el-button>
+                    <el-button type="primary" @click="saveJob">{{$t('message.save')}}</el-button>
+                    <el-button @click="modifiedJobFormVisible = false">{{$t('message.cancel')}}</el-button>
                 </el-form-item>
 
             </el-form>
@@ -260,11 +271,11 @@
                     data: []
                 },
                 // 时间表达式选择类型
-                timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIX_RATE", label: "固定频率（单位毫秒）"}, {key: "FIX_DELAY", label: "固定延迟（单位毫秒）"}, {key: "WORKFLOW", label: "工作流"} ],
+                timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIX_RATE", label: this.$t('message.fixRate')}, {key: "FIX_DELAY", label: this.$t('message.fixDelay')}, {key: "WORKFLOW", label: this.$t('message.workflow')} ],
                 // 处理器类型
-                processorTypeOptions: [{key: "EMBEDDED_JAVA", label: "内置JAVA处理器"}, {key: "JAVA_CONTAINER", label: "JAVA容器"}, {key: "SHELL", label: "Shell脚本处理器"}, {key: "PYTHON", label: "Python处理器"}],
+                processorTypeOptions: [{key: "EMBEDDED_JAVA", label: "JAVA"}, {key: "JAVA_CONTAINER", label: this.$t('message.javaContainer')}, {key: "SHELL", label: "SHELL"}, {key: "PYTHON", label: "PYTHON"}],
                 // 执行方式类型
-                executeTypeOptions: [{key: "STANDALONE", label: "单机执行"}, {key: "BROADCAST", label: "广播执行"},  {key: "MAP", label: "Map执行"}, {key: "MAP_REDUCE", label: "MapReduce执行"}],
+                executeTypeOptions: [{key: "STANDALONE", label: this.$t('message.standalone')}, {key: "BROADCAST", label: this.$t('message.broadcast')},  {key: "MAP", label: this.$t('message.map')}, {key: "MAP_REDUCE", label: this.$t('message.mapReduce')}],
                 // 用户列表
                 userList: []
 
@@ -276,7 +287,7 @@
                 const that = this;
                 this.axios.post("/job/save", this.modifiedJobForm).then(() => {
                     that.modifiedJobFormVisible = false;
-                    that.$message.success("保存成功！");
+                    that.$message.success(this.$t('message.success'));
 
                     // 重新加载数据
                     that.listJobInfos();
@@ -327,14 +338,14 @@
             onClickRun(data) {
                 let that = this;
                 let url = "/job/run?jobId=" + data.id;
-                this.axios.get(url).then(() => that.$message.success("触发成功"));
+                this.axios.get(url).then(() => that.$message.success(this.$t('message.success')));
             },
             // 点击 删除任务
             onClickDeleteJob(data) {
                 let that = this;
                 let url = "/job/delete?jobId=" + data.id;
                 this.axios.get(url).then(() => {
-                    that.$message.success("删除成功");
+                    that.$message.success(this.$t('message.success'));
                     that.listJobInfos();
                 });
             },
@@ -348,16 +359,34 @@
             onClickReset() {
                 this.jobQueryContent.keyword = undefined;
                 this.jobQueryContent.jobId = undefined;
+                this.listJobInfos();
             },
-            verifyPlaceholder(processorType){
+            verifyPlaceholder(processorType) {
                 let res;
                 switch(processorType){
-                    case "EMBEDDED_JAVA": res =  "全限定类名，eg：com.github.kfcfans.DemoProcessor";break
-                    case "JAVA_CONTAINER": res =  "容器ID#全限定类名，eg：1#com.github.kfcfans.DemoProcessor";break
-                    case "SHELL": res =  "SHELL脚本文件内容";break
-                    case "PYTHON" : res = "Python脚本文件内容";
+                    case "EMBEDDED_JAVA": res = this.$t('message.javaProcessorInfoPLH');break;
+                    case "JAVA_CONTAINER": res =  this.$t('message.containerProcessorInfoPLH');break;
+                    case "SHELL": res =  this.$t('message.shellProcessorInfoPLH');break;
+                    case "PYTHON" : res = this.$t('message.pythonProcessorInfoPLH');
                 }
                 return  res;
+            },
+            // 翻译执行类型
+            translateExecuteType(executeType) {
+                switch (executeType) {
+                    case "STANDALONE": return this.$t('message.standalone');
+                    case "BROADCAST": return this.$t('message.broadcast');
+                    case "MAP_REDUCE": return this.$t('message.mapReduce');
+                    case "MAP": return this.$t('message.map');
+                    default: return "UNKNOWN";
+                }
+            },
+            // 翻译处理器类型
+            translateProcessorType(processorType) {
+                if (processorType === "JAVA_CONTAINER") {
+                    return this.$t('message.javaContainer');
+                }
+                return processorType;
             }
         },
         mounted() {

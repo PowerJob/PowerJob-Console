@@ -3,52 +3,52 @@
         <el-card class="box-card">
         <div slot="header" class="clearfix">
             <span></span>
-            <el-button style="float: right; " type="primary" @click="dialogVisible=true">新增容器</el-button>
+            <el-button style="float: right; " type="primary" @click="dialogVisible=true">{{$t('message.newContainer')}}</el-button>
         </div>
         <div class="wrapper">
             <div v-for="(item,key) in containerList" :key="key" class="item">
-                <div class="containerText"><span class='value'>容器ID：</span><span class='value'>{{item.id}}</span></div>
-                <div class="containerText"><span class='value'> 容器名称：</span><span class='value'>{{item.containerName}}</span></div>
-                <div class="containerText"><span class='value'>地址类型：</span><span class='value'>{{item.sourceType}}</span></div>
-                <div class="containerText"><span class='value'>文件版本：</span><span class='value'>{{item.version}}</span></div>
-                <div class="containerText"><span class='value'>部署日期：</span><span class='value'>{{item.lastDeployTime}}</span></div>
-                <div class="containerText"><span class='value'>当前状态：</span><span class='value'>{{item.status}}</span></div>
+                <div class="containerText"><span class='value'>{{$t('message.containerId')}}</span><span class='value'>{{item.id}}</span></div>
+                <div class="containerText"><span class='value'> {{$t('message.containerName')}} </span><span class='value'>{{item.containerName}}</span></div>
+                <div class="containerText"><span class='value'>{{$t('message.containerType')}} </span><span class='value'>{{item.sourceType}}</span></div>
+                <div class="containerText"><span class='value'>{{$t('message.containerVersion')}} </span><span class='value'>{{item.version}}</span></div>
+                <div class="containerText"><span class='value'>{{$t('message.deployTime')}} </span><span class='value'>{{item.lastDeployTime}}</span></div>
+                <div class="containerText"><span class='value'>{{$t('message.status')}} </span><span class='value'>{{item.status}}</span></div>
                 <div style="width:240px;margin:0 auto">
-                    <div class="btnWrap"><el-button type="primary" @click="arrangeItem(item)">部署</el-button></div>
-                    <div class="btnWrap"><el-button type="primary" @click="editItem(item)">编辑</el-button></div>
-                    <div class="btnWrap"><el-button type="primary" @click="deleteItem(item,key)">删除</el-button></div>
-                    <div class="btnWrap"><el-button type="primary" @click="listOfItem(item)">机器列表</el-button></div>
+                    <div class="btnWrap"><el-button type="primary" @click="arrangeItem(item)">{{$t('message.deploy')}}</el-button></div>
+                    <div class="btnWrap"><el-button type="primary" @click="editItem(item)">{{$t('message.edit')}}</el-button></div>
+                    <div class="btnWrap"><el-button type="primary" @click="deleteItem(item,key)">{{$t('message.delete')}}</el-button></div>
+                    <div class="btnWrap"><el-button type="primary" @click="listOfItem(item)">{{$t('message.deployedWorkerList')}}</el-button></div>
             </div>
         </div>
         </div>
         </el-card>
             <el-dialog
-                title="新增容器"
+                :title="$t('message.newContainer')"
                 :visible.sync="dialogVisible"
                 width="50%"
                 v-on:close="closeEdit"
                 :before-close="handleClose">
                 <el-form ref="form" :model="form" label-width="150px" class="genTable" label-position='left'>
-                    <el-form-item label="Container Name">
+                    <el-form-item :label="$t('message.containerName')">
                         <el-input v-model="form.containerName"></el-input>
                     </el-form-item>
-                    <el-form-item label="地址类型">
+                    <el-form-item :label="$t('message.containerType')">
                         <el-radio-group v-model="form.sourceType">
                         <el-radio label="Git"></el-radio>
                         <el-radio label="FatJar"></el-radio>
                         </el-radio-group>
                     </el-form-item>
                 <el-form  v-if="form.sourceType=='Git'" ref="gitform" :model="gitForm" label-width="150px" class="gitTable" label-position='left'>
-                    <el-form-item label="Git仓库地址">
+                    <el-form-item :label="$t('message.containerGitURL')">
                         <el-input v-model="gitForm.repo"></el-input>
                     </el-form-item>
-                    <el-form-item label="分支名称">
+                    <el-form-item :label="$t('message.branchName')">
                         <el-input v-model="gitForm.branch"></el-input>
                     </el-form-item>
-                    <el-form-item label="用户名">
+                    <el-form-item :label="$t('message.username')">
                         <el-input v-model="gitForm.username"></el-input>
                     </el-form-item>
-                    <el-form-item label="密码">
+                    <el-form-item :label="$t('message.password')">
                         <el-input v-model="gitForm.password"></el-input>
                     </el-form-item>
                 </el-form>
@@ -61,8 +61,8 @@
                         :action="`${requestUrl}/container/jarUpload`"
                         multiple>
                     <i class="el-icon-upload"></i>
-                    <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                    <div class="el-upload__tip" slot="tip">拖拽或点击文件后会自动上传</div>
+                    <div class="el-upload__text">Drag the file here, or <em>click on Upload</em></div>
+                    <div class="el-upload__tip" slot="tip">{{$t('message.uploadTips')}}</div>
                     </el-upload>
                 </el-form-item>
                 <el-form-item>
@@ -129,7 +129,7 @@
                         let appId = this.$store.state.appInfo.id;
                         this.flyio.get("/container/list?appId=" + appId).then(res => {
                             if(res.data.success){
-                            this.$message('成功创建/修改容器～');
+                            this.$message.info(this.$t('message.success'));
                             // 恢复默认表单
                             this.dialogVisible = false;
                             this.form.containerName = '';
@@ -142,7 +142,7 @@
                      });
                    }
                    else{
-                       this.$message('创建容器失败～');
+                       this.$message.warning(this.$t('message.failed'));
                    }
                });
             },
@@ -153,9 +153,9 @@
             deleteItem(item,index){
                 let appId = this.$store.state.appInfo.id;
                 this.flyio.get("/container/delete?containerId="+ item.id+'&appId='+appId).then(res => {
-                    console.log(res)
+                    console.log(res);
                     this.containerList.splice(index,1);
-                    this.$message(`容器${item.containerName}已删除`);
+                    this.$message.info(this.$t('message.success'));
                 });
             },
             editItem(item){
@@ -176,7 +176,7 @@
                 ws = new WebSocket(wsUrl);
 
                 ws.onopen = ()=> {
-                    this.arrangeTitle = "机器部署";
+                    this.arrangeTitle = this.$t('message.deploy');
                     this.arrangeVisible = true;
                         console.log("Connection open ...");
                         ws.send("Hello WebSockets!");
@@ -204,7 +204,7 @@
                 this.flyio.get("/container/listDeployedWorker?containerId="+ item.id+'&appId='+appId).then(res => {
                     if(res.data.data){
                         this.logs = res.data.data.split('\n');
-                        this.arrangeTitle = "机器列表";
+                        this.arrangeTitle = this.$t('message.deployedWorkerList');
                         this.arrangeVisible = true;
                     }
                     // this.containerList.splice(index,1);
@@ -229,7 +229,7 @@
 
             let appId = this.$store.state.appInfo.id;
             this.flyio.get("/container/list?appId=" + appId).then(res => {
-                console.log(res)
+                console.log(res);
                 if(res.data.success){
                     this.containerList = res.data.data;
                 }
@@ -283,6 +283,7 @@
       display: inline-block;
       max-width: 200px;
       overflow:hidden;
+      margin-left: 20px;
   }
   .el-dialog{
       height: 100vh;

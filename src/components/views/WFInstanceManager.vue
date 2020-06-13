@@ -8,28 +8,28 @@
           :model="wfInstanceQueryContent"
           class="el-form--inline"
         >
-          <el-form-item label="工作流实例ID">
+          <el-form-item :label="$t('message.wfInstanceId')">
             <el-input
               v-model="wfInstanceQueryContent.wfInstanceId"
-              placeholder="工作流实例ID"
+              :placeholder="$t('message.wfInstanceId')"
             />
           </el-form-item>
-          <el-form-item label="工作流ID">
+          <el-form-item :label="$t('message.wfId')">
             <el-input
               v-model="wfInstanceQueryContent.workflowId"
-              placeholder="工作流ID"
+              :placeholder="$t('message.wfId')"
             />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="listWfInstances">查询</el-button>
-            <el-button type="cancel" @click="onClickRest">重置</el-button>
+            <el-button type="primary" @click="listWfInstances">{{$t('message.query')}}</el-button>
+            <el-button type="cancel" @click="onClickRest">{{$t('message.reset')}}</el-button>
           </el-form-item>
         </el-form>
       </el-col>
       <el-col :span="4">
         <div style="float:right;padding-right:10px">
           <el-button type="primary" @click="listWfInstances"
-            >刷新状态</el-button
+            >{{$t('message.refresh')}}</el-button
           >
         </div>
       </el-col>
@@ -42,20 +42,24 @@
         style="width: 100%"
         :row-class-name="wfInstanceTableRowClassName"
       >
-        <el-table-column prop="workflowId" label="工作流ID" width="80" />
-        <el-table-column prop="workflowName" label="工作流名称" />
-        <el-table-column prop="wfInstanceId" label="工作流实例ID" />
-        <el-table-column prop="statusStr" label="状态" width="80" />
-        <el-table-column prop="actualTriggerTime" label="触发时间" />
-        <el-table-column prop="finishedTime" label="结束时间" />
+        <el-table-column prop="workflowId" :label="$t('message.wfId')" width="160" />
+        <el-table-column prop="workflowName" :label="$t('message.wfName')" />
+        <el-table-column prop="wfInstanceId" :label="$t('message.wfInstanceId')" />
+        <el-table-column prop="status" :label="$t('message.status')" width="160">
+          <template slot-scope="scope">
+            {{fetchWFStatus(scope.row.status)}}
+          </template>
+        </el-table-column>
+        <el-table-column prop="actualTriggerTime" :label="$t('message.triggerTime')" />
+        <el-table-column prop="finishedTime" :label="$t('message.finishedTime')" />
 
-        <el-table-column label="操作" width="300">
+        <el-table-column :label="$t('message.operation')" width="300">
           <template slot-scope="scope">
             <el-button size="medium" @click="onClickShowDetail(scope.row)"
-              >详情</el-button
+              >{{$t('message.detail')}}</el-button
             >
             <el-button size="medium" @click="onClickStop(scope.row)"
-              >停止</el-button
+              >{{$t('message.stop')}}</el-button
             >
           </template>
         </el-table-column>
@@ -108,6 +112,7 @@ export default {
     onClickRest() {
       this.wfInstanceQueryContent.wfInstanceId = undefined;
       this.wfInstanceQueryContent.workflowId = undefined;
+      this.listWfInstances();
     },
     // 查看工作流详情
     onClickShowDetail(data) {
@@ -129,7 +134,7 @@ export default {
         "&appId=" +
         this.$store.state.appInfo.id;
       this.axios.get(url).then(() => {
-        that.$message.success("停止成功");
+        that.$message.success(this.$t('message.success'));
         // 重新加载列表
         that.listInstanceInfos();
       });
@@ -152,6 +157,9 @@ export default {
         case 10:
           return "warning-row";
       }
+    },
+    fetchWFStatus(status) {
+      return this.common.translateWfInstanceStatus(status);
     }
   },
   mounted() {

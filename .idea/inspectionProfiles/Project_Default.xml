@@ -2,5 +2,36 @@
   <profile version="1.0">
     <option name="myName" value="Project Default" />
     <inspection_tool class="Eslint" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="22">
+            <item index="0" class="java.lang.String" itemvalue="nobr" />
+            <item index="1" class="java.lang.String" itemvalue="noembed" />
+            <item index="2" class="java.lang.String" itemvalue="comment" />
+            <item index="3" class="java.lang.String" itemvalue="noscript" />
+            <item index="4" class="java.lang.String" itemvalue="embed" />
+            <item index="5" class="java.lang.String" itemvalue="script" />
+            <item index="6" class="java.lang.String" itemvalue="el-dropdown-menu" />
+            <item index="7" class="java.lang.String" itemvalue="el-dropdown" />
+            <item index="8" class="java.lang.String" itemvalue="el-dropdown-item" />
+            <item index="9" class="java.lang.String" itemvalue="el-button" />
+            <item index="10" class="java.lang.String" itemvalue="el-table-column" />
+            <item index="11" class="java.lang.String" itemvalue="el-switch" />
+            <item index="12" class="java.lang.String" itemvalue="el-table" />
+            <item index="13" class="java.lang.String" itemvalue="el-row" />
+            <item index="14" class="java.lang.String" itemvalue="el-pagination" />
+            <item index="15" class="java.lang.String" itemvalue="el-dialog" />
+            <item index="16" class="java.lang.String" itemvalue="el-form" />
+            <item index="17" class="java.lang.String" itemvalue="el-input" />
+            <item index="18" class="java.lang.String" itemvalue="el-form-item" />
+            <item index="19" class="java.lang.String" itemvalue="el-col" />
+            <item index="20" class="java.lang.String" itemvalue="el-select" />
+            <item index="21" class="java.lang.String" itemvalue="el-option" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
   </profile>
 </component>
