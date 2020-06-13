@@ -20,8 +20,8 @@ const cn = {
         'back': '返回',
 
         // 欢迎界面
-        'appRegister': '应用注册',
-        'userRegister': '用户注册',
+        'appRegister': '执行应用注册',
+        'userRegister': '报警用户录入',
         'appNameInputPLH': '请输入应用名称',
         'appName': '应用名称',
         'appDescription': '应用描述',
@@ -79,8 +79,8 @@ const cn = {
         'threadConcurrency': '单机线程并发度',
         'timeout': '运行时间限制（毫秒）',
         'retryConfig': '重试配置',
-        'taskRetryTimes': '任务重试次数',
-        'subTaskRetryTimes': "子任务重试次数",
+        'taskRetryTimes': 'Instance重试次数',
+        'subTaskRetryTimes': "Task重试次数",
         'workerConfig': '机器配置',
         'minCPU': '最低CPU核心数',
         'minMemory': '最低内存(GB)',
