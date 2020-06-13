@@ -39,7 +39,7 @@ const en = {
         'tabTemplate': 'TemplateGenerator',
         'tabContainerManager': 'ContainerManager',
 
-        'omsServerTime': 'oms-server time',
+        'omsServerTime': 'server time',
         'localBrowserTime': 'local browser time',
         'githubURL': 'GitHub Repo',
         'docURL': 'document address',
@@ -97,6 +97,7 @@ const en = {
         'fixDelay': 'Fix Delay (ms)',
         'workflow': 'workflow',
         'onlineCronTool': 'online cron tool',
+        'javaContainer': 'Java（Container）',
 
         // JobInstance
         'wfInstanceId': 'WorkflowInstanceId',

@@ -100,6 +100,7 @@ const cn = {
         'fixDelay': '固定延迟（毫秒）',
         'workflow': '工作流',
         'onlineCronTool': '在线生成工具',
+        'javaContainer': 'Java（容器）',
 
         // 任务实例管理
         'wfInstanceId': '工作流实例ID',

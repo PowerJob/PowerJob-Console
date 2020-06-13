@@ -43,16 +43,20 @@ new Vue({
 axios.interceptors.request.use((request) => {
 
   let url = request.url;
-  console.log(url.search("/appInfo/list"));
-  let needIntercept = url.search("/appInfo/list") === -1;
-  if (needIntercept) {
+  let isListAppInfo = url.search("/appInfo/list") !== -1;
+  let isAppRegister = url.search("/appInfo/save") !== -1;
+  let isUserRegister = url.search("/user/save") !== -1;
 
-    let appId = store.state.appInfo.id;
-    if (appId === undefined || appId === null) {
-      router.push("/");
-      return Promise.reject("no appId");
-    }
+  if (isListAppInfo || isAppRegister || isUserRegister) {
+    return request;
   }
+
+  let appId = store.state.appInfo.id;
+  if (appId === undefined || appId === null) {
+    router.push("/");
+    return Promise.reject("no appId");
+  }
+
   return request;
 
 }, function (error) {

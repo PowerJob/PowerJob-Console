@@ -38,8 +38,16 @@
                         {{scope.row.timeExpressionType}}  {{scope.row.timeExpression}}
                     </template>
                 </el-table-column>
-                <el-table-column prop="executeType" :label="$t('message.executeType')"/>
-                <el-table-column prop="processorType" :label="$t('message.processorType')"/>
+                <el-table-column :label="$t('message.executeType')">
+                    <template slot-scope="scope">
+                        {{translateExecuteType(scope.row.executeType)}}
+                    </template>
+                </el-table-column>
+                <el-table-column :label="$t('message.processorType')">
+                    <template slot-scope="scope">
+                        {{translateProcessorType(scope.row.processorType)}}
+                    </template>
+                </el-table-column>
                 <el-table-column :label="$t('message.status')" width="80">
                     <template slot-scope="scope">
                         <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="changeJobStatus(scope.row)"/>
@@ -265,7 +273,7 @@
                 // 时间表达式选择类型
                 timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIX_RATE", label: this.$t('message.fixRate')}, {key: "FIX_DELAY", label: this.$t('message.fixDelay')}, {key: "WORKFLOW", label: this.$t('message.workflow')} ],
                 // 处理器类型
-                processorTypeOptions: [{key: "EMBEDDED_JAVA", label: "JAVA"}, {key: "JAVA_CONTAINER", label: "JAVA (CONTAINER)"}, {key: "SHELL", label: "SHELL"}, {key: "PYTHON", label: "PYTHON"}],
+                processorTypeOptions: [{key: "EMBEDDED_JAVA", label: "JAVA"}, {key: "JAVA_CONTAINER", label: this.$t('message.javaContainer')}, {key: "SHELL", label: "SHELL"}, {key: "PYTHON", label: "PYTHON"}],
                 // 执行方式类型
                 executeTypeOptions: [{key: "STANDALONE", label: this.$t('message.standalone')}, {key: "BROADCAST", label: this.$t('message.broadcast')},  {key: "MAP", label: this.$t('message.map')}, {key: "MAP_REDUCE", label: this.$t('message.mapReduce')}],
                 // 用户列表
@@ -353,7 +361,7 @@
                 this.jobQueryContent.jobId = undefined;
                 this.listJobInfos();
             },
-            verifyPlaceholder(processorType){
+            verifyPlaceholder(processorType) {
                 let res;
                 switch(processorType){
                     case "EMBEDDED_JAVA": res = this.$t('message.javaProcessorInfoPLH');break;
@@ -362,6 +370,23 @@
                     case "PYTHON" : res = this.$t('message.pythonProcessorInfoPLH');
                 }
                 return  res;
+            },
+            // 翻译执行类型
+            translateExecuteType(executeType) {
+                switch (executeType) {
+                    case "STANDALONE": return this.$t('message.standalone');
+                    case "BROADCAST": return this.$t('message.broadcast');
+                    case "MAP_REDUCE": return this.$t('message.mapReduce');
+                    case "MAP": return this.$t('message.map');
+                    default: return "UNKNOWN";
+                }
+            },
+            // 翻译处理器类型
+            translateProcessorType(processorType) {
+                if (processorType === "JAVA_CONTAINER") {
+                    return this.$t('message.javaContainer');
+                }
+                return processorType;
             }
         },
         mounted() {

@@ -73,7 +73,7 @@
                          <el-input v-model="userRegisterForm.phone"/>
                      </el-form-item>
 
-                     <el-form-item :label="$t('message.mail')">
+                     <el-form-item :label="$t('message.email')">
                          <el-input v-model="userRegisterForm.email"/>
                      </el-form-item>
 
