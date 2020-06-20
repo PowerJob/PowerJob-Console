@@ -20,15 +20,17 @@ const en = {
         'back': 'back',
 
         // 欢迎界面
-        'appRegister': 'Application Registration',
+        'appRegister': 'App Registration',
         'userRegister': 'User Registration',
         'appNameInputPLH': 'Enter The AppName',
         'appName': 'AppName',
-        'appDescription': 'AppDescription',
+        'appPassword': 'AppPassword',
         'register': 'register',
         'name': 'name',
         'phone': 'phone',
         'email': 'email',
+        'welcomeTitle': 'Welcome to use PowerJob!',
+        'login': 'Login',
 
         'tabHome': 'Home',
         'tabJobManage': 'JobManage',

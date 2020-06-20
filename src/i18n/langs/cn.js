@@ -24,11 +24,13 @@ const cn = {
         'userRegister': '报警用户录入',
         'appNameInputPLH': '请输入应用名称',
         'appName': '应用名称',
-        'appDescription': '应用描述',
+        'appPassword': '密码',
         'register': '注册',
         'name': '姓名',
         'phone': '手机号',
         'email': '邮箱地址',
+        'welcomeTitle': '欢迎使用 PowerJob!',
+        'login': '登陆',
 
 
         // 左侧tab栏
