@@ -35,6 +35,7 @@ const cn = {
         'changeAppInfo': '修改应用信息',
         'newPassword': '新密码',
         'newPassword2': '确认密码',
+        'stayLogged': '保持登录状态',
 
 
         // 左侧tab栏

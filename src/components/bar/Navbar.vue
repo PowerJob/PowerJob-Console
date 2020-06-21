@@ -72,7 +72,7 @@
         methods: {
             // 退出当前应用
             onClickCloseConsole: function () {
-                console.log("onClickCloseConsole");
+                window.localStorage.removeItem('oms_auto_login');
                 this.$router.push("/");
             },
             // 处理系统设置的指令时间

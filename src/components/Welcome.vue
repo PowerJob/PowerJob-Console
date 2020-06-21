@@ -27,6 +27,7 @@
 
              <h1 align="center">{{$t('message.welcomeTitle')}}</h1>
 
+             <!-- 登录表单 -->
              <el-form ref="ruleForm" :model="appLoginForm" label-width="0px" class="loginWrap">
                  <el-form-item label-width="">
                      <el-autocomplete
@@ -42,8 +43,10 @@
                  <el-form-item>
                      <el-button type="primary" @click="login" class="loginWrap">{{$t('message.login')}}</el-button>
                  </el-form-item>
+                 <el-checkbox v-model="stayLogged" style="color: #f0f3f4">{{$t('message.stayLogged')}}</el-checkbox>
              </el-form>
 
+             <!-- 应用注册弹窗 -->
              <el-dialog :title="$t('message.appRegister')" :visible.sync="appRegisterFormVisible" width="35%" >
                  <el-form :model="appRegisterForm" style="margin:0 5px">
 
@@ -62,6 +65,7 @@
                  </el-form>
              </el-dialog>
 
+             <!-- 用户注册弹窗 -->
              <el-dialog :title="$t('message.userRegister')" :visible.sync="userRegisterFormVisible" width="35%" >
                  <el-form :model="userRegisterForm" style="margin:0 5px">
 
@@ -114,7 +118,9 @@
                 appLoginForm: {
                     appName: undefined,
                     password: undefined
-                }
+                },
+                // 是否保持登录状态
+                stayLogged: true,
             }
         },
         methods: {
@@ -157,7 +163,12 @@
             login() {
                 const that = this;
                 this.axios.post("/appInfo/assert", this.appLoginForm).then(res => {
-                    that.$message.success(this.$t('message.success'));
+
+                    // 勾选了保持登录状态，就开启自动登录，直接本地存用户名密码（内部系统浏览器明文存问题不大）
+                    if (this.stayLogged) {
+                        window.localStorage.setItem('oms_auto_login', JSON.stringify(this.appLoginForm));
+                    }
+
                     let appInfo = {
                         id: res,
                         appName: that.appLoginForm.appName
@@ -166,7 +177,19 @@
                     this.$store.commit("initAppInfo", appInfo);
                     // 跳转到主界面
                     this.$router.push("/oms/home")
-                },error => that.$message.error(error));
+                },error => {
+                    window.localStorage.removeItem('oms_auto_login');
+                    that.$message.error(error);
+                });
+            },
+            // 自动登录
+            autoLogin: function () {
+                let autoLoginString = window.localStorage.getItem("oms_auto_login");
+                if (autoLoginString === undefined || autoLoginString === null) {
+                    return;
+                }
+                this.appLoginForm = JSON.parse(autoLoginString);
+                this.login();
             }
         },
         mounted() {
@@ -175,19 +198,21 @@
             console.log("language from localStorage is %o", localLang);
             if (localLang != null) {
                 this.$i18n.locale = localLang;
-                return;
+            }else {
+                let lang = navigator.language;
+                console.log("language from system is %o", lang);
+                switch (lang) {
+                    case "zh-HK":
+                    case "zh-TW":
+                    case "zh-SG":
+                    case "zh-CN": this.$i18n.locale = "cn"; break;
+                    default:
+                        this.$i18n.locale = "en";
+                }
             }
 
-            let lang = navigator.language;
-            console.log("language from system is %o", lang);
-            switch (lang) {
-                case "zh-HK":
-                case "zh-TW":
-                case "zh-SG":
-                case "zh-CN": this.$i18n.locale = "cn"; break;
-                default:
-                    this.$i18n.locale = "en";
-            }
+            // 自动登录
+            this.autoLogin();
         }
     }
 </script>

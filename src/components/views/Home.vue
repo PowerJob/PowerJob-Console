@@ -4,6 +4,18 @@
         <!-- 第0行，显示时间信息 -->
         <el-row :gutter="24">
             <el-col :span="6">
+                <el-card shadow="always" style="text-align:center">
+                    {{this.$store.state.appInfo.appName}}
+                </el-card>
+            </el-col>
+            <a href="https://github.com/KFCFans/PowerJob" target="_blank">
+                <el-col :span="6">
+                    <el-card shadow="always" style="text-align:center">
+                        {{$t('message.githubURL')}}
+                    </el-card>
+                </el-col>
+            </a>
+            <el-col :span="6">
                 <el-card shadow="always">
                     {{$t('message.omsServerTime')}}：{{ this.common.timestamp2Str(systemInfo.serverTime) }}
                 </el-card>
@@ -13,20 +25,6 @@
                     {{$t('message.localBrowserTime')}}：{{ this.common.timestamp2Str(new Date().getTime()) }}
                 </el-card>
             </el-col>
-            <a href="https://github.com/KFCFans/OhMyScheduler" target="_blank">
-                <el-col :span="6">
-                    <el-card shadow="always" style="text-align:center">
-                        {{$t('message.githubURL')}}
-                    </el-card>
-                </el-col>
-            </a>
-            <a href="https://www.yuque.com/ohmyscheduler/guidence" target="_blank" style="text-align:center">
-                <el-col :span="6">
-                    <el-card shadow="always">
-                        {{$t('message.docURL')}}
-                    </el-card>
-                </el-col>
-            </a>
         </el-row>
 
         <!-- 第一行，显示概览 overview -->

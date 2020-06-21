@@ -35,6 +35,7 @@ const en = {
         'changeAppInfo': 'Change AppInfo',
         'newPassword': 'New Password',
         'newPassword2': 'Check New Password',
+        'stayLogged': 'Keep me logged in',
 
         'tabHome': 'Home',
         'tabJobManage': 'JobManage',
