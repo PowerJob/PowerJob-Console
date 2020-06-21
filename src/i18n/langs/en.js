@@ -31,6 +31,10 @@ const en = {
         'email': 'email',
         'welcomeTitle': 'Welcome to use PowerJob!',
         'login': 'Login',
+        'logout': 'Logout',
+        'changeAppInfo': 'Change AppInfo',
+        'newPassword': 'New Password',
+        'newPassword2': 'Check New Password',
 
         'tabHome': 'Home',
         'tabJobManage': 'JobManage',

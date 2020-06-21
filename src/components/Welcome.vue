@@ -159,8 +159,8 @@
                 this.axios.post("/appInfo/assert", this.appLoginForm).then(res => {
                     that.$message.success(this.$t('message.success'));
                     let appInfo = {
-                        "id": res,
-                        "appName": that.appLoginForm.username
+                        id: res,
+                        appName: that.appLoginForm.appName
                     };
                     // 将 appId 存储到 VueStore
                     this.$store.commit("initAppInfo", appInfo);

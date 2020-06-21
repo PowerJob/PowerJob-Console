@@ -31,6 +31,10 @@ const cn = {
         'email': '邮箱地址',
         'welcomeTitle': '欢迎使用 PowerJob!',
         'login': '登陆',
+        'logout': '退出',
+        'changeAppInfo': '修改应用信息',
+        'newPassword': '新密码',
+        'newPassword2': '确认密码',
 
 
         // 左侧tab栏
