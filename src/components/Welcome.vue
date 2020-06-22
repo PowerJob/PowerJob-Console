@@ -2,8 +2,14 @@
      <div id="container">
 
          <div id="head">
-             <el-row>
-                 <el-col :offset="22">
+             <el-row type="flex" class="row-bg" justify="end">
+                 <el-col span="2">
+                     <el-button type="primary" plain @click="appRegisterFormVisible = true">{{$t('message.appRegister')}}</el-button>
+                 </el-col>
+                 <el-col span="2">
+                     <el-button type="success" plain @click="userRegisterFormVisible = true">{{$t('message.userRegister')}}</el-button>
+                 </el-col>
+                 <el-col span="2">
                      <el-dropdown @command="this.common.switchLanguage">
                         <span class="el-dropdown-link">
                             <p style="color:#ffffff">Language<i class="el-icon-arrow-down el-icon--right"/></p>
@@ -19,31 +25,28 @@
 
          <div id="welcome">
 
-             <!-- <h3 class="topBar"><span class="left">OhMy</span><span class="right">Scheduler</span></h3> -->
-             <el-button type="primary" plain @click="appRegisterFormVisible = true">{{$t('message.appRegister')}}</el-button>
+             <h1 align="center">{{$t('message.welcomeTitle')}}</h1>
 
-             <div id="entrance">
-                 <el-select
-                         id="appSelect"
-                         v-model="selectedAppInfo"
-                         filterable
-                         remote
-                         reserve-keyword
-                         :placeholder="$t('message.appNameInputPLH')"
-                         :remote-method="fetchAppNames"
-                         @change="selectedApp"
-                         :loading="loading">
-                     <el-option
-                             v-for="appInfo in appInfoList"
-                             :key="appInfo.id"
-                             :label="appInfo.appName"
-                             :value="appInfo">
-                     </el-option>
-                 </el-select>
-             </div>
+             <!-- 登录表单 -->
+             <el-form ref="ruleForm" :model="appLoginForm" label-width="0px" class="loginWrap">
+                 <el-form-item label-width="">
+                     <el-autocomplete
+                             :trigger-on-focus="false"
+                             class="loginWrap"
+                             v-model="appLoginForm.appName"
+                             :fetch-suggestions="queryAppNames"
+                             :placeholder="$t('message.appName')"/>
+                 </el-form-item>
+                 <el-form-item label-width="">
+                     <el-input v-model="appLoginForm.password" :placeholder="$t('message.password')" type="password" show-password="true"/>
+                 </el-form-item>
+                 <el-form-item>
+                     <el-button type="primary" @click="login" class="loginWrap">{{$t('message.login')}}</el-button>
+                 </el-form-item>
+                 <el-checkbox v-model="stayLogged" style="color: #f0f3f4">{{$t('message.stayLogged')}}</el-checkbox>
+             </el-form>
 
-             <el-button type="success" plain @click="userRegisterFormVisible = true">{{$t('message.userRegister')}}</el-button>
-
+             <!-- 应用注册弹窗 -->
              <el-dialog :title="$t('message.appRegister')" :visible.sync="appRegisterFormVisible" width="35%" >
                  <el-form :model="appRegisterForm" style="margin:0 5px">
 
@@ -51,8 +54,8 @@
                          <el-input v-model="appRegisterForm.appName"/>
                      </el-form-item>
 
-                     <el-form-item :label="$t('message.appDescription')">
-                         <el-input v-model="appRegisterForm.description"/>
+                     <el-form-item :label="$t('message.appPassword')">
+                         <el-input v-model="appRegisterForm.password"/>
                      </el-form-item>
 
                      <el-form-item>
@@ -62,6 +65,7 @@
                  </el-form>
              </el-dialog>
 
+             <!-- 用户注册弹窗 -->
              <el-dialog :title="$t('message.userRegister')" :visible.sync="userRegisterFormVisible" width="35%" >
                  <el-form :model="userRegisterForm" style="margin:0 5px">
 
@@ -93,10 +97,6 @@
         name: "Welcome",
         data() {
             return {
-                // 下拉框被选中的数据
-                selectedAppInfo: {},
-                // 下拉框的选择列表数据
-                appInfoList: [],
 
                 // 应用注册表单是否可见
                 appRegisterFormVisible: false,
@@ -106,31 +106,42 @@
                 // 应用注册表单对象
                 appRegisterForm: {
                     appName: "",
-                    description: ""
+                    password: ""
                 },
                 // 用户注册表单对象
                 userRegisterForm: {
                     username: "",
                     phone: "",
                     email: ""
-                }
+                },
+                // 控制台登陆对象
+                appLoginForm: {
+                    appName: undefined,
+                    password: undefined
+                },
+                // 是否保持登录状态
+                stayLogged: true,
             }
         },
         methods: {
             // 请求应用下拉框数据
-            fetchAppNames(condition) {
+            queryAppNames(queryString, cb) {
+                const array = [];
                 const that = this;
-                const url = "/appInfo/list?condition=" + condition;
+                const url = "/appInfo/list?condition=" + queryString;
                 this.axios.get(url).then((result) => {
-                    that.appInfoList = result;
+                    result.forEach(appInfo => {
+                       array.push({
+                           "value": appInfo.appName
+                       });
+                       cb(array);
+                    });
                 }, error => that.$message.error(error));
-            },
-            // 选中应用跳转
-            selectedApp() {
-                // 将 appId 存储到 VueStore
-                this.$store.commit("initAppInfo", this.selectedAppInfo);
-                // 跳转到主界面
-                this.$router.push("/oms/home")
+
+                clearTimeout(this.timeout);
+                this.timeout = setTimeout(() => {
+                    cb(array);
+                }, 3000);
             },
             // 注册应用
             registerApp() {
@@ -147,6 +158,38 @@
                     that.$message.success(this.$t('message.success'));
                     that.userRegisterFormVisible = false;
                 }, that.userRegisterFormVisible = false);
+            },
+            // 登陆控制台
+            login() {
+                const that = this;
+                this.axios.post("/appInfo/assert", this.appLoginForm).then(res => {
+
+                    // 勾选了保持登录状态，就开启自动登录，直接本地存用户名密码（内部系统浏览器明文存问题不大）
+                    if (this.stayLogged) {
+                        window.localStorage.setItem('oms_auto_login', JSON.stringify(this.appLoginForm));
+                    }
+
+                    let appInfo = {
+                        id: res,
+                        appName: that.appLoginForm.appName
+                    };
+                    // 将 appId 存储到 VueStore
+                    this.$store.commit("initAppInfo", appInfo);
+                    // 跳转到主界面
+                    this.$router.push("/oms/home")
+                },error => {
+                    window.localStorage.removeItem('oms_auto_login');
+                    that.$message.error(error);
+                });
+            },
+            // 自动登录
+            autoLogin: function () {
+                let autoLoginString = window.localStorage.getItem("oms_auto_login");
+                if (autoLoginString === undefined || autoLoginString === null) {
+                    return;
+                }
+                this.appLoginForm = JSON.parse(autoLoginString);
+                this.login();
             }
         },
         mounted() {
@@ -155,19 +198,21 @@
             console.log("language from localStorage is %o", localLang);
             if (localLang != null) {
                 this.$i18n.locale = localLang;
-                return;
+            }else {
+                let lang = navigator.language;
+                console.log("language from system is %o", lang);
+                switch (lang) {
+                    case "zh-HK":
+                    case "zh-TW":
+                    case "zh-SG":
+                    case "zh-CN": this.$i18n.locale = "cn"; break;
+                    default:
+                        this.$i18n.locale = "en";
+                }
             }
 
-            let lang = navigator.language;
-            console.log("language from system is %o", lang);
-            switch (lang) {
-                case "zh-HK":
-                case "zh-TW":
-                case "zh-SG":
-                case "zh-CN": this.$i18n.locale = "cn"; break;
-                default:
-                    this.$i18n.locale = "en";
-            }
+            // 自动登录
+            this.autoLogin();
         }
     }
 </script>
@@ -194,8 +239,8 @@
         align-items：定义了项目在交叉轴伤的对齐方式
          */
         display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
+        flex-direction: column;
+        /*flex-wrap: nowrap;*/
         justify-content: center;
         align-items: center;
     }
@@ -214,7 +259,14 @@
         border-radius: 5px;
         padding: 5px;
     }
-    #entrance {
-        margin: 20px;
+
+    h1 {
+        width: 450px;
+        color: #f0f3f4;
     }
+
+    .loginWrap {
+        width: 300px;
+    }
+
 </style>

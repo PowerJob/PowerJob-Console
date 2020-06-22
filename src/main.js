@@ -46,8 +46,9 @@ axios.interceptors.request.use((request) => {
   let isListAppInfo = url.search("/appInfo/list") !== -1;
   let isAppRegister = url.search("/appInfo/save") !== -1;
   let isUserRegister = url.search("/user/save") !== -1;
+  let isAssertAppInfo = url.search("/appInfo/assert") !== -1;
 
-  if (isListAppInfo || isAppRegister || isUserRegister) {
+  if (isListAppInfo || isAppRegister || isUserRegister || isAssertAppInfo) {
     return request;
   }
 
