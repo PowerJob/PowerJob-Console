@@ -6,20 +6,33 @@
         <el-form
           :inline="true"
           :model="wfInstanceQueryContent"
-          class="el-form--inline"
-        >
+          class="el-form--inline">
+
+          <el-form-item :label="$t('message.wfId')">
+            <el-input
+                    v-model="wfInstanceQueryContent.workflowId"
+                    :placeholder="$t('message.wfId')"
+            />
+          </el-form-item>
+
           <el-form-item :label="$t('message.wfInstanceId')">
             <el-input
               v-model="wfInstanceQueryContent.wfInstanceId"
               :placeholder="$t('message.wfInstanceId')"
             />
           </el-form-item>
-          <el-form-item :label="$t('message.wfId')">
-            <el-input
-              v-model="wfInstanceQueryContent.workflowId"
-              :placeholder="$t('message.wfId')"
-            />
+
+          <el-form-item :label="$t('message.status')">
+            <el-select v-model="wfInstanceQueryContent.status" :placeholder="$t('message.status')">
+              <el-option
+                      v-for="item in wfInstanceStatusOptions"
+                      :key="item.key"
+                      :label="item.label"
+                      :value="item.key">
+              </el-option>
+            </el-select>
           </el-form-item>
+
           <el-form-item>
             <el-button type="primary" @click="listWfInstances">{{$t('message.query')}}</el-button>
             <el-button type="cancel" @click="onClickRest">{{$t('message.reset')}}</el-button>
@@ -92,13 +105,23 @@ export default {
         pageSize: 10,
         wfInstanceId: undefined,
         workflowId: undefined,
+        status: ""
       },
       // 查询结果
       wfInstancePageResult: {
         pageSize: 10,
         totalItems: 0,
         data: [],
-      }
+      },
+      // 工作流实例状态选择
+      wfInstanceStatusOptions: [
+        {key: "", label: this.$t('message.all')},
+        {key: "WAITING", label: this.$t('message.waitingDispatch')},
+        {key: "RUNNING", label: this.$t('message.running')},
+        {key: "FAILED", label: this.$t('message.failed')},
+        {key: "SUCCEED", label: this.$t('message.success')},
+        {key: "STOPPED", label: this.$t('message.stopped')}
+      ]
     };
   },
   methods: {
@@ -112,6 +135,7 @@ export default {
     onClickRest() {
       this.wfInstanceQueryContent.wfInstanceId = undefined;
       this.wfInstanceQueryContent.workflowId = undefined;
+      this.wfInstanceQueryContent.status = "";
       this.listWfInstances();
     },
     // 查看工作流详情

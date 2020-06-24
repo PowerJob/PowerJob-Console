@@ -18,6 +18,7 @@ const en = {
         'download': 'download',
         'stop': 'stop',
         'back': 'back',
+        'all': 'ALL',
 
         // 欢迎界面
         'appRegister': 'App Registration',

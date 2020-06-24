@@ -18,6 +18,7 @@ const cn = {
         'download': '下载',
         'stop': '停止',
         'back': '返回',
+        'all': '全部',
 
         // 欢迎界面
         'appRegister': '执行应用注册',
