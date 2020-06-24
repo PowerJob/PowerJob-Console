@@ -18,6 +18,7 @@ const en = {
         'download': 'download',
         'stop': 'stop',
         'back': 'back',
+        'all': 'ALL',
 
         // 欢迎界面
         'appRegister': 'App Registration',
@@ -46,10 +47,12 @@ const en = {
         'tabTemplate': 'TemplateGenerator',
         'tabContainerManager': 'ContainerManager',
 
-        'omsServerTime': 'server time',
-        'localBrowserTime': 'local browser time',
+        'omsServerTime': 'Server Time',
+        'omsServerTimezone': 'Server Timezone',
+        'localBrowserTime': 'Local Time',
+        'localBrowserTimezone': 'Local Timezone',
         'githubURL': 'GitHub Repo',
-        'docURL': 'document address',
+        'docURL': 'Document Address',
         'totalJobNum': 'total job Num',
         'runningInstanceNum': 'running instance num',
         'recentFailedInstanceNum': 'recent failed instance Num',

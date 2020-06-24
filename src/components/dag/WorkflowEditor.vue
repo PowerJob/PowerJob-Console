@@ -169,6 +169,7 @@
             onClickReset() {
                 this.jobQueryContent.keyword = undefined;
                 this.jobQueryContent.jobId = undefined;
+                this.listJobInfos();
             },
             // 列出符合当前搜索条件的任务
             listJobInfos() {
@@ -353,17 +354,12 @@
             if (modify) {
                 this.workflowInfo = this.$route.params.workflowInfo;
                 this.workflowInfo.appId = this.$store.state.appInfo.id;
-                // this.workflowInfo.peworkflowDAG.nodes = this.workflowInfo.peworkflowDAG.nodes.map(x => {
-                //     return {
-                //         jobId: x.jobId,
-                //         jobName: x.jobName
-                //     }
-                // });
                 this.draw();
             }
         }
     }
 </script>
+
 <style scoped>
     .el-input {
         width: 80%;
@@ -374,18 +370,24 @@
         font-size: 16px;
         font-weight: bold;
     }
+</style>
+
+<!-- can't use scope, or dag will be the black block, maybe this is the bug of d3.js -->
+<style>
 
     svg {
         font-size: 16px;
+        border: 1px solid red;
     }
+
     .node rect {
-        stroke: #606266;
+        stroke: #999;
         fill: #fff;
+        stroke-width: 1.5px;
     }
 
     .edgePath path {
-        stroke: #606266;
-        fill: #ff9900;
-        stroke-width: 3px;
+        stroke: #333;
+        stroke-width: 1px;
     }
 </style>

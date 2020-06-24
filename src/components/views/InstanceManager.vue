@@ -4,14 +4,24 @@
         <el-row>
             <el-col :span="22">
                 <el-form :inline="true" :model="instanceQueryContent" class="el-form--inline">
-                    <el-form-item :label="$t('message.instanceId')">
-                        <el-input v-model="instanceQueryContent.instanceId" :placeholder="$t('message.instanceId')"/>
-                    </el-form-item>
                     <el-form-item :label="$t('message.jobId')">
                         <el-input v-model="instanceQueryContent.jobId" :placeholder="$t('message.jobId')"/>
                     </el-form-item>
+                    <el-form-item :label="$t('message.instanceId')">
+                        <el-input v-model="instanceQueryContent.instanceId" :placeholder="$t('message.instanceId')"/>
+                    </el-form-item>
                     <el-form-item  v-if="instanceQueryContent.type === 'WORKFLOW'" :label="$t('message.wfInstanceId')">
                         <el-input v-model="instanceQueryContent.wfInstanceId" :placeholder="$t('message.wfInstanceId')"/>
+                    </el-form-item>
+                    <el-form-item :label="$t('message.status')">
+                        <el-select v-model="instanceQueryContent.status" :placeholder="$t('message.status')">
+                            <el-option
+                                    v-for="item in instanceStatusOptions"
+                                    :key="item.key"
+                                    :label="item.label"
+                                    :value="item.key">
+                            </el-option>
+                        </el-select>
                     </el-form-item>
 
                     <el-form-item>
@@ -119,6 +129,7 @@
                     pageSize: 10,
                     instanceId: undefined,
                     wfInstanceId:undefined,
+                    status: "",
                     jobId: undefined,
                     type: "NORMAL"
                 },
@@ -143,7 +154,17 @@
                 },
                 // 日志弹出框是否可见
                 instanceLogVisible: false,
-                currentInstanceId: undefined
+                currentInstanceId: undefined,
+                // 任务实例状态选择
+                instanceStatusOptions: [
+                    {key: "", label: this.$t('message.all')},
+                    {key: "WAITING_DISPATCH", label: this.$t('message.waitingDispatch')},
+                    {key: "WAITING_WORKER_RECEIVE", label: this.$t('message.waitingWorkerReceive')},
+                    {key: "RUNNING", label: this.$t('message.running')},
+                    {key: "FAILED", label: this.$t('message.failed')},
+                    {key: "SUCCEED", label: this.$t('message.success')},
+                    {key: "STOPPED", label: this.$t('message.stopped')}
+                ]
             }
         },
         methods: {
@@ -159,6 +180,7 @@
                 this.instanceQueryContent.jobId = undefined;
                 this.instanceQueryContent.instanceId = undefined;
                 this.instanceQueryContent.wfInstanceId = undefined;
+                this.instanceQueryContent.status = "";
                 this.listInstanceInfos();
             },
             // 点击查询详情

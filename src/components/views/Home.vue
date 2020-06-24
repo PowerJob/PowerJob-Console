@@ -5,24 +5,42 @@
         <el-row :gutter="24">
             <el-col :span="6">
                 <el-card shadow="always" style="text-align:center">
-                    {{this.$store.state.appInfo.appName}}
+                    <div>
+                        {{$t('message.appName')}}
+                    </div>
+                    <div>
+                        {{this.$store.state.appInfo.appName}}
+                    </div>
                 </el-card>
             </el-col>
-            <a href="https://github.com/KFCFans/PowerJob" target="_blank">
                 <el-col :span="6">
                     <el-card shadow="always" style="text-align:center">
-                        {{$t('message.githubURL')}}
+                        <div>
+                            <a href="https://github.com/KFCFans/PowerJob" target="_blank">{{$t('message.githubURL')}}</a>
+                        </div>
+                        <div>
+                            <a href="https://github.com/KFCFans/PowerJob/wiki" target="_blank">{{$t('message.docURL')}}</a>
+                        </div>
                     </el-card>
                 </el-col>
-            </a>
             <el-col :span="6">
                 <el-card shadow="always">
-                    {{$t('message.omsServerTime')}}：{{ this.common.timestamp2Str(systemInfo.serverTime) }}
+                    <div>
+                        {{$t('message.omsServerTimezone')}}：{{ systemInfo.timezone }}
+                    </div>
+                    <div>
+                        {{$t('message.omsServerTime')}}：{{ systemInfo.serverTime }}
+                    </div>
                 </el-card>
             </el-col>
             <el-col :span="6">
                 <el-card shadow="always">
-                    {{$t('message.localBrowserTime')}}：{{ this.common.timestamp2Str(new Date().getTime()) }}
+                    <div>
+                        {{$t('message.localBrowserTimezone')}}：{{Intl.DateTimeFormat().resolvedOptions().timeZone}}
+                    </div>
+                    <div>
+                        {{$t('message.localBrowserTime')}}：{{ this.common.timestamp2Str(new Date().getTime()) }}
+                    </div>
                 </el-card>
             </el-col>
         </el-row>
@@ -94,7 +112,8 @@
                     jobCount: "N/A",
                     runningInstanceCount: "N/A",
                     failedInstanceCount: "N/A",
-                    serverTime: undefined
+                    serverTime: "UNKNOWN",
+                    timezone: "UNKNOWN"
                 },
                 activeWorkerCount: "N/A",
                 workerList: []
@@ -121,22 +140,20 @@
             that.axios.get("/system/overview?appId=" + appId).then(res => {
                 that.systemInfo = res;
 
-                // 对比服务器时间和本地时间
-                let localTime=new Date().getTime();
-                let serverTime = res.serverTime;
-                console.log("localTime: %o, serverTime: %o", localTime, serverTime);
-
-                let offset = localTime - serverTime;
-                // 误差大于一分钟，弹窗告警
-                if (Math.abs(offset) > 60000) {
-                    this.$notify({
-                        title: '警告',
-                        message: '调度中心服务器与本地存在时间差，可能影响任务调度准确性，建议排查时间问题！',
-                        type: 'warning',
-                        duration: 0
-                    });
-                }
-
+                // 对比服务器时间和本地时间，误差超过一定时间弹窗警告
+                // let localTime=new Date().getTime();
+                // let serverTime = res.serverTime;
+                // console.log("localTime: %o, serverTime: %o", localTime, serverTime);
+                //
+                // let offset = localTime - serverTime;
+                // if (Math.abs(offset) > 60000) {
+                //     this.$notify({
+                //         title: '警告',
+                //         message: '调度中心服务器与本地存在时间差，可能影响任务调度准确性，建议排查时间问题！',
+                //         type: 'warning',
+                //         duration: 0
+                //     });
+                // }
 
             });
         }

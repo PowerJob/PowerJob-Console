@@ -18,6 +18,7 @@ const cn = {
         'download': '下载',
         'stop': '停止',
         'back': '返回',
+        'all': '全部',
 
         // 欢迎界面
         'appRegister': '执行应用注册',
@@ -50,7 +51,9 @@ const cn = {
 
         // 系统首页
         'omsServerTime': '调度服务器时间',
-        'localBrowserTime': '本地浏览器时间',
+        'omsServerTimezone': '调度服务器时区',
+        'localBrowserTime': '本地时间',
+        'localBrowserTimezone': '本地时区',
         'githubURL': '项目地址',
         'docURL': '文档地址',
         'totalJobNum': '任务总数',
