@@ -49,8 +49,8 @@ const en = {
 
         'omsServerTime': 'server time',
         'omsServerTimezone': 'server timezone',
-        'localBrowserTime': 'local browser time',
-        'localBrowserTimezone': 'local browser timezone',
+        'localBrowserTime': 'local time',
+        'localBrowserTimezone': 'local timezone',
         'githubURL': 'GitHub Repo',
         'docURL': 'document address',
         'totalJobNum': 'total job Num',

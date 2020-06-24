@@ -36,7 +36,7 @@
             <el-col :span="6">
                 <el-card shadow="always">
                     <div>
-                        {{$t('message.localBrowserTime')}}：{{Intl.DateTimeFormat().resolvedOptions().timeZone}}
+                        {{$t('message.localBrowserTimezone')}}：{{Intl.DateTimeFormat().resolvedOptions().timeZone}}
                     </div>
                     <div>
                         {{$t('message.localBrowserTime')}}：{{ this.common.timestamp2Str(new Date().getTime()) }}
