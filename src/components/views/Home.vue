@@ -5,24 +5,42 @@
         <el-row :gutter="24">
             <el-col :span="6">
                 <el-card shadow="always" style="text-align:center">
-                    {{this.$store.state.appInfo.appName}}
+                    <div>
+                        {{$t('message.appName')}}
+                    </div>
+                    <div>
+                        {{this.$store.state.appInfo.appName}}
+                    </div>
                 </el-card>
             </el-col>
-            <a href="https://github.com/KFCFans/PowerJob" target="_blank">
                 <el-col :span="6">
                     <el-card shadow="always" style="text-align:center">
-                        {{$t('message.githubURL')}}
+                        <div>
+                            <a href="https://github.com/KFCFans/PowerJob" target="_blank">{{$t('message.githubURL')}}</a>
+                        </div>
+                        <div>
+                            <a href="https://github.com/KFCFans/PowerJob/wiki" target="_blank">{{$t('message.docURL')}}</a>
+                        </div>
                     </el-card>
                 </el-col>
-            </a>
             <el-col :span="6">
                 <el-card shadow="always">
-                    {{$t('message.omsServerTime')}}：{{ this.common.timestamp2Str(systemInfo.serverTime) }}
+                    <div>
+                        {{$t('message.omsServerTimezone')}}：{{ systemInfo.timezone }}
+                    </div>
+                    <div>
+                        {{$t('message.omsServerTime')}}：{{ systemInfo.serverTime }}
+                    </div>
                 </el-card>
             </el-col>
             <el-col :span="6">
                 <el-card shadow="always">
-                    {{$t('message.localBrowserTime')}}：{{ this.common.timestamp2Str(new Date().getTime()) }}
+                    <div>
+                        {{$t('message.localBrowserTime')}}：{{Intl.DateTimeFormat().resolvedOptions().timeZone}}
+                    </div>
+                    <div>
+                        {{$t('message.localBrowserTime')}}：{{ this.common.timestamp2Str(new Date().getTime()) }}
+                    </div>
                 </el-card>
             </el-col>
         </el-row>
@@ -94,7 +112,8 @@
                     jobCount: "N/A",
                     runningInstanceCount: "N/A",
                     failedInstanceCount: "N/A",
-                    serverTime: undefined
+                    serverTime: "UNKNOWN",
+                    timezone: "UNKNOWN"
                 },
                 activeWorkerCount: "N/A",
                 workerList: []

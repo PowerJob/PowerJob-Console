@@ -169,6 +169,7 @@
             onClickReset() {
                 this.jobQueryContent.keyword = undefined;
                 this.jobQueryContent.jobId = undefined;
+                this.listJobInfos();
             },
             // 列出符合当前搜索条件的任务
             listJobInfos() {

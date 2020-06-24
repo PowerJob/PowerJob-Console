@@ -47,7 +47,9 @@ const en = {
         'tabContainerManager': 'ContainerManager',
 
         'omsServerTime': 'server time',
+        'omsServerTimezone': 'server timezone',
         'localBrowserTime': 'local browser time',
+        'localBrowserTimezone': 'local browser timezone',
         'githubURL': 'GitHub Repo',
         'docURL': 'document address',
         'totalJobNum': 'total job Num',
