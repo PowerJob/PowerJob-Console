@@ -354,20 +354,13 @@
             if (modify) {
                 this.workflowInfo = this.$route.params.workflowInfo;
                 this.workflowInfo.appId = this.$store.state.appInfo.id;
-                // this.workflowInfo.peworkflowDAG.nodes = this.workflowInfo.peworkflowDAG.nodes.map(x => {
-                //     return {
-                //         jobId: x.jobId,
-                //         jobName: x.jobName
-                //     }
-                // });
                 this.draw();
             }
         }
     }
 </script>
 
-<!-- can't use scope, or dag will be the black block, maybe this is the bug of d3.js -->
-<style>
+<style scoped>
     .el-input {
         width: 80%;
     }
@@ -377,6 +370,10 @@
         font-size: 16px;
         font-weight: bold;
     }
+</style>
+
+<!-- can't use scope, or dag will be the black block, maybe this is the bug of d3.js -->
+<style>
 
     svg {
         font-size: 16px;
