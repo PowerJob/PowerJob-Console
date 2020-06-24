@@ -106,7 +106,7 @@
                 // 应用注册表单对象
                 appRegisterForm: {
                     appName: "",
-                    password: ""
+                    password: undefined
                 },
                 // 用户注册表单对象
                 userRegisterForm: {

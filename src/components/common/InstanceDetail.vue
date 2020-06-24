@@ -45,7 +45,11 @@
                 <el-table-column prop="subInstanceId" :label="$t('message.subInstanceId')" width="120"/>
                 <el-table-column prop="startTime" :label="$t('message.startTime')" width="160"/>
                 <el-table-column prop="finishedTime" :label="$t('message.finishedTime')" width="160"/>
-                <el-table-column prop="status" :label="$t('message.status')" width="160"/>
+                <el-table-column :label="$t('message.status')" width="160">
+                    <template slot-scope="scope">
+                        {{common.translateInstanceStatus(scope.row.status)}}
+                    </template>
+                </el-table-column>
                 <el-table-column prop="result" :label="$t('message.result')"/>
             </el-table>
         </el-row>

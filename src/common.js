@@ -24,7 +24,6 @@ let timestamp2Str = ts => {
 
 // 公共函数，涉及到 i18n ，放进 common.js 报错，暂时先放在这里吧
 let translateInstanceStatus = status => {
-    console.log("zzzzzzzz %o", status);
     switch (status) {
         case 1: return i18n.t('message.waitingDispatch');
         case 2: return i18n.t('message.waitingWorkerReceive');
