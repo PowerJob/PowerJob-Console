@@ -124,26 +124,19 @@
                    data.sourceInfo = this.sourceInfo;
                    data.sourceType = 'FatJar'
                }
-               this.flyio.post("container/save",data).then(res=>{
-                   if(res.data.success){
-                        let appId = this.$store.state.appInfo.id;
-                        this.flyio.get("/container/list?appId=" + appId).then(res => {
-                            if(res.data.success){
-                            this.$message.info(this.$t('message.success'));
-                            // 恢复默认表单
-                            this.dialogVisible = false;
-                            this.form.containerName = '';
-                            this.gitForm = {};
-                            this.sourceInfo = '';
-                            this.id = '';
-                            // 刷新容器表单
-                            this.containerList = res.data.data;
-                        }
-                     });
-                   }
-                   else{
-                       this.$message.warning(this.$t('message.failed'));
-                   }
+               this.axios.post("container/save",data).then(()=>{
+                   let appId = this.$store.state.appInfo.id;
+                   this.axios.get("/container/list?appId=" + appId).then(res => {
+                       this.$message.info(this.$t('message.success'));
+                       // 恢复默认表单
+                       this.dialogVisible = false;
+                       this.form.containerName = '';
+                       this.gitForm = {};
+                       this.sourceInfo = '';
+                       this.id = '';
+                       // 刷新容器表单
+                       this.containerList = res;
+                   });
                });
             },
             // 文件上传成功后 修改来源信息

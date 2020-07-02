@@ -90,6 +90,8 @@
                         that.$message.success(this.$t('message.success'));
                         that.$router.push("/");
                     }, e => that.$message.error(e));
+                }else {
+                    this.$message.error("the password doesn't match");
                 }
             }
         }
