@@ -240,7 +240,7 @@
                     executeType: "",
                     processorType: "",
                     processorInfo: "",
-                    maxInstanceNum: 1,
+                    maxInstanceNum: 0,
                     concurrency: 5,
                     instanceTimeLimit: 0,
                     instanceRetryNum: 0,
