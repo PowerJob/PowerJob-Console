@@ -119,8 +119,9 @@ const en = {
         'runningTimes': 'running times',
         'taskTrackerAddress': 'taskTracker address',
         'startTime': 'start time',
+        'expectedTriggerTime': 'expected trigger time',
         'result': 'result',
-        'subTaskInfo': 'subTask info',
+        'subTaskInfo': 'task info',
         'secondlyJobHistory': 'secondlyJobHistory',
         'subInstanceId': 'subInstanceId',
 

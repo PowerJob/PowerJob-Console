@@ -24,6 +24,11 @@
             </el-col>
         </el-row>
         <el-row>
+            <el-col :span="24" >
+                {{$t('message.expectedTriggerTime')}}: <span class='title' > {{instanceDetail.expectedTriggerTime}}</span>
+            </el-col>
+        </el-row>
+        <el-row>
             <el-col :span="8">
                 {{$t('message.startTime')}}: <span class='title' > {{instanceDetail.actualTriggerTime}}</span>
             </el-col>
@@ -39,8 +44,8 @@
         <el-row id="taskDetail">
             {{$t('message.subTaskInfo')}}: <span class='title' >{{instanceDetail.taskDetail}}</span>
         </el-row>
+        <el-divider content-position="center">{{$t('message.secondlyJobHistory')}}:</el-divider>
         <el-row>
-            <span class="title">{{$t('message.secondlyJobHistory')}}:</span>
             <el-table  :data="instanceDetail.subInstanceDetails" style="width: 100%">
                 <el-table-column prop="subInstanceId" :label="$t('message.subInstanceId')" width="120"/>
                 <el-table-column prop="startTime" :label="$t('message.startTime')" width="160"/>

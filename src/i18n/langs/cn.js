@@ -122,9 +122,10 @@ const cn = {
         'runningTimes': '运行次数',
         'taskTrackerAddress': 'TaskTracker 地址',
         'startTime': '开始时间',
-        'result': '运行结果',
-        'subTaskInfo': '子任务数据',
-        'secondlyJobHistory': '最近10条秒级任务历史记录',
+        'expectedTriggerTime': '预计执行时间',
+        'result': '任务结果',
+        'subTaskInfo': 'Task 信息',
+        'secondlyJobHistory': '最近 10 条秒级任务历史记录（秒级任务专用）',
         'subInstanceId': '子任务实例ID',
 
         // 工作流管理
