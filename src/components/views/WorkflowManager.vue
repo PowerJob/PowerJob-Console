@@ -52,6 +52,16 @@
             </el-table-column>
         </el-table>
     </el-row>
+
+    <!-- 第三行，分页插件 -->
+    <el-row>
+        <el-pagination
+                layout="prev, pager, next"
+                :total="this.workflowPageResult.totalItems"
+                :page-size="this.workflowPageResult.pageSize"
+                @current-change="onClickChangePage"
+                :hide-on-single-page="true"/>
+    </el-row>
 </div>
 </template>
 
@@ -136,7 +146,13 @@
                         modify: false
                     }
                 })
-            }
+            },
+            // 点击换页
+            onClickChangePage(index) {
+                // 后端从0开始，前端从1开始
+                this.workflowQueryContent.index = index - 1;
+                this.listWorkflow();
+            },
 
         },
         mounted() {

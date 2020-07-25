@@ -25,10 +25,10 @@
         </el-row>
         <el-row>
             <el-col :span="8">
-                {{$t('message.startTime')}}: <span class='title' > {{this.common.timestamp2Str(instanceDetail.actualTriggerTime)}}</span>
+                {{$t('message.startTime')}}: <span class='title' > {{instanceDetail.actualTriggerTime}}</span>
             </el-col>
             <el-col :span="8">
-                {{$t('message.finishedTime')}}: <span class='title' >{{this.common.timestamp2Str(instanceDetail.finishedTime)}}</span>
+                {{$t('message.finishedTime')}}: <span class='title' >{{instanceDetail.finishedTime}}</span>
             </el-col>
         </el-row>
         <el-row>
