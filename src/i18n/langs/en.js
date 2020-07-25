@@ -168,6 +168,7 @@ const en = {
         'waitingWorkerReceive': 'waiting receive',
         'running': 'running',
         'stopped': 'stopped',
+        'canceled': 'canceled',
         'wfWaiting': 'waiting',
         'waitingUpstream': 'waiting upstream'
 

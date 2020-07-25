@@ -163,6 +163,7 @@
                     {key: "RUNNING", label: this.$t('message.running')},
                     {key: "FAILED", label: this.$t('message.failed')},
                     {key: "SUCCEED", label: this.$t('message.success')},
+                    {key: "CANCELED", label: this.$t('message.canceled')},
                     {key: "STOPPED", label: this.$t('message.stopped')}
                 ]
             }
@@ -210,6 +211,7 @@
                     case 4: return 'error-row';
                     // 成功
                     case 5: return 'success-row';
+                    case 9:
                     case 10: return 'warning-row';
                 }
             },

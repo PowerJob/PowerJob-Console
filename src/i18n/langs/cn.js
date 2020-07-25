@@ -171,6 +171,7 @@ const cn = {
         'waitingWorkerReceive': '等待Worker接收',
         'running': '运行中',
         'stopped': '手动停止',
+        'canceled': '手动取消',
         'wfWaiting': '等待调度',
         'waitingUpstream': '等待上游节点'
 
