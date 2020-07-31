@@ -19,6 +19,7 @@ const en = {
         'stop': 'stop',
         'back': 'back',
         'all': 'ALL',
+        'more': '| more',
 
         // 欢迎界面
         'appRegister': 'App Registration',

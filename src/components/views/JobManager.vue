@@ -53,14 +53,12 @@
                         <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="changeJobStatus(scope.row)"/>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('message.operation')" width="300">
+                <el-table-column :label="$t('message.operation')" width="150">
                     <template slot-scope="scope">
-                        <el-button size="mini" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
-                        <el-button size="mini" @click="onClickRun(scope.row)">{{$t('message.run')}}</el-button>
+                        <el-button size="mini" type="text" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
+                        <el-button size="mini" type="text" @click="onClickRun(scope.row)">{{$t('message.run')}}</el-button>
                         <el-dropdown trigger="click">
-                            <span class="el-dropdown-link">
-                                更多<i class="el-icon-arrow-down el-icon--right"></i>
-                            </span>
+                            <el-button size="mini" type="text">{{$t('message.more')}}</el-button>
                             <el-dropdown-menu slot="dropdown">
                                 <el-dropdown-item>
                                     <el-button size="mini" type="text" @click="onClickRunHistory(scope.row)">{{$t('message.runHistory')}}</el-button>

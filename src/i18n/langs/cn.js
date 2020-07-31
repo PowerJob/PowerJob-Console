@@ -19,6 +19,7 @@ const cn = {
         'stop': '停止',
         'back': '返回',
         'all': '全部',
+        'more': '| 更多',
 
         // 欢迎界面
         'appRegister': '执行应用注册',
