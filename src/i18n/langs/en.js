@@ -119,8 +119,9 @@ const en = {
         'runningTimes': 'running times',
         'taskTrackerAddress': 'taskTracker address',
         'startTime': 'start time',
+        'expectedTriggerTime': 'expected trigger time',
         'result': 'result',
-        'subTaskInfo': 'subTask info',
+        'subTaskInfo': 'task info',
         'secondlyJobHistory': 'secondlyJobHistory',
         'subInstanceId': 'subInstanceId',
 
@@ -168,6 +169,7 @@ const en = {
         'waitingWorkerReceive': 'waiting receive',
         'running': 'running',
         'stopped': 'stopped',
+        'canceled': 'canceled',
         'wfWaiting': 'waiting',
         'waitingUpstream': 'waiting upstream'
 

@@ -30,6 +30,7 @@ let translateInstanceStatus = status => {
         case 3: return i18n.t('message.running');
         case 4: return i18n.t('message.failed');
         case 5: return i18n.t('message.success');
+        case 9: return i18n.t('message.canceled');
         case 10: return i18n.t('message.stopped');
         default: return "unknown";
     }
