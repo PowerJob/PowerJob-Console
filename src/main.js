@@ -55,9 +55,9 @@ axios.interceptors.request.use((request) => {
   let appId = store.state.appInfo.id;
   if (appId === undefined || appId === null) {
     router.push("/");
-    return Promise.reject("no appId");
+    // remove no appId warn due to too much user report this is a bug...
+    return Promise.reject();
   }
-
   return request;
 
 }, function (error) {
