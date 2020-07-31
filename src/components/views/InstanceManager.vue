@@ -246,6 +246,12 @@
             }
         },
         mounted() {
+            // 读取传递的参数
+            let jobId = this.$route.params.jobId;
+            if (jobId !== undefined) {
+                this.instanceQueryContent.jobId = jobId;
+            }
+
             this.listInstanceInfos();
         }
     }

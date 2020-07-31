@@ -108,6 +108,8 @@ const en = {
         'workflow': 'workflow',
         'onlineCronTool': 'online cron tool',
         'javaContainer': 'Java（Container）',
+        'runHistory': 'history',
+        'reRun': 'retry',
 
         // JobInstance
         'wfInstanceId': 'WorkflowInstanceId',

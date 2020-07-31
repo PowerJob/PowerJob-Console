@@ -55,9 +55,21 @@
                 </el-table-column>
                 <el-table-column :label="$t('message.operation')" width="300">
                     <template slot-scope="scope">
-                        <el-button size="medium" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
-                        <el-button size="medium" @click="onClickRun(scope.row)">{{$t('message.run')}}</el-button>
-                        <el-button size="medium" type="danger" @click="onClickDeleteJob(scope.row)">{{$t('message.delete')}}</el-button>
+                        <el-button size="mini" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
+                        <el-button size="mini" @click="onClickRun(scope.row)">{{$t('message.run')}}</el-button>
+                        <el-dropdown trigger="click">
+                            <span class="el-dropdown-link">
+                                更多<i class="el-icon-arrow-down el-icon--right"></i>
+                            </span>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item>
+                                    <el-button size="mini" type="text" @click="onClickRunHistory(scope.row)">{{$t('message.runHistory')}}</el-button>
+                                </el-dropdown-item>
+                                <el-dropdown-item>
+                                    <el-button size="mini" type="text" @click="onClickDeleteJob(scope.row)">{{$t('message.delete')}}</el-button>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
                     </template>
                 </el-table-column>
             </el-table>
@@ -348,6 +360,16 @@
                     that.$message.success(this.$t('message.success'));
                     that.listJobInfos();
                 });
+            },
+            // 点击 历史记录
+            onClickRunHistory(data) {
+                console.log(JSON.stringify(data));
+                this.$router.push({
+                    name: 'instanceManager',
+                    params: {
+                        jobId: data.id,
+                    }
+                })
             },
             // 点击 换页
             onClickChangePage(index) {
