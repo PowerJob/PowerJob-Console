@@ -113,7 +113,7 @@ const cn = {
         'onlineCronTool': '在线生成工具',
         'javaContainer': 'Java（容器）',
         'runHistory': '运行记录',
-        'reRun': '重新执行',
+        'reRun': '重跑',
 
         // 任务实例管理
         'wfInstanceId': '工作流实例ID',

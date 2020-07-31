@@ -61,9 +61,10 @@
 
                 <el-table-column label="操作" width="300">
                     <template slot-scope="scope">
-                        <el-button size="medium" @click="onClickShowDetail(scope.row)">{{$t('message.detail')}}</el-button>
-                        <el-button size="medium" @click="onClickShowLog(scope.row)">{{$t('message.log')}}</el-button>
-                        <el-button size="medium" @click="onClickStop(scope.row)">{{$t('message.stop')}}</el-button>
+                        <el-button size="mini" type="primary" @click="onClickShowDetail(scope.row)">{{$t('message.detail')}}</el-button>
+                        <el-button size="mini" type="success" @click="onClickShowLog(scope.row)">{{$t('message.log')}}</el-button>
+                        <el-button size="mini" type="warning" @click="onClickRetryJob(scope.row)">{{$t('message.reRun')}}</el-button>
+                        <el-button size="mini" type="danger" @click="onClickStop(scope.row)">{{$t('message.stop')}}</el-button>
                     </template>
                 </el-table-column>
 
@@ -188,6 +189,15 @@
             onClickShowDetail(data) {
                 this.instanceDetailVisible = true;
                 this.currentInstanceId = data.instanceId;
+            },
+            // 点击重跑
+            onClickRetryJob(data) {
+                let that = this;
+                let url = "/instance/retry?instanceId=" + data.instanceId;
+                this.axios.get(url).then(() => {
+                    that.$message.success(this.$t('message.success'));
+                    that.listInstanceInfos();
+                });
             },
             // 点击停止实例
             onClickStop(data) {
