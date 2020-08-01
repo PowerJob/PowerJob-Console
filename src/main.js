@@ -18,7 +18,7 @@ Vue.use(ElementUI);
 // let baseURL = "http://139.224.83.134:7700";
 let baseURL = process.env.VUE_APP_BASE_URL;
 
-let timeout = 5000;
+let timeout = 10000;
 
 Vue.prototype.common = common;
 /* ******* axios config ******* */
