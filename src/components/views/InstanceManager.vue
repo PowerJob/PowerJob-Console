@@ -83,12 +83,12 @@
         </el-row>
 
         <!--  任务实例详情弹出框 -->
-        <el-dialog :visible.sync="instanceDetailVisible" v-if='instanceDetailVisible'>
+        <el-dialog :visible.sync="instanceDetailVisible" v-if='instanceDetailVisible' width="80%">
             <InstanceDetail :instance-id="currentInstanceId"/>
         </el-dialog>
 
         <!-- 任务运行日志弹出框 -->
-        <el-dialog :visible.sync="instanceLogVisible" width="50%">
+        <el-dialog :visible.sync="instanceLogVisible" width="80%">
             <el-row>
                 <el-col :span="4" :offset="20" style="margin-bottom:20px">
                     <el-button type="primary" size="mini" @click="onclickDownloadLog()" icon="el-icon-download">{{$t('message.download')}}</el-button>
