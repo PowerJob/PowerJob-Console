@@ -124,7 +124,7 @@
                 switch (row.status) {
                     case 1: return 'success-row';
                     case 2: return 'warning-row';
-                    case 3: return 'error-row';
+                    default: return 'error-row';
                 }
             }
         },

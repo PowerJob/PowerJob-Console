@@ -18,7 +18,7 @@ Vue.use(ElementUI);
 // let baseURL = "http://139.224.83.134:7700";
 let baseURL = process.env.VUE_APP_BASE_URL;
 
-let timeout = 5000;
+let timeout = 10000;
 
 Vue.prototype.common = common;
 /* ******* axios config ******* */
@@ -55,9 +55,9 @@ axios.interceptors.request.use((request) => {
   let appId = store.state.appInfo.id;
   if (appId === undefined || appId === null) {
     router.push("/");
-    return Promise.reject("no appId");
+    // remove no appId warn due to too much user report this is a bug...
+    return Promise.reject();
   }
-
   return request;
 
 }, function (error) {

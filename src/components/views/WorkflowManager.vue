@@ -45,9 +45,9 @@
             </el-table-column>
             <el-table-column :label="$t('message.operation')" width="300">
                 <template slot-scope="scope">
-                    <el-button size="medium" @click="onClickModifyWorkflow(scope.row)">{{$t('message.edit')}}</el-button>
-                    <el-button size="medium" @click="onClickRunWorkflow(scope.row)">{{$t('message.run')}}</el-button>
-                    <el-button size="medium" type="danger" @click="onClickDeleteWorkflow(scope.row)">{{$t('message.delete')}}</el-button>
+                    <el-button size="mini" @click="onClickModifyWorkflow(scope.row)">{{$t('message.edit')}}</el-button>
+                    <el-button size="mini" @click="onClickRunWorkflow(scope.row)">{{$t('message.run')}}</el-button>
+                    <el-button size="mini" type="danger" @click="onClickDeleteWorkflow(scope.row)">{{$t('message.delete')}}</el-button>
                 </template>
             </el-table-column>
         </el-table>

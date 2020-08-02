@@ -61,9 +61,10 @@
 
                 <el-table-column label="操作" width="300">
                     <template slot-scope="scope">
-                        <el-button size="medium" @click="onClickShowDetail(scope.row)">{{$t('message.detail')}}</el-button>
-                        <el-button size="medium" @click="onClickShowLog(scope.row)">{{$t('message.log')}}</el-button>
-                        <el-button size="medium" @click="onClickStop(scope.row)">{{$t('message.stop')}}</el-button>
+                        <el-button size="mini" type="primary" @click="onClickShowDetail(scope.row)">{{$t('message.detail')}}</el-button>
+                        <el-button size="mini" type="success" @click="onClickShowLog(scope.row)">{{$t('message.log')}}</el-button>
+                        <el-button size="mini" type="warning" @click="onClickRetryJob(scope.row)">{{$t('message.reRun')}}</el-button>
+                        <el-button size="mini" type="danger" @click="onClickStop(scope.row)">{{$t('message.stop')}}</el-button>
                     </template>
                 </el-table-column>
 
@@ -82,12 +83,12 @@
         </el-row>
 
         <!--  任务实例详情弹出框 -->
-        <el-dialog :visible.sync="instanceDetailVisible" v-if='instanceDetailVisible'>
+        <el-dialog :visible.sync="instanceDetailVisible" v-if='instanceDetailVisible' width="80%">
             <InstanceDetail :instance-id="currentInstanceId"/>
         </el-dialog>
 
         <!-- 任务运行日志弹出框 -->
-        <el-dialog :visible.sync="instanceLogVisible" width="50%">
+        <el-dialog :visible.sync="instanceLogVisible" width="80%">
             <el-row>
                 <el-col :span="4" :offset="20" style="margin-bottom:20px">
                     <el-button type="primary" size="mini" @click="onclickDownloadLog()" icon="el-icon-download">{{$t('message.download')}}</el-button>
@@ -189,6 +190,15 @@
                 this.instanceDetailVisible = true;
                 this.currentInstanceId = data.instanceId;
             },
+            // 点击重跑
+            onClickRetryJob(data) {
+                let that = this;
+                let url = "/instance/retry?instanceId=" + data.instanceId;
+                this.axios.get(url).then(() => {
+                    that.$message.success(this.$t('message.success'));
+                    that.listInstanceInfos();
+                });
+            },
             // 点击停止实例
             onClickStop(data) {
                 let that = this;
@@ -246,6 +256,12 @@
             }
         },
         mounted() {
+            // 读取传递的参数
+            let jobId = this.$route.params.jobId;
+            if (jobId !== undefined) {
+                this.instanceQueryContent.jobId = jobId;
+            }
+
             this.listInstanceInfos();
         }
     }

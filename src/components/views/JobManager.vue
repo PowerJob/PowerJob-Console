@@ -53,11 +53,21 @@
                         <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="changeJobStatus(scope.row)"/>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('message.operation')" width="300">
+                <el-table-column :label="$t('message.operation')" width="150">
                     <template slot-scope="scope">
-                        <el-button size="medium" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
-                        <el-button size="medium" @click="onClickRun(scope.row)">{{$t('message.run')}}</el-button>
-                        <el-button size="medium" type="danger" @click="onClickDeleteJob(scope.row)">{{$t('message.delete')}}</el-button>
+                        <el-button size="mini" type="text" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
+                        <el-button size="mini" type="text" @click="onClickRun(scope.row)">{{$t('message.run')}}</el-button>
+                        <el-dropdown trigger="click">
+                            <el-button size="mini" type="text">{{$t('message.more')}}</el-button>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item>
+                                    <el-button size="mini" type="text" @click="onClickRunHistory(scope.row)">{{$t('message.runHistory')}}</el-button>
+                                </el-dropdown-item>
+                                <el-dropdown-item>
+                                    <el-button size="mini" type="text" @click="onClickDeleteJob(scope.row)">{{$t('message.delete')}}</el-button>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
                     </template>
                 </el-table-column>
             </el-table>
@@ -102,7 +112,7 @@
                             <el-input v-model="modifiedJobForm.timeExpression" :placeholder="$t('message.timeExpressionPlaceHolder')" />
                         </el-col>
                         <el-col :span="4">
-                            <el-link href="https://cron.qqe2.com/" type="success" target="_blank">{{$t('message.onlineCronTool')}}</el-link>
+                            <el-link href="https://www.bejson.com/othertools/cron/" type="success" target="_blank">{{$t('message.onlineCronTool')}}</el-link>
                         </el-col>
                     </el-row>
                 </el-form-item>
@@ -348,6 +358,16 @@
                     that.$message.success(this.$t('message.success'));
                     that.listJobInfos();
                 });
+            },
+            // 点击 历史记录
+            onClickRunHistory(data) {
+                console.log(JSON.stringify(data));
+                this.$router.push({
+                    name: 'instanceManager',
+                    params: {
+                        jobId: data.id,
+                    }
+                })
             },
             // 点击 换页
             onClickChangePage(index) {

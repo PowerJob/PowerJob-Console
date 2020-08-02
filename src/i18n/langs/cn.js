@@ -19,6 +19,7 @@ const cn = {
         'stop': '停止',
         'back': '返回',
         'all': '全部',
+        'more': '| 更多',
 
         // 欢迎界面
         'appRegister': '执行应用注册',
@@ -111,6 +112,8 @@ const cn = {
         'workflow': '工作流',
         'onlineCronTool': '在线生成工具',
         'javaContainer': 'Java（容器）',
+        'runHistory': '运行记录',
+        'reRun': '重跑',
 
         // 任务实例管理
         'wfInstanceId': '工作流实例ID',
