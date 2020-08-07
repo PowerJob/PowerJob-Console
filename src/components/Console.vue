@@ -1,25 +1,25 @@
 <template>
     <div id="console">
         <!-- 顶部导航条 -->
-        <navbar/>
+        <navbar />
         <!-- 左侧导航条 -->
-        <sidebar/>
+        <sidebar />
     </div>
 </template>
 
 <script>
-    import Sidebar from "./bar/Sidebar";
-    import Navbar from "./bar/Navbar";
+import Sidebar from './bar/Sidebar'
+import Navbar from './bar/Navbar'
 
-    export default {
-        name: "Console",
-        components: {Navbar, Sidebar}
-    }
+export default {
+    name: 'Console',
+    components: { Navbar, Sidebar }
+}
 </script>
 
 <style scoped>
-    #console {
-        width: 100%;
-        height: 100%;
-    }
+#console {
+    width: 100%;
+    height: 100%;
+}
 </style>

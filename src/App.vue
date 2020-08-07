@@ -1,34 +1,33 @@
 <template>
-  <div id="app">
-    <router-view/>
-  </div>
+    <div id="app">
+        <router-view />
+    </div>
 </template>
 
 <script>
-
-  export default {
+export default {
     name: 'app'
-  }
+}
 </script>
 
 <style>
-  #app {
+#app {
     width: 100%;
     height: 100%;
-  }
-  html,
-  body {
+}
+html,
+body {
     width: 100%;
     height: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden; 
+    overflow: hidden;
     font-family: Helvetica, ‘Hiragino Sans GB’, ‘Microsoft Yahei’, ‘微软雅黑’,
-    Arial, sans-serif;
+        Arial, sans-serif;
     background: #f0f3f4;
-  }
-  a {
+}
+a {
     color: #303133;
     text-decoration: none;
-  }
+}
 </style>
