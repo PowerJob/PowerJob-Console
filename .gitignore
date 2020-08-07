@@ -2,3 +2,7 @@
 node_modules/
 dist/
 npm-debug.log
+
+# 依赖文件忽略，本地安装依赖时会自动生成，使用远程版本时本地安装依赖会出错
+yarn.lock
+package-lock.json
