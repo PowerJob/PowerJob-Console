@@ -62,7 +62,7 @@
                         <div class="text mTitle">{{$t('message.runningInstanceNum')}}</div>
                         <div class="text">{{systemInfo.runningInstanceCount}}</div>
                     </div>
-                    <i class="el-icon-loading"/>
+                    <i class="el-icon-timer"/>
                 </div>
             </el-col>
             <el-col :span="6">
