@@ -99,10 +99,7 @@
                 <el-form-item :label="$t('message.scheduleInfo')">
                     <el-row>
                         <el-col :span="8">
-                            <el-select v-model="modifiedJobForm.timeExpressionType"
-                                       :placeholder="$t('message.timeExpressionType')"
-                                       @change="modifiedJobForm.timeExpression=undefined"
-                            >
+                            <el-select v-model="modifiedJobForm.timeExpressionType" :placeholder="$t('message.timeExpressionType')">
                                 <el-option
                                         v-for="item in timeExpressionTypeOptions"
                                         :key="item.key"
@@ -111,17 +108,11 @@
                                 </el-option>
                             </el-select>
                         </el-col>
-                        <el-col :span="16">
-                            <!--固定频率/固定延时任务输入条件-->
-                            <el-input v-model="modifiedJobForm.timeExpression"
-                                      type="number"
-                                      v-if="['FIX_RATE','FIX_DELAY'].indexOf(modifiedJobForm.timeExpressionType)!==-1"
-                                      :placeholder="$t('message.timeExpressionPlaceHolder')" />
-                            <!--CRON输入-->
-                            <el-popover v-model="cronPopover" v-if="modifiedJobForm.timeExpressionType==='CRON'">
-                              <vue-cron @change="changeCron" @close="cronPopover=false"/>
-                              <el-input slot="reference" @click="cronPopover=true" v-model="modifiedJobForm.timeExpression" :placeholder="$t('message.timeExpressionPlaceHolder')"></el-input>
-                            </el-popover>
+                        <el-col :span="12">
+                            <el-input v-model="modifiedJobForm.timeExpression" :placeholder="$t('message.timeExpressionPlaceHolder')" />
+                        </el-col>
+                        <el-col :span="4">
+                            <el-link href="https://www.bejson.com/othertools/cron/" type="success" target="_blank">{{$t('message.onlineCronTool')}}</el-link>
                         </el-col>
                     </el-row>
                 </el-form-item>
@@ -291,8 +282,6 @@
                 },
                 // 时间表达式选择类型
                 timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIX_RATE", label: this.$t('message.fixRate')}, {key: "FIX_DELAY", label: this.$t('message.fixDelay')}, {key: "WORKFLOW", label: this.$t('message.workflow')} ],
-                // cron表达式弹出层
-                cronPopover:false,
                 // 处理器类型
                 processorTypeOptions: [{key: "EMBEDDED_JAVA", label: "JAVA"}, {key: "JAVA_CONTAINER", label: this.$t('message.javaContainer')}, {key: "SHELL", label: "SHELL"}, {key: "PYTHON", label: "PYTHON"}],
                 // 执行方式类型
@@ -418,10 +407,6 @@
                     return this.$t('message.javaContainer');
                 }
                 return processorType;
-            },
-            // 基于vue-cron组件改变cron表达式值
-            changeCron(val){
-              this.modifiedJobForm.timeExpression=val
             }
         },
         mounted() {

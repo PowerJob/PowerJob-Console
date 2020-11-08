@@ -37,6 +37,11 @@
             </el-col>
         </el-row>
         <el-row>
+          <el-col :span="24">
+            {{$t('message.instanceParams')}}: <span class='title' > {{instanceDetail.instanceParams}}</span>
+          </el-col>
+        </el-row>
+        <el-row>
             <el-col :span="24">
                 {{$t('message.result')}}: <span class='title' > {{instanceDetail.result}}</span>
             </el-col>

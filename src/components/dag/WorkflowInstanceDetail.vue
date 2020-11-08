@@ -36,6 +36,12 @@
                 <span class="title">{{ wfInstanceDetail.finishedTime }}</span>
             </el-col>
         </el-row>
+      <el-row>
+        <el-col :span="24">
+          {{$t('message.wfInitParams')}}：
+          <span class="title">{{ wfInstanceDetail.wfInitParams }}</span>
+        </el-col>
+      </el-row>
         <el-row>
             <el-col :span="24">
                 {{$t('message.result')}}（{{$t('message.wfTips')}}）：
