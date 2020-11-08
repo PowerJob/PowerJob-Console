@@ -126,6 +126,7 @@ const en = {
         'subTaskInfo': 'task info',
         'secondlyJobHistory': 'secondlyJobHistory',
         'subInstanceId': 'subInstanceId',
+        'instanceParams': 'instanceParams',
 
         // workflowManage
         'wfId': 'WorkflowID',
@@ -150,6 +151,7 @@ const en = {
         // workflowInstance
         'wfTips': 'tips：Click on a node to view details of the job instance',
         'ntfClickWaitingNode': 'Waiting for the upstream instances... No instances have been generated, and details cannot be viewed!',
+        'wfInitParams': 'initParams',
 
         // 容器
         'newContainer': 'new container',

@@ -129,6 +129,7 @@ const cn = {
         'subTaskInfo': 'Task 信息',
         'secondlyJobHistory': '最近 10 条秒级任务历史记录（秒级任务专用）',
         'subInstanceId': '子任务实例ID',
+        'instanceParams': '任务实例参数',
 
         // 工作流管理
         'wfId': '工作流ID',
@@ -153,6 +154,7 @@ const cn = {
         // 工作流实例
         'wfTips': 'tips：点击节点可查看任务实例详情',
         'ntfClickWaitingNode': '等待上游任务中...未生成任务实例，无法查看详情！',
+        'wfInitParams': '启动参数',
 
         // 容器
         'newContainer': '新增容器',
