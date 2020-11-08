@@ -32,11 +32,10 @@
                             </el-select>
                         </el-col>
                         <el-col :span="12">
-                          <!--CRON输入-->
-                          <el-popover v-model="cronPopover" v-if="workflowInfo.timeExpressionType==='CRON'">
-                            <vue-cron @change="changeCron" @close="cronPopover=false"/>
-                            <el-input slot="reference" @click="cronPopover=true" v-model="workflowInfo.timeExpression" :placeholder="$t('message.wfTimeExpressionPLH')"></el-input>
-                          </el-popover>
+                            <el-input v-model="workflowInfo.timeExpression" :placeholder="$t('message.wfTimeExpressionPLH')" />
+                        </el-col>
+                        <el-col :span="4">
+                            <el-link href="https://www.bejson.com/othertools/cron/" type="success" target="_blank">{{$t('message.onlineCronTool')}}</el-link>
                         </el-col>
                     </el-row>
                 </el-form-item>
@@ -138,8 +137,6 @@
                     wfName: undefined
                 },
                 timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"} ],
-                // cron表达式弹出层
-                cronPopover:false,
                 userList: [],
 
                 // 导入任务相关
@@ -343,11 +340,8 @@
                         break;
                     }
                 }
-            },
-            // 基于vue-cron组件改变cron表达式值
-            changeCron(val){
-              this.workflowInfo.timeExpression=val
             }
+
         },
         mounted() {
 

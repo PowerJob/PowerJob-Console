@@ -5,7 +5,6 @@ import { Message } from 'element-ui';
 import './styles.scss'
 import './plugins/element.js'
 import i18n from './i18n/i18n'
-import VueCron from 'vue-cron'
 
 
 // axios 负责统一拦截处理 ResultDTO，fly 负责处理不需要拦截的请求
@@ -16,8 +15,6 @@ import store from "./store";
 import common from "./common";
 
 Vue.use(ElementUI);
-Vue.use(VueCron)
-
 // let baseURL = "http://139.224.83.134:7700";
 let baseURL = process.env.VUE_APP_BASE_URL;
 
