@@ -144,7 +144,7 @@
                 jobQueryContent: {
                     appId: this.$store.state.appInfo.id,
                     index: 0,
-                    pageSize: 10,
+                    pageSize: 8,
                     jobId: undefined,
                     keyword: undefined
                 },
