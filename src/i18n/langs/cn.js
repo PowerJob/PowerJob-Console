@@ -31,6 +31,7 @@ const cn = {
         'name': '姓名',
         'phone': '手机号',
         'email': '邮箱地址',
+        'webhook': 'WebHook',
         'welcomeTitle': '欢迎使用 PowerJob!',
         'login': '登陆',
         'logout': '退出',

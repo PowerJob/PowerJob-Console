@@ -31,6 +31,7 @@ const en = {
         'name': 'name',
         'phone': 'phone',
         'email': 'email',
+        'webhook': 'webhook',
         'welcomeTitle': 'Welcome to use PowerJob!',
         'login': 'Login',
         'logout': 'Logout',

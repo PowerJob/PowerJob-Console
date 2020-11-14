@@ -81,6 +81,10 @@
                          <el-input v-model="userRegisterForm.email"/>
                      </el-form-item>
 
+                   <el-form-item :label="$t('message.webhook')">
+                     <el-input v-model="userRegisterForm.webhook"/>
+                   </el-form-item>
+
                      <el-form-item>
                          <el-button type="primary" @click="registerUser">{{$t('message.register')}}</el-button>
                          <el-button @click="userRegisterFormVisible = false">{{$t('message.cancel')}}</el-button>
@@ -112,7 +116,8 @@
                 userRegisterForm: {
                     username: "",
                     phone: "",
-                    email: ""
+                    email: "",
+                    webhook: ""
                 },
                 // 控制台登陆对象
                 appLoginForm: {
