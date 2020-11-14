@@ -161,6 +161,7 @@ const en = {
         'containerGitURL': 'Git URL',
         'branchName': 'branch',
         'username': 'username',
+        'oldPassword': 'old password',
         'password': 'password',
         'containerId': 'ID',
         'containerName': 'name',

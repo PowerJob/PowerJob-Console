@@ -164,6 +164,7 @@ const cn = {
         'containerGitURL': 'Git仓库地址',
         'branchName': '分支名称',
         'username': '用户名',
+        'oldPassword': '旧密码',
         'password': '密码',
         'containerId': '容器ID',
         'containerName': '容器名称',
