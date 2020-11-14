@@ -82,7 +82,7 @@
                      </el-form-item>
 
                    <el-form-item :label="$t('message.webhook')">
-                     <el-input v-model="userRegisterForm.webhook"/>
+                     <el-input v-model="userRegisterForm.webHook"/>
                    </el-form-item>
 
                      <el-form-item>
@@ -117,7 +117,7 @@
                     username: "",
                     phone: "",
                     email: "",
-                    webhook: ""
+                    webHook: ""
                 },
                 // 控制台登陆对象
                 appLoginForm: {
