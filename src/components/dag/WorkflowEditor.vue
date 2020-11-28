@@ -35,7 +35,7 @@
                             <el-input v-model="workflowInfo.timeExpression" :placeholder="$t('message.wfTimeExpressionPLH')" />
                         </el-col>
                         <el-col :span="4">
-                            <el-link href="https://www.bejson.com/othertools/cron/" type="success" target="_blank">{{$t('message.onlineCronTool')}}</el-link>
+                            <el-button type="text" @click="onClickValidateTimeExpression">{{$t('message.validateTimeExpression')}}</el-button>
                         </el-col>
                     </el-row>
                 </el-form-item>
@@ -111,15 +111,21 @@
                         @current-change="onClickChangePage"/>
             </el-row>
         </el-drawer>
+
+        <el-dialog :visible.sync="timeExpressionValidatorVisible" v-if='timeExpressionValidatorVisible'>
+            <TimeExpressionValidator :time-expression="workflowInfo.timeExpression" :time-expression-type="workflowInfo.timeExpressionType"/>
+        </el-dialog>
     </div>
 </template>
 
 <script>
+    import TimeExpressionValidator from "../common/TimeExpressionValidator";
     import dagreD3 from "dagre-d3";
     import * as d3 from "d3";
 
     export default {
         name: "WorkflowEditor",
+        components: {TimeExpressionValidator},
         data() {
             return {
                 workflowInfo: {
@@ -156,7 +162,10 @@
 
                 // 事件（1：新增起点，2：新增终点，3：删除节点；4：删除边）
                 event: undefined,
-                from: undefined
+                from: undefined,
+
+                // 时间表达式校验窗口
+                timeExpressionValidatorVisible: false
             }
         },
         methods: {
@@ -340,6 +349,9 @@
                         break;
                     }
                 }
+            },
+            onClickValidateTimeExpression() {
+                this.timeExpressionValidatorVisible = true;
             }
 
         },

@@ -108,7 +108,7 @@ const en = {
         'fixRate': 'Fix Rate (ms)',
         'fixDelay': 'Fix Delay (ms)',
         'workflow': 'workflow',
-        'onlineCronTool': 'online cron tool',
+        'validateTimeExpression': 'validate',
         'javaContainer': 'Java（Container）',
         'runHistory': 'history',
         'reRun': 'retry',

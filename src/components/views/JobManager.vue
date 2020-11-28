@@ -112,7 +112,7 @@
                             <el-input v-model="modifiedJobForm.timeExpression" :placeholder="$t('message.timeExpressionPlaceHolder')" />
                         </el-col>
                         <el-col :span="4">
-                            <el-link href="https://www.bejson.com/othertools/cron/" type="success" target="_blank">{{$t('message.onlineCronTool')}}</el-link>
+                            <el-button type="text" @click="onClickValidateTimeExpression">{{$t('message.validateTimeExpression')}}</el-button>
                         </el-col>
                     </el-row>
                 </el-form-item>
@@ -229,12 +229,18 @@
 
             </el-form>
         </el-dialog>
+
+        <el-dialog :visible.sync="timeExpressionValidatorVisible" v-if='timeExpressionValidatorVisible'>
+            <TimeExpressionValidator :time-expression="modifiedJobForm.timeExpression" :time-expression-type="modifiedJobForm.timeExpressionType"/>
+        </el-dialog>
     </div>
 </template>
 
 <script>
+    import TimeExpressionValidator from "../common/TimeExpressionValidator";
     export default {
         name: "JobManager",
+        components: {TimeExpressionValidator},
         data() {
             return {
                 modifiedJobFormVisible: false,
@@ -287,7 +293,9 @@
                 // 执行方式类型
                 executeTypeOptions: [{key: "STANDALONE", label: this.$t('message.standalone')}, {key: "BROADCAST", label: this.$t('message.broadcast')},  {key: "MAP", label: this.$t('message.map')}, {key: "MAP_REDUCE", label: this.$t('message.mapReduce')}],
                 // 用户列表
-                userList: []
+                userList: [],
+                // 时间表达式校验窗口
+                timeExpressionValidatorVisible: false
 
             }
         },
@@ -407,6 +415,10 @@
                     return this.$t('message.javaContainer');
                 }
                 return processorType;
+            },
+            // 点击校验
+            onClickValidateTimeExpression() {
+                this.timeExpressionValidatorVisible = true;
             }
         },
         mounted() {
