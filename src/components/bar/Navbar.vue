@@ -36,6 +36,10 @@
                         <el-input v-model="appInfo.appName"/>
                     </el-form-item>
 
+                  <el-form-item :label="$t('message.oldPassword')">
+                    <el-input v-model="appInfo.oldPassword"/>
+                  </el-form-item>
+
                     <el-form-item :label="$t('message.newPassword')">
                         <el-input v-model="appInfo.password"/>
                     </el-form-item>
@@ -64,6 +68,7 @@
                 appInfo: {
                     id: this.$store.state.appInfo.id,
                     appName: this.$store.state.appInfo.appName,
+                    oldPassword: undefined,
                     password: undefined,
                     password2: undefined
                 }
