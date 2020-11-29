@@ -28,6 +28,10 @@
         </el-row>
         <el-row>
             <el-col :span="8">
+                {{$t('message.expectedTriggerTime')}}：
+                <span class="title">{{ wfInstanceDetail.expectedTriggerTime }}</span>
+            </el-col>
+            <el-col :span="8">
                 {{$t('message.triggerTime')}}：
                 <span class="title">{{ wfInstanceDetail.actualTriggerTime }}</span>
             </el-col>
