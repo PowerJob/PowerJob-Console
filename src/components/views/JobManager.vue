@@ -355,7 +355,7 @@
             // 点击 立即运行按钮
             onClickRun(data) {
                 let that = this;
-                let url = "/job/run?jobId=" + data.id;
+                let url = "/job/run?jobId=" + data.id + "&appId=" + that.$store.state.appInfo.id;
                 this.axios.get(url).then(() => that.$message.success(this.$t('message.success')));
             },
             // 点击 删除任务

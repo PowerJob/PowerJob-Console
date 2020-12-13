@@ -193,7 +193,7 @@
             // 点击重跑
             onClickRetryJob(data) {
                 let that = this;
-                let url = "/instance/retry?instanceId=" + data.instanceId;
+                let url = "/instance/retry?instanceId=" + data.instanceId + "&appId=" + that.$store.state.appInfo.id;
                 this.axios.get(url).then(() => {
                     that.$message.success(this.$t('message.success'));
                     that.listInstanceInfos();
