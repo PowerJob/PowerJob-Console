@@ -41,7 +41,7 @@ const en = {
         'stayLogged': 'Keep me logged in',
 
         'tabHome': 'Home',
-        'tabJobManage': 'JobManage',
+        'tabJobManage': 'Job management',
         'tabJobInstance': 'Job instances',
         'tabWorkflowManage': 'Workflow management',
         'tabWfInstance': 'Workflow instances',
