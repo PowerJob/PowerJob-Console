@@ -16,10 +16,10 @@
                 <el-col :span="6">
                     <el-card shadow="always" style="text-align:center">
                         <div>
-                            <a href="https://github.com/KFCFans/PowerJob" target="_blank">{{$t('message.githubURL')}}</a>
+                            <a href="https://github.com/PowerJob/PowerJob" target="_blank">{{$t('message.githubURL')}}</a>
                         </div>
                         <div>
-                            <a href="https://github.com/KFCFans/PowerJob/wiki" target="_blank">{{$t('message.docURL')}}</a>
+                            <a href="https://github.com/PowerJob/PowerJob/wiki" target="_blank">{{$t('message.docURL')}}</a>
                         </div>
                     </el-card>
                 </el-col>
