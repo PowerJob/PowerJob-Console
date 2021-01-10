@@ -59,7 +59,7 @@
                 <el-table-column prop="actualTriggerTime" :label="$t('message.triggerTime')"/>
                 <el-table-column prop="finishedTime" :label="$t('message.finishedTime')"/>
 
-                <el-table-column label="操作" width="300">
+                <el-table-column :label="$t('message.operation')" width="300">
                     <template slot-scope="scope">
                         <el-button size="mini" type="primary" @click="onClickShowDetail(scope.row)">{{$t('message.detail')}}</el-button>
                         <el-button size="mini" type="success" @click="onClickShowLog(scope.row)">{{$t('message.log')}}</el-button>
