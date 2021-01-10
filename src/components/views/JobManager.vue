@@ -287,7 +287,7 @@
                     data: []
                 },
                 // 时间表达式选择类型
-                timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIX_RATE", label: this.$t('message.fixRate')}, {key: "FIX_DELAY", label: this.$t('message.fixDelay')}, {key: "WORKFLOW", label: this.$t('message.workflow')} ],
+                timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIXED_RATE", label: this.$t('message.fixRate')}, {key: "FIXED_DELAY", label: this.$t('message.fixDelay')}, {key: "WORKFLOW", label: this.$t('message.workflow')} ],
                 // 处理器类型
                 processorTypeOptions: [{key: "EMBEDDED_JAVA", label: "JAVA"}, {key: "JAVA_CONTAINER", label: this.$t('message.javaContainer')}, {key: "SHELL", label: "SHELL"}, {key: "PYTHON", label: "PYTHON"}],
                 // 执行方式类型
