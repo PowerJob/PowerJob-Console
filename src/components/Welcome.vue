@@ -195,6 +195,18 @@
                 }
                 this.appLoginForm = JSON.parse(autoLoginString);
                 this.login();
+            },
+            // 通过 URL 自动登陆
+            loginByUrlParams: function () {
+              let appName = this.$route.query.appName;
+              let password = this.$route.query.password;
+              console.log("login params from url: %o, %o", appName, password)
+              if (appName === undefined || appName === null || appName === '') {
+                return
+              }
+              this.appLoginForm.appName = appName;
+              this.appLoginForm.password = password;
+              this.login();
             }
         },
         mounted() {
@@ -215,8 +227,9 @@
                         this.$i18n.locale = "en";
                 }
             }
-
-            // 自动登录
+            // 根据 URL 自动登陆
+            this.loginByUrlParams();
+            // 根据历史记录自动登陆
             this.autoLogin();
         }
     }
