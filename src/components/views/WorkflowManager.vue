@@ -46,6 +46,7 @@
             <el-table-column :show-overflow-tooltip="true" :label="$t('message.operation')" width="300">
                 <template slot-scope="scope">
                     <el-button size="mini" @click="onClickModifyWorkflow(scope.row)">{{$t('message.edit')}}</el-button>
+                    <el-button size="mini" @click="onClickCopy(scope.row)" :loading="copyLoading">{{$t('message.copy')}}</el-button>
                     <el-button size="mini" @click="onClickRunWorkflow(scope.row)">{{$t('message.run')}}</el-button>
                     <el-button size="mini" type="danger" @click="onClickDeleteWorkflow(scope.row)">{{$t('message.delete')}}</el-button>
                 </template>
@@ -155,6 +156,26 @@
                 this.workflowQueryContent.index = index - 1;
                 this.listWorkflow();
             },
+            /** 复制工作流 */
+            onClickCopy(data) {
+                this.copyLoading = true
+                this.axios.post(`/workflow/copy?workflowId=${data.id}&appId=${this.workflowQueryContent.appId}`).then(res => {
+                    this.$router.push({
+                        name: 'workflowEditor',
+                        params: {
+                            modify: true,
+                            workflowInfo: {
+                                ...data,
+                                id: res
+                            }
+                        }
+                    });
+                    this.copyLoading = false;
+                    this.$message.success(this.$t('message.success'));
+                }).catch(() => {
+                    this.copyLoading = false;
+                })
+            }
         },
         mounted() {
             this.listWorkflow();
