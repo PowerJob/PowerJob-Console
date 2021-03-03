@@ -60,7 +60,7 @@
                 <div class="wrap">
                     <div class="grid-content bg-purple">
                         <div class="text mTitle">{{$t('message.runningInstanceNum')}}</div>
-                        <div class="text">{{systemInfo.runningInstanceCount}}</div>
+                        <div class="text mText">{{systemInfo.runningInstanceCount}}</div>
                     </div>
                     <i class="el-icon-timer"/>
                 </div>
@@ -69,7 +69,7 @@
                 <div class="wrap">
                     <div class="grid-content bg-purple">
                         <div class="text mTitle">{{$t('message.recentFailedInstanceNum')}}</div>
-                        <div class="text">{{systemInfo.failedInstanceCount}}</div>
+                        <div class="text mText">{{systemInfo.failedInstanceCount}}</div>
                     </div>
                     <i class="el-icon-bell"/>
                 </div>
@@ -78,7 +78,7 @@
                 <div class="wrap">
                     <div class="grid-content bg-purple">
                         <div class="text mTitle">{{$t('message.workerNum')}}</div>
-                        <div class="text">{{activeWorkerCount}}</div>
+                        <div class="text mText">{{activeWorkerCount}}</div>
                     </div>
                     <i class="el-icon-cpu"/>
                 </div>
@@ -175,9 +175,14 @@
         height: 131px;
     }
     .mTitle{
-        font-size: 20px;
+        font-size: 16px;
         color:#0f0f0fad;
         margin-bottom: 8px;
+    }
+    .mText{
+      font-size: 18px;
+      color:#0f0f0fff;
+      margin-bottom: 8px;
     }
 
     .el-card {
