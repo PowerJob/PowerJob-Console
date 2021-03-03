@@ -75,6 +75,9 @@
             <el-button type="danger" size="mini" @click="onClickStop(scope.row)"
               >{{$t('message.stop')}}</el-button
             >
+            <el-button type="warning" size="mini" @click="restart(scope.row)"
+              >{{$t('message.reRun')}}</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -184,7 +187,18 @@ export default {
     },
     fetchWFStatus(status) {
       return this.common.translateWfInstanceStatus(status);
-    }
+    },
+    // 重试
+    async restart(row) {
+      const data = {
+          appId: this.wfInstanceQueryContent.appId,
+          wfInstanceId: row.wfInstanceId,
+      };
+      await this.axios.get('/wfInstance/retry', {
+        params: data
+      });
+      this.listWfInstances();
+     },
   },
   mounted() {
     this.listWfInstances();
