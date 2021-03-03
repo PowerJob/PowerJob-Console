@@ -31,19 +31,19 @@
     <!--第二行，工作流数据表格-->
     <el-row>
         <el-table :data="workflowPageResult.data" style="width: 100%">
-            <el-table-column prop="id" :label="$t('message.wfId')" width="120"/>
-            <el-table-column prop="wfName" :label="$t('message.wfName')"/>
-            <el-table-column :label="$t('message.scheduleInfo')" >
+            <el-table-column :show-overflow-tooltip="true" prop="id" :label="$t('message.wfId')" width="120"/>
+            <el-table-column :show-overflow-tooltip="true" prop="wfName" :label="$t('message.wfName')"/>
+            <el-table-column :show-overflow-tooltip="true" :label="$t('message.scheduleInfo')" >
                 <template slot-scope="scope">
                     {{scope.row.timeExpressionType}}  {{scope.row.timeExpression}}
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('message.status')" width="80">
+            <el-table-column :show-overflow-tooltip="true" :label="$t('message.status')" width="80">
                 <template slot-scope="scope">
                     <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="switchWorkflow(scope.row)"/>
                 </template>
             </el-table-column>
-            <el-table-column :label="$t('message.operation')" width="300">
+            <el-table-column :show-overflow-tooltip="true" :label="$t('message.operation')" width="300">
                 <template slot-scope="scope">
                     <el-button size="mini" @click="onClickModifyWorkflow(scope.row)">{{$t('message.edit')}}</el-button>
                     <el-button size="mini" @click="onClickRunWorkflow(scope.row)">{{$t('message.run')}}</el-button>
@@ -84,6 +84,8 @@
                     totalItems: 0,
                     data: []
                 },
+                // 复制loading
+                copyLoading: false,
                 // 新建工作流对象
                 workflowObj: {
 
@@ -153,7 +155,6 @@
                 this.workflowQueryContent.index = index - 1;
                 this.listWorkflow();
             },
-
         },
         mounted() {
             this.listWorkflow();
