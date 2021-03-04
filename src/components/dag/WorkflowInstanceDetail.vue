@@ -8,6 +8,7 @@
                 <div>
                     <el-button @click="fetchWfInstanceInfo">{{$t('message.refresh')}}</el-button>
                     <el-button type="warning" @click="restart">{{$t('message.reRun')}}</el-button>
+                    <el-button type="danger" @click="stop">{{$t('message.stop')}}</el-button>
                 </div>
             </div>
         </el-row>
@@ -200,6 +201,17 @@
                     params: data
                 });
                 this.fetchWfInstanceInfo()
+            },
+
+            // 点击停止实例
+            async stop() {
+              let that = this;
+              let url = "/wfInstance/stop?wfInstanceId=" + this.$route.params.wfInstanceId +
+                  "&appId=" + this.$store.state.appInfo.id;
+              await this.axios.get(url).then(() => {
+                that.$message.success(this.$t('message.success'));
+              });
+              await this.fetchWfInstanceInfo()
             },
 
             /** 更改状态为成功 */
