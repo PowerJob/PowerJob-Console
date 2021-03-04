@@ -453,7 +453,7 @@ export default {
           appId: item.appId,
           enable: item.enable,
           skipWhenFailed: item.skipWhenFailed,
-          nodeAlias: item.jobDescription,
+          nodeAlias: item.jobName,
           jobId: item.id,
           nodeParams: item.jobParams,
           workflowId: this.workflowInfo.id
@@ -468,7 +468,7 @@ export default {
       res.forEach((item, index) => {
         this.poverFlow.graph.add("node", {
           ...item,
-          id: `${item.id}`,
+          nodeId: `${item.id}`,
           type: "flow-node",
           size: [240, 70],
           x: viewPointEnd.x + 20,
@@ -477,12 +477,11 @@ export default {
           titleText: item.nodeAlias
         });
       });
-      // this.poverFlow.graph.fitCenter();
       this.taskList = [
-        this.taskList,
-        ...res.map(item => ({ ...item, nodeId: item.id }))
+        ...this.taskList,
+        ...res.map(item => ({ ...item,jobParams: item.nodeParams, nodeId: item.id }))
       ];
-      this.saveDagInfo();
+      await this.saveDagInfo();
     },
     /** 保存单个节点 */
     async handleNodeSave() {
