@@ -64,6 +64,9 @@
                                     <el-button size="mini" type="text" @click="onClickRunHistory(scope.row)">{{$t('message.runHistory')}}</el-button>
                                 </el-dropdown-item>
                                 <el-dropdown-item>
+                                  <el-button size="mini" type="text" @click="onClickCopyJob(scope.row)">{{$t('message.copy')}}</el-button>
+                                </el-dropdown-item>
+                                <el-dropdown-item>
                                     <el-button size="mini" type="text" @click="onClickDeleteJob(scope.row)">{{$t('message.delete')}}</el-button>
                                 </el-dropdown-item>
                             </el-dropdown-menu>
@@ -361,6 +364,15 @@
                     that.$message.success(this.$t('message.success'));
                     that.listJobInfos();
                 });
+            },
+            // 点击 复制任务
+            onClickCopyJob(data) {
+              let url = "/job/copy?jobId=" + data.id;
+              let that = this;
+              this.axios.post(url).then(res => {
+                that.modifiedJobForm = res
+                that.modifiedJobFormVisible = true;
+              });
             },
             // 点击 历史记录
             onClickRunHistory(data) {
