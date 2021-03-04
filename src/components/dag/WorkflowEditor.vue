@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-row style="margin: 20px">
+    <el-row style="margin-left: 0px; margin-bottom: 20px; margin-right: 25px">
       <el-col :span="1">
         <el-button type="primary" @click="back">{{$t('message.back')}}</el-button>
       </el-col>

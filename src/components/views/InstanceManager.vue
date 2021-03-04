@@ -63,17 +63,19 @@
         <el-table-column :show-overflow-tooltip="true" prop="jobName" :label="$t('message.jobName')" />
         <el-table-column
           v-if="instanceQueryContent.type === 'WORKFLOW'"
+          :show-overflow-tooltip="true"
           prop="wfInstanceId"
           :label="$t('message.wfInstanceId')"
+          width="155"
         />
         <el-table-column :show-overflow-tooltip="true" prop="instanceId" :label="$t('message.instanceId')" />
         <el-table-column prop="status" :label="$t('message.status')" width="160">
           <template slot-scope="scope">{{fetchStatus(scope.row.status)}}</template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="actualTriggerTime" :label="$t('message.triggerTime')" />
-        <el-table-column :show-overflow-tooltip="true" prop="finishedTime" :label="$t('message.finishedTime')" />
+        <el-table-column  prop="actualTriggerTime" :label="$t('message.triggerTime')" width="150"/>
+        <el-table-column  prop="finishedTime" :label="$t('message.finishedTime')" width="150"/>
 
-        <el-table-column :label="$t('message.operation')" width="300">
+        <el-table-column :label="$t('message.operation')" width="285">
           <template slot-scope="scope">
             <el-button
               size="mini"
