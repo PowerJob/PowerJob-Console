@@ -246,7 +246,10 @@ export default {
     // 点击停止实例
     onClickStop(data) {
       let that = this;
-      let url = "/instance/stop?instanceId=" + data.instanceId;
+      let url = "/instance/stop?instanceId=" +
+          data.instanceId +
+          "&appId=" +
+          that.$store.state.appInfo.id;
       this.axios.get(url).then(() => {
         that.$message.success(this.$t("message.success"));
         // 重新加载列表
