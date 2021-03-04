@@ -133,6 +133,7 @@
             let appId = that.$store.state.appInfo.id;
             // 请求 Worker 列表
             that.axios.get("/system/listWorker?appId=" + appId).then(res => {
+                res.sort((a,b) => a.status - b.status );
                 that.workerList = res;
                 that.activeWorkerCount = that.workerList.length;
             });
