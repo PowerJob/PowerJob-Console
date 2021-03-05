@@ -346,7 +346,7 @@ export default {
       let node = this.taskList[index];
 
       this.nodeInfo = {
-        nodeAlias: item.get("model").titleText,
+        nodeAlias: node.jobName,
         nodeParams: node.jobParams,
         enable: node.enable,
         skipWhenFailed: node.skipWhenFailed,
@@ -496,7 +496,7 @@ export default {
 
       this.taskList[index] = {
         ...this.taskList[index],
-        nodeAlias: this.nodeInfo.nodeAlias,
+        jobName: this.nodeInfo.nodeAlias,
         jobParams: this.nodeInfo.nodeParams,
         enable: this.nodeInfo.enable,
         skipWhenFailed: this.nodeInfo.skipWhenFailed
