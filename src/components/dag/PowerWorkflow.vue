@@ -80,8 +80,7 @@ export default {
     /** 初始化图 */
     initFlow() {
       // 整理节点数据
-      let {nodes, edges} = this.makeNodes()
-
+      let {nodes, edges} = this.makeNodes();
       const powerFlow = new Workflow({
         container: this.$refs.powerDag,
         width: this.size.width,
@@ -131,7 +130,7 @@ export default {
     makeNodes() {
       let width = 0;
       this.nodes.forEach(item => {
-        let len = item.jobName.length * 9;
+        let len = item.nodeName.length * 9;
         let curtWidth = len > 250 ? 250 : len;
         curtWidth = len < 180 ? 180 : len;
         if (curtWidth > width) {
@@ -176,7 +175,7 @@ export default {
             type: "flow-node",
             size: [width, 70],
             leftText: item.jobId,
-            titleText: item.jobName,
+            titleText: item.nodeName,
             // taskStatus: text,
             ...statusValue,
             style: statusStyle,

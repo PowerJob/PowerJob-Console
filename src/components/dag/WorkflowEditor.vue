@@ -87,25 +87,18 @@
             :defaultWidthInc="234"
             fullInc="fullInc"
           >
-            <template v-slot:tool>
-              <div @click="saveNodeInfo">
-                <el-tooltip :content="$t('message.saveDAG')" placement="top" effect="light">
-                  <i class="el-icon-collection"></i>
-                </el-tooltip>
-              </div>
-            </template>
             <div class="job-panl" v-if="selectNode !== null">
               <el-form ref="form" :model="nodeInfo">
-                <el-form-item :label="$t('message.nodeAliasName')">
-                  <el-input v-model="nodeInfo.nodeAlias" @input="handleNodeAlias" />
+                <el-form-item :label="$t('message.nodeName')">
+                  <el-input v-model="nodeInfo.nodeName" @input="handleNodeName" />
                 </el-form-item>
-                <el-form-item :label="$t('message.nodeParamsName')">
+                <el-form-item :label="$t('message.nodeParams')">
                   <el-input v-model="nodeInfo.nodeParams" />
                 </el-form-item>
-                <el-form-item :label="$t('message.enableName')">
+                <el-form-item :label="$t('message.enable')">
                   <el-switch v-model="nodeInfo.enable"></el-switch>
                 </el-form-item>
-                <el-form-item :label="$t('message.skipWhenFailedName')">
+                <el-form-item :label="$t('message.skipWhenFailed')">
                   <el-switch v-model="nodeInfo.skipWhenFailed"></el-switch>
                 </el-form-item>
               </el-form>
@@ -194,7 +187,9 @@ export default {
         wfName: undefined
       },
       nodeInfo: {
-        nodeAlias: "",
+        id: null,
+        jobId: null,
+        nodeName: "",
         nodeParams: "",
         enable: true,
         skipWhenFailed: true
@@ -274,65 +269,6 @@ export default {
       this.listJobInfos();
       this.importDrawerVisible = true;
     },
-    onClickDAGNode(nodeId, g) {
-      switch (this.event) {
-        case 3: {
-          g.removeNode(nodeId);
-          let nodesArr = this.workflowInfo.peworkflowDAG.nodes;
-          let oldEdges = this.workflowInfo.peworkflowDAG.edges;
-          this.workflowInfo.peworkflowDAG.edges = [];
-          // 删除节点
-          nodesArr.splice(
-            nodesArr.findIndex(item => item.jobId == nodeId),
-            1
-          );
-          // 删除节点相关的所有边
-          oldEdges.forEach(edge => {
-            if (edge.from == nodeId || edge.to == nodeId) {
-              console.log("remove edge: " + JSON.stringify(edge));
-            } else {
-              this.workflowInfo.peworkflowDAG.edges.push(edge);
-            }
-          });
-
-          this.draw();
-          break;
-        }
-        case 1: {
-          this.from = nodeId;
-          break;
-        }
-        case 2: {
-          let to = nodeId;
-          if (this.from === undefined) {
-            this.$message.warning(this.$t("message.ntfAddStartPointFirst"));
-            break;
-          }
-          if (this.from === to) {
-            this.$message.warning(this.$t("message.ntfInvalidEdge"));
-            break;
-          }
-
-          let canSave = true;
-          this.workflowInfo.peworkflowDAG.edges.forEach(edge => {
-            if (edge.from === this.from && edge.to === to) {
-              canSave = false;
-              console.log("edge(%o -> %o) already exists!", this.from, to);
-            }
-          });
-
-          if (canSave) {
-            this.workflowInfo.peworkflowDAG.edges.push({
-              from: this.from,
-              to: to
-            });
-            console.log("new edge(%o -> %o)", this.from, to);
-          }
-          this.draw();
-          break;
-        }
-      }
-    },
     onClickValidateTimeExpression() {
       this.timeExpressionValidatorVisible = true;
     },
@@ -346,8 +282,9 @@ export default {
       let node = this.taskList[index];
 
       this.nodeInfo = {
-        nodeAlias: node.jobName,
-        nodeParams: node.jobParams,
+        jobId: node.jobId,
+        nodeName: node.nodeName,
+        nodeParams: node.nodeParams,
         enable: node.enable,
         skipWhenFailed: node.skipWhenFailed,
         id: item.get("model").nodeId || item.get("model").id
@@ -357,8 +294,8 @@ export default {
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    /** 修改别名 */
-    handleNodeAlias(value) {
+    /** 修改节点名称 */
+    handleNodeName(value) {
       const nodeItem = this.poverFlow.graph.get("selectedItem");
       const group = nodeItem.getContainer();
       const current = group.getChildByIndex(2);
@@ -392,58 +329,30 @@ export default {
           }
         });
       }
-      // this.taskList = res.peworkflowDAG.nodes;
-      // this.peworkflowDAG = res.peworkflowDAG;
     },
     /** 保存工作流全局信息 */
     async saveWorkflow() {
-      // this.saveLoading = true;
-      if (!this.workflowInfo.id) {
-        await this.saveWorkflowForm();
-      } else {
-        await this.saveWorkflowForm();
-        await this.saveDagInfo();
-        this.back();
-      }
-      // this.saveLoading = false;
-    },
-    /** 保存工作流节点信息 */
-    async saveNodeInfo() {
-      await this.saveDagInfo();
-      this.$message.success(this.$t("message.success"));
-    },
-    /** 保存工作流描述信息 */
-    async saveWorkflowForm() {
-      const res = await this.axios.post("/workflow/save", this.workflowInfo);
-      this.$message.success(this.$t("message.success"));
-      if (!this.workflowInfo.id) this.workflowInfo.id = res;
-    },
-    /** 保存dag信息 */
-    async saveDagInfo() {
-      // 获取节点连接信息
-      const flowData = this.poverFlow.graph.save();
-      console.log(flowData);
-      const data = {
-        id: this.workflowInfo.id,
-        appId: this.workflowInfo.appId,
-        dag: {
+      let dagInfo = {};
+      if (this.workflowInfo.id) {
+        // 获取 DAG 信息
+        const flowData = this.poverFlow.graph.save();
+        console.log(flowData);
+        dagInfo= {
           nodes: flowData.nodes.map(item => ({ nodeId: item.id })),
           edges: flowData.edges.map(item => ({
             from: item.source,
             to: item.target
           }))
         }
-      };
-
-      const res = await this.axios.post("/workflow/saveDAG", data);
-      console.log(res);
+      }
+      const res = await this.axios.post("/workflow/save", {...this.workflowInfo,dag:dagInfo});
+      this.$message.success(this.$t("message.success"));
+      if (!this.workflowInfo.id) this.workflowInfo.id = res;
     },
+
     /** 导入任务节点数据 */
     async importTask(taskList) {
-      let repeatNodes = [];
-      if (repeatNodes.length > 0) {
-        this.$message.warning(this.$t("message.repeatNode"));
-      }
+
       if (taskList.length === 0) {
         return;
       }
@@ -453,13 +362,13 @@ export default {
           appId: item.appId,
           enable: item.enable,
           skipWhenFailed: item.skipWhenFailed,
-          nodeAlias: item.jobName,
+          nodeName: item.jobName,
           jobId: item.id,
           nodeParams: item.jobParams,
           workflowId: this.workflowInfo.id
         };
       });
-      let res = await this.axios.post("/workflow/addNode", data);
+      let res = await this.axios.post("/workflow/saveNode", data);
       // 先移动视口一个节点点的位置
       // 获取缩放比例
       const zoom = this.poverFlow.graph.getZoom();
@@ -474,30 +383,30 @@ export default {
           x: viewPointEnd.x + 20,
           y: viewPointEnd.y + 70 * index + 20 + index * 10,
           leftText: item.jobId,
-          titleText: item.nodeAlias
+          titleText: item.nodeName
         });
       });
       this.taskList = [
         ...this.taskList,
-        ...res.map(item => ({ ...item,jobParams: item.nodeParams, nodeId: item.id }))
+        ...res.map(item => ({ ...item,nodeParams: item.nodeParams, nodeId: item.id }))
       ];
-      await this.saveDagInfo();
+
     },
     /** 保存单个节点 */
     async handleNodeSave() {
-      let data = {
+      let data = [{
         ...this.nodeInfo,
         appId: this.workflowInfo.appId,
         workflowId: this.workflowInfo.id
-      };
-      await this.axios.post("/workflow/modifyNode", data);
+      }];
+      await this.axios.post("/workflow/saveNode", data);
 
       let index = this.getNodeIndexById(this.nodeInfo.id);
 
       this.taskList[index] = {
         ...this.taskList[index],
-        jobName: this.nodeInfo.nodeAlias,
-        jobParams: this.nodeInfo.nodeParams,
+        nodeName: this.nodeInfo.nodeName,
+        nodeParams: this.nodeInfo.nodeParams,
         enable: this.nodeInfo.enable,
         skipWhenFailed: this.nodeInfo.skipWhenFailed
       };
@@ -510,7 +419,7 @@ export default {
         this.$message.warning(this.$t("message.noSelect"));
         return;
       }
-      this.importTask(this.multipleSelection);
+      await this.importTask(this.multipleSelection);
     }
   },
   mounted() {

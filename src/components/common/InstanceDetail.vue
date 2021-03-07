@@ -57,7 +57,7 @@
         </el-row>
         <el-row class="job-detail-text">
           <el-col :span="24">
-            <span class="power-job-text">{{$t('message.nodeParamsName')}}:</span>
+            <span class="power-job-text">{{$t('message.nodeParams')}}:</span>
             <span class="title">{{instanceDetail.jobParams}}</span>
           </el-col>
         </el-row>

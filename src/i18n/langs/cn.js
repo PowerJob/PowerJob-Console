@@ -187,22 +187,19 @@ const cn = {
 
         // 新增的提示信息
         'noSelect': '请至少选中一条数据',
-        'nodeAliasName': '节点别名',
-        'nodeParamsName': '任务参数',
-        'enableName': '是否启用',
-        'skipWhenFailedName': '失败跳过',
+        'nodeName': '节点名称',
+        'nodeParams': '任务参数',
+        'enable': '是否启用',
+        'skipWhenFailed': '失败跳过',
         'fullScreen': '全屏',
         'zoomIn': '放大',
         'zoomOut': '缩小',
         'autoFit': '自适应',
-        'repeatNode': '节点重复，已自动过滤',
-        'saveDAG': '保存 DAG 信息',
         'markerSuccess': '标记成功',
         'restart': '重试',
         'wfContext': '上下文',
         'yes': 'YES',
         'no': 'NO',
-        'instanceIdNo': '实例ID不存在！',
         'copy': '复制'
     },
     ...zhLocale

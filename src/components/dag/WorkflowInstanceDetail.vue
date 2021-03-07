@@ -104,13 +104,13 @@
                         <template>
                             <el-row class="job-detail-text">
                                 <el-col :span="24">
-                                    <span class="power-job-text">{{$t('message.enableName')}}:</span>
+                                    <span class="power-job-text">{{$t('message.enable')}}:</span>
                                     <span class="title">{{currentNodeInfo.enable ? $t('message.yes') : $t('message.no')}}</span>
                                 </el-col>
                             </el-row>
                             <el-row class="job-detail-text">
                                  <el-col :span="24">
-                                    <span class="power-job-text">{{$t('message.skipWhenFailedName')}}:</span>
+                                    <span class="power-job-text">{{$t('message.skipWhenFailed')}}:</span>
                                     <span class="title">{{currentNodeInfo.skipWhenFailed ? $t('message.yes') : $t('message.no')}}</span>
                                 </el-col>
                             </el-row>
