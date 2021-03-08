@@ -97,9 +97,25 @@
                 </el-form-item>
                 <el-form-item :label="$t('message.enable')">
                   <el-switch v-model="nodeInfo.enable"></el-switch>
+                  <img
+                    class="job-panl-icon"
+                    v-if="nodeInfo.enable"
+                    src="../../assets/start.svg"
+                    height="18"
+                    width="18"
+                    alt
+                  />
                 </el-form-item>
                 <el-form-item :label="$t('message.skipWhenFailed')">
                   <el-switch v-model="nodeInfo.skipWhenFailed"></el-switch>
+                  <img
+                    class="job-panl-icon"
+                    v-if="nodeInfo.skipWhenFailed"
+                    src="../../assets/skip.svg"
+                    height="18"
+                    width="18"
+                    alt
+                  />
                 </el-form-item>
               </el-form>
               <div class="job-panl-btn">
@@ -132,7 +148,11 @@
                   </el-form-item>
                 </el-form>
               </el-row>
-              <el-table class="power-import-table" :data="jobInfoPageResult.data" @selection-change="handleSelectionChange">
+              <el-table
+                class="power-import-table"
+                :data="jobInfoPageResult.data"
+                @selection-change="handleSelectionChange"
+              >
                 <el-table-column type="selection" width="55" />
                 <el-table-column property="id" :label="$t('message.jobId')" />
                 <el-table-column property="jobName" :label="$t('message.jobName')" />
@@ -170,6 +190,7 @@
 <script>
 import TimeExpressionValidator from "../common/TimeExpressionValidator";
 import PowerWorkflow from "./PowerWorkflow";
+
 export default {
   name: "WorkflowEditor",
   components: { TimeExpressionValidator, PowerWorkflow },
@@ -337,22 +358,24 @@ export default {
         // 获取 DAG 信息
         const flowData = this.poverFlow.graph.save();
         console.log(flowData);
-        dagInfo= {
+        dagInfo = {
           nodes: flowData.nodes.map(item => ({ nodeId: item.id })),
           edges: flowData.edges.map(item => ({
             from: item.source,
             to: item.target
           }))
-        }
+        };
       }
-      const res = await this.axios.post("/workflow/save", {...this.workflowInfo,dag:dagInfo});
+      const res = await this.axios.post("/workflow/save", {
+        ...this.workflowInfo,
+        dag: dagInfo
+      });
       this.$message.success(this.$t("message.success"));
       if (!this.workflowInfo.id) this.workflowInfo.id = res;
     },
 
     /** 导入任务节点数据 */
     async importTask(taskList) {
-
       if (taskList.length === 0) {
         return;
       }
@@ -388,17 +411,22 @@ export default {
       });
       this.taskList = [
         ...this.taskList,
-        ...res.map(item => ({ ...item,nodeParams: item.nodeParams, nodeId: item.id }))
+        ...res.map(item => ({
+          ...item,
+          nodeParams: item.nodeParams,
+          nodeId: item.id
+        }))
       ];
-
     },
     /** 保存单个节点 */
     async handleNodeSave() {
-      let data = [{
-        ...this.nodeInfo,
-        appId: this.workflowInfo.appId,
-        workflowId: this.workflowInfo.id
-      }];
+      let data = [
+        {
+          ...this.nodeInfo,
+          appId: this.workflowInfo.appId,
+          workflowId: this.workflowInfo.id
+        }
+      ];
       await this.axios.post("/workflow/saveNode", data);
 
       let index = this.getNodeIndexById(this.nodeInfo.id);
@@ -434,6 +462,32 @@ export default {
       this.workflowInfo.appId = this.$store.state.appInfo.id;
       this.getWorkflowInfo(true);
     }
+  },
+  watch: {
+    "nodeInfo.enable": {
+      handler: function(value) {
+        if (!this.selectNode) return;
+        const group = this.selectNode.getContainer();
+        const current = group.getChildByIndex(3);
+        if (value) {
+          current.attr({ img: require("../../assets/start.svg") });
+        } else {
+          current.attr({ img: "" });
+        }
+      }
+    },
+    "nodeInfo.skipWhenFailed": {
+      handler: function(value) {
+        if (!this.selectNode) return;
+        const group = this.selectNode.getContainer();
+        const current = group.getChildByIndex(4);
+        if (value) {
+          current.attr({ img: require("../../assets/skip.svg") });
+        } else {
+          current.attr({ img: "" });
+        }
+      }
+    }
   }
 };
 </script>
@@ -441,6 +495,9 @@ export default {
 <style scoped>
 .el-input {
   width: 80%;
+}
+.job-panl-icon {
+  vertical-align: middle;
 }
 .title {
   display: inline-block;
@@ -513,7 +570,6 @@ export default {
 /* .el-drawer__body {
   padding: 0 20px;
 } */
-
 </style>
 <!-- can't use scope, or dag will be the black block, maybe this is the bug of d3.js -->
 <style>

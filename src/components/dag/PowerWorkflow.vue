@@ -176,6 +176,8 @@ export default {
             size: [width, 70],
             leftText: item.jobId,
             titleText: item.nodeName,
+            icon1: item.enable ? require('../../assets/start.svg') : '',
+            icon2: item.skipWhenFailed ? require('../../assets/skip.svg') : '',
             // taskStatus: text,
             ...statusValue,
             style: statusStyle,
