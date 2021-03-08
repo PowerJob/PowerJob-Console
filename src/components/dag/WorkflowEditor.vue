@@ -89,11 +89,32 @@
           >
             <div class="job-panl" v-if="selectNode !== null">
               <el-form ref="form" :model="nodeInfo">
+                <el-form-item :label="$t('message.jobName')">
+                  <el-select
+                    v-model="nodeInfo.jobId"
+                    filterable
+                    remote
+                    reserve-keyword
+                    placeholder="请输入关键词"
+                    :remote-method="remoteTaskData"
+                    :loading="taskLoading"
+                    :style="{width: 'calc(100% - 90px)'}"
+                    @focus="handleWaitFocus"
+                    @change="handleWaitTaskChange"
+                  >
+                    <el-option
+                      v-for="item in waitTaskList"
+                      :key="item.id"
+                      :label="item.jobName"
+                      :value="item.id"
+                    ></el-option>
+                  </el-select>
+                </el-form-item>
                 <el-form-item :label="$t('message.nodeName')">
-                  <el-input v-model="nodeInfo.nodeName" @input="handleNodeName" />
+                  <el-input v-model="nodeInfo.nodeName" @input="handleNodeName" :style="{width: 'calc(100% - 90px)'}" />
                 </el-form-item>
                 <el-form-item :label="$t('message.nodeParams')">
-                  <el-input v-model="nodeInfo.nodeParams" />
+                  <el-input v-model="nodeInfo.nodeParams" :style="{width: 'calc(100% - 90px)'}" />
                 </el-form-item>
                 <el-form-item :label="$t('message.enable')">
                   <el-switch v-model="nodeInfo.enable"></el-switch>
@@ -191,6 +212,19 @@
 import TimeExpressionValidator from "../common/TimeExpressionValidator";
 import PowerWorkflow from "./PowerWorkflow";
 
+function nodeInfoChange(icon, index) {
+  return function(value) {
+    if (!this.selectNode) return;
+    const group = this.selectNode.getContainer();
+    const current = group.getChildByIndex(index);
+    if (value) {
+      current.attr({ img: icon });
+    } else {
+      current.attr({ img: "" });
+    }
+  }
+}
+
 export default {
   name: "WorkflowEditor",
   components: { TimeExpressionValidator, PowerWorkflow },
@@ -258,7 +292,11 @@ export default {
       /** 当前选中的节点 */
       selectNode: null,
       /** 重置节点方法 */
-      resetNodes: null
+      resetNodes: null,
+      /** 待选任务列表 */
+      waitTaskList: [],
+      /** 任务搜索loading */
+      taskLoading: false
     };
   },
   methods: {
@@ -301,7 +339,7 @@ export default {
       let index = this.getNodeIndexById(item.get("model").nodeId);
 
       let node = this.taskList[index];
-
+      this.remoteTaskData(null, node.jobId)
       this.nodeInfo = {
         jobId: node.jobId,
         nodeName: node.nodeName,
@@ -373,7 +411,6 @@ export default {
       this.$message.success(this.$t("message.success"));
       if (!this.workflowInfo.id) this.workflowInfo.id = res;
     },
-
     /** 导入任务节点数据 */
     async importTask(taskList) {
       if (taskList.length === 0) {
@@ -419,12 +456,13 @@ export default {
       ];
     },
     /** 保存单个节点 */
-    async handleNodeSave() {
+    async handleNodeSave(value = {}) {
       let data = [
         {
           ...this.nodeInfo,
           appId: this.workflowInfo.appId,
-          workflowId: this.workflowInfo.id
+          workflowId: this.workflowInfo.id,
+          ...value
         }
       ];
       await this.axios.post("/workflow/saveNode", data);
@@ -448,6 +486,36 @@ export default {
         return;
       }
       await this.importTask(this.multipleSelection);
+    },
+    /** 远程加载任务列表数据 */
+    async remoteTaskData(value, jobId) {
+      console.log('哈啊')
+      this.taskLoading = true
+      this.axios.post("/job/list", {
+        ...this.jobQueryContent,
+        index: 0,
+        keyword: value,
+        jobId: jobId
+      }).then(res => {
+        console.log()
+        this.waitTaskList = res.data;
+        this.taskLoading = false;
+      });
+    },
+    /** 选中任务时 */
+    handleWaitTaskChange(value) {
+      console.log(value);
+      // 找到节点信息
+      let current = this.waitTaskList.find(item => item.id === value);
+
+      let currentShape = this.selectNode.getContainer().getChildByIndex(1);
+
+      currentShape.attr({text: current.id});
+      this.nodeInfo.jobId = value;
+    },
+    /** 节点外点击时单独处理 */
+    handleWaitFocus() {
+      this.poverFlow.graph.set('noKeyDown', true)
     }
   },
   mounted() {
@@ -465,28 +533,10 @@ export default {
   },
   watch: {
     "nodeInfo.enable": {
-      handler: function(value) {
-        if (!this.selectNode) return;
-        const group = this.selectNode.getContainer();
-        const current = group.getChildByIndex(3);
-        if (value) {
-          current.attr({ img: require("../../assets/start.svg") });
-        } else {
-          current.attr({ img: "" });
-        }
-      }
+      handler: nodeInfoChange(require("../../assets/start.svg"), 3)
     },
     "nodeInfo.skipWhenFailed": {
-      handler: function(value) {
-        if (!this.selectNode) return;
-        const group = this.selectNode.getContainer();
-        const current = group.getChildByIndex(4);
-        if (value) {
-          current.attr({ img: require("../../assets/skip.svg") });
-        } else {
-          current.attr({ img: "" });
-        }
-      }
+      handler: nodeInfoChange(require("../../assets/skip.svg"), 4)
     }
   }
 };
