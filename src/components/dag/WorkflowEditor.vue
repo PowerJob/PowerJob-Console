@@ -296,7 +296,9 @@ export default {
       /** 待选任务列表 */
       waitTaskList: [],
       /** 任务搜索loading */
-      taskLoading: false
+      taskLoading: false,
+      /** 任务节流 */
+      taskTimeout: null
     };
   },
   methods: {
@@ -340,6 +342,7 @@ export default {
 
       let node = this.taskList[index];
       this.remoteTaskData(null, node.jobId)
+
       this.nodeInfo = {
         jobId: node.jobId,
         nodeName: node.nodeName,
@@ -489,28 +492,38 @@ export default {
     },
     /** 远程加载任务列表数据 */
     async remoteTaskData(value, jobId) {
-      console.log('哈啊')
-      this.taskLoading = true
-      this.axios.post("/job/list", {
-        ...this.jobQueryContent,
-        index: 0,
-        keyword: value,
-        jobId: jobId
-      }).then(res => {
-        console.log()
-        this.waitTaskList = res.data;
-        this.taskLoading = false;
-      });
+      clearTimeout(this.taskTimeout)
+      this.taskTimeout = setTimeout(() => {
+        this.taskLoading = true
+        this.axios.post("/job/list", {
+          ...this.jobQueryContent,
+          index: 0,
+          keyword: value,
+          jobId: jobId
+        }).then(res => {
+          this.waitTaskList = res.data;
+          this.taskLoading = false;
+        });
+      }, 100)
+      
     },
     /** 选中任务时 */
     handleWaitTaskChange(value) {
-      console.log(value);
       // 找到节点信息
       let current = this.waitTaskList.find(item => item.id === value);
 
       let currentShape = this.selectNode.getContainer().getChildByIndex(1);
 
       currentShape.attr({text: current.id});
+      let index = this.getNodeIndexById(this.selectNode.get("model").nodeId)
+      this.poverFlow.graph.updateItem(this.selectNode, {
+        leftText: current.id,
+        jobId: current.id
+      });
+      this.taskList[index] = {
+        ...this.taskList[index],
+        jobId: current.id
+      }
       this.nodeInfo.jobId = value;
     },
     /** 节点外点击时单独处理 */
