@@ -440,6 +440,7 @@ export default {
       res.forEach((item, index) => {
         this.poverFlow.graph.add("node", {
           ...item,
+          id: `${item.id}`,
           nodeId: `${item.id}`,
           type: "flow-node",
           size: [240, 70],
