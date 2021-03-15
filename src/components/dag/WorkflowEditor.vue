@@ -428,7 +428,8 @@ export default {
           nodeName: item.jobName,
           jobId: item.id,
           nodeParams: item.jobParams,
-          workflowId: this.workflowInfo.id
+          workflowId: this.workflowInfo.id,
+          type: 'JOB'
         };
       });
       let res = await this.axios.post("/workflow/saveNode", data);

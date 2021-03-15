@@ -292,7 +292,7 @@
                 // 时间表达式选择类型
                 timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIXED_RATE", label: this.$t('message.fixRate')}, {key: "FIXED_DELAY", label: this.$t('message.fixDelay')}, {key: "WORKFLOW", label: this.$t('message.workflow')} ],
                 // 处理器类型
-                processorTypeOptions: [{key: "EMBEDDED_JAVA", label: "JAVA"}, {key: "JAVA_CONTAINER", label: this.$t('message.javaContainer')}], // {key: "SHELL", label: "SHELL"}, {key: "PYTHON", label: "PYTHON"}
+                processorTypeOptions: [{key: "BUILT_IN", label: "Built-in"}, {key: "External", label: this.$t('message.javaContainer')}], // {key: "SHELL", label: "SHELL"}, {key: "PYTHON", label: "PYTHON"}
                 // 执行方式类型
                 executeTypeOptions: [{key: "STANDALONE", label: this.$t('message.standalone')}, {key: "BROADCAST", label: this.$t('message.broadcast')},  {key: "MAP", label: this.$t('message.map')}, {key: "MAP_REDUCE", label: this.$t('message.mapReduce')}],
                 // 用户列表
@@ -399,8 +399,8 @@
             verifyPlaceholder(processorType) {
                 let res;
                 switch(processorType){
-                    case "EMBEDDED_JAVA": res = this.$t('message.javaProcessorInfoPLH');break;
-                    case "JAVA_CONTAINER": res =  this.$t('message.containerProcessorInfoPLH');break;
+                    case "BUILT_IN": res = this.$t('message.javaProcessorInfoPLH');break;
+                    case "EXTERNAL": res =  this.$t('message.containerProcessorInfoPLH');break;
                     case "SHELL": res =  this.$t('message.shellProcessorInfoPLH');break;
                     case "PYTHON" : res = this.$t('message.pythonProcessorInfoPLH');
                 }
