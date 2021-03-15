@@ -75,7 +75,8 @@
     </el-row>
 
     <el-row>
-      <div class="power-flow" v-if="workflowInfo.id">
+      <!-- v-if="workflowInfo.id" -->
+      <div class="power-flow"> 
         <div class="power-dag" id="fullInc">
           <PowerWorkflow
             @onSelectedNode="handleSelectedNode"
@@ -387,26 +388,24 @@ export default {
         this.$nextTick(() => {
           this.resetNodes();
           if (fit) {
-            this.poverFlow.graph.fitView(20);
+            // this.poverFlow.graph.fitView(20);
+            // 改为layout适配会对节点少的时候友好一点
+            this.poverFlow.graph.layout();
           }
         });
       }
     },
     /** 保存工作流全局信息 */
     async saveWorkflow() {
-      let dagInfo = {};
-      if (this.workflowInfo.id) {
-        // 获取 DAG 信息
-        const flowData = this.poverFlow.graph.save();
-        console.log(flowData);
-        dagInfo = {
-          nodes: flowData.nodes.map(item => ({ nodeId: item.id })),
-          edges: flowData.edges.map(item => ({
-            from: item.source,
-            to: item.target
-          }))
-        };
-      }
+      // 改为不需要dag信息
+      const flowData = this.poverFlow.graph.save();
+      let dagInfo = {
+        nodes: flowData.nodes.map(item => ({ nodeId: item.id })),
+        edges: flowData.edges.map(item => ({
+          from: item.source,
+          to: item.target
+        }))
+      };
       const res = await this.axios.post("/workflow/save", {
         ...this.workflowInfo,
         dag: dagInfo
