@@ -117,7 +117,7 @@
     <!--  任务实例详情弹出框 -->
     <el-dialog :visible.sync="instanceDetailVisible" v-if="instanceDetailVisible" width="80%">
       <div class="power-instance-detail-log">
-        <InstanceDetail :instance-id="currentInstanceId" />
+        <InstanceDetail :instance-id="currentInstanceId" :resultAll="true" />
       </div>
     </el-dialog>
 

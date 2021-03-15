@@ -69,15 +69,16 @@
         </el-row>
         <el-row class="job-detail-text">
           <el-col :span="24">
-            <div class="power-job-result">
+            <div :class="{'power-job-result': true, 'power-job-result-detail': resultAll}">
               <span class="power-job-text">{{$t('message.result')}}:</span>
-              <el-popover width="400" placement="right" trigger="click">
+              <el-popover width="400" placement="right" trigger="click" v-if="!resultAll">
                 <div class="power-job-content-slot">
                   {{instanceDetail.result}}
                 </div>
                 <span class="power-job-content" slot="reference" :style="{width: fixedWidth ? `${fixedWidth - 200}px` : '400px'}">{{instanceDetail.result}}</span>
                 <!-- <i class="el-icon-chat-dot-square result" slot="reference"></i> -->
               </el-popover>
+              <span v-if="resultAll" class="title">{{instanceDetail.result}}</span>
             </div>
           </el-col>
         </el-row>
@@ -112,7 +113,7 @@
 export default {
   name: "InstanceDetail",
   // 数据传递
-  props: ["instanceId", "fixedWidth"],
+  props: ["instanceId", "fixedWidth", "resultAll"],
   data() {
     return {
       instanceDetail: {}
@@ -148,6 +149,7 @@ export default {
   /* margin: 5px 0; */
   font-size: 14px;
   font-weight: bold;
+  flex: 1;
 }
 .power-job-button {
   display: flex;
@@ -165,6 +167,8 @@ export default {
   text-align: right;
   margin-right: 4px;
   font-size: 14px;
+  word-break: break-all;
+  flex-basis: 148px;
 }
 .result:hover {
   transition: 0.5s;
@@ -173,6 +177,9 @@ export default {
 .power-job-result {
   display: flex;
   align-items: center;
+}
+.power-job-result.power-job-result-detail {
+  align-items: flex-start;
 }
 .power-job-content-slot {
   max-height: 300px;
