@@ -188,7 +188,7 @@ const cn = {
         // 新增的提示信息
         'noSelect': '请至少选中一条数据',
         'nodeName': '节点名称',
-        'nodeParams': '任务参数',
+        'nodeParams': '节点参数',
         'enable': '是否启用',
         'skipWhenFailed': '失败跳过',
         'fullScreen': '全屏',

@@ -184,7 +184,7 @@ const en = {
         // 新增的提示信息
         'noSelect': 'Please select at least one data item',
         'nodeName': 'Node name',
-        'nodeParams': 'Task parameter',
+        'nodeParams': 'Node parameter',
         'enable': 'Enable',
         'skipWhenFailed': 'Allow skips when failed',
         'fullScreen': 'Full Screen',
