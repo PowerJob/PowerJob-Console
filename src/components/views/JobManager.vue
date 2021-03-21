@@ -64,6 +64,9 @@
                                     <el-button size="mini" type="text" @click="onClickRunHistory(scope.row)">{{$t('message.runHistory')}}</el-button>
                                 </el-dropdown-item>
                                 <el-dropdown-item>
+                                  <el-button size="mini" type="text" @click="onClickCopyJob(scope.row)">{{$t('message.copy')}}</el-button>
+                                </el-dropdown-item>
+                                <el-dropdown-item>
                                     <el-button size="mini" type="text" @click="onClickDeleteJob(scope.row)">{{$t('message.delete')}}</el-button>
                                 </el-dropdown-item>
                             </el-dropdown-menu>
@@ -84,7 +87,7 @@
         </el-row>
 
 
-        <el-dialog :visible.sync="modifiedJobFormVisible" width="60%">
+        <el-dialog :close-on-click-modal="false" :visible.sync="modifiedJobFormVisible" width="60%">
             <el-form :model="modifiedJobForm" label-width="120px">
 
                 <el-form-item :label="$t('message.jobName')">
@@ -112,7 +115,7 @@
                             <el-input v-model="modifiedJobForm.timeExpression" :placeholder="$t('message.timeExpressionPlaceHolder')" />
                         </el-col>
                         <el-col :span="4">
-                            <el-button type="text" @click="onClickValidateTimeExpression">{{$t('message.validateTimeExpression')}}</el-button>
+                            <el-button type="text" @click="onClickValidateTimeExpression" style="padding-left: 10px">{{$t('message.validateTimeExpression')}}</el-button>
                         </el-col>
                     </el-row>
                 </el-form-item>
@@ -230,7 +233,7 @@
             </el-form>
         </el-dialog>
 
-        <el-dialog :visible.sync="timeExpressionValidatorVisible" v-if='timeExpressionValidatorVisible'>
+        <el-dialog :close-on-click-modal="false" :visible.sync="timeExpressionValidatorVisible" v-if='timeExpressionValidatorVisible'>
             <TimeExpressionValidator :time-expression="modifiedJobForm.timeExpression" :time-expression-type="modifiedJobForm.timeExpressionType"/>
         </el-dialog>
     </div>
@@ -289,7 +292,7 @@
                 // 时间表达式选择类型
                 timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIXED_RATE", label: this.$t('message.fixRate')}, {key: "FIXED_DELAY", label: this.$t('message.fixDelay')}, {key: "WORKFLOW", label: this.$t('message.workflow')} ],
                 // 处理器类型
-                processorTypeOptions: [{key: "EMBEDDED_JAVA", label: "JAVA"}, {key: "JAVA_CONTAINER", label: this.$t('message.javaContainer')}, {key: "SHELL", label: "SHELL"}, {key: "PYTHON", label: "PYTHON"}],
+                processorTypeOptions: [{key: "BUILT_IN", label: "Built-in"}, {key: "External", label: this.$t('message.javaContainer')}], // {key: "SHELL", label: "SHELL"}, {key: "PYTHON", label: "PYTHON"}
                 // 执行方式类型
                 executeTypeOptions: [{key: "STANDALONE", label: this.$t('message.standalone')}, {key: "BROADCAST", label: this.$t('message.broadcast')},  {key: "MAP", label: this.$t('message.map')}, {key: "MAP_REDUCE", label: this.$t('message.mapReduce')}],
                 // 用户列表
@@ -301,16 +304,11 @@
         },
         methods: {
             // 保存变更，包括新增和修改
-            saveJob() {
-                const that = this;
-                this.axios.post("/job/save", this.modifiedJobForm).then(() => {
-                    that.modifiedJobFormVisible = false;
-                    that.$message.success(this.$t('message.success'));
-
-                    // 重新加载数据
-                    that.listJobInfos();
-
-                }, () => that.modifiedJobFormVisible = false);
+            async saveJob() {
+                await this.axios.post("/job/save", this.modifiedJobForm);
+                this.modifiedJobFormVisible = false;
+                this.$message.success(this.$t('message.success'));
+                this.listJobInfos();
             },
             // 列出符合当前搜索条件的任务
             listJobInfos() {
@@ -367,6 +365,15 @@
                     that.listJobInfos();
                 });
             },
+            // 点击 复制任务
+            onClickCopyJob(data) {
+              let url = "/job/copy?jobId=" + data.id;
+              let that = this;
+              this.axios.post(url).then(res => {
+                that.modifiedJobForm = res
+                that.modifiedJobFormVisible = true;
+              });
+            },
             // 点击 历史记录
             onClickRunHistory(data) {
                 console.log(JSON.stringify(data));
@@ -392,8 +399,8 @@
             verifyPlaceholder(processorType) {
                 let res;
                 switch(processorType){
-                    case "EMBEDDED_JAVA": res = this.$t('message.javaProcessorInfoPLH');break;
-                    case "JAVA_CONTAINER": res =  this.$t('message.containerProcessorInfoPLH');break;
+                    case "BUILT_IN": res = this.$t('message.javaProcessorInfoPLH');break;
+                    case "EXTERNAL": res =  this.$t('message.containerProcessorInfoPLH');break;
                     case "SHELL": res =  this.$t('message.shellProcessorInfoPLH');break;
                     case "PYTHON" : res = this.$t('message.pythonProcessorInfoPLH');
                 }

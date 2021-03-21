@@ -4,6 +4,6 @@
 
 rm -rf dist
 npm run build_spring
-rm -rf ../PowerJob/powerjob-server/src/main/resources/static/*
-mv dist/* ../PowerJob/powerjob-server/src/main/resources/static/
+rm -rf ../PowerJob/powerjob-server/powerjob-server-starter/src/main/resources/static/*
+mv dist/* ../PowerJob/powerjob-server/powerjob-server-starter/src/main/resources/static/
 
