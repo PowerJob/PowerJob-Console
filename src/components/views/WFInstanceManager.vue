@@ -52,27 +52,31 @@
     <el-row>
       <el-table
         :data="wfInstancePageResult.data"
+        
         style="width: 100%"
         :row-class-name="wfInstanceTableRowClassName"
       >
-        <el-table-column prop="workflowId" :label="$t('message.wfId')" width="160" />
-        <el-table-column prop="workflowName" :label="$t('message.wfName')" />
-        <el-table-column prop="wfInstanceId" :label="$t('message.wfInstanceId')" />
-        <el-table-column prop="status" :label="$t('message.status')" width="160">
+        <el-table-column :show-overflow-tooltip="true" prop="workflowId" :label="$t('message.wfId')" width="110" />
+        <el-table-column :show-overflow-tooltip="true" prop="workflowName" :label="$t('message.wfName')" />
+        <el-table-column :show-overflow-tooltip="true" prop="wfInstanceId" :label="$t('message.wfInstanceId')" />
+        <el-table-column :show-overflow-tooltip="true" prop="status" :label="$t('message.status')" width="160">
           <template slot-scope="scope">
             {{fetchWFStatus(scope.row.status)}}
           </template>
         </el-table-column>
-        <el-table-column prop="actualTriggerTime" :label="$t('message.triggerTime')" />
-        <el-table-column prop="finishedTime" :label="$t('message.finishedTime')" />
+        <el-table-column :show-overflow-tooltip="true" prop="actualTriggerTime" :label="$t('message.triggerTime')" />
+        <el-table-column :show-overflow-tooltip="true" prop="finishedTime" :label="$t('message.finishedTime')" />
 
-        <el-table-column :label="$t('message.operation')" width="300">
+        <el-table-column :show-overflow-tooltip="true" :label="$t('message.operation')" width="225">
           <template slot-scope="scope">
-            <el-button size="medium" @click="onClickShowDetail(scope.row)"
+            <el-button type="primary" size="mini" @click="onClickShowDetail(scope.row)"
               >{{$t('message.detail')}}</el-button
             >
-            <el-button size="medium" @click="onClickStop(scope.row)"
+            <el-button type="danger" size="mini" @click="onClickStop(scope.row)"
               >{{$t('message.stop')}}</el-button
+            >
+            <el-button type="warning" size="mini" @click="restart(scope.row)"
+              >{{$t('message.reRun')}}</el-button
             >
           </template>
         </el-table-column>
@@ -140,7 +144,6 @@ export default {
     },
     // 查看工作流详情
     onClickShowDetail(data) {
-      console.log(data);
       this.$router.push({
         name: 'WorkflowInstanceDetail',
         params: {
@@ -184,7 +187,18 @@ export default {
     },
     fetchWFStatus(status) {
       return this.common.translateWfInstanceStatus(status);
-    }
+    },
+    // 重试
+    async restart(row) {
+      const data = {
+          appId: this.wfInstanceQueryContent.appId,
+          wfInstanceId: row.wfInstanceId,
+      };
+      await this.axios.get('/wfInstance/retry', {
+        params: data
+      });
+      this.listWfInstances();
+     },
   },
   mounted() {
     this.listWfInstances();

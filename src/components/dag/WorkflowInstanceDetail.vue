@@ -1,22 +1,26 @@
 <template>
     <div>
         <el-row>
-            <el-col :span="1">
-                <el-button type="primary" @click="back">{{$t('message.back')}}</el-button>
-            </el-col>
-            <el-col :span="1" :offset="17">
-                <el-button type="success" @click="fetchWfInstanceInfo">{{$t('message.refresh')}}</el-button>
-            </el-col>
+            <div class="power-toolbtn">
+                <div>
+                    <el-button type="primary" @click="back">{{$t('message.back')}}</el-button>
+                </div>
+                <div>
+                    <el-button @click="fetchWfInstanceInfo">{{$t('message.refresh')}}</el-button>
+                    <el-button type="warning" @click="restart">{{$t('message.reRun')}}</el-button>
+                    <el-button type="danger" @click="stop">{{$t('message.stop')}}</el-button>
+                </div>
+            </div>
         </el-row>
 
-        <el-row>
+        <el-row class="power-work-info-item">
             <el-col :span="24">
                 {{$t('message.status')}}：
                 <span class="title">{{ this.common.translateWfInstanceStatus(wfInstanceDetail.status) }}</span>
             </el-col>
         </el-row>
 
-        <el-row>
+        <el-row class="power-work-info-item">
             <el-col :span="8">
                 {{$t('message.wfId')}}：
                 <span class="title">{{ wfInstanceDetail.workflowId }}</span>
@@ -26,7 +30,7 @@
                 <span class="title">{{ wfInstanceDetail.wfInstanceId }}</span>
             </el-col>
         </el-row>
-        <el-row>
+        <el-row class="power-work-info-item">
             <el-col :span="8">
                 {{$t('message.expectedTriggerTime')}}：
                 <span class="title">{{ wfInstanceDetail.expectedTriggerTime }}</span>
@@ -40,13 +44,27 @@
                 <span class="title">{{ wfInstanceDetail.finishedTime }}</span>
             </el-col>
         </el-row>
-      <el-row>
-        <el-col :span="24">
-          {{$t('message.wfInitParams')}}：
-          <span class="title">{{ wfInstanceDetail.wfInitParams }}</span>
-        </el-col>
-      </el-row>
-        <el-row>
+        <el-row class="power-work-info-item">
+            <el-col :span="24">
+            {{$t('message.wfInitParams')}}：
+            <span class="title">{{ wfInstanceDetail.wfInitParams }}</span>
+            </el-col>
+        </el-row>
+        <el-row v-if="wfInstanceDetail.wfContext" class="power-work-info-item">
+            <div>
+                <el-col :span="24">
+                    {{$t('message.wfContext')}}：
+                    <el-popover width="400" placement="top" trigger="click">
+                        <div class="power-work-info-item-content">
+                            <JsonViewer :value="JSON.parse(wfInstanceDetail.wfContext)" />
+                        </div>
+                        <span class="power-work-info-item-context" slot="reference">{{wfInstanceDetail.wfContext}}</span>
+                        <!-- <i class="el-icon-chat-dot-square result" slot="reference"></i> -->
+                    </el-popover>
+                </el-col>
+            </div>
+        </el-row>
+        <el-row class="power-work-info-item">
             <el-col :span="24">
                 {{$t('message.result')}}（{{$t('message.wfTips')}}）：
                 <span class="title">{{ wfInstanceDetail.result }}</span>
@@ -54,10 +72,52 @@
         </el-row>
         <el-row>
             <div>
-                <svg width="80%" height=1000px id="svgCanvas">
-                    <g />
-                    <rect />
-                </svg>
+                <PowerWorkFlow 
+                    v-if="peworkflowDAG.nodes.length > 0" 
+                    :rightFixed="421"
+                    :nodes="peworkflowDAG.nodes" 
+                    :edges="peworkflowDAG.edges" 
+                    :selectNode="selectNode" 
+                    :defaultWidthInc="245"
+                    :interceptSelectedNode="interceptSelectedNode"
+                    mode="view"
+                    @getDag="getDag" 
+                    @onSelectedNode="handleSelectedNode"
+                    @onClearSelectNode="handleClearSelectNode"
+                >
+                    <template v-slot:tool>
+                        <div @click="markedSuccess">
+                            <el-tooltip :content="$t('message.markerSuccess')" placement="top" effect="light">
+                              <i class="el-icon-document-checked" :style="{'color': selectNode && selectNode.get('model').status == 4 ? '#3D3E3E' : '#BBBBBB'}"></i>
+                            </el-tooltip>
+                        </div>
+                        <div @click="fetchWfInstanceInfo">
+                            <el-tooltip :content="$t('message.refresh')" placement="top" effect="light">
+                              <i class="el-icon-refresh"></i>
+                            </el-tooltip>
+                        </div>
+                    </template>
+                    <InstanceDetail 
+                        :instance-id="currentInstanceId" 
+                        :fixedWidth="400"
+                    >
+                        <template>
+                            <el-row class="job-detail-text">
+                                <el-col :span="24">
+                                    <span class="power-job-text">{{$t('message.enable')}}:</span>
+                                    <span class="title">{{currentNodeInfo.enable ? $t('message.yes') : $t('message.no')}}</span>
+                                </el-col>
+                            </el-row>
+                            <el-row class="job-detail-text">
+                                 <el-col :span="24">
+                                    <span class="power-job-text">{{$t('message.skipWhenFailed')}}:</span>
+                                    <span class="title">{{currentNodeInfo.skipWhenFailed ? $t('message.yes') : $t('message.no')}}</span>
+                                </el-col>
+                            </el-row>
+                           
+                        </template>
+                    </InstanceDetail>
+                </PowerWorkFlow>
             </div>
         </el-row>
 
@@ -68,15 +128,16 @@
 </template>
 
 <script>
-    import dagreD3 from "dagre-d3";
-    import * as d3 from "d3";
-
     import InstanceDetail from "../common/InstanceDetail";
-
+    import PowerWorkFlow from './PowerWorkflow';
+    import JsonViewer from 'vue-json-viewer'
     export default {
         name: "WorkflowInstanceDetail",
         components: {
-            InstanceDetail
+            InstanceDetail,
+            // WorkFlow,
+            PowerWorkFlow,
+            JsonViewer
         },
         data() {
             return {
@@ -84,90 +145,111 @@
                 },
                 // 任务实例详情
                 currentInstanceId: undefined,
-                instanceDetailVisible: false
+                instanceDetailVisible: false,
+                powerFlow: null,
+                selectNode: null,
+                /** 当前的节点信息 */
+                currentNodeInfo: {},
+                peworkflowDAG: {
+                    nodes: [],
+                    edges: []
+                }
             }
         },
         methods: {
-            fetchWfInstanceInfo: function () {
-
-                let that = this;
+            /** 获取数据 */
+            async fetchWfInstanceInfo() {
                 // 从 router 获取 wfInstanceId
+                this.peworkflowDAG = {
+                    nodes: [],
+                    edges: []
+                }
                 const wfInstanceId = this.$route.params.wfInstanceId;
-                console.log("wfInstanceId: " + wfInstanceId);
-
                 let url = "/wfInstance/info?appId=" + this.$store.state.appInfo.id + "&wfInstanceId=" + wfInstanceId;
-                this.axios.get(url).then(res => {
-                    that.wfInstanceDetail = res;
-                    that.draw();
-                });
+                let res = await this.axios.get(url)
+                this.wfInstanceDetail = res;
+                this.peworkflowDAG = res.peworkflowDAG;
+                // this.initDag()
             },
-            draw: function () {
 
-                console.log(this.wfInstanceDetail);
-                //获取D3
-                var g = new dagreD3.graphlib.Graph().setGraph({});
+            /** 标记成功 */
+            async markedSuccess() {
+                // console.log(this.selectNode)
+                if(!(this.selectNode && this.selectNode.get('model').status == 4)) return;
+                
+                const data = {
+                    appId: this.$store.state.appInfo.id,
+                    wfInstanceId: this.$route.params.wfInstanceId,
+                    nodeId: this.selectNode.get('model').id
+                };
 
-                // 转化节点
-                let nodes = this.wfInstanceDetail.peworkflowDAG.nodes.map(node => {
-
-                    // 计算颜色 1:等待上游节点，3:运行中，4:失败，5:成功，10:手动停止
-                    let color;
-                    let statusStr;
-                    switch (node.status) {
-                        case 3: color="#3498DB"; statusStr = this.$t('message.running');break;
-                        case 4: color = "#EC7063"; statusStr = this.$t('message.failed');break;
-                        case 5: color = "#58D68D"; statusStr = this.$t('message.success');break;
-                        case 10: color = "#F1C40F"; statusStr = this.$t('message.stopped');break;
-                        default: color = "#CACFD2"; statusStr = this.$t('message.waitingUpstream');break;
-                    }
-
-                    let l = this.$t('message.jobId') + ": " + node.jobId + "\n" +
-                             this.$t('message.jobName') + ": " + node.jobName + "\n" +
-                             this.$t('message.status') + ": " + statusStr + "\n" +
-                             this.$t('message.instanceId') + ": " + node.instanceId ;
-
-
-                    return {
-                        id: node.jobId,
-                        label: l,
-                        color: color
-                    }
+                await this.axios.get('/wfInstance/markNodeAsSuccess', {
+                    params: data
                 });
+                
+                this.changeStatusSuccess();
+                this.$message.success(this.$t("message.success"));
+            },
 
-                // 添加节点
-                nodes.forEach(node => {
-                    g.setNode(node.id, node);
-                    // 设置颜色
-                    g.node(node.id).style = 'fill:' + node.color;
+            /** 重试 */
+            async restart() {
+                const data = {
+                    appId: this.$store.state.appInfo.id,
+                    wfInstanceId: this.$route.params.wfInstanceId,
+                };
+                await this.axios.get('/wfInstance/retry', {
+                    params: data
                 });
-                // 链接关系
-                this.wfInstanceDetail.peworkflowDAG.edges.forEach(item => {
-                    g.setEdge(item.from, item.to, {});
-                });
-                //绘制图形
-                var svg = d3.select("svg"),
-                    inner = svg.select("g");
+                this.fetchWfInstanceInfo()
+            },
 
-                //缩放
-                var zoom = d3.zoom().on("zoom", function () {
-                    inner.attr("transform", d3.event.transform);
-                });
-                svg.call(zoom);
-                var render = new dagreD3.render();
-                render(inner, g);
+            // 点击停止实例
+            async stop() {
+              let that = this;
+              let url = "/wfInstance/stop?wfInstanceId=" + this.$route.params.wfInstanceId +
+                  "&appId=" + this.$store.state.appInfo.id;
+              await this.axios.get(url).then(() => {
+                that.$message.success(this.$t('message.success'));
+              });
+              await this.fetchWfInstanceInfo()
+            },
 
-                inner.selectAll("g.node").on("click", e => {
-                    this.wfInstanceDetail.peworkflowDAG.nodes.forEach(node => {
-                        if (node.jobId == e) {
-                            if (node.instanceId == undefined) {
-                                this.$message.warning(this.$t('message.ntfClickWaitingNode'))
-                            }else {
-                                this.currentInstanceId = node.instanceId;
-                                this.instanceDetailVisible = true;
-                            }
-                        }
-                    })
-                });
+            /** 更改状态为成功 */
+            changeStatusSuccess() {
+                const group = this.selectNode.getContainer();
+                /** 主图 */
+                const current0 = group.getChildByIndex(0);
+                /** 状态文字 */
+                const current2 = group.getChildByIndex(3);
+                /** 状态圆 */
+                const current3 = group.getChildByIndex(4);
+                current0.attr('fill', '#C3FFD2');
+                current2.attr('fill', '#00BB2F');
+                current2.attr('text', '成功');
+                current3.attr('fill', '#00BB2F');
+            },
+
+            /** node 拦截判断 */
+            interceptSelectedNode(node) {
+                return node.get('model').instanceId;
+            },
+
+            /** 选中 node 回调 */
+            handleSelectedNode(node) {
+                const instanceId = node && node.get('model').instanceId;
+                if(!instanceId) this.$message.warning(this.$t('message.ntfClickNoInstanceNode'));
+                this.currentInstanceId = instanceId;
+                this.selectNode = node;
+                this.currentNodeInfo = node.get('model');
+                console.log(this.currentNodeInfo);
+            },
+            /** 清除 node 节点 */
+            handleClearSelectNode() {
+                this.selectNode = null;
+            },
+            /** 获取工作流程图实例 */
+            getDag(powerFlow) {
+              this.powerFlow = powerFlow;
             },
             back: function () {
                 this.$router.go(-1);
@@ -181,15 +263,19 @@
 </script>
 
 <style scoped>
-
-    .el-row {
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+    /* .el-row {
         margin: 20px;
-    }
+    } */
 
     .title{
         display: inline-block;
-        margin:5px 0;
-        font-size: 16px;
+        /* margin:5px 0; */
+        font-size: 14px;
         font-weight: bold;
     }
 
@@ -208,4 +294,41 @@
         stroke-width: 1.5px;
     }
 
+    .power-toolbtn {
+        display: flex;
+        justify-content: space-between;
+    }
+    .power-work-info-item {
+        margin: 10px;
+    }
+
+    .power-work-info-item-content {
+        max-height: 300px;
+        overflow-y: scroll;
+    }
+
+    .power-work-info-item-context {
+        max-width: 600px;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        display: inline-block;
+    }
+    
+</style>
+
+<style>
+.jv-container .jv-code {
+    padding: 8px;
+}
+.power-job-text {
+  display: inline-block;
+  width: 148px;
+  text-align: right;
+  margin-right: 4px;
+  font-size: 14px;
+}
+.job-detail-text {
+    padding: 5px 0;
+}
 </style>
