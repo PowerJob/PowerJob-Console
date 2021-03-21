@@ -9,7 +9,7 @@
     "build_spring": "vue-cli-service build --mode spring"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "core-js": "^3.6.4",
     "d3": "^5.14.2",
     "dagre-d3": "^0.6.4",
