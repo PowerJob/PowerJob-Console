@@ -116,6 +116,8 @@ const cn = {
         'javaContainer': 'Java（容器）',
         'runHistory': '运行记录',
         'reRun': '重试',
+        'builtIn': '内建',
+        'external': '外置（动态加载）',
 
         // 任务实例管理
         'wfInstanceId': '工作流实例 ID',

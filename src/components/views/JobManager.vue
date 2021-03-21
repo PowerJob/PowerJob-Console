@@ -292,7 +292,7 @@
                 // 时间表达式选择类型
                 timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIXED_RATE", label: this.$t('message.fixRate')}, {key: "FIXED_DELAY", label: this.$t('message.fixDelay')}, {key: "WORKFLOW", label: this.$t('message.workflow')} ],
                 // 处理器类型
-                processorTypeOptions: [{key: "BUILT_IN", label: "Built-in"}, {key: "External", label: this.$t('message.javaContainer')}], // {key: "SHELL", label: "SHELL"}, {key: "PYTHON", label: "PYTHON"}
+                processorTypeOptions: [{key: "BUILT_IN", label: this.$t('message.builtIn')}, {key: "EXTERNAL", label: this.$t('message.external')}], // {key: "SHELL", label: "SHELL"}, {key: "PYTHON", label: "PYTHON"}
                 // 执行方式类型
                 executeTypeOptions: [{key: "STANDALONE", label: this.$t('message.standalone')}, {key: "BROADCAST", label: this.$t('message.broadcast')},  {key: "MAP", label: this.$t('message.map')}, {key: "MAP_REDUCE", label: this.$t('message.mapReduce')}],
                 // 用户列表
@@ -418,10 +418,10 @@
             },
             // 翻译处理器类型
             translateProcessorType(processorType) {
-                if (processorType === "JAVA_CONTAINER") {
-                    return this.$t('message.javaContainer');
+                if (processorType === "EXTERNAL") {
+                    return this.$t('message.external');
                 }
-                return processorType;
+                return this.$t('message.builtIn');
             },
             // 点击校验
             onClickValidateTimeExpression() {

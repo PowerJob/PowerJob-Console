@@ -113,6 +113,8 @@ const en = {
         'javaContainer': 'External',
         'runHistory': 'History',
         'reRun': 'Retry',
+        'builtIn': 'BUILT_IN',
+        'External': 'EXTERNAL',
 
         // JobInstance
         'wfInstanceId': 'WorkflowInstanceId',
