@@ -67,6 +67,7 @@ const cn = {
         'cpuLoad': 'CPU 占用',
         'memoryLoad': '内存占用',
         'diskLoad': '磁盘占用',
+        'lastActiveTime': '上次在线时间',
 
         // 任务管理
         'jobId': '任务 ID',
