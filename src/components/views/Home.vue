@@ -96,6 +96,8 @@
                     <el-table-column prop="cpuLoad" :label="$t('message.cpuLoad')"/>
                     <el-table-column prop="memoryLoad" :label="$t('message.memoryLoad')"/>
                     <el-table-column prop="diskLoad" :label="$t('message.diskLoad')"/>
+                    <el-table-column prop="tag" label="tag"/>
+                    <el-table-column prop="lastActiveTime" :label="$t('message.lastActiveTime')"/>
                 </el-table>
 
             </el-col>
@@ -124,6 +126,7 @@
                 switch (row.status) {
                     case 1: return 'success-row';
                     case 2: return 'warning-row';
+                    case 9999: return 'offline-row';
                     default: return 'error-row';
                 }
             }
@@ -135,7 +138,13 @@
             that.axios.get("/system/listWorker?appId=" + appId).then(res => {
                 res.sort((a,b) => a.status - b.status );
                 that.workerList = res;
-                that.activeWorkerCount = that.workerList.length;
+                let num = 0;
+                that.workerList.forEach(w => {
+                  if (w.status !== 9999) {
+                      num++;
+                  }
+                })
+                that.activeWorkerCount = num;
             });
             // 请求 Overview
             that.axios.get("/system/overview?appId=" + appId).then(res => {
@@ -203,5 +212,9 @@
 
     .el-table .error-row {
         color: red;
+    }
+
+    .el-table .offline-row {
+        color: darkgray;
     }
 </style>

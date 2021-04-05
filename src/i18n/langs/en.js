@@ -64,6 +64,7 @@ const en = {
         'cpuLoad': 'CPU Load',
         'memoryLoad': 'Memory Load',
         'diskLoad': 'Disk Load',
+        'lastActiveTime': 'Last Active Time',
 
         // JobManage
         'jobId': 'Job ID',
