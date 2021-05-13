@@ -97,7 +97,8 @@
                     <el-input v-model="modifiedJobForm.jobDescription"/>
                 </el-form-item>
                 <el-form-item :label="$t('message.jobParams')">
-                    <el-input v-model="modifiedJobForm.jobParams"/>
+                    <el-input v-model="modifiedJobForm.jobParams"
+                              type="textarea" :rows="3"/>
                 </el-form-item>
                 <el-form-item :label="$t('message.scheduleInfo')">
                     <el-row>
