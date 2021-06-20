@@ -119,6 +119,9 @@ const cn = {
         'reRun': '重试',
         'builtIn': '内建',
         'external': '外置（动态加载）',
+        'dps_title': '派发策略',
+        'dps_performance_first': '性能优先',
+        'dps_random': '随机',
 
         // 任务实例管理
         'wfInstanceId': '工作流实例 ID',

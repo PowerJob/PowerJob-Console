@@ -115,7 +115,10 @@ const en = {
         'runHistory': 'History',
         'reRun': 'Retry',
         'builtIn': 'BUILT_IN',
-        'External': 'EXTERNAL',
+        'external': 'EXTERNAL',
+        'dps_title': 'DispatchStrategy',
+        'dps_performance_first': 'PERFORMANCE_FIRST',
+        'dps_random': 'RANDOM',
 
         // JobInstance
         'wfInstanceId': 'WorkflowInstanceId',

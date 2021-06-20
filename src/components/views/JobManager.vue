@@ -202,7 +202,7 @@
                 </el-form-item>
                 <el-form-item :label="$t('message.clusterConfig')">
                     <el-row>
-                        <el-col :span="16">
+                        <el-col :span="12">
                             <el-input :placeholder="$t('message.designatedWorkerAddressPLH')" v-model="modifiedJobForm.designatedWorkers" class="ruleContent">
                                 <template slot="prepend">{{$t('message.designatedWorkerAddress')}}</template>
                             </el-input>
@@ -211,6 +211,16 @@
                             <el-input :placeholder="$t('message.maxWorkerNumPLH')" v-model="modifiedJobForm.maxWorkerCount" class="ruleContent">
                                 <template slot="prepend">{{$t('message.maxWorkerNum')}}</template>
                             </el-input>
+                        </el-col>
+                        <el-col :span="4">
+                          <el-select v-model="modifiedJobForm.dispatchStrategy" filterable :placeholder="$t('message.dps_title')">
+                            <el-option
+                                v-for="strategy in dispatchStrategyOptions"
+                                :key="strategy.key"
+                                :label="strategy.label"
+                                :value="strategy.key">
+                            </el-option>
+                          </el-select>
                         </el-col>
                     </el-row>
                 </el-form-item>
@@ -272,6 +282,7 @@
                     enable: true,
                     designatedWorkers: "",
                     maxWorkerCount: 0,
+                    dispatchStrategy: "",
                     notifyUserIds: []
 
                 },
@@ -295,6 +306,8 @@
                 processorTypeOptions: [{key: "BUILT_IN", label: this.$t('message.builtIn')}, {key: "EXTERNAL", label: this.$t('message.external')}], // {key: "SHELL", label: "SHELL"}, {key: "PYTHON", label: "PYTHON"}
                 // 执行方式类型
                 executeTypeOptions: [{key: "STANDALONE", label: this.$t('message.standalone')}, {key: "BROADCAST", label: this.$t('message.broadcast')},  {key: "MAP", label: this.$t('message.map')}, {key: "MAP_REDUCE", label: this.$t('message.mapReduce')}],
+                // 派发策略
+                dispatchStrategyOptions: [{key: "PERFORMANCE_FIRST", label: this.$t('message.dps_performance_first')}, {key: "RANDOM", label: this.$t('message.dps_random')}],
                 // 用户列表
                 userList: [],
                 // 时间表达式校验窗口
