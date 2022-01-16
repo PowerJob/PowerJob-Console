@@ -203,7 +203,10 @@ const cn = {
         'wfContext': '上下文',
         'yes': 'YES',
         'no': 'NO',
-        'copy': '复制'
+        'copy': '复制',
+        'condition': '判断节点',
+        'workflowChild': '子流程节点',
+        'importWorkflowTitle': '工作流节点引入'
     },
     ...zhLocale
 };

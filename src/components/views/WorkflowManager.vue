@@ -21,7 +21,7 @@
         </el-col>
 
         <!-- 右侧新增任务按钮，占地面积 4/24 -->
-        <el-col :span="4">
+        <el-col :span="4" v-if="!isWorkflow">
             <div style="float:right;padding-right:10px">
                 <el-button type="primary" @click="onClickNewWorkflow">{{$t('message.newWorkflow')}}</el-button>
             </div>
@@ -30,7 +30,7 @@
 
     <!--第二行，工作流数据表格-->
     <el-row>
-        <el-table :data="workflowPageResult.data" style="width: 100%">
+        <el-table :data="workflowPageResult.data" style="width: 100%" :type="isWorkflow ? 'selection' : null">
             <el-table-column :show-overflow-tooltip="true" prop="id" :label="$t('message.wfId')" width="120"/>
             <el-table-column :show-overflow-tooltip="true" prop="wfName" :label="$t('message.wfName')"/>
             <el-table-column :show-overflow-tooltip="true" :label="$t('message.scheduleInfo')" >
@@ -38,17 +38,22 @@
                     {{scope.row.timeExpressionType}}  {{scope.row.timeExpression}}
                 </template>
             </el-table-column>
-            <el-table-column :show-overflow-tooltip="true" :label="$t('message.status')" width="80">
+            <el-table-column :show-overflow-tooltip="true" :label="$t('message.status')" width="80" v-if="!isWorkflow">
                 <template slot-scope="scope">
                     <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="switchWorkflow(scope.row)"/>
                 </template>
             </el-table-column>
-            <el-table-column :show-overflow-tooltip="true" :label="$t('message.operation')" width="300">
+            <el-table-column :show-overflow-tooltip="true" :label="$t('message.operation')" :width="isWorkflow ? 100 : 300">
                 <template slot-scope="scope">
-                    <el-button size="mini" @click="onClickModifyWorkflow(scope.row)">{{$t('message.edit')}}</el-button>
-                    <el-button size="mini" @click="onClickCopy(scope.row)" :loading="copyLoading">{{$t('message.copy')}}</el-button>
-                    <el-button size="mini" @click="onClickRunWorkflow(scope.row)">{{$t('message.run')}}</el-button>
-                    <el-button size="mini" type="danger" @click="onClickDeleteWorkflow(scope.row)">{{$t('message.delete')}}</el-button>
+                    <div v-if="!isWorkflow">
+                        <el-button size="mini" @click="onClickModifyWorkflow(scope.row)">{{$t('message.edit')}}</el-button>
+                        <el-button size="mini" @click="onClickCopy(scope.row)" :loading="copyLoading">{{$t('message.copy')}}</el-button>
+                        <el-button size="mini" @click="onClickRunWorkflow(scope.row)">{{$t('message.run')}}</el-button>
+                        <el-button size="mini" type="danger" @click="onClickDeleteWorkflow(scope.row)">{{$t('message.delete')}}</el-button>
+                    </div>
+                    <div v-if="isWorkflow">
+                        <el-button size="mini" @click="onImportNode(scope.row)">引入</el-button>
+                    </div>
                 </template>
             </el-table-column>
         </el-table>
@@ -69,6 +74,7 @@
 <script>
     export default {
         name: "WorkflowManager",
+        props: ['isWorkflow'],
         data() {
             return {
                 // 查询条件
@@ -100,6 +106,10 @@
                 this.axios.post("/workflow/list", this.workflowQueryContent).then((res) => {
                     that.workflowPageResult = res;
                 });
+            },
+            /** 引入嵌套工作流节点 */
+            onImportNode(data) {
+                this.$emit('onImportNode', data)
             },
             // 点击重置
             onClickReset() {

@@ -199,7 +199,10 @@ const en = {
         'wfContext': 'Context',
         'yes': 'YES',
         'no': 'NO',
-        'copy': 'Copy'
+        'copy': 'Copy',
+        'condition': 'Condition',
+        'workflowChild': 'Subprocesses',
+        'importWorkflowTitle': 'importWorkflowTitle'
     },
     ...enLocale
 };
