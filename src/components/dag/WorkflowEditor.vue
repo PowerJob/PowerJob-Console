@@ -92,8 +92,8 @@
             fullInc="fullInc"
           >
             <div class="job-panl" v-if="selectNode !== null">
-              <el-form ref="form" :model="nodeInfo" v-if="nodeInfo.type != '2'">
-                <el-form-item :label="$t('message.jobName')">
+              <el-form ref="form" :model="nodeInfo">
+                <el-form-item :label="$t('message.jobName')"  v-if="nodeInfo.type != '2'">
                   <el-select
                     v-model="nodeInfo.jobId"
                     filterable
@@ -121,13 +121,13 @@
                     :style="{ width: 'calc(100% - 90px)' }"
                   />
                 </el-form-item>
-                <el-form-item :label="$t('message.nodeParams')">
+                <el-form-item :label="$t('message.nodeParams')"  v-if="nodeInfo.type != '2'">
                   <el-input
                     v-model="nodeInfo.nodeParams"
                     :style="{ width: 'calc(100% - 90px)' }"
                   />
                 </el-form-item>
-                <el-form-item :label="$t('message.enable')">
+                <el-form-item :label="$t('message.enable')"  v-if="nodeInfo.type != '2'">
                   <el-switch v-model="nodeInfo.enable"></el-switch>
                   <img
                     class="job-panl-icon"
@@ -138,7 +138,7 @@
                     alt
                   />
                 </el-form-item>
-                <el-form-item :label="$t('message.skipWhenFailed')">
+                <el-form-item :label="$t('message.skipWhenFailed')"  v-if="nodeInfo.type != '2'">
                   <el-switch v-model="nodeInfo.skipWhenFailed"></el-switch>
                   <img
                     class="job-panl-icon"
@@ -160,8 +160,8 @@
                     @codeChange="onCodeChange"
                   >
                   </MonacoEditor> -->
-              <div v-if="nodeInfo.type == '2'">
-                节点参数: 
+              <div v-if="nodeInfo.type == '2'" class="juage-message-parmes">
+                <p>{{$t('message.nodeParams')}}</p>
                 <JSEditor :code="nodeInfo.nodeParams" key="nodeParams" @onCodeChange="onCodeChange"></JSEditor>
               </div>
               
@@ -296,10 +296,10 @@ const nodeType = {
       icon2: item.skipWhenFailed ? require("../../assets/skip.svg") : "",
     };
   },
-  2: () => {
+  2: (item) => {
     return {
       type: "max-diamond-node",
-      text: "判断",
+      text: !item.nodeName ? '判断' : item.nodeName,
       style: {
         sideLength: 80,
         textStyle: {
@@ -480,11 +480,11 @@ export default {
       let node = this.taskList[index];
       // if (node.type === "condition") return false;
       this.remoteTaskData(null, node.jobId);
-
+      console.log(node)
       this.nodeInfo = {
         type: node.nodeType,
         jobId: node.jobId,
-        nodeName: node.nodeName,
+        nodeName: node.nodeName ? node.nodeName : node.nodeType == 2 ? '判断' : node.nodeName,
         nodeParams: node.nodeParams,
         enable: node.enable,
         skipWhenFailed: node.skipWhenFailed,
@@ -819,5 +819,12 @@ svg {
 }
 .power-import-table .el-table-column--selection > .cell {
   padding-left: 15px;
+}
+.juage-message-parmes {
+  font-size: 14px;
+  color: #606266;
+}
+.juage-message-parmes p {
+  margin-bottom: 4px;
 }
 </style>

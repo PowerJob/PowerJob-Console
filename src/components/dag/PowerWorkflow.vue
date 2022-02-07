@@ -153,7 +153,7 @@ export default {
         edgeCallback: this.edgeEnd
       });
       powerFlow.graph.setMode("edit");
-      powerFlow.graph.fitCenter(20);
+      // powerFlow.graph.fitCenter(20);
       this.powerFlow = powerFlow;
 
       this.powerFlow.graph.on("onSelectNode", (item) => {
@@ -164,17 +164,6 @@ export default {
           this.selectNode = item;
           this.$emit("onSelectedNode", item);
         }
-      });
-
-      this.powerFlow.graph.on("onSelectEdge", (item) => {
-        console.log(item);
-        // if (this.interceptSelectedNode && !this.interceptSelectedNode(item)) {
-        //   this.$emit("onSelectedNode", item);
-        //   return;
-        // } else {
-        //   this.selectNode = item;
-        //   this.$emit("onSelectedNode", item);
-        // }
       });
 
       this.powerFlow.graph.on("onClearSelectNode", () => {
@@ -272,7 +261,7 @@ export default {
           return {
             id: `${item.nodeId}`,
             type: "max-diamond-node",
-            text: "判断",
+            text: item.nodeName ? item.nodeName : "判断",
             style: {
               sideLength: 80,
               textStyle: {
