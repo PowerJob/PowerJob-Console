@@ -160,11 +160,11 @@
                     @codeChange="onCodeChange"
                   >
                   </MonacoEditor> -->
-              <div v-if="nodeInfo.type == '2'" class="juage-message-parmes">
+              <div v-if="nodeInfo.type == '2'" class="judge-message-params">
                 <p>{{$t('message.nodeParams')}}</p>
                 <JSEditor :code="nodeInfo.nodeParams" key="nodeParams" @onCodeChange="onCodeChange"></JSEditor>
               </div>
-              
+
               <div class="job-panl-btn">
                 <el-button type="success" @click="handleNodeSave">{{
                   $t("message.save")
@@ -434,7 +434,7 @@ export default {
       this.listJobInfos();
       this.importDrawerVisible = true;
     },
-    /** 引入其他类型节点, 判断，工做流 */
+    /** 引入其他类型节点, 判断，工作流 */
     onClickImportSpecialNode(data) {
       const { type } = data;
       console.log(type);
@@ -444,7 +444,7 @@ export default {
         this.importTask([
           {
             appId: this.workflowInfo.appId,
-            jobParams: "",
+            jobParams: "true",
             type: type,
             workflowId: this.workflowInfo.id,
             jobName: "",
@@ -595,6 +595,7 @@ export default {
 
           id: `${item.id}`,
           nodeId: `${item.id}`,
+          nodeType: `${item.type}`,
           // type: nodeType[item.type],
           // size: [240, 70],
           x: viewPointEnd.x + 20,
@@ -610,6 +611,7 @@ export default {
         ...this.taskList,
         ...res.map((item) => ({
           ...item,
+          nodeType: item.type,
           nodeParams: item.nodeParams,
           nodeId: item.id,
         })),
@@ -820,11 +822,11 @@ svg {
 .power-import-table .el-table-column--selection > .cell {
   padding-left: 15px;
 }
-.juage-message-parmes {
+.judge-message-params {
   font-size: 14px;
   color: #606266;
 }
-.juage-message-parmes p {
+.judge-message-params p {
   margin-bottom: 4px;
 }
 </style>
