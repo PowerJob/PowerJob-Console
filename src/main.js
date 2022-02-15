@@ -5,6 +5,7 @@ import { Message } from 'element-ui';
 import './styles.scss'
 import './plugins/element.js'
 import i18n from './i18n/i18n'
+import './iconfont.css';
 
 
 // axios 负责统一拦截处理 ResultDTO，fly 负责处理不需要拦截的请求

@@ -11,22 +11,24 @@
             <i class="el-icon-document-add"></i>
           </el-tooltip>
         </div>
-        <div @click="importJudgeNode">
+        <div @click="importJudgeNode" v-if="mode !== 'view'">
           <el-tooltip
             :content="$t('message.condition')"
             placement="top"
             effect="light"
           >
-            <i class="el-icon-connection"></i>
+            <i class="iconfont icon-panduanti"></i>
+            <!-- <img src="../../assets/panduanti.png" alt="" width="16" height="16">  -->
           </el-tooltip>
         </div>
-        <div @click="importWorkflowNode">
+        <div @click="importWorkflowNode"  v-if="mode !== 'view'">
           <el-tooltip
             :content="$t('message.workflowChild')"
             placement="top"
             effect="light"
           >
-            <i class="el-icon-c-scale-to-original"></i>
+            <!-- <i class="el-icon-c-scale-to-original"></i> -->
+            <i class="iconfont icon-workflow_"></i>
           </el-tooltip>
         </div>
         <slot name="tool"></slot>
@@ -431,6 +433,9 @@ export default {
 *::before,
 *::after {
   box-sizing: border-box;
+}
+.iconfont {
+  font-size: 18px !important;
 }
 .power-power-flow {
   border: 1px solid #d0d0d0;
