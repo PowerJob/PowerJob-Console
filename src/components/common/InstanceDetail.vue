@@ -56,7 +56,7 @@
         <el-row class="job-detail-text">
           <el-col :span="24">
             <span class="power-job-text">{{ $t("message.startTime") }}:</span>
-            <span class="title">{{ instanceDetail.actualTriggerTime }}</span>
+            <span class="title">{{ instanceDetail.actualTriggerTime || instanceDetail.startTime }}</span>
           </el-col>
         </el-row>
         <el-row>
