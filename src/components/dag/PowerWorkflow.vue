@@ -253,6 +253,11 @@ export default {
           color: "",
           text: this.$t("message.stopped"),
         },
+        9: {
+          text: this.$t("message.canceleded"),
+          color: '#E2E2E2',
+          stroke: "#A5A5A5"
+        }
       };
       let nodes = this.nodes.map((item) => {
         let statusValue = {};
@@ -265,7 +270,7 @@ export default {
             style: {
               sideLength: 80,
               textStyle: {
-                fill: "#FFFFFF",
+                // fill: "#FFFFFF",
               }
             },
             ...item
@@ -282,6 +287,9 @@ export default {
             statusStyle = {
               fill: status[item.status].color,
             };
+            if(status[item.status].stroke) {
+              statusStyle.stroke = status[item.status].stroke;
+            }
           }
         }
 

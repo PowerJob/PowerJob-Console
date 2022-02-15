@@ -181,6 +181,7 @@ const en = {
         'running': 'Running',
         'stopped': 'Stopped',
         'canceled': 'Canceled',
+        'canceleded': 'Canceled',
         'wfWaiting': 'Waiting',
         'waitingUpstream': 'Waiting upstream',
 

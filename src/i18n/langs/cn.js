@@ -185,6 +185,7 @@ const cn = {
         'running': '运行中',
         'stopped': '手动停止',
         'canceled': '手动取消',
+        'canceleded': '已取消',
         'wfWaiting': '等待调度',
         'waitingUpstream': '等待上游节点',
 

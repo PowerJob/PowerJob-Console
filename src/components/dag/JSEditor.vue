@@ -39,9 +39,22 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style>
 .code-edit {
   border: 1px solid #f0f0f0;
+}
+.code-edit .margin-view-overlays.monaco-editor-background {
+  width: 0px !important;
+}
+.code-edit .margin-view-overlays.monaco-editor-background .view-line .line-numbers {
+  width: 24px !important;
+  left: 0px !important;
+}
+.code-edit .margin-view-overlays.monaco-editor-background .glyph-margin {
+  width: 0px !important;
+}
+.code-edit .monaco-scrollable-element.editor-scrollable {
+  left: 32px !important;
 }
 </style>
 
