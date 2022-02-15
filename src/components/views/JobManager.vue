@@ -431,7 +431,15 @@
         mounted() {
             // 加载用户信息
             let that = this;
-            that.axios.get("/user/list").then(res => that.userList = res);
+            that.axios.get("/user/list").then(res => {
+                const data = res || [];
+                that.userList = data.map(item => {
+                    return {
+                        ...item,
+                        id: `${item.id}`
+                    }
+                })
+            });
             // 加载任务信息
             this.listJobInfos();
         }
