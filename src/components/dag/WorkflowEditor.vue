@@ -109,7 +109,7 @@
                     <el-option
                       v-for="item in waitTaskList"
                       :key="item.id"
-                      :label="item.jobName"
+                      :label="item.jobName || item.wfName"
                       :value="item.id"
                     ></el-option>
                   </el-select>
@@ -654,8 +654,13 @@ export default {
       clearTimeout(this.taskTimeout);
       this.taskTimeout = setTimeout(() => {
         this.taskLoading = true;
+        console.log(this.nodeInfo);
+        let url = '/job/list';
+        if(this.nodeInfo.type === 3) {
+          url = '/workflow/list'
+        }
         this.axios
-          .post("/job/list", {
+          .post(url, {
             ...this.jobQueryContent,
             index: 0,
             keyword: value,
