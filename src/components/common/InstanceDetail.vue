@@ -194,11 +194,7 @@ export default {
   },
   methods: {
     fetchInstanceDetail() {
-      console.log('我是要执行了的值-------');
-      console.log(this.nodeDetail);
       if (this.nodeDetail) {
-        console.log('我是要执行了的值-------');
-        console.log(this.nodeDetail);
         this.instanceDetail = this.nodeDetail;
       } else {
         let that = this;
