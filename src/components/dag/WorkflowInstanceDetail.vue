@@ -117,8 +117,11 @@
                             </el-row>
                            <el-row class="job-detail-text" v-if="nodeDetail && nodeDetail.nodeType == 2">
                                  <el-col :span="24">
-                                    <span class="power-job-text">{{$t('message.nodeParams')}}:</span>
-                                    <JSEditor :code="nodeDetail.nodeParams" key="nodeParams" :editorOptions="{readOnly: true}"></JSEditor>
+                                    <span class="power-job-text" :style="{width: nodeDetail.nodeType == 2 ? '64px' : ''}">{{$t('message.nodeParams')}}:</span>
+                                    <div :style="{paddingTop: '10px'}">
+                                        <JSEditor :code="nodeDetail.nodeParams" key="nodeParams" :editorOptions="{readOnly: true}"></JSEditor>
+                                    </div>
+                                    
                                     <!-- <span class="title">{{nodeDetail.nodeParams}}</span> -->
                                 </el-col>
                             </el-row>

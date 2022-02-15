@@ -23,13 +23,13 @@
         </el-row>
         <el-row class="job-detail-text">
           <el-col :span="24">
-            <span class="power-job-text">{{ $t("message.status") }}:</span>
+            <span class="power-job-text" :style="{width: instanceDetail.nodeType == 2 ? '64px' : ''}">{{ $t("message.status") }}:</span>
             <span class="title">{{
               this.common.translateInstanceStatus(instanceDetail.status)
             }}</span>
           </el-col>
         </el-row>
-        <el-row v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
+        <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
           <el-col :span="24">
             <span class="power-job-text"
               >{{ $t("message.runningTimes") }}:</span
@@ -55,13 +55,13 @@
         </el-row>
         <el-row class="job-detail-text">
           <el-col :span="24">
-            <span class="power-job-text">{{ $t("message.startTime") }}:</span>
+            <span class="power-job-text" :style="{width: instanceDetail.nodeType == 2 ? '64px' : ''}">{{ $t("message.startTime") }}:</span>
             <span class="title">{{ instanceDetail.actualTriggerTime || instanceDetail.startTime }}</span>
           </el-col>
         </el-row>
-        <el-row>
+        <el-row class="job-detail-text">
           <el-col :span="24">
-            <span class="power-job-text"
+            <span class="power-job-text" :style="{width: instanceDetail.nodeType == 2 ? '64px' : ''}"
               >{{ $t("message.finishedTime") }}:</span
             >
             <span class="title">{{ instanceDetail.finishedTime }}</span>
@@ -89,7 +89,7 @@
                 'power-job-result-detail': resultAll,
               }"
             >
-              <span class="power-job-text">{{ $t("message.result") }}:</span>
+              <span class="power-job-text" :style="{width: instanceDetail.nodeType == 2 ? '64px' : ''}">{{ $t("message.result") }}:</span>
               <el-popover
                 width="400"
                 placement="right"
@@ -259,7 +259,7 @@ export default {
   margin-right: 4px;
   font-size: 14px;
   word-break: break-all;
-  flex-basis: 148px;
+  /* flex-basis: 148px; */
 }
 .result:hover {
   transition: 0.5s;
