@@ -303,7 +303,7 @@ const nodeType = {
       style: {
         sideLength: 80,
         textStyle: {
-          fill: "#FFFFFF",
+          // fill: "#FFFFFF",
         },
         // fill: "#FE9201",
         // stroke: "#D45547",
@@ -597,7 +597,7 @@ export default {
           nodeId: `${item.id}`,
           nodeType: `${item.type}`,
           // type: nodeType[item.type],
-          // size: [240, 70],
+          size: [240, 70],
           x: viewPointEnd.x + 20,
           y: viewPointEnd.y + 70 * index + 20 + index * 10,
           ...nodeText,

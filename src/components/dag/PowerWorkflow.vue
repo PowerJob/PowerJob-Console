@@ -145,13 +145,23 @@ export default {
         height: this.size.height,
         initNodes: nodes,
         initEdges: edges,
-        layout: 'horizontal',
-        // layout: {
-        //   type: "dagre",
-        //   rankdir: "TB", // 可选，默认为图的中心
-        //   nodesep: 10, // 可选
-        //   ranksep: 40, // 可选
-        // },
+        // layout: 'vertical',
+
+        layout: {
+          type: 'dagre',
+          // align: 'UR', // 可选
+          nodesep: 40, // 可选
+          // ranksep: 60, // 可选
+          rankdir: 'LR',
+          controlPoints: true, // 可选
+          ranksepFunc: (node) => {
+            // console.log(node);
+            if(node.nodeType === 2) {
+              return 55
+            }
+            return 60
+          }
+        },
         edgeCallback: this.edgeEnd
       });
       powerFlow.graph.setMode("edit");
@@ -232,8 +242,14 @@ export default {
       let width = 0;
       this.nodes.forEach((item) => {
         let len = item.nodeName.length * 9;
-        let curtWidth = len > 250 ? 250 : len;
-        curtWidth = len < 180 ? 180 : len;
+        let curtWidth = 0;
+        if(len > 220) {
+          curtWidth = 220;
+        } else if (len < 180) {
+          curtWidth = 180;
+        } else {
+          curtWidth = len;
+        }
         if (curtWidth > width) {
           width = curtWidth;
         }
@@ -269,6 +285,7 @@ export default {
             id: `${item.nodeId}`,
             type: "max-diamond-node",
             text: item.nodeName ? item.nodeName : "判断",
+            size: [15, 80], 
             style: {
               sideLength: 80,
               textStyle: {
