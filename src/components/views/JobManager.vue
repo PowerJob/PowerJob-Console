@@ -436,6 +436,16 @@
             // 点击 编辑按钮
             onClickModify(data) {
                 // 修复点击编辑后再点击新增 行数据被清空 的问题
+                if (!data.alarmConfig) {
+                    data.alarmConfig = {
+                        alertThreshold: undefined,
+                        statisticWindowLen: undefined,
+                        silenceWindowLen: undefined
+                    }
+                }
+                if (!data.lifecycle) {
+                    data.lifecycle = null;
+                }
                 this.modifiedJobForm = JSON.parse(JSON.stringify(data));
                 this.modifiedJobFormVisible = true;
             },
