@@ -148,6 +148,16 @@
                         </el-col>
                     </el-row>
                 </el-form-item>
+                <el-form-item label="生命周期">
+                    <el-date-picker
+                        v-model="modifiedJobForm.lifecycle"
+                        type="datetimerange"
+                        start-placeholder="开始时间"
+                        end-placeholder="结束时间"
+                        value-format="timestamp"
+                    >
+                    </el-date-picker>
+                </el-form-item>
                 <el-form-item :label="$t('message.runtimeConfig')">
                     <el-row>
                         <el-col :span="8">
@@ -215,14 +225,27 @@
                     </el-row>
                 </el-form-item>
                 <el-form-item :label="$t('message.alarmConfig')">
-                    <el-select v-model="modifiedJobForm.notifyUserIds" multiple filterable :placeholder="$t('message.alarmSelectorPLH')">
-                        <el-option
-                                v-for="user in userList"
-                                :key="user.id"
-                                :label="user.username"
-                                :value="user.id">
-                        </el-option>
-                    </el-select>
+                    <el-row>
+                        <el-col :span="6">
+                            <el-select v-model="modifiedJobForm.notifyUserIds" multiple filterable :placeholder="$t('message.alarmSelectorPLH')">
+                                <el-option
+                                    v-for="user in userList"
+                                    :key="user.id"
+                                    :label="user.username"
+                                    :value="user.id">
+                                </el-option>
+                            </el-select>
+                        </el-col>
+                        <el-col :span="6">
+                            <el-input-number v-model="modifiedJobForm.alarmConfig.alertThreshold" placeholder="错误阈值" controls-position="right" :min="0" :max="10000"></el-input-number>
+                        </el-col>
+                        <el-col :span="6">
+                            <el-input-number v-model="modifiedJobForm.alarmConfig.statisticWindowLen" placeholder="统计窗口(s)" controls-position="right" :min="0" :max="10000"></el-input-number>
+                        </el-col>
+                        <el-col :span="6">
+                            <el-input-number v-model="modifiedJobForm.alarmConfig.silenceWindowLen" placeholder="沉默窗口(s)" controls-position="right" :min="0" :max="10000"></el-input-number>
+                        </el-col>
+                    </el-row>
                 </el-form-item>
 
                 <el-form-item>
@@ -272,8 +295,13 @@
                     enable: true,
                     designatedWorkers: "",
                     maxWorkerCount: 0,
-                    notifyUserIds: []
-
+                    notifyUserIds: [],
+                    lifecycle: null,
+                    alarmConfig: {
+                        alertThreshold: null,
+                        statisticWindowLen: null,
+                        silenceWindowLen: null
+                    }
                 },
                 // 任务查询请求对象
                 jobQueryContent: {
@@ -305,6 +333,16 @@
         methods: {
             // 保存变更，包括新增和修改
             async saveJob() {
+                const lifecycle = this.modifiedJobForm.lifecycle;
+                if (lifecycle && Array.isArray(lifecycle)) {
+                    const start = lifecycle[0];
+                    const end = lifecycle[1];
+                    this.modifiedJobForm.lifecycle = {
+                        start,
+                        end
+                    }
+                }
+                console.log(this.modifiedJobForm);
                 await this.axios.post("/job/save", this.modifiedJobForm);
                 this.modifiedJobFormVisible = false;
                 this.$message.success(this.$t('message.success'));
@@ -314,6 +352,19 @@
             listJobInfos() {
                 const that = this;
                 this.axios.post("/job/list", this.jobQueryContent).then((res) => {
+                    console.log(res);
+                    if (res && res.data) {
+                        res.data = res.data.map(item => {
+                            const lifecycle = item.lifecycle;
+                            if (lifecycle && lifecycle.start && lifecycle.end) {
+                                item.lifecycle = [lifecycle.start, lifecycle.end];
+                            } else {
+                                item.lifecycle = null;
+                            }
+                            return item;
+                        })
+                    }
+                    
                     that.jobInfoPageResult = res;
                 });
             },
