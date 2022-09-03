@@ -90,7 +90,7 @@
         </el-row>
 
 
-        <el-dialog :close-on-click-modal="false" :visible.sync="modifiedJobFormVisible" width="60%">
+        <el-dialog :close-on-click-modal="false" :visible.sync="modifiedJobFormVisible" width="80%">
             <el-form :model="modifiedJobForm" label-width="120px">
 
                 <el-form-item :label="$t('message.jobName')">
@@ -230,7 +230,7 @@
                 <el-form-item :label="$t('message.alarmConfig')">
                     <el-row>
                         <el-col :span="6">
-                            <el-select v-model="modifiedJobForm.notifyUserIds" multiple filterable :placeholder="$t('message.alarmSelectorPLH')">
+                            <el-select :style="{width: '100%'}" v-model="modifiedJobForm.notifyUserIds" multiple filterable :placeholder="$t('message.alarmSelectorPLH')">
                                 <el-option
                                     v-for="user in userList"
                                     :key="user.id"
@@ -240,13 +240,25 @@
                             </el-select>
                         </el-col>
                         <el-col :span="6">
-                            <el-input-number v-model="modifiedJobForm.alarmConfig.alertThreshold" :placeholder="$t('message.alertThreshold')" controls-position="right" :min="0" :max="10000"></el-input-number>
+                            <el-input v-model="modifiedJobForm.alarmConfig.alertThreshold">
+                                <template slot="prepend">{{$t('message.alertThreshold')}}</template>
+                            </el-input>
+                            <!-- <div class="job-editor-number">
+                                <div class="job-input-number">{{$t('message.alertThreshold')}}</div>
+                                <el-input-number v-model="modifiedJobForm.alarmConfig.alertThreshold" :placeholder="$t('message.alertThreshold')" controls-position="right" :min="0"></el-input-number>
+                            </div> -->
                         </el-col>
                         <el-col :span="6">
-                            <el-input-number v-model="modifiedJobForm.alarmConfig.statisticWindowLen" :placeholder="$t('message.statisticWindow') + '(s)'" controls-position="right" :min="0" :max="10000"></el-input-number>
+                            <el-input v-model="modifiedJobForm.alarmConfig.statisticWindowLen">
+                                <template slot="prepend">{{$t('message.statisticWindow') + '(s)'}}</template>
+                            </el-input>
+                            <!-- <el-input-number v-model="modifiedJobForm.alarmConfig.statisticWindowLen" :placeholder="$t('message.statisticWindow') + '(s)'" controls-position="right" :min="0"></el-input-number> -->
                         </el-col>
                         <el-col :span="6">
-                            <el-input-number v-model="modifiedJobForm.alarmConfig.silenceWindowLen" :placeholder="$t('message.silenceWindow') + '(s)'" controls-position="right" :min="0" :max="10000"></el-input-number>
+                            <el-input v-model="modifiedJobForm.alarmConfig.silenceWindowLen">
+                                <template slot="prepend">{{$t('message.silenceWindow') + '(s)'}}</template>
+                            </el-input>
+                            <!-- <el-input-number v-model="modifiedJobForm.alarmConfig.silenceWindowLen" :placeholder="$t('message.silenceWindow') + '(s)'" controls-position="right" :min="0"></el-input-number> -->
                         </el-col>
                     </el-row>
                 </el-form-item>
@@ -565,5 +577,32 @@
 </script>
 
 <style scoped>
+.job-editor-number {
+    display: flex;
+}
+.job-input-number {
+    background-color: #F5F7FA;
+    color: #909399;
+    /* vertical-align: middle; */
+    /* display: table-cell; */
+    position: relative;
+    border: 1px solid #DCDFE6;
+    border-radius: 4px;
+    padding: 0 20px;
+    /* width: 1px; */
+    white-space: nowrap;
+    display: block;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    line-height: 38px;
+    width: auto;
+}
+.el-input-number {
+    width: 100px;
+}
 
+.el-input-number .el-input {
+    width: 1000px;
+}
+    
 </style>
