@@ -53,6 +53,16 @@
             </el-col>
           </el-row>
         </el-form-item>
+        <el-form-item :label="$t('message.lifeCycle')">
+          <el-date-picker
+            v-model="workflowInfo.lifeCycle"
+            type="datetimerange"
+            :start-placeholder="$t('message.startTime')"
+            :end-placeholder="$t('message.finishedTime')"
+            value-format="timestamp"
+          >
+          </el-date-picker>
+        </el-form-item>
 
         <el-form-item :label="$t('message.maxInstanceNum')">
           <el-input-number v-model="workflowInfo.maxWfInstanceNum" />
@@ -93,7 +103,10 @@
           >
             <div class="job-panl" v-if="selectNode !== null">
               <el-form ref="form" :model="nodeInfo">
-                <el-form-item :label="$t('message.jobName')"  v-if="nodeInfo.type != '2'">
+                <el-form-item
+                  :label="$t('message.jobName')"
+                  v-if="nodeInfo.type != '2'"
+                >
                   <el-select
                     v-model="nodeInfo.jobId"
                     filterable
@@ -121,13 +134,19 @@
                     :style="{ width: 'calc(100% - 90px)' }"
                   />
                 </el-form-item>
-                <el-form-item :label="$t('message.nodeParams')"  v-if="nodeInfo.type != '2'">
+                <el-form-item
+                  :label="$t('message.nodeParams')"
+                  v-if="nodeInfo.type != '2'"
+                >
                   <el-input
                     v-model="nodeInfo.nodeParams"
                     :style="{ width: 'calc(100% - 90px)' }"
                   />
                 </el-form-item>
-                <el-form-item :label="$t('message.enable')"  v-if="nodeInfo.type != '2'">
+                <el-form-item
+                  :label="$t('message.enable')"
+                  v-if="nodeInfo.type != '2'"
+                >
                   <el-switch v-model="nodeInfo.enable"></el-switch>
                   <img
                     class="job-panl-icon"
@@ -138,7 +157,10 @@
                     alt
                   />
                 </el-form-item>
-                <el-form-item :label="$t('message.skipWhenFailed')"  v-if="nodeInfo.type != '2'">
+                <el-form-item
+                  :label="$t('message.skipWhenFailed')"
+                  v-if="nodeInfo.type != '2'"
+                >
                   <el-switch v-model="nodeInfo.skipWhenFailed"></el-switch>
                   <img
                     class="job-panl-icon"
@@ -161,8 +183,12 @@
                   >
                   </MonacoEditor> -->
               <div v-if="nodeInfo.type == '2'" class="judge-message-params">
-                <p>{{$t('message.nodeParams')}}</p>
-                <JSEditor :code="nodeInfo.nodeParams" key="nodeParams" @onCodeChange="onCodeChange"></JSEditor>
+                <p>{{ $t("message.nodeParams") }}</p>
+                <JSEditor
+                  :code="nodeInfo.nodeParams"
+                  key="nodeParams"
+                  @onCodeChange="onCodeChange"
+                ></JSEditor>
               </div>
 
               <div class="job-panl-btn">
@@ -299,7 +325,7 @@ const nodeType = {
   2: (item) => {
     return {
       type: "max-diamond-node",
-      text: !item.nodeName ? '判断' : item.nodeName,
+      text: !item.nodeName ? "判断" : item.nodeName,
       style: {
         sideLength: 80,
         textStyle: {
@@ -342,6 +368,7 @@ export default {
         timeExpressionType: undefined,
         wfDescription: undefined,
         wfName: undefined,
+        lifeCycle: null,
       },
       nodeInfo: {
         id: null,
@@ -480,11 +507,15 @@ export default {
       let node = this.taskList[index];
       // if (node.type === "condition") return false;
       this.remoteTaskData(null, node.jobId);
-      console.log(node)
+      console.log(node);
       this.nodeInfo = {
         type: node.nodeType,
         jobId: node.jobId,
-        nodeName: node.nodeName ? node.nodeName : node.nodeType == 2 ? '判断' : node.nodeName,
+        nodeName: node.nodeName
+          ? node.nodeName
+          : node.nodeType == 2
+          ? "判断"
+          : node.nodeName,
         nodeParams: node.nodeParams,
         enable: node.enable,
         skipWhenFailed: node.skipWhenFailed,
@@ -541,17 +572,26 @@ export default {
       let dagInfo = {
         nodes: flowData.nodes.map((item) => ({ nodeId: item.id })),
         edges: flowData.edges.map((item) => {
-          const property = {}
-          if(item.label) {
-            property.property = item.label === "Y" ? 'true' : 'false';
+          const property = {};
+          if (item.label) {
+            property.property = item.label === "Y" ? "true" : "false";
           }
           return {
             from: item.source,
             to: item.target,
-            ...property
+            ...property,
           };
         }),
       };
+      const { lifeCycle } = this.workflowInfo;
+      if (lifeCycle && Array.isArray(lifeCycle)) {
+        const start = lifeCycle[0];
+        const end = lifeCycle[1];
+        this.workflowInfo.lifeCycle = {
+          start,
+          end,
+        };
+      }
       const res = await this.axios.post("/workflow/save", {
         ...this.workflowInfo,
         dag: dagInfo,
@@ -655,9 +695,9 @@ export default {
       this.taskTimeout = setTimeout(() => {
         this.taskLoading = true;
         console.log(this.nodeInfo);
-        let url = '/job/list';
-        if(this.nodeInfo.type === 3) {
-          url = '/workflow/list'
+        let url = "/job/list";
+        if (this.nodeInfo.type === 3) {
+          url = "/workflow/list";
         }
         this.axios
           .post(url, {
@@ -698,7 +738,7 @@ export default {
     /** 判断节点参数改变 */
     onCodeChange(code) {
       this.nodeInfo.nodeParams = code;
-    }
+    },
   },
   mounted() {
     // 加载用户信息
@@ -709,6 +749,12 @@ export default {
     let modify = this.$route.params.modify;
     if (modify) {
       this.workflowInfo = this.$route.params.workflowInfo;
+      if (this.workflowInfo.lifeCycle) {
+        const { start, end } = this.workflowInfo.lifeCycle;
+        this.workflowInfo.lifeCycle = [start, end]
+      } else {
+        this.workflowInfo.lifeCycle = null;
+      }
       this.workflowInfo.appId = this.$store.state.appInfo.id;
       this.getWorkflowInfo(true);
     }

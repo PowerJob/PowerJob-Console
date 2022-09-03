@@ -48,7 +48,14 @@
                     <div v-if="!isWorkflow">
                         <el-button size="mini" @click="onClickModifyWorkflow(scope.row)">{{$t('message.edit')}}</el-button>
                         <el-button size="mini" @click="onClickCopy(scope.row)" :loading="copyLoading">{{$t('message.copy')}}</el-button>
-                        <el-button size="mini" @click="onClickRunWorkflow(scope.row)">{{$t('message.run')}}</el-button>
+                        <el-dropdown>
+                            <el-button :style="{marginRight: '10px', marginLeft: '10px'}" size="mini" @click="onClickRunWorkflow(scope.row)">{{$t('message.run')}}</el-button>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item>
+                                    <el-button size="mini" type="text" @click="onClickRunByParameter(scope.row)">{{$t('message.runByParameter')}}</el-button>
+                                </el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
                         <el-button size="mini" type="danger" @click="onClickDeleteWorkflow(scope.row)">{{$t('message.delete')}}</el-button>
                     </div>
                     <div v-if="isWorkflow">
@@ -68,6 +75,22 @@
                 @current-change="onClickChangePage"
                 :hide-on-single-page="true"/>
     </el-row>
+    <el-dialog
+            :title="$t('message.runByParameter')"
+            :visible="!!temporaryRowData"
+            width="50%"
+        >
+            <el-input
+                type="textarea"
+                :rows="4"
+                :placeholder="$t('message.enteringParameter')"
+                v-model="runParamter">
+            </el-input>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="onClickRuncCancel">{{$t('message.cancel')}}</el-button>
+                <el-button type="primary" @click="onClickRunWorkflow(temporaryRowData)" :loading="runLoading">{{$t('message.run')}}</el-button>
+            </span>
+        </el-dialog>
 </div>
 </template>
 
@@ -97,6 +120,11 @@
                 workflowObj: {
 
                 },
+                temporaryRowData: null,
+                // 运行参数
+                runParamter: null,
+                // 运行loading
+                runLoading: false
             }
         },
         methods: {
@@ -140,7 +168,26 @@
             onClickRunWorkflow(data) {
                 let that = this;
                 let url = "/workflow/run?appId=" + this.$store.state.appInfo.id + "&workflowId=" + data.id;
-                this.axios.get(url).then(() => that.$message.success(this.$t('message.success')));
+                if (this.temporaryRowData && this.runParamter) {
+                    url += `&initParams=${this.runParamter}`
+                }
+                this.runLoading = true;
+                this.axios.get(url).then(() => {
+                    that.$message.success(this.$t('message.success'))
+                    this.temporaryRowData = null;
+                    this.runLoading = false
+                }).catch(() => {
+                    this.runLoading = false
+                });
+            },
+            // 参数运行
+            onClickRunByParameter(data) {
+                this.temporaryRowData = data;
+            },
+            // 取消参数运行
+            onClickRuncCancel() {
+                this.temporaryRowData = null;
+                this.runParamter = null;
             },
             // 删除工作流
             onClickDeleteWorkflow(data) {
