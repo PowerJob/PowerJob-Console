@@ -133,6 +133,10 @@ const en = {
         'secondlyJobHistory': 'Secondly job history',
         'subInstanceId': 'SubInstanceId',
         'instanceParams': 'InstanceParams',
+        'lifeCycle': 'LifeCycle',
+        'alertThreshold': 'AlertThreshold',
+        'statisticWindow': 'StatisticWindow',
+        'silenceWindow': 'SilenceWindow',
 
         // workflowManage
         'wfId': 'Workflow ID',

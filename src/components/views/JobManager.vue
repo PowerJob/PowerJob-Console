@@ -148,12 +148,12 @@
                         </el-col>
                     </el-row>
                 </el-form-item>
-                <el-form-item label="生命周期">
+                <el-form-item :label="$t('message.lifeCycle')">
                     <el-date-picker
                         v-model="modifiedJobForm.lifecycle"
                         type="datetimerange"
-                        start-placeholder="开始时间"
-                        end-placeholder="结束时间"
+                        :start-placeholder="$t('message.startTime')"
+                        :end-placeholder="$t('message.finishedTime')"
                         value-format="timestamp"
                     >
                     </el-date-picker>
@@ -237,13 +237,13 @@
                             </el-select>
                         </el-col>
                         <el-col :span="6">
-                            <el-input-number v-model="modifiedJobForm.alarmConfig.alertThreshold" placeholder="错误阈值" controls-position="right" :min="0" :max="10000"></el-input-number>
+                            <el-input-number v-model="modifiedJobForm.alarmConfig.alertThreshold" :placeholder="$t('message.alertThreshold')" controls-position="right" :min="0" :max="10000"></el-input-number>
                         </el-col>
                         <el-col :span="6">
-                            <el-input-number v-model="modifiedJobForm.alarmConfig.statisticWindowLen" placeholder="统计窗口(s)" controls-position="right" :min="0" :max="10000"></el-input-number>
+                            <el-input-number v-model="modifiedJobForm.alarmConfig.statisticWindowLen" :placeholder="$('message.statisticWindow') + '(s)'" controls-position="right" :min="0" :max="10000"></el-input-number>
                         </el-col>
                         <el-col :span="6">
-                            <el-input-number v-model="modifiedJobForm.alarmConfig.silenceWindowLen" placeholder="沉默窗口(s)" controls-position="right" :min="0" :max="10000"></el-input-number>
+                            <el-input-number v-model="modifiedJobForm.alarmConfig.silenceWindowLen" :placeholder="$('message.silenceWindow') + '(s)'" controls-position="right" :min="0" :max="10000"></el-input-number>
                         </el-col>
                     </el-row>
                 </el-form-item>

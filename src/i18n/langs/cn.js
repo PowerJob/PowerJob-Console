@@ -137,6 +137,11 @@ const cn = {
         'secondlyJobHistory': '最近 10 条秒级任务历史记录',
         'subInstanceId': '子任务实例 ID',
         'instanceParams': '任务实例参数',
+        'lifeCycle': '生命周期',
+        'alertThreshold': '错误阈值',
+        'statisticWindow': '统计窗口',
+        'silenceWindow': '沉默窗口',
+
 
         // 工作流管理
         'wfId': '工作流 ID',
