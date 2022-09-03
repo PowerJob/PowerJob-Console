@@ -137,6 +137,8 @@ const en = {
         'alertThreshold': 'AlertThreshold',
         'statisticWindow': 'StatisticWindow',
         'silenceWindow': 'SilenceWindow',
+        'runByParameter': 'Run by parameter',
+        'enteringParameter': 'Entering Parameter',
 
         // workflowManage
         'wfId': 'Workflow ID',

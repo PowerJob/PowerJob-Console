@@ -141,6 +141,8 @@ const cn = {
         'alertThreshold': '错误阈值',
         'statisticWindow': '统计窗口',
         'silenceWindow': '沉默窗口',
+        'runByParameter': '参数运行',
+        'enteringParameter': '填写参数',
 
 
         // 工作流管理

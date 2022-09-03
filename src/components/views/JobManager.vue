@@ -61,6 +61,9 @@
                             <el-button size="mini" type="text">{{$t('message.more')}}</el-button>
                             <el-dropdown-menu slot="dropdown">
                                 <el-dropdown-item>
+                                    <el-button size="mini" type="text" @click="onClickRunByParameter(scope.row)">{{$t('message.runByParameter')}}</el-button>
+                                </el-dropdown-item>
+                                <el-dropdown-item>
                                     <el-button size="mini" type="text" @click="onClickRunHistory(scope.row)">{{$t('message.runHistory')}}</el-button>
                                 </el-dropdown-item>
                                 <el-dropdown-item>
@@ -240,10 +243,10 @@
                             <el-input-number v-model="modifiedJobForm.alarmConfig.alertThreshold" :placeholder="$t('message.alertThreshold')" controls-position="right" :min="0" :max="10000"></el-input-number>
                         </el-col>
                         <el-col :span="6">
-                            <el-input-number v-model="modifiedJobForm.alarmConfig.statisticWindowLen" :placeholder="$('message.statisticWindow') + '(s)'" controls-position="right" :min="0" :max="10000"></el-input-number>
+                            <el-input-number v-model="modifiedJobForm.alarmConfig.statisticWindowLen" :placeholder="$t('message.statisticWindow') + '(s)'" controls-position="right" :min="0" :max="10000"></el-input-number>
                         </el-col>
                         <el-col :span="6">
-                            <el-input-number v-model="modifiedJobForm.alarmConfig.silenceWindowLen" :placeholder="$('message.silenceWindow') + '(s)'" controls-position="right" :min="0" :max="10000"></el-input-number>
+                            <el-input-number v-model="modifiedJobForm.alarmConfig.silenceWindowLen" :placeholder="$t('message.silenceWindow') + '(s)'" controls-position="right" :min="0" :max="10000"></el-input-number>
                         </el-col>
                     </el-row>
                 </el-form-item>
@@ -258,6 +261,22 @@
 
         <el-dialog :close-on-click-modal="false" :visible.sync="timeExpressionValidatorVisible" v-if='timeExpressionValidatorVisible'>
             <TimeExpressionValidator :time-expression="modifiedJobForm.timeExpression" :time-expression-type="modifiedJobForm.timeExpressionType"/>
+        </el-dialog>
+        <el-dialog
+            :title="$t('message.runByParameter')"
+            :visible="!!temporaryRowData"
+            width="50%"
+        >
+            <el-input
+                type="textarea"
+                :rows="4"
+                :placeholder="$t('message.enteringParameter')"
+                v-model="runParamter">
+            </el-input>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="onClickRuncCancel">{{$t('message.cancel')}}</el-button>
+                <el-button type="primary" @click="onClickRun(temporaryRowData)" :loading="runLoading">{{$t('message.run')}}</el-button>
+            </span>
         </el-dialog>
     </div>
 </template>
@@ -298,9 +317,9 @@
                     notifyUserIds: [],
                     lifecycle: null,
                     alarmConfig: {
-                        alertThreshold: null,
-                        statisticWindowLen: null,
-                        silenceWindowLen: null
+                        alertThreshold: undefined,
+                        statisticWindowLen: undefined,
+                        silenceWindowLen: undefined
                     }
                 },
                 // 任务查询请求对象
@@ -326,14 +345,19 @@
                 // 用户列表
                 userList: [],
                 // 时间表达式校验窗口
-                timeExpressionValidatorVisible: false
-
+                timeExpressionValidatorVisible: false,
+                // 临时存储的行数据
+                temporaryRowData: null,
+                // 运行参数
+                runParamter: null,
+                // 运行loading
+                runLoading: false
             }
         },
         methods: {
             // 保存变更，包括新增和修改
             async saveJob() {
-                const lifecycle = this.modifiedJobForm.lifecycle;
+                const { lifecycle, alarmConfig } = this.modifiedJobForm;
                 if (lifecycle && Array.isArray(lifecycle)) {
                     const start = lifecycle[0];
                     const end = lifecycle[1];
@@ -342,7 +366,16 @@
                         end
                     }
                 }
-                console.log(this.modifiedJobForm);
+                if (!alarmConfig.alertThreshold) {
+                    alarmConfig.alertThreshold = 0;
+                }
+                if (!alarmConfig.statisticWindowLen) {
+                    alarmConfig.statisticWindowLen = 0;
+                }
+                if (!alarmConfig.silenceWindowLen) {
+                    alarmConfig.silenceWindowLen = 0;
+                }
+                this.modifiedJobForm.alarmConfig = alarmConfig;
                 await this.axios.post("/job/save", this.modifiedJobForm);
                 this.modifiedJobFormVisible = false;
                 this.$message.success(this.$t('message.success'));
@@ -392,7 +425,12 @@
                 this.modifiedJobForm.processorInfo = undefined;
                 this.modifiedJobForm.processorType = undefined;
                 this.modifiedJobForm.executeType = undefined;
-
+                this.modifiedJobForm.lifecycle = null;
+                this.modifiedJobForm.alarmConfig = {
+                    alertThreshold: undefined,
+                    statisticWindowLen: undefined,
+                    silenceWindowLen: undefined
+                }
                 this.modifiedJobFormVisible = true;
             },
             // 点击 编辑按钮
@@ -405,7 +443,26 @@
             onClickRun(data) {
                 let that = this;
                 let url = "/job/run?jobId=" + data.id + "&appId=" + that.$store.state.appInfo.id;
-                this.axios.get(url).then(() => that.$message.success(this.$t('message.success')));
+                if (this.temporaryRowData && this.runParamter) {
+                    url += `&instanceParam=${this.runParamter}`
+                }
+                this.runLoading = true;
+                this.axios.get(url).then(() => {
+                    that.$message.success(this.$t('message.success'));
+                    this.temporaryRowData = null;
+                    this.runLoading = false
+                }).catch(() => {
+                    this.runLoading = false
+                });
+            },
+            // 参数运行
+            onClickRunByParameter(data) {
+                this.temporaryRowData = data;
+            },
+            // 取消参数运行
+            onClickRuncCancel() {
+                this.temporaryRowData = null;
+                this.runParamter = null;
             },
             // 点击 删除任务
             onClickDeleteJob(data) {
