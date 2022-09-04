@@ -133,7 +133,7 @@ const en = {
         'secondlyJobHistory': 'Secondly job history',
         'subInstanceId': 'SubInstanceId',
         'instanceParams': 'InstanceParams',
-        'lifeCycle': 'LifeCycle',
+        'lifeCycle': 'Life cycle',
         'alertThreshold': 'AlertThreshold',
         'statisticWindow': 'StatisticWindow',
         'silenceWindow': 'SilenceWindow',

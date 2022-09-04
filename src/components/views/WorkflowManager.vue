@@ -84,10 +84,10 @@
                 type="textarea"
                 :rows="4"
                 :placeholder="$t('message.enteringParameter')"
-                v-model="runParamter">
+                v-model="runParameter">
             </el-input>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="onClickRuncCancel">{{$t('message.cancel')}}</el-button>
+                <el-button @click="onClickRunCancel">{{$t('message.cancel')}}</el-button>
                 <el-button type="primary" @click="onClickRunWorkflow(temporaryRowData)" :loading="runLoading">{{$t('message.run')}}</el-button>
             </span>
         </el-dialog>
@@ -122,7 +122,7 @@
                 },
                 temporaryRowData: null,
                 // 运行参数
-                runParamter: null,
+                runParameter: null,
                 // 运行loading
                 runLoading: false
             }
@@ -168,8 +168,8 @@
             onClickRunWorkflow(data) {
                 let that = this;
                 let url = "/workflow/run?appId=" + this.$store.state.appInfo.id + "&workflowId=" + data.id;
-                if (this.temporaryRowData && this.runParamter) {
-                    url += `&initParams=${this.runParamter}`
+                if (this.temporaryRowData && this.runParameter) {
+                    url += `&initParams=${encodeURIComponent(this.runParameter)}`
                 }
                 this.runLoading = true;
                 this.axios.get(url).then(() => {
@@ -185,9 +185,9 @@
                 this.temporaryRowData = data;
             },
             // 取消参数运行
-            onClickRuncCancel() {
+            onClickRunCancel() {
                 this.temporaryRowData = null;
-                this.runParamter = null;
+                this.runParameter = null;
             },
             // 删除工作流
             onClickDeleteWorkflow(data) {

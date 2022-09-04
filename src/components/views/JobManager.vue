@@ -100,7 +100,7 @@
                     <el-input v-model="modifiedJobForm.jobDescription"/>
                 </el-form-item>
                 <el-form-item :label="$t('message.jobParams')">
-                    <el-input v-model="modifiedJobForm.jobParams"/>
+                    <el-input v-model="modifiedJobForm.jobParams" type="textarea"/>
                 </el-form-item>
                 <el-form-item :label="$t('message.scheduleInfo')">
                     <el-row>
@@ -122,6 +122,16 @@
                         </el-col>
                     </el-row>
                 </el-form-item>
+              <el-form-item :label="$t('message.lifeCycle')">
+                <el-date-picker
+                    v-model="modifiedJobForm.lifeCycle"
+                    type="datetimerange"
+                    :start-placeholder="$t('message.startTime')"
+                    :end-placeholder="$t('message.finishedTime')"
+                    value-format="timestamp"
+                >
+                </el-date-picker>
+              </el-form-item>
                 <el-form-item :label="$t('message.executeConfig')">
                     <el-row>
                         <el-col :span="5">
@@ -150,16 +160,6 @@
                             <el-input v-model="modifiedJobForm.processorInfo" :placeholder="verifyPlaceholder(modifiedJobForm.processorType)" />
                         </el-col>
                     </el-row>
-                </el-form-item>
-                <el-form-item :label="$t('message.lifeCycle')">
-                    <el-date-picker
-                        v-model="modifiedJobForm.lifecycle"
-                        type="datetimerange"
-                        :start-placeholder="$t('message.startTime')"
-                        :end-placeholder="$t('message.finishedTime')"
-                        value-format="timestamp"
-                    >
-                    </el-date-picker>
                 </el-form-item>
                 <el-form-item :label="$t('message.runtimeConfig')">
                     <el-row>
@@ -283,10 +283,10 @@
                 type="textarea"
                 :rows="4"
                 :placeholder="$t('message.enteringParameter')"
-                v-model="runParamter">
+                v-model="runParameter">
             </el-input>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="onClickRuncCancel">{{$t('message.cancel')}}</el-button>
+                <el-button @click="onClickRunCancel">{{$t('message.cancel')}}</el-button>
                 <el-button type="primary" @click="onClickRun(temporaryRowData)" :loading="runLoading">{{$t('message.run')}}</el-button>
             </span>
         </el-dialog>
@@ -327,7 +327,7 @@
                     designatedWorkers: "",
                     maxWorkerCount: 0,
                     notifyUserIds: [],
-                    lifecycle: null,
+                    lifeCycle: null,
                     alarmConfig: {
                         alertThreshold: undefined,
                         statisticWindowLen: undefined,
@@ -361,7 +361,7 @@
                 // 临时存储的行数据
                 temporaryRowData: null,
                 // 运行参数
-                runParamter: null,
+                runParameter: null,
                 // 运行loading
                 runLoading: false
             }
@@ -369,11 +369,11 @@
         methods: {
             // 保存变更，包括新增和修改
             async saveJob() {
-                const { lifecycle, alarmConfig } = this.modifiedJobForm;
-                if (lifecycle && Array.isArray(lifecycle)) {
-                    const start = lifecycle[0];
-                    const end = lifecycle[1];
-                    this.modifiedJobForm.lifecycle = {
+                const { lifeCycle, alarmConfig } = this.modifiedJobForm;
+                if (lifeCycle && Array.isArray(lifeCycle)) {
+                    const start = lifeCycle[0];
+                    const end = lifeCycle[1];
+                    this.modifiedJobForm.lifeCycle = {
                         start,
                         end
                     }
@@ -400,16 +400,16 @@
                     console.log(res);
                     if (res && res.data) {
                         res.data = res.data.map(item => {
-                            const lifecycle = item.lifecycle;
-                            if (lifecycle && lifecycle.start && lifecycle.end) {
-                                item.lifecycle = [lifecycle.start, lifecycle.end];
+                            const lifeCycle = item.lifeCycle;
+                            if (lifeCycle && lifeCycle.start && lifeCycle.end) {
+                                item.lifeCycle = [lifeCycle.start, lifeCycle.end];
                             } else {
-                                item.lifecycle = null;
+                                item.lifeCycle = null;
                             }
                             return item;
                         })
                     }
-                    
+
                     that.jobInfoPageResult = res;
                 });
             },
@@ -437,7 +437,7 @@
                 this.modifiedJobForm.processorInfo = undefined;
                 this.modifiedJobForm.processorType = undefined;
                 this.modifiedJobForm.executeType = undefined;
-                this.modifiedJobForm.lifecycle = null;
+                this.modifiedJobForm.lifeCycle = null;
                 this.modifiedJobForm.alarmConfig = {
                     alertThreshold: undefined,
                     statisticWindowLen: undefined,
@@ -455,8 +455,8 @@
                         silenceWindowLen: undefined
                     }
                 }
-                if (!data.lifecycle) {
-                    data.lifecycle = null;
+                if (!data.lifeCycle) {
+                    data.lifeCycle = null;
                 }
                 this.modifiedJobForm = JSON.parse(JSON.stringify(data));
                 this.modifiedJobFormVisible = true;
@@ -465,8 +465,8 @@
             onClickRun(data) {
                 let that = this;
                 let url = "/job/run?jobId=" + data.id + "&appId=" + that.$store.state.appInfo.id;
-                if (this.temporaryRowData && this.runParamter) {
-                    url += `&instanceParam=${this.runParamter}`
+                if (this.temporaryRowData && this.runParameter) {
+                    url += `&instanceParams=${encodeURIComponent(this.runParameter)}`
                 }
                 this.runLoading = true;
                 this.axios.get(url).then(() => {
@@ -482,9 +482,9 @@
                 this.temporaryRowData = data;
             },
             // 取消参数运行
-            onClickRuncCancel() {
+            onClickRunCancel() {
                 this.temporaryRowData = null;
-                this.runParamter = null;
+                this.runParameter = null;
             },
             // 点击 删除任务
             onClickDeleteJob(data) {
@@ -604,5 +604,5 @@
 .el-input-number .el-input {
     width: 1000px;
 }
-    
+
 </style>
