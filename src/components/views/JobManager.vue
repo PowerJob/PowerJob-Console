@@ -61,6 +61,9 @@
                             <el-button size="mini" type="text">{{$t('message.more')}}</el-button>
                             <el-dropdown-menu slot="dropdown">
                                 <el-dropdown-item>
+                                    <el-button size="mini" type="text" @click="onClickRunByParameter(scope.row)">{{$t('message.runByParameter')}}</el-button>
+                                </el-dropdown-item>
+                                <el-dropdown-item>
                                     <el-button size="mini" type="text" @click="onClickRunHistory(scope.row)">{{$t('message.runHistory')}}</el-button>
                                 </el-dropdown-item>
                                 <el-dropdown-item>
@@ -87,7 +90,7 @@
         </el-row>
 
 
-        <el-dialog :close-on-click-modal="false" :visible.sync="modifiedJobFormVisible" width="60%">
+        <el-dialog :close-on-click-modal="false" :visible.sync="modifiedJobFormVisible" width="80%">
             <el-form :model="modifiedJobForm" label-width="120px">
 
                 <el-form-item :label="$t('message.jobName')">
@@ -97,7 +100,7 @@
                     <el-input v-model="modifiedJobForm.jobDescription"/>
                 </el-form-item>
                 <el-form-item :label="$t('message.jobParams')">
-                    <el-input v-model="modifiedJobForm.jobParams"/>
+                    <el-input v-model="modifiedJobForm.jobParams" type="textarea"/>
                 </el-form-item>
                 <el-form-item :label="$t('message.scheduleInfo')">
                     <el-row>
@@ -119,6 +122,16 @@
                         </el-col>
                     </el-row>
                 </el-form-item>
+              <el-form-item :label="$t('message.lifeCycle')">
+                <el-date-picker
+                    v-model="modifiedJobForm.lifeCycle"
+                    type="datetimerange"
+                    :start-placeholder="$t('message.startTime')"
+                    :end-placeholder="$t('message.finishedTime')"
+                    value-format="timestamp"
+                >
+                </el-date-picker>
+              </el-form-item>
                 <el-form-item :label="$t('message.executeConfig')">
                     <el-row>
                         <el-col :span="5">
@@ -215,14 +228,39 @@
                     </el-row>
                 </el-form-item>
                 <el-form-item :label="$t('message.alarmConfig')">
-                    <el-select v-model="modifiedJobForm.notifyUserIds" multiple filterable :placeholder="$t('message.alarmSelectorPLH')">
-                        <el-option
-                                v-for="user in userList"
-                                :key="user.id"
-                                :label="user.username"
-                                :value="user.id">
-                        </el-option>
-                    </el-select>
+                    <el-row>
+                        <el-col :span="6">
+                            <el-select :style="{width: '100%'}" v-model="modifiedJobForm.notifyUserIds" multiple filterable :placeholder="$t('message.alarmSelectorPLH')">
+                                <el-option
+                                    v-for="user in userList"
+                                    :key="user.id"
+                                    :label="user.username"
+                                    :value="user.id">
+                                </el-option>
+                            </el-select>
+                        </el-col>
+                        <el-col :span="6">
+                            <el-input v-model="modifiedJobForm.alarmConfig.alertThreshold">
+                                <template slot="prepend">{{$t('message.alertThreshold')}}</template>
+                            </el-input>
+                            <!-- <div class="job-editor-number">
+                                <div class="job-input-number">{{$t('message.alertThreshold')}}</div>
+                                <el-input-number v-model="modifiedJobForm.alarmConfig.alertThreshold" :placeholder="$t('message.alertThreshold')" controls-position="right" :min="0"></el-input-number>
+                            </div> -->
+                        </el-col>
+                        <el-col :span="6">
+                            <el-input v-model="modifiedJobForm.alarmConfig.statisticWindowLen">
+                                <template slot="prepend">{{$t('message.statisticWindow') + '(s)'}}</template>
+                            </el-input>
+                            <!-- <el-input-number v-model="modifiedJobForm.alarmConfig.statisticWindowLen" :placeholder="$t('message.statisticWindow') + '(s)'" controls-position="right" :min="0"></el-input-number> -->
+                        </el-col>
+                        <el-col :span="6">
+                            <el-input v-model="modifiedJobForm.alarmConfig.silenceWindowLen">
+                                <template slot="prepend">{{$t('message.silenceWindow') + '(s)'}}</template>
+                            </el-input>
+                            <!-- <el-input-number v-model="modifiedJobForm.alarmConfig.silenceWindowLen" :placeholder="$t('message.silenceWindow') + '(s)'" controls-position="right" :min="0"></el-input-number> -->
+                        </el-col>
+                    </el-row>
                 </el-form-item>
 
                 <el-form-item>
@@ -235,6 +273,22 @@
 
         <el-dialog :close-on-click-modal="false" :visible.sync="timeExpressionValidatorVisible" v-if='timeExpressionValidatorVisible'>
             <TimeExpressionValidator :time-expression="modifiedJobForm.timeExpression" :time-expression-type="modifiedJobForm.timeExpressionType"/>
+        </el-dialog>
+        <el-dialog
+            :title="$t('message.runByParameter')"
+            :visible="!!temporaryRowData"
+            width="50%"
+        >
+            <el-input
+                type="textarea"
+                :rows="4"
+                :placeholder="$t('message.enteringParameter')"
+                v-model="runParameter">
+            </el-input>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="onClickRunCancel">{{$t('message.cancel')}}</el-button>
+                <el-button type="primary" @click="onClickRun(temporaryRowData)" :loading="runLoading">{{$t('message.run')}}</el-button>
+            </span>
         </el-dialog>
     </div>
 </template>
@@ -272,8 +326,13 @@
                     enable: true,
                     designatedWorkers: "",
                     maxWorkerCount: 0,
-                    notifyUserIds: []
-
+                    notifyUserIds: [],
+                    lifeCycle: null,
+                    alarmConfig: {
+                        alertThreshold: undefined,
+                        statisticWindowLen: undefined,
+                        silenceWindowLen: undefined
+                    }
                 },
                 // 任务查询请求对象
                 jobQueryContent: {
@@ -298,13 +357,37 @@
                 // 用户列表
                 userList: [],
                 // 时间表达式校验窗口
-                timeExpressionValidatorVisible: false
-
+                timeExpressionValidatorVisible: false,
+                // 临时存储的行数据
+                temporaryRowData: null,
+                // 运行参数
+                runParameter: null,
+                // 运行loading
+                runLoading: false
             }
         },
         methods: {
             // 保存变更，包括新增和修改
             async saveJob() {
+                const { lifeCycle, alarmConfig } = this.modifiedJobForm;
+                if (lifeCycle && Array.isArray(lifeCycle)) {
+                    const start = lifeCycle[0];
+                    const end = lifeCycle[1];
+                    this.modifiedJobForm.lifeCycle = {
+                        start,
+                        end
+                    }
+                }
+                if (!alarmConfig.alertThreshold) {
+                    alarmConfig.alertThreshold = 0;
+                }
+                if (!alarmConfig.statisticWindowLen) {
+                    alarmConfig.statisticWindowLen = 0;
+                }
+                if (!alarmConfig.silenceWindowLen) {
+                    alarmConfig.silenceWindowLen = 0;
+                }
+                this.modifiedJobForm.alarmConfig = alarmConfig;
                 await this.axios.post("/job/save", this.modifiedJobForm);
                 this.modifiedJobFormVisible = false;
                 this.$message.success(this.$t('message.success'));
@@ -314,6 +397,19 @@
             listJobInfos() {
                 const that = this;
                 this.axios.post("/job/list", this.jobQueryContent).then((res) => {
+                    console.log(res);
+                    if (res && res.data) {
+                        res.data = res.data.map(item => {
+                            const lifeCycle = item.lifeCycle;
+                            if (lifeCycle && lifeCycle.start && lifeCycle.end) {
+                                item.lifeCycle = [lifeCycle.start, lifeCycle.end];
+                            } else {
+                                item.lifeCycle = null;
+                            }
+                            return item;
+                        })
+                    }
+
                     that.jobInfoPageResult = res;
                 });
             },
@@ -341,12 +437,27 @@
                 this.modifiedJobForm.processorInfo = undefined;
                 this.modifiedJobForm.processorType = undefined;
                 this.modifiedJobForm.executeType = undefined;
-
+                this.modifiedJobForm.lifeCycle = null;
+                this.modifiedJobForm.alarmConfig = {
+                    alertThreshold: undefined,
+                    statisticWindowLen: undefined,
+                    silenceWindowLen: undefined
+                }
                 this.modifiedJobFormVisible = true;
             },
             // 点击 编辑按钮
             onClickModify(data) {
                 // 修复点击编辑后再点击新增 行数据被清空 的问题
+                if (!data.alarmConfig) {
+                    data.alarmConfig = {
+                        alertThreshold: undefined,
+                        statisticWindowLen: undefined,
+                        silenceWindowLen: undefined
+                    }
+                }
+                if (!data.lifeCycle) {
+                    data.lifeCycle = null;
+                }
                 this.modifiedJobForm = JSON.parse(JSON.stringify(data));
                 this.modifiedJobFormVisible = true;
             },
@@ -354,7 +465,26 @@
             onClickRun(data) {
                 let that = this;
                 let url = "/job/run?jobId=" + data.id + "&appId=" + that.$store.state.appInfo.id;
-                this.axios.get(url).then(() => that.$message.success(this.$t('message.success')));
+                if (this.temporaryRowData && this.runParameter) {
+                    url += `&instanceParams=${encodeURIComponent(this.runParameter)}`
+                }
+                this.runLoading = true;
+                this.axios.get(url).then(() => {
+                    that.$message.success(this.$t('message.success'));
+                    this.temporaryRowData = null;
+                    this.runLoading = false
+                }).catch(() => {
+                    this.runLoading = false
+                });
+            },
+            // 参数运行
+            onClickRunByParameter(data) {
+                this.temporaryRowData = data;
+            },
+            // 取消参数运行
+            onClickRunCancel() {
+                this.temporaryRowData = null;
+                this.runParameter = null;
             },
             // 点击 删除任务
             onClickDeleteJob(data) {
@@ -431,7 +561,15 @@
         mounted() {
             // 加载用户信息
             let that = this;
-            that.axios.get("/user/list").then(res => that.userList = res);
+            that.axios.get("/user/list").then(res => {
+                const data = res || [];
+                that.userList = data.map(item => {
+                    return {
+                        ...item,
+                        id: `${item.id}`
+                    }
+                })
+            });
             // 加载任务信息
             this.listJobInfos();
         }
@@ -439,5 +577,32 @@
 </script>
 
 <style scoped>
+.job-editor-number {
+    display: flex;
+}
+.job-input-number {
+    background-color: #F5F7FA;
+    color: #909399;
+    /* vertical-align: middle; */
+    /* display: table-cell; */
+    position: relative;
+    border: 1px solid #DCDFE6;
+    border-radius: 4px;
+    padding: 0 20px;
+    /* width: 1px; */
+    white-space: nowrap;
+    display: block;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    line-height: 38px;
+    width: auto;
+}
+.el-input-number {
+    width: 100px;
+}
+
+.el-input-number .el-input {
+    width: 1000px;
+}
 
 </style>

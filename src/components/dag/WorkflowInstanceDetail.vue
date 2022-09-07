@@ -100,21 +100,31 @@
                     <InstanceDetail 
                         :instance-id="currentInstanceId" 
                         :fixedWidth="400"
+                        :nodeDetail="nodeDetail"
                     >
                         <template>
-                            <el-row class="job-detail-text">
+                            <el-row class="job-detail-text" v-if="nodeDetail && nodeDetail.nodeType != 2">
                                 <el-col :span="24">
                                     <span class="power-job-text">{{$t('message.enable')}}:</span>
                                     <span class="title">{{currentNodeInfo.enable ? $t('message.yes') : $t('message.no')}}</span>
                                 </el-col>
                             </el-row>
-                            <el-row class="job-detail-text">
+                            <el-row class="job-detail-text" v-if="nodeDetail && nodeDetail.nodeType != 2">
                                  <el-col :span="24">
                                     <span class="power-job-text">{{$t('message.skipWhenFailed')}}:</span>
                                     <span class="title">{{currentNodeInfo.skipWhenFailed ? $t('message.yes') : $t('message.no')}}</span>
                                 </el-col>
                             </el-row>
-                           
+                           <el-row class="job-detail-text" v-if="nodeDetail && nodeDetail.nodeType == 2">
+                                 <el-col :span="24">
+                                    <span class="power-job-text" :style="{width: nodeDetail.nodeType == 2 ? '64px' : ''}">{{$t('message.nodeParams')}}:</span>
+                                    <div :style="{paddingTop: '10px'}">
+                                        <JSEditor :code="nodeDetail.nodeParams" key="nodeParams" :editorOptions="{readOnly: true}"></JSEditor>
+                                    </div>
+                                    
+                                    <!-- <span class="title">{{nodeDetail.nodeParams}}</span> -->
+                                </el-col>
+                            </el-row>
                         </template>
                     </InstanceDetail>
                 </PowerWorkFlow>
@@ -122,7 +132,7 @@
         </el-row>
 
         <el-dialog :visible.sync="instanceDetailVisible" v-if='instanceDetailVisible'>
-            <InstanceDetail :instance-id="currentInstanceId"/>
+            <InstanceDetail :instance-id="currentInstanceId" :nodeDetail="nodeDetail" />
         </el-dialog>
     </div>
 </template>
@@ -130,14 +140,16 @@
 <script>
     import InstanceDetail from "../common/InstanceDetail";
     import PowerWorkFlow from './PowerWorkflow';
-    import JsonViewer from 'vue-json-viewer'
+    import JsonViewer from 'vue-json-viewer';
+    import JSEditor from "./JSEditor";
     export default {
         name: "WorkflowInstanceDetail",
         components: {
             InstanceDetail,
             // WorkFlow,
             PowerWorkFlow,
-            JsonViewer
+            JsonViewer,
+            JSEditor
         },
         data() {
             return {
@@ -153,7 +165,8 @@
                 peworkflowDAG: {
                     nodes: [],
                     edges: []
-                }
+                },
+                nodeDetail: null
             }
         },
         methods: {
@@ -231,13 +244,28 @@
 
             /** node 拦截判断 */
             interceptSelectedNode(node) {
-                return node.get('model').instanceId;
+                const model = node.get('model');
+                
+                console.log()
+                return model.instanceId || model.nodeType == 2;
             },
 
             /** 选中 node 回调 */
             handleSelectedNode(node) {
-                const instanceId = node && node.get('model').instanceId;
-                if(!instanceId) this.$message.warning(this.$t('message.ntfClickNoInstanceNode'));
+                const model = node ? node.get('model') : {};
+                const instanceId = model.instanceId;
+                const type = model.nodeType;
+                console.log(model);
+                
+                console.log(instanceId);
+                if(type === 2 || type == 3) {
+                    console.log('1111');
+                    this.nodeDetail = model;
+                } else {
+                    if(!instanceId) this.$message.warning(this.$t('message.ntfClickNoInstanceNode'));
+                    this.nodeDetail = null;
+                }
+                
                 this.currentInstanceId = instanceId;
                 this.selectNode = node;
                 this.currentNodeInfo = node.get('model');

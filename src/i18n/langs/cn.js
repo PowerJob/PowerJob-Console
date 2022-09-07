@@ -137,6 +137,13 @@ const cn = {
         'secondlyJobHistory': '最近 10 条秒级任务历史记录',
         'subInstanceId': '子任务实例 ID',
         'instanceParams': '任务实例参数',
+        'lifeCycle': '生命周期',
+        'alertThreshold': '错误阈值',
+        'statisticWindow': '统计窗口',
+        'silenceWindow': '沉默窗口',
+        'runByParameter': '参数运行',
+        'enteringParameter': '填写参数',
+
 
         // 工作流管理
         'wfId': '工作流 ID',
@@ -185,6 +192,7 @@ const cn = {
         'running': '运行中',
         'stopped': '手动停止',
         'canceled': '手动取消',
+        'canceleded': '已取消',
         'wfWaiting': '等待调度',
         'waitingUpstream': '等待上游节点',
 
@@ -203,7 +211,10 @@ const cn = {
         'wfContext': '上下文',
         'yes': 'YES',
         'no': 'NO',
-        'copy': '复制'
+        'copy': '复制',
+        'condition': '判断节点',
+        'workflowChild': '子流程节点',
+        'importWorkflowTitle': '工作流节点引入'
     },
     ...zhLocale
 };

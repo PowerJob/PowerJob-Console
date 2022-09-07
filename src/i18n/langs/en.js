@@ -133,6 +133,12 @@ const en = {
         'secondlyJobHistory': 'Secondly job history',
         'subInstanceId': 'SubInstanceId',
         'instanceParams': 'InstanceParams',
+        'lifeCycle': 'Life cycle',
+        'alertThreshold': 'AlertThreshold',
+        'statisticWindow': 'StatisticWindow',
+        'silenceWindow': 'SilenceWindow',
+        'runByParameter': 'Run by parameter',
+        'enteringParameter': 'Entering Parameter',
 
         // workflowManage
         'wfId': 'Workflow ID',
@@ -181,6 +187,7 @@ const en = {
         'running': 'Running',
         'stopped': 'Stopped',
         'canceled': 'Canceled',
+        'canceleded': 'Canceled',
         'wfWaiting': 'Waiting',
         'waitingUpstream': 'Waiting upstream',
 
@@ -199,7 +206,10 @@ const en = {
         'wfContext': 'Context',
         'yes': 'YES',
         'no': 'NO',
-        'copy': 'Copy'
+        'copy': 'Copy',
+        'condition': 'Condition',
+        'workflowChild': 'Subprocesses',
+        'importWorkflowTitle': 'importWorkflowTitle'
     },
     ...enLocale
 };
