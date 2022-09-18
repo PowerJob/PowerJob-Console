@@ -263,6 +263,36 @@
                     </el-row>
                 </el-form-item>
 
+              <el-form-item :label="$t('message.logConfig')">
+                <el-row>
+                  <el-col :span="6">
+                      <el-select v-model="modifiedJobForm.logConfig.type" :placeholder="$t('message.logType')">
+                          <el-option
+                              v-for="item in logType"
+                              :key="item.key"
+                              :label="item.label"
+                              :value="item.key">
+                          </el-option>
+                      </el-select>
+                  </el-col>
+                    <el-col :span="6">
+                        <el-select v-if="modifiedJobForm.logConfig.type===1" v-model="modifiedJobForm.logConfig.level" :placeholder="$t('message.logLevel')">
+                            <el-option
+                                v-for="item in logLevel"
+                                :key="item.key"
+                                :label="item.label"
+                                :value="item.key">
+                            </el-option>
+                        </el-select>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-input v-if="modifiedJobForm.logConfig.type===2" v-model="modifiedJobForm.logConfig.loggerName">
+                            <template slot="prepend">{{$t('message.loggerName')}}</template>
+                        </el-input>
+                    </el-col>
+                </el-row>
+              </el-form-item>
+
                 <el-form-item>
                     <el-button type="primary" @click="saveJob">{{$t('message.save')}}</el-button>
                     <el-button @click="modifiedJobFormVisible = false">{{$t('message.cancel')}}</el-button>
@@ -332,6 +362,11 @@
                         alertThreshold: undefined,
                         statisticWindowLen: undefined,
                         silenceWindowLen: undefined
+                    },
+                    logConfig: {
+                        type: 1,
+                        level: undefined,
+                        loggerName: undefined
                     }
                 },
                 // 任务查询请求对象
@@ -354,6 +389,10 @@
                 processorTypeOptions: [{key: "BUILT_IN", label: this.$t('message.builtIn')}, {key: "EXTERNAL", label: this.$t('message.external')}], // {key: "SHELL", label: "SHELL"}, {key: "PYTHON", label: "PYTHON"}
                 // 执行方式类型
                 executeTypeOptions: [{key: "STANDALONE", label: this.$t('message.standalone')}, {key: "BROADCAST", label: this.$t('message.broadcast')},  {key: "MAP", label: this.$t('message.map')}, {key: "MAP_REDUCE", label: this.$t('message.mapReduce')}],
+                // 日志级别
+                logLevel: [{key: 1, label: 'DEBUG'}, {key: 2, label: 'INFO'}, {key: 3, label: 'WARN'}, {key: 4, label: 'ERROR'}, {key: 99, label: 'OFF'}],
+                // 日志类型
+                logType: [{key: 1, label: 'ONLINE'}, {key: 2, label: 'LOCAL'}],
                 // 用户列表
                 userList: [],
                 // 时间表达式校验窗口
