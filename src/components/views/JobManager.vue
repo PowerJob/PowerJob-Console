@@ -287,7 +287,7 @@
                       </el-select>
                   </el-col>
                     <el-col :span="6">
-                        <el-select v-if="modifiedJobForm.logConfig.type===1" v-model="modifiedJobForm.logConfig.level" :placeholder="$t('message.logLevel')">
+                        <el-select v-model="modifiedJobForm.logConfig.level" :placeholder="$t('message.logLevel')">
                             <el-option
                                 v-for="item in logLevel"
                                 :key="item.key"
@@ -404,7 +404,7 @@
                 // 日志级别
                 logLevel: [{key: 1, label: 'DEBUG'}, {key: 2, label: 'INFO'}, {key: 3, label: 'WARN'}, {key: 4, label: 'ERROR'}, {key: 99, label: 'OFF'}],
                 // 日志类型
-                logType: [{key: 1, label: 'ONLINE'}, {key: 2, label: 'LOCAL'}],
+                logType: [{key: 1, label: 'ONLINE'}, {key: 2, label: 'LOCAL'}, {key: 3, label: 'STDOUT'}, {key: 999, label: 'NULL'}],
                 // 分发类型
                 dispatchStrategy: [{key: 'HEALTH_FIRST', label: 'HEALTH_FIRST'}, {key: 'RANDOM', label: 'RANDOM'}],
                 // 用户列表
