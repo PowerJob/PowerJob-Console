@@ -79,6 +79,7 @@ const en = {
         'jobDescription': 'Job description',
         'jobParams': 'Job params',
         'timeExpressionType': 'Time expression type',
+        'dispatchStrategy': 'Dispatch strategy',
         'timeExpressionPlaceHolder': 'Cron expression or number of millions for fixed_rate/fixed_delay job',
         'executeConfig': 'Execution config',
         'javaProcessorInfoPLH': 'Classname, eg: tech.powerjob.HelloWordProcessor',

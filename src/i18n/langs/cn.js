@@ -82,6 +82,7 @@ const cn = {
         'jobDescription': '任务描述',
         'jobParams': '任务参数',
         'timeExpressionType': '时间表达式类型',
+        'dispatchStrategy': '分发策略',
         'timeExpressionPlaceHolder': 'CRON 填写 CRON 表达式，秒级任务填写整数，API 无需填写',
         'executeConfig': '执行配置',
         'javaProcessorInfoPLH': '全限定类名，eg：tech.powerjob.HelloWordProcessor',

@@ -163,17 +163,28 @@
                 </el-form-item>
                 <el-form-item :label="$t('message.runtimeConfig')">
                     <el-row>
-                        <el-col :span="8">
+                        <el-col :span="6">
+                            <el-select v-model="modifiedJobForm.dispatchStrategy" :placeholder="$t('message.dispatchStrategy')">
+                                <el-option
+                                    v-for="item in dispatchStrategy"
+                                    :key="item.key"
+                                    :label="item.label"
+                                    :value="item.key">
+                                </el-option>
+                            </el-select>
+                        </el-col>
+
+                        <el-col :span="6">
                             <el-input :placeholder="$t('message.maxInstanceNum')" v-model="modifiedJobForm.maxInstanceNum" class="ruleContent">
                                 <template slot="prepend">{{$t('message.maxInstanceNum')}}</template>
                             </el-input>
                         </el-col>
-                        <el-col :span="8">
+                        <el-col :span="6">
                             <el-input :placeholder="$t('message.threadConcurrency')" v-model="modifiedJobForm.concurrency" class="ruleContent">
                                 <template slot="prepend">{{$t('message.threadConcurrency')}}</template>
                             </el-input>
                         </el-col>
-                        <el-col :span="8">
+                        <el-col :span="6">
                             <el-input :placeholder="$t('message.timeout')" v-model="modifiedJobForm.instanceTimeLimit" class="ruleContent">
                                 <template slot="prepend">{{$t('message.timeout')}}</template>
                             </el-input>
@@ -348,6 +359,7 @@
                     instanceTimeLimit: 0,
                     instanceRetryNum: 0,
                     taskRetryNum: 1,
+                    dispatchStrategy: undefined,
 
                     minCpuCores: 0,
                     minMemorySpace: 0,
@@ -393,6 +405,8 @@
                 logLevel: [{key: 1, label: 'DEBUG'}, {key: 2, label: 'INFO'}, {key: 3, label: 'WARN'}, {key: 4, label: 'ERROR'}, {key: 99, label: 'OFF'}],
                 // 日志类型
                 logType: [{key: 1, label: 'ONLINE'}, {key: 2, label: 'LOCAL'}],
+                // 分发类型
+                dispatchStrategy: [{key: 'HEALTH_FIRST', label: 'HEALTH_FIRST'}, {key: 'RANDOM', label: 'RANDOM'}],
                 // 用户列表
                 userList: [],
                 // 时间表达式校验窗口
