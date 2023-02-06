@@ -57,21 +57,13 @@
                     <template slot-scope="scope">
                         <el-button size="mini" type="text" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
                         <el-button size="mini" type="text" @click="onClickRun(scope.row)">{{$t('message.run')}}</el-button>
-                        <el-dropdown trigger="click">
+                        <el-dropdown trigger="click" @command="handleCommand">
                             <el-button size="mini" type="text">{{$t('message.more')}}</el-button>
                             <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item>
-                                    <el-button size="mini" type="text" @click="onClickRunByParameter(scope.row)">{{$t('message.runByParameter')}}</el-button>
-                                </el-dropdown-item>
-                                <el-dropdown-item>
-                                    <el-button size="mini" type="text" @click="onClickRunHistory(scope.row)">{{$t('message.runHistory')}}</el-button>
-                                </el-dropdown-item>
-                                <el-dropdown-item>
-                                  <el-button size="mini" type="text" @click="onClickCopyJob(scope.row)">{{$t('message.copy')}}</el-button>
-                                </el-dropdown-item>
-                                <el-dropdown-item>
-                                    <el-button size="mini" type="text" @click="onClickDeleteJob(scope.row)">{{$t('message.delete')}}</el-button>
-                                </el-dropdown-item>
+                                <el-dropdown-item command="onClickRunByParameter" :row="scope.row">{{$t('message.runByParameter')}}</el-dropdown-item>
+                                <el-dropdown-item command="onClickRunHistory" :row="scope.row">{{$t('message.runHistory')}}</el-dropdown-item>
+                                <el-dropdown-item command="onClickCopyJob" :row="scope.row">{{$t('message.copy')}}</el-dropdown-item>
+                                <el-dropdown-item command="onClickDeleteJob" :row="scope.row">{{$t('message.delete')}}</el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
                     </template>
@@ -265,7 +257,7 @@
 
                 <el-form-item>
                     <el-button type="primary" @click="saveJob">{{$t('message.save')}}</el-button>
-                    <el-button @click="modifiedJobFormVisible = false">{{$t('message.cancel')}}</el-button>
+                    <el-button @click="modifiedJobFormVisible = false; listJobInfos()">{{$t('message.cancel')}}</el-button>
                 </el-form-item>
 
             </el-form>
@@ -476,6 +468,10 @@
                 }).catch(() => {
                     this.runLoading = false
                 });
+            },
+            // 处理下拉命令
+            handleCommand(command, e) {
+                this[command](e.$attrs.row);
             },
             // 参数运行
             onClickRunByParameter(data) {
