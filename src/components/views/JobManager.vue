@@ -115,7 +115,8 @@
                             </el-select>
                         </el-col>
                         <el-col :span="12">
-                            <el-input v-model="modifiedJobForm.timeExpression" :placeholder="$t('message.timeExpressionPlaceHolder')" />
+                            <el-input v-model="modifiedJobForm.timeExpression" :placeholder="$t('message.timeExpressionPlaceHolder')" v-if="['CRON', 'FIXED_DELAY', 'FIXED_RATE'].includes(modifiedJobForm.timeExpressionType)" />
+                            <el-button type="primary" @click="onClickEditTimeExpression"  v-if="['DAILY_TIME_INTERVAL'].includes(modifiedJobForm.timeExpressionType)">点击编辑</el-button>
                         </el-col>
                         <el-col :span="4">
                             <el-button type="text" @click="onClickValidateTimeExpression" style="padding-left: 10px">{{$t('message.validateTimeExpression')}}</el-button>
@@ -274,6 +275,12 @@
         <el-dialog :close-on-click-modal="false" :visible.sync="timeExpressionValidatorVisible" v-if='timeExpressionValidatorVisible'>
             <TimeExpressionValidator :time-expression="modifiedJobForm.timeExpression" :time-expression-type="modifiedJobForm.timeExpressionType"/>
         </el-dialog>
+
+        <!-- 时间表达式编辑 -->
+        <el-dialog :close-on-click-modal="false" :visible.sync="timeExpressionEditorVisible" v-if='timeExpressionEditorVisible'>
+          <DailyTimeIntervalForm :timeExpression="modifiedJobForm.timeExpression" @contentChanged="eventFromDailyTimeIntervalExpress"></DailyTimeIntervalForm>
+        </el-dialog>
+
         <el-dialog
             :title="$t('message.runByParameter')"
             :visible="!!temporaryRowData"
@@ -295,9 +302,10 @@
 
 <script>
     import TimeExpressionValidator from "../common/TimeExpressionValidator";
+    import DailyTimeIntervalForm from "../common/DailyTimeIntervalForm";
     export default {
         name: "JobManager",
-        components: {TimeExpressionValidator},
+        components: {TimeExpressionValidator, DailyTimeIntervalForm},
         data() {
             return {
                 modifiedJobFormVisible: false,
@@ -349,7 +357,7 @@
                     data: []
                 },
                 // 时间表达式选择类型
-                timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIXED_RATE", label: this.$t('message.fixRate')}, {key: "FIXED_DELAY", label: this.$t('message.fixDelay')}, {key: "WORKFLOW", label: this.$t('message.workflow')} ],
+                timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIXED_RATE", label: this.$t('message.fixRate')}, {key: "FIXED_DELAY", label: this.$t('message.fixDelay')}, {key: "WORKFLOW", label: this.$t('message.workflow')}, {key: "DAILY_TIME_INTERVAL", label: this.$t('message.dailyTimeInterval')} ],
                 // 处理器类型
                 processorTypeOptions: [{key: "BUILT_IN", label: this.$t('message.builtIn')}, {key: "EXTERNAL", label: this.$t('message.external')}], // {key: "SHELL", label: "SHELL"}, {key: "PYTHON", label: "PYTHON"}
                 // 执行方式类型
@@ -358,6 +366,8 @@
                 userList: [],
                 // 时间表达式校验窗口
                 timeExpressionValidatorVisible: false,
+                // 时间表达式编辑窗口
+                timeExpressionEditorVisible: false,
                 // 临时存储的行数据
                 temporaryRowData: null,
                 // 运行参数
@@ -556,6 +566,16 @@
             // 点击校验
             onClickValidateTimeExpression() {
                 this.timeExpressionValidatorVisible = true;
+            },
+            // 点击编辑
+            onClickEditTimeExpression() {
+                this.timeExpressionEditorVisible = true;
+            },
+            // 每日固定间隔回调
+            eventFromDailyTimeIntervalExpress(content) {
+                console.log("event from dailyTimeIntervalExpress: " + content);
+                this.modifiedJobForm.timeExpression = content;
+                this.timeExpressionEditorVisible = false;
             }
         },
         mounted() {

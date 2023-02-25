@@ -113,12 +113,15 @@ const cn = {
         'fixRate': '固定频率（毫秒）',
         'fixDelay': '固定延迟（毫秒）',
         'workflow': '工作流',
+        'dailyTimeInterval': '每日固定间隔',
         'validateTimeExpression': '校验定时参数',
         'javaContainer': 'Java（容器）',
         'runHistory': '运行记录',
         'reRun': '重试',
         'builtIn': '内建',
         'external': '外置（动态加载）',
+        'interval': '时间间隔',
+        'timeRange': '时间范围',
 
         // 任务实例管理
         'wfInstanceId': '工作流实例 ID',
@@ -130,6 +133,7 @@ const cn = {
         'runningTimes': '运行次数',
         'taskTrackerAddress': 'TaskTracker 地址',
         'startTime': '开始时间',
+        'endTime': '结束时间',
         'expectedTriggerTime': '预计执行时间',
         'result': '任务结果',
         'subTaskInfo': 'Task 信息',

@@ -110,12 +110,15 @@ const en = {
         'fixRate': 'Fixed rate (ms)',
         'fixDelay': 'Fixed delay (ms)',
         'workflow': 'Workflow',
+        'dailyTimeInterval': 'DailyTimeInterval',
         'validateTimeExpression': 'Validate',
         'javaContainer': 'External',
         'runHistory': 'History',
         'reRun': 'Retry',
         'builtIn': 'BUILT_IN',
         'External': 'EXTERNAL',
+        'interval': 'Interval',
+        'timeRange': 'TimeRange',
 
         // JobInstance
         'wfInstanceId': 'WorkflowInstanceId',
@@ -127,6 +130,7 @@ const en = {
         'runningTimes': 'Running times',
         'taskTrackerAddress': 'TaskTracker address',
         'startTime': 'Start time',
+        'endTime': 'End time',
         'expectedTriggerTime': 'Expected trigger time',
         'result': 'Result',
         'subTaskInfo': 'Task info',
