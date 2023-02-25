@@ -122,6 +122,7 @@ const cn = {
         'external': '外置（动态加载）',
         'interval': '时间间隔',
         'timeRange': '时间范围',
+        'weekRange': '星期范围',
 
         // 任务实例管理
         'wfInstanceId': '工作流实例 ID',

@@ -119,6 +119,7 @@ const en = {
         'External': 'EXTERNAL',
         'interval': 'Interval',
         'timeRange': 'TimeRange',
+        'weekRange': 'WeekRange',
 
         // JobInstance
         'wfInstanceId': 'WorkflowInstanceId',

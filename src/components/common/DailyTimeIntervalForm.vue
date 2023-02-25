@@ -33,6 +33,12 @@
         </el-col>
       </el-form-item>
 
+        <el-form-item :label="$t('message.weekRange')">
+            <el-checkbox-group v-model="dailyTimeIntervalExpress.daysOfWeek">
+                <el-checkbox v-for="c in weekDaysConstant" :label="c.key" :key="c.key">{{c.label}}</el-checkbox>
+            </el-checkbox-group>
+        </el-form-item>
+
       <el-form-item>
         <el-button type="primary" @click="onSubmit">{{$t('message.save')}}</el-button>
       </el-form-item>
@@ -54,6 +60,15 @@ export default {
         intervalUnit: 'SECONDS',
         daysOfWeek: []
       },
+      weekDaysConstant: [
+          {key:1, label:'Monday'},
+          {key:2, label:'Tuesday'},
+          {key:3, label:'Wednesday'},
+          {key:4, label:'Thursday'},
+          {key:5, label:'Friday'},
+          {key:6, label:'Saturday'},
+          {key:7, label:'Sunday'},
+      ]
     }
   },
   methods: {
