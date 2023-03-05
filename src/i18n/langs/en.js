@@ -5,6 +5,7 @@ const en = {
 
         'save': 'Save',
         'cancel': 'Cancel',
+        'confirm': 'Confirm',
         'refresh': 'Refresh',
         'query': 'Query',
         'reset': 'Reset',
@@ -76,6 +77,7 @@ const en = {
         'status': 'Status',
         'operation': 'Operation',
         'newJob': 'New job',
+        'inputJob': 'Input job',
         'jobDescription': 'Job description',
         'jobParams': 'Job params',
         'timeExpressionType': 'Time expression type',
@@ -212,6 +214,7 @@ const en = {
         'yes': 'YES',
         'no': 'NO',
         'copy': 'Copy',
+        'export': 'Export',
         'condition': 'Condition',
         'workflowChild': 'Subprocesses',
         'importWorkflowTitle': 'importWorkflowTitle'

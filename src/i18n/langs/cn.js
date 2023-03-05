@@ -5,6 +5,7 @@ const cn = {
         // common
         'save': '保存',
         'cancel': '取消',
+        'confirm': '确定',
         'refresh': '刷新',
         'query': '查询',
         'reset': '重置',
@@ -79,6 +80,7 @@ const cn = {
         'status': '状态',
         'operation': '操作',
         'newJob': '新建任务',
+        'inputJob': '导入任务',
         'jobDescription': '任务描述',
         'jobParams': '任务参数',
         'timeExpressionType': '时间表达式类型',
@@ -217,6 +219,7 @@ const cn = {
         'yes': 'YES',
         'no': 'NO',
         'copy': '复制',
+        'export': '导出',
         'condition': '判断节点',
         'workflowChild': '子流程节点',
         'importWorkflowTitle': '工作流节点引入'
