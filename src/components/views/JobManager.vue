@@ -306,13 +306,12 @@
                         </el-select>
                     </el-col>
                     <el-col :span="12">
-                        <el-input v-if="modifiedJobForm.logConfig.type===2" v-model="modifiedJobForm.logConfig.loggerName">
+                        <el-input v-if="[2, 4].includes(modifiedJobForm.logConfig.type)" v-model="modifiedJobForm.logConfig.loggerName">
                             <template slot="prepend">{{$t('message.loggerName')}}</template>
                         </el-input>
                     </el-col>
                 </el-row>
               </el-form-item>
-
                 <el-form-item>
                     <el-button type="primary" @click="saveJob">{{$t('message.save')}}</el-button>
                     <el-button @click="modifiedJobFormVisible = false">{{$t('message.cancel')}}</el-button>
