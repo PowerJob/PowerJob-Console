@@ -27,6 +27,8 @@
         },mounted() {
             console.log("type:" + this.timeExpressionType);
             console.log("expression:" + this.timeExpression);
+            this.timeExpression = encodeURIComponent(this.timeExpression);
+            console.log("expressionAfterEncodeURIComponent: " + this.timeExpression);
             this.checkTimeExpression();
         }
     }

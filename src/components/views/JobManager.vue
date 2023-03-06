@@ -4,8 +4,8 @@
         <!--第一行，条件搜索栏（row布局：gutter代表栅格间隔，span代表占用格数）-->
         <el-row :gutter="20">
 
-            <!-- 左侧搜索栏，占地面积 20/24 -->
-            <el-col :span="20">
+            <!-- 左侧搜索栏，占地面积 16/24 -->
+            <el-col :span="16">
                 <el-form :inline="true" :model="jobQueryContent" class="el-form--inline">
                     <el-form-item :label="$t('message.jobId')">
                         <el-input v-model="jobQueryContent.jobId" :placeholder="$t('message.jobId')"/>
@@ -21,6 +21,11 @@
             </el-col>
 
             <!-- 右侧新增任务按钮，占地面积 4/24 -->
+            <el-col :span="4">
+                <div style="float:right;">
+                    <el-button type="success" @click="onClickJobInputButton">{{$t('message.inputJob')}}</el-button>
+                </div>
+            </el-col>
             <el-col :span="4">
                 <div style="float:right;padding-right:10px">
                 <el-button type="primary" @click="onClickNewJob">{{$t('message.newJob')}}</el-button>
@@ -70,6 +75,9 @@
                                   <el-button size="mini" type="text" @click="onClickCopyJob(scope.row)">{{$t('message.copy')}}</el-button>
                                 </el-dropdown-item>
                                 <el-dropdown-item>
+                                    <el-button size="mini" type="text" @click="onClickJobExportButton(scope.row)">{{$t('message.export')}}</el-button>
+                                </el-dropdown-item>
+                                <el-dropdown-item>
                                     <el-button size="mini" type="text" @click="onClickDeleteJob(scope.row)">{{$t('message.delete')}}</el-button>
                                 </el-dropdown-item>
                             </el-dropdown-menu>
@@ -115,7 +123,8 @@
                             </el-select>
                         </el-col>
                         <el-col :span="12">
-                            <el-input v-model="modifiedJobForm.timeExpression" :placeholder="$t('message.timeExpressionPlaceHolder')" />
+                            <el-input v-model="modifiedJobForm.timeExpression" :placeholder="$t('message.timeExpressionPlaceHolder')" v-if="['CRON', 'FIXED_DELAY', 'FIXED_RATE'].includes(modifiedJobForm.timeExpressionType)" />
+                            <el-button type="primary" @click="onClickEditTimeExpression"  v-if="['DAILY_TIME_INTERVAL'].includes(modifiedJobForm.timeExpressionType)">点击编辑</el-button>
                         </el-col>
                         <el-col :span="4">
                             <el-button type="text" @click="onClickValidateTimeExpression" style="padding-left: 10px">{{$t('message.validateTimeExpression')}}</el-button>
@@ -274,6 +283,17 @@
         <el-dialog :close-on-click-modal="false" :visible.sync="timeExpressionValidatorVisible" v-if='timeExpressionValidatorVisible'>
             <TimeExpressionValidator :time-expression="modifiedJobForm.timeExpression" :time-expression-type="modifiedJobForm.timeExpressionType"/>
         </el-dialog>
+
+        <!-- 时间表达式编辑 -->
+        <el-dialog :close-on-click-modal="false" :visible.sync="timeExpressionEditorVisible" v-if='timeExpressionEditorVisible'>
+          <DailyTimeIntervalForm :timeExpression="modifiedJobForm.timeExpression" @contentChanged="eventFromDailyTimeIntervalExpress"></DailyTimeIntervalForm>
+        </el-dialog>
+
+        <!-- 任务导入导出 -->
+        <el-dialog :close-on-click-modal="false" :visible.sync="jobExporterDialogVisible" v-if='jobExporterDialogVisible'>
+            <Exporter type="JOB" :mode="jobExporterMode" :target-id="jobExporterTargetId"  @finished="eventFromExporter"></Exporter>
+        </el-dialog>
+
         <el-dialog
             :title="$t('message.runByParameter')"
             :visible="!!temporaryRowData"
@@ -295,9 +315,11 @@
 
 <script>
     import TimeExpressionValidator from "../common/TimeExpressionValidator";
+    import DailyTimeIntervalForm from "../common/DailyTimeIntervalForm";
+    import Exporter from "../common/Exporter";
     export default {
         name: "JobManager",
-        components: {TimeExpressionValidator},
+        components: {Exporter, TimeExpressionValidator, DailyTimeIntervalForm},
         data() {
             return {
                 modifiedJobFormVisible: false,
@@ -349,7 +371,7 @@
                     data: []
                 },
                 // 时间表达式选择类型
-                timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIXED_RATE", label: this.$t('message.fixRate')}, {key: "FIXED_DELAY", label: this.$t('message.fixDelay')}, {key: "WORKFLOW", label: this.$t('message.workflow')} ],
+                timeExpressionTypeOptions: [{key: "API", label: "API"}, {key: "CRON", label: "CRON"}, {key: "FIXED_RATE", label: this.$t('message.fixRate')}, {key: "FIXED_DELAY", label: this.$t('message.fixDelay')}, {key: "WORKFLOW", label: this.$t('message.workflow')}, {key: "DAILY_TIME_INTERVAL", label: this.$t('message.dailyTimeInterval')} ],
                 // 处理器类型
                 processorTypeOptions: [{key: "BUILT_IN", label: this.$t('message.builtIn')}, {key: "EXTERNAL", label: this.$t('message.external')}], // {key: "SHELL", label: "SHELL"}, {key: "PYTHON", label: "PYTHON"}
                 // 执行方式类型
@@ -358,12 +380,19 @@
                 userList: [],
                 // 时间表达式校验窗口
                 timeExpressionValidatorVisible: false,
+                // 时间表达式编辑窗口
+                timeExpressionEditorVisible: false,
                 // 临时存储的行数据
                 temporaryRowData: null,
                 // 运行参数
                 runParameter: null,
                 // 运行loading
-                runLoading: false
+                runLoading: false,
+
+                // 任务导入导出相关功能
+                jobExporterMode: undefined,
+                jobExporterTargetId: undefined,
+                jobExporterDialogVisible: false,
             }
         },
         methods: {
@@ -556,6 +585,37 @@
             // 点击校验
             onClickValidateTimeExpression() {
                 this.timeExpressionValidatorVisible = true;
+            },
+            // 点击编辑
+            onClickEditTimeExpression() {
+                this.timeExpressionEditorVisible = true;
+            },
+            // 每日固定间隔策略的组件回调
+            eventFromDailyTimeIntervalExpress(content) {
+                console.log("event from dailyTimeIntervalExpress: " + content);
+                this.modifiedJobForm.timeExpression = content;
+                this.timeExpressionEditorVisible = false;
+            },
+
+            // 任务导出按钮
+            onClickJobExportButton(row) {
+                this.jobExporterMode = 'EXPORT';
+                this.jobExporterTargetId = row.id;
+                this.jobExporterDialogVisible = true;
+            },
+            // 任务导入按钮
+            onClickJobInputButton() {
+                this.jobExporterMode = 'INPUT';
+                this.jobExporterTargetId = undefined;
+                this.jobExporterDialogVisible = true;
+            },
+            // 任务导出组件的回调
+            eventFromExporter(content) {
+                console.log('receive callback from Exporter: ' + content)
+                this.jobExporterDialogVisible = false;
+                if (this.jobExporterMode === 'INPUT') {
+                    this.listJobInfos();
+                }
             }
         },
         mounted() {

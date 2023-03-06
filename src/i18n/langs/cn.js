@@ -5,6 +5,7 @@ const cn = {
         // common
         'save': '保存',
         'cancel': '取消',
+        'confirm': '确定',
         'refresh': '刷新',
         'query': '查询',
         'reset': '重置',
@@ -79,6 +80,7 @@ const cn = {
         'status': '状态',
         'operation': '操作',
         'newJob': '新建任务',
+        'inputJob': '导入任务',
         'jobDescription': '任务描述',
         'jobParams': '任务参数',
         'timeExpressionType': '时间表达式类型',
@@ -113,12 +115,16 @@ const cn = {
         'fixRate': '固定频率（毫秒）',
         'fixDelay': '固定延迟（毫秒）',
         'workflow': '工作流',
+        'dailyTimeInterval': '每日固定间隔',
         'validateTimeExpression': '校验定时参数',
         'javaContainer': 'Java（容器）',
         'runHistory': '运行记录',
         'reRun': '重试',
         'builtIn': '内建',
         'external': '外置（动态加载）',
+        'interval': '时间间隔',
+        'timeRange': '时间范围',
+        'weekRange': '星期范围',
 
         // 任务实例管理
         'wfInstanceId': '工作流实例 ID',
@@ -130,6 +136,7 @@ const cn = {
         'runningTimes': '运行次数',
         'taskTrackerAddress': 'TaskTracker 地址',
         'startTime': '开始时间',
+        'endTime': '结束时间',
         'expectedTriggerTime': '预计执行时间',
         'result': '任务结果',
         'subTaskInfo': 'Task 信息',
@@ -212,6 +219,7 @@ const cn = {
         'yes': 'YES',
         'no': 'NO',
         'copy': '复制',
+        'export': '导出',
         'condition': '判断节点',
         'workflowChild': '子流程节点',
         'importWorkflowTitle': '工作流节点引入'

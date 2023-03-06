@@ -5,6 +5,7 @@ const en = {
 
         'save': 'Save',
         'cancel': 'Cancel',
+        'confirm': 'Confirm',
         'refresh': 'Refresh',
         'query': 'Query',
         'reset': 'Reset',
@@ -76,6 +77,7 @@ const en = {
         'status': 'Status',
         'operation': 'Operation',
         'newJob': 'New job',
+        'inputJob': 'Input job',
         'jobDescription': 'Job description',
         'jobParams': 'Job params',
         'timeExpressionType': 'Time expression type',
@@ -110,12 +112,16 @@ const en = {
         'fixRate': 'Fixed rate (ms)',
         'fixDelay': 'Fixed delay (ms)',
         'workflow': 'Workflow',
+        'dailyTimeInterval': 'DailyTimeInterval',
         'validateTimeExpression': 'Validate',
         'javaContainer': 'External',
         'runHistory': 'History',
         'reRun': 'Retry',
         'builtIn': 'BUILT_IN',
         'External': 'EXTERNAL',
+        'interval': 'Interval',
+        'timeRange': 'TimeRange',
+        'weekRange': 'WeekRange',
 
         // JobInstance
         'wfInstanceId': 'WorkflowInstanceId',
@@ -127,6 +133,7 @@ const en = {
         'runningTimes': 'Running times',
         'taskTrackerAddress': 'TaskTracker address',
         'startTime': 'Start time',
+        'endTime': 'End time',
         'expectedTriggerTime': 'Expected trigger time',
         'result': 'Result',
         'subTaskInfo': 'Task info',
@@ -207,6 +214,7 @@ const en = {
         'yes': 'YES',
         'no': 'NO',
         'copy': 'Copy',
+        'export': 'Export',
         'condition': 'Condition',
         'workflowChild': 'Subprocesses',
         'importWorkflowTitle': 'importWorkflowTitle'
