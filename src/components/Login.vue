@@ -16,12 +16,37 @@
                         <label>Password</label>
                         <input type="password" v-model="password" />
                     </div>
-                    <button @click="handleLogin">Login</button>
+                    <el-button type="primary" @click="handleRegister">Register</el-button>
+                    <el-button type="success" @click="handleLogin">Login</el-button>
                 </form>
+                <div id="third_part_login">
+                    第三方登陆
+                </div>
             </div>
         </div>
     </div>
 </template>
+
+<script>
+export default {
+    name: "Login",
+    data() {
+        return {
+            username: "",
+            password: "",
+        };
+    },
+    methods: {
+        handleRegister() {
+
+        },
+        handleLogin() {
+            // 处理登录逻辑
+            console.log("login");
+        },
+    },
+};
+</script>
 
 <style scoped>
 .login-page {
@@ -29,12 +54,14 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
+    background-image: url("../assets/banner.jpg");
 }
 
 .login-intro {
     flex: 1;
     padding: 50px;
     text-align: center;
+    color: #ffffff;
 }
 
 h1 {
@@ -49,6 +76,7 @@ p {
 .login-panel {
     width: 400px;
     background-color: #fff;
+    margin-right: 30px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
 
@@ -84,36 +112,4 @@ input:focus {
     outline: none;
     border-color: #007bff;
 }
-
-button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #0069d9;
-}
 </style>
-
-<script>
-export default {
-    name: "Login",
-    data() {
-        return {
-            username: "",
-            password: "",
-        };
-    },
-    methods: {
-        handleLogin() {
-            // 处理登录逻辑
-            console.log("login");
-        },
-    },
-};
-</script>
