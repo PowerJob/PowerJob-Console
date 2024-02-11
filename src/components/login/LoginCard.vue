@@ -8,7 +8,7 @@
 
 <script>
 export default {
-  name: "LoginHomepage",
+  name: "LoginCard",
   props: {
     name: String,
     image: String,
@@ -18,11 +18,14 @@ export default {
     navigateToUrl() {
       this.axios.get('/auth/thirdPartyLoginUrl?type=' + this.loginType).then(ret => {
 
-        // 特殊处理 PowerJob 自己的登录
-        if ('fe-redirect:PowerJob' === ret) {
+        // FE-REDIRECT 开头，则跳转到本地 vue 页面
+        let redirectUrl = ret.toString()
+        if (redirectUrl.startsWith('FE-REDIRECT:')) {
+          this.$router.push(redirectUrl.split(':')[1])
           return
         }
 
+        // 否则直接打开 URL
         window.open(ret, "_blank");
       })
     }
