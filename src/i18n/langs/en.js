@@ -22,6 +22,9 @@ const en = {
         'back': 'Back',
         'all': 'ALL',
         'more': '| More',
+        'add': 'Add',
+        'extra': 'Extra',
+        'tag': 'Tag',
 
         // 欢迎界面
         'appRegister': 'App Registration',

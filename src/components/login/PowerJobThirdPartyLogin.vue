@@ -97,7 +97,10 @@ export default {
       }
 
       this.axios.post('/auth/thirdPartyLoginDirect', login_request).then(ret => {
-        console.log(ret)
+
+        const jwtToken = ret.jwtToken
+        window.localStorage.setItem('Power_jwt', jwtToken);
+
         this.$router.push("/admin/app")
       })
 

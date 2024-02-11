@@ -44,6 +44,8 @@ new Vue({
 //请求发送拦截，没有 appId 要求重新 "登录"
 axios.interceptors.request.use((request) => {
 
+  request.headers['Power_jwt'] = window.localStorage.getItem("Power_jwt");
+
   let url = request.url;
   let isListAppInfo = url.search("/appInfo/list") !== -1;
   let isAppRegister = url.search("/appInfo/save") !== -1;

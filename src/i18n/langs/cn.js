@@ -22,6 +22,9 @@ const cn = {
         'back': '返回',
         'all': '全部',
         'more': '| 更多',
+        'add': '新增',
+        'extra': '额外信息',
+        'tag': '标签',
 
         // 欢迎界面
         'appRegister': '执行应用注册',
@@ -30,7 +33,7 @@ const cn = {
         'appName': '应用名称',
         'appPassword': '密码',
         'register': '注册',
-        'name': '用户名',
+        'name': '名称',
         'nick': '昵称',
         'phone': '手机号',
         'email': '邮箱地址',

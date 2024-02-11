@@ -43,9 +43,12 @@ import LoginCard from './LoginCard.vue';
         const that = this;
 
         const url = "/auth/ifLogin";
-        this.axios.get(url).then((result) => {
-          console.log('[LoginHomePage] ifLogin result: ' + result)
-        }, error => that.$message.error(error));
+        this.axios.get(url).then(() => {
+          this.$router.push("/admin/app")
+        }, error => {
+          window.localStorage.removeItem('Power_jwt');
+          that.$message.error(error)
+        });
       },
 
       // 处理第三方登录的回调请求
@@ -64,8 +67,11 @@ import LoginCard from './LoginCard.vue';
         console.log('final url:' + callbackLoginUrl)
         this.axios.get(callbackLoginUrl).then(ret => {
           console.log('login success, user: ' + ret)
+
+          const jwtToken = ret.jwtToken
+          window.localStorage.setItem('Power_jwt', jwtToken);
+
           this.$router.push("/admin/app")
-          return
         })
       }
     },
