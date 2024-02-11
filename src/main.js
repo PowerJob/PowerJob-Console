@@ -54,12 +54,15 @@ axios.interceptors.request.use((request) => {
     return request;
   }
 
+  /*
+  TODO: 先注释原来的全局 appId 登录拦截逻辑，后续考虑兼容性问题
   let appId = store.state.appInfo.id;
   if (appId === undefined || appId === null) {
     router.push("/");
     // remove no appId warn due to too much user report this is a bug...
     return Promise.reject();
   }
+   */
   return request;
 
 }, function (error) {

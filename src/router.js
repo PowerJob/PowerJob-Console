@@ -6,8 +6,10 @@ Vue.use(VueRouter);
 
 const router = new VueRouter({
     routes: [
-        { path: "/", redirect: '/welcome' },
+        { path: "/", redirect: '/loginHomepage' },
         { path: "/welcome", component: () => import('./components/Welcome') },
+        { path: "/loginHomepage", component: () => import('./components/login/LoginHomepage.vue') },
+        { path: "/powerjobLogin", component: () => import('./components/login/PowerJobThirdPartyLogin.vue') },
         {
             path: "/oms", component: Console, redirect: "/oms/home", children: [
                 // 二级路由

@@ -31,6 +31,7 @@ const en = {
         'appPassword': 'AppPassword',
         'register': 'Register',
         'name': 'Name',
+        'nick': 'Nick',
         'phone': 'Phone',
         'email': 'Email',
         'webhook': 'Webhook',
