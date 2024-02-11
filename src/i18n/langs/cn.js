@@ -233,7 +233,13 @@ const cn = {
         'export': '导出',
         'condition': '判断节点',
         'workflowChild': '子流程节点',
-        'importWorkflowTitle': '工作流节点引入'
+        'importWorkflowTitle': '工作流节点引入',
+
+        // namespace
+        'createTime': '创建时间',
+        'modifyTime': '修改时间',
+        'creator': '创建人',
+        'modifier': '修改人',
     },
     ...zhLocale
 };

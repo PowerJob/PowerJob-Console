@@ -228,7 +228,13 @@ const en = {
         'export': 'Export',
         'condition': 'Condition',
         'workflowChild': 'Subprocesses',
-        'importWorkflowTitle': 'importWorkflowTitle'
+        'importWorkflowTitle': 'importWorkflowTitle',
+
+        // namespace
+        'createTime': 'CreateTime',
+        'modifyTime': 'ModifyTime',
+        'creator': 'Creator',
+        'modifier': 'Modifier',
     },
     ...enLocale
 };

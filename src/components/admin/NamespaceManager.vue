@@ -28,6 +28,20 @@
       </el-col>
     </el-row>
 
+    <!--第二行，任务数据表格-->
+    <el-row>
+      <el-table :data="namespaceResult" style="width: 100%">
+        <el-table-column prop="id" label="ID" width="80"/>
+        <el-table-column prop="code" label="code" width="80"/>
+        <el-table-column prop="name" :label="$t('message.name')" />
+        <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" />
+        <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" />
+        <el-table-column prop="statusStr" :label="$t('message.status')" />
+        <el-table-column prop="creator" :label="$t('message.creator')" />
+        <el-table-column prop="modifier" :label="$t('message.modifier')" />
+      </el-table>
+    </el-row>
+
 
     <el-dialog :close-on-click-modal="false" :visible.sync="modifiedNamespaceFormVisible" width="80%">
       <el-form :model="modifiedNamespaceForm" label-width="120px">
@@ -99,6 +113,16 @@ export default {
 
     // 新增 namespace
     onClickNewNamespace() {
+      // 清空之前填写的脏数据
+      this.modifiedNamespaceForm = {
+        id: undefined,
+        code: undefined,
+        name: undefined,
+        tags: undefined,
+        status: undefined,
+        extra: undefined
+      }
+
       this.modifiedNamespaceFormVisible = true;
     },
 
@@ -110,6 +134,9 @@ export default {
       this.modifiedNamespaceFormVisible = false;
       this.listJobInfos();
     }
+  },
+  mounted() {
+    this.listNamespaces()
   }
 }
 </script>
