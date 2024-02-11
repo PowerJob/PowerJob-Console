@@ -45,6 +45,8 @@ const cn = {
 
 
         // 左侧tab栏
+        'tabAppManage': '应用管理',
+        'tabNamespace': '命名空间',
         'tabHome': '系统首页',
         'tabJobManage': '任务管理',
         'tabJobInstance': '任务实例',

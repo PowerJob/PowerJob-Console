@@ -36,10 +36,43 @@ import LoginCard from './LoginCard.vue';
         this.axios.get(url).then((result) => {
           that.login_type_info = result;
         }, error => that.$message.error(error));
+      },
+
+      // 上下文登录（JWT ifLogin）
+      tryLogin() {
+        const that = this;
+
+        const url = "/auth/ifLogin";
+        this.axios.get(url).then((result) => {
+          console.log('[LoginHomePage] ifLogin result: ' + result)
+        }, error => that.$message.error(error));
+      },
+
+      // 处理第三方登录的回调请求
+      callbackLogin() {
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        if (urlSearchParams.size === 0) {
+          console.log('no urlSearchParams, skip process callback')
+          return
+        }
+        // 处理第三方回调
+        let callbackLoginUrl = '/auth/thirdPartyLoginCallback?'
+        // 显示键/值对
+        for (var pair of urlSearchParams.entries()) {
+          callbackLoginUrl = callbackLoginUrl + '&' + pair[0] + '=' + pair[1];
+        }
+        console.log('final url:' + callbackLoginUrl)
+        this.axios.get(callbackLoginUrl).then(ret => {
+          console.log('login success, user: ' + ret)
+          this.$router.push("/admin/app")
+          return
+        })
       }
     },
     mounted() {
       this.fetchSupportLoginTypes()
+      this.callbackLogin()
+      this.tryLogin()
     }
   }
 </script>

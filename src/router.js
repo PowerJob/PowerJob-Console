@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Console from "./components/Console";
+import AdminConsole from "./components/admin/AdminConsole.vue";
 
 Vue.use(VueRouter);
 
@@ -25,6 +26,16 @@ const router = new VueRouter({
                 { path: "/oms/workflowEditor", name: "workflowEditor", meta: { title: '工作流编辑器' }, component: () => import('./components/dag/WorkflowEditor') }
             ]
         },
+
+        // 管理后台
+        {
+            path: "/admin", component: AdminConsole, redirect: "/admin/app", children: [
+                // 二级路由
+                { path: "/admin/app", meta: { title: '应用管理' }, component: () => import('./components/admin/AppManager.vue') },
+                { path: "/admin/namespace", meta: { title: '命名空间' }, component: () => import('./components/admin/NamespaceManager.vue') }
+            ]
+        },
+
         // 调试用
         { path: "/sidebar", component: () => import('./components/bar/Sidebar') },
         { path: "/navbar", component: () => import('./components/bar/Navbar') },

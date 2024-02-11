@@ -98,6 +98,7 @@ export default {
 
       this.axios.post('/auth/thirdPartyLoginDirect', login_request).then(ret => {
         console.log(ret)
+        this.$router.push("/admin/app")
       })
 
     },

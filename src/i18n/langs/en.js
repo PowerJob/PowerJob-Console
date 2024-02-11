@@ -43,6 +43,8 @@ const en = {
         'newPassword2': 'Check New Password',
         'stayLogged': 'Keep me logged in',
 
+        'tabAppManage': 'AppManage',
+        'tabNamespace': 'Namespace',
         'tabHome': 'Home',
         'tabJobManage': 'Job management',
         'tabJobInstance': 'Job instances',
