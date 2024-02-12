@@ -25,6 +25,7 @@ const en = {
         'add': 'Add',
         'extra': 'Extra',
         'tag': 'Tag',
+        'enter': 'Enter',
 
         // 欢迎界面
         'appRegister': 'App Registration',

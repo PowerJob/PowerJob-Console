@@ -16,9 +16,15 @@
             <el-input v-model="queryAppRequest.tagLike" placeholder="tags(Like)"/>
           </el-form-item>
 
-          <!-- TODO: 上线前改为下拉筛选框 -->
           <el-form-item label="namespace">
-            <el-input v-model="queryAppRequest.namespaceId" placeholder="namespaceId"/>
+            <el-select v-model="queryAppRequest.namespaceId" placeholder="namespace">
+              <el-option
+                  v-for="item in namespaceList"
+                  :key="item.id"
+                  :label="item.frontName"
+                  :value="item.id">
+              </el-option>
+            </el-select>
           </el-form-item>
 
           <el-form-item>
@@ -50,6 +56,7 @@
         <el-table-column :label="$t('message.operation')" width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
+            <el-button size="mini" type="text" @click="onClickEnter(scope.row)">{{$t('message.enter')}}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -67,6 +74,18 @@
 
     <el-dialog :close-on-click-modal="false" :visible.sync="modifiedAppFormVisible" width="80%">
       <el-form :model="modifiedAppForm" label-width="120px">
+
+        <el-form-item label="namespace">
+          <el-select v-model="modifiedAppForm.namespaceId" placeholder="namespace">
+            <el-option
+                v-for="item in namespaceList"
+                :key="item.id"
+                :label="item.frontName"
+                :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
         <el-form-item label="appName">
           <el-input v-model="modifiedAppForm.appName"/>
         </el-form-item>
@@ -122,6 +141,7 @@ export default {
       modifiedAppForm: {
         id: undefined,
         appName: undefined,
+        namespaceId: undefined,
         password: undefined,
         title: undefined,
         tags: undefined,
@@ -138,7 +158,10 @@ export default {
       appResult: [],
 
       // 显示变量
-      modifiedAppFormVisible: false
+      modifiedAppFormVisible: false,
+
+      // namespace，用于驱动下拉列表
+      namespaceList: []
     }
   },
   methods: {
@@ -211,10 +234,30 @@ export default {
       this.user_rule_form = JSON.parse(JSON.stringify(data.componentUserRoleInfo));
       this.modifiedAppFormVisible = true;
     },
+
+    // 进入任务管理界面
+    onClickEnter(data) {
+      let appInfo = {
+        id: data.id,
+        appName: data.appName
+      };
+      // 将 appId 存储到 VueStore
+      this.$store.commit("initAppInfo", appInfo);
+      // 跳转到主界面
+      this.$router.push("/oms/home")
+    },
+
+    listNamespaces() {
+      const that = this;
+      this.axios.post("/namespace/listAll", this.queryAppRequest).then((res) => {
+        that.namespaceList = res;
+      });
+    }
   },
 
   mounted() {
     this.listApps()
+    this.listNamespaces()
   }
 }
 </script>

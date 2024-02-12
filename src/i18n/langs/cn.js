@@ -25,6 +25,7 @@ const cn = {
         'add': '新增',
         'extra': '额外信息',
         'tag': '标签',
+        'enter': '进入',
 
         // 欢迎界面
         'appRegister': '执行应用注册',
