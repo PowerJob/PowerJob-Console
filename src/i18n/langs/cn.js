@@ -240,6 +240,12 @@ const cn = {
         'modifyTime': '修改时间',
         'creator': '创建人',
         'modifier': '修改人',
+
+        // permission
+        'observer': '观察者',
+        'qa': '测试员',
+        'developer':'开发者',
+        'admin': '管理员'
     },
     ...zhLocale
 };

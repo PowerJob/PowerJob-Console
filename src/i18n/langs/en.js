@@ -235,6 +235,12 @@ const en = {
         'modifyTime': 'ModifyTime',
         'creator': 'Creator',
         'modifier': 'Modifier',
+
+        // permission
+        'observer': 'Observer',
+        'qa': 'QA',
+        'developer':'Developer',
+        'admin': 'Admin'
     },
     ...enLocale
 };

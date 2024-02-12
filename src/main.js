@@ -74,6 +74,14 @@ axios.interceptors.request.use((request) => {
 
 // 请求返回拦截，封装公共处理逻辑
 axios.interceptors.response.use((response) => {
+
+  // -100 为未登录约定状态码，前端全局拦截跳转登录页面
+  if (response.data.code === '-100') {
+    Message.warning("USER_NEED_LOGIN")
+    router.push("/");
+    return
+  }
+
   if (response.data.success === true) {
     return response.data.data;
   }

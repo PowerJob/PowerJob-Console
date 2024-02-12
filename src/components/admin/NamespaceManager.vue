@@ -71,6 +71,10 @@
           <el-input v-model="modifiedNamespaceForm.extra"/>
         </el-form-item>
 
+        <el-form-item label="权限管控">
+          <user-role :user-rule-form="user_rule_form"/>
+        </el-form-item>
+
         <el-form-item>
           <el-button type="primary" @click="onClickSaveNamespace">{{$t('message.save')}}</el-button>
           <el-button @click="modifiedNamespaceFormVisible = false">{{$t('message.cancel')}}</el-button>
@@ -81,8 +85,11 @@
 </template>
 
 <script>
+import UserRole from "../common/UserRole.vue";
+
 export default {
   name: "NamespaceManager",
+  components: {UserRole},
   data() {
     return {
 
@@ -103,6 +110,13 @@ export default {
         tags: undefined,
         status: undefined,
         extra: undefined
+      },
+
+      user_rule_form: {
+        observer: [],
+        qa: [],
+        developer: [],
+        admin: [],
       },
 
       namespaceResult: [],
@@ -147,17 +161,24 @@ export default {
         status: undefined,
         extra: undefined
       }
+      this.user_rule_form.observer = []
+      this.user_rule_form.qa = []
+      this.user_rule_form.developer = []
+      this.user_rule_form.admin = []
 
       this.modifiedNamespaceFormVisible = true;
     },
 
     onClickSaveNamespace() {
       let that = this;
+      this.modifiedNamespaceForm['componentUserRoleInfo'] = this.user_rule_form;
+
+      console.log("modifiedNamespaceForm: " + JSON.stringify(this.modifiedNamespaceForm))
       this.axios.post("/namespace/save", this.modifiedNamespaceForm).then(() => {
         that.$message.success(that.$t('message.success'));
       }, e => that.$message.error(e))
       this.modifiedNamespaceFormVisible = false;
-      this.listJobInfos();
+      this.listNamespaces();
     }
   },
   mounted() {

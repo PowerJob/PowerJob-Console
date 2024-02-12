@@ -43,8 +43,12 @@ import LoginCard from './LoginCard.vue';
         const that = this;
 
         const url = "/auth/ifLogin";
-        this.axios.get(url).then(() => {
-          this.$router.push("/admin/app")
+        this.axios.get(url).then(ret => {
+          if (ret === null || ret === undefined) {
+            console.log('ifLogin failed, need reLogin')
+          } else {
+            this.$router.push("/admin/app")
+          }
         }, error => {
           window.localStorage.removeItem('Power_jwt');
           that.$message.error(error)
