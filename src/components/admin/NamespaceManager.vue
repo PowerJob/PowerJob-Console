@@ -8,10 +8,13 @@
       <el-col :span="16">
         <el-form :inline="true" :model="queryNamespaceRequest" class="el-form--inline">
           <el-form-item label="code">
-            <el-input v-model="queryNamespaceRequest.code" placeholder="code"/>
+            <el-input v-model="queryNamespaceRequest.codeLike" placeholder="code"/>
           </el-form-item>
           <el-form-item :label="$t('message.name')">
-            <el-input v-model="queryNamespaceRequest.name" :placeholder="$t('message.name')"/>
+            <el-input v-model="queryNamespaceRequest.nameLike" :placeholder="$t('message.name')"/>
+          </el-form-item>
+          <el-form-item label="tag">
+            <el-input v-model="queryNamespaceRequest.tagLike" placeholder="tag"/>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="listNamespaces">{{$t('message.query')}}</el-button>
@@ -30,7 +33,7 @@
 
     <!--第二行，任务数据表格-->
     <el-row>
-      <el-table :data="namespaceResult" style="width: 100%">
+      <el-table :data="namespaceResult.data" style="width: 100%">
         <el-table-column prop="id" label="ID" width="80"/>
         <el-table-column prop="code" label="code" width="80"/>
         <el-table-column prop="name" :label="$t('message.name')" />
@@ -40,6 +43,16 @@
         <el-table-column prop="creator" :label="$t('message.creator')" />
         <el-table-column prop="modifier" :label="$t('message.modifier')" />
       </el-table>
+    </el-row>
+
+    <!-- 第三行，分页插件 -->
+    <el-row>
+      <el-pagination
+          layout="prev, pager, next"
+          :total="this.namespaceResult.totalItems"
+          :page-size="this.namespaceResult.pageSize"
+          @current-change="onClickChangePage"
+          :hide-on-single-page="true"/>
     </el-row>
 
 
@@ -75,8 +88,11 @@ export default {
 
       // 查询命名空间
       queryNamespaceRequest: {
-        code: undefined,
-        name: undefined
+        codeLike: undefined,
+        nameLike: undefined,
+        tagLike: undefined,
+        index:0,
+        pageSize:10
       },
 
       // 创建or修改表单
@@ -98,8 +114,10 @@ export default {
   methods: {
     // 点击重置按钮
     onClickReset() {
-      this.queryNamespaceRequest.code = undefined;
-      this.queryNamespaceRequest.name = undefined;
+      this.queryNamespaceRequest.codeLike = undefined;
+      this.queryNamespaceRequest.nameLike = undefined;
+      this.queryNamespaceRequest.tagLike = undefined;
+      this.queryNamespaceRequest.index = 0;
       this.listNamespaces();
     },
 
@@ -109,6 +127,13 @@ export default {
       this.axios.post("/namespace/list", this.queryNamespaceRequest).then((res) => {
         that.namespaceResult = res;
       });
+    },
+
+    // 点击 换页
+    onClickChangePage(index) {
+      // 后端从0开始，前端从1开始
+      this.queryNamespaceRequest.index = index - 1;
+      this.listNamespaces();
     },
 
     // 新增 namespace
