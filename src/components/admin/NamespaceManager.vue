@@ -42,6 +42,12 @@
         <el-table-column prop="statusStr" :label="$t('message.status')" />
         <el-table-column prop="creator" :label="$t('message.creator')" />
         <el-table-column prop="modifier" :label="$t('message.modifier')" />
+
+        <el-table-column :label="$t('message.operation')" width="150">
+          <template slot-scope="scope">
+            <el-button size="mini" type="text" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </el-row>
 
@@ -63,6 +69,9 @@
         </el-form-item>
         <el-form-item :label="$t('message.name')">
           <el-input v-model="modifiedNamespaceForm.name"/>
+        </el-form-item>
+        <el-form-item label="Token" >
+          <el-input :disabled="true" v-model="modifiedNamespaceForm.token"/>
         </el-form-item>
         <el-form-item :label="$t('message.tag')">
           <el-input v-model="modifiedNamespaceForm.tags"/>
@@ -169,17 +178,30 @@ export default {
       this.modifiedNamespaceFormVisible = true;
     },
 
+    // 保存
     onClickSaveNamespace() {
       let that = this;
       this.modifiedNamespaceForm['componentUserRoleInfo'] = this.user_rule_form;
 
       console.log("modifiedNamespaceForm: " + JSON.stringify(this.modifiedNamespaceForm))
-      this.axios.post("/namespace/save", this.modifiedNamespaceForm).then(() => {
+      this.axios.post("/namespace/save", this.modifiedNamespaceForm, {
+        'headers': {
+          'Content-Type': 'application/json',
+          'NamespaceId': that.modifiedNamespaceForm.id
+        }
+      }).then(() => {
         that.$message.success(that.$t('message.success'));
       }, e => that.$message.error(e))
       this.modifiedNamespaceFormVisible = false;
       this.listNamespaces();
-    }
+    },
+
+    // 点击 编辑按钮
+    onClickModify(data) {
+      this.modifiedNamespaceForm = JSON.parse(JSON.stringify(data));
+      this.user_rule_form = JSON.parse(JSON.stringify(data.componentUserRoleInfo));
+      this.modifiedNamespaceFormVisible = true;
+    },
   },
   mounted() {
     this.listNamespaces()
