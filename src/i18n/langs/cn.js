@@ -30,6 +30,7 @@ const cn = {
         // 欢迎界面
         'appRegister': '执行应用注册',
         'userRegister': '注册',
+        'changePassword': '修改密码',
         'appNameInputPLH': '请输入应用名称',
         'appName': '应用名称',
         'appPassword': '密码',

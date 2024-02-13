@@ -30,6 +30,7 @@ const en = {
         // 欢迎界面
         'appRegister': 'App Registration',
         'userRegister': 'User Registration',
+        'changePassword': 'Change Password',
         'appNameInputPLH': 'Enter The AppName',
         'appName': 'AppName',
         'appPassword': 'AppPassword',

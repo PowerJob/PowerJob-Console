@@ -54,6 +54,32 @@
 
       </el-form>
     </el-dialog>
+
+    <el-dialog :title="$t('message.changePassword')" :visible.sync="changePasswordFormVisible" width="35%" >
+      <el-form :model="changePasswordRequest" style="margin:0 5px">
+
+        <el-form-item label="username">
+          <el-input v-model="changePasswordRequest.username"/>
+        </el-form-item>
+
+        <el-form-item :label="$t('message.oldPassword')">
+          <el-input v-model="changePasswordRequest.oldPassword"/>
+        </el-form-item>
+
+        <el-form-item :label="$t('message.newPassword')">
+          <el-input v-model="changePasswordRequest.newPassword"/>
+        </el-form-item>
+        <el-form-item :label="$t('message.newPassword2')">
+          <el-input v-model="changePasswordRequest.newPassword2"/>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="changePassword">{{$t('message.confirm')}}</el-button>
+          <el-button @click="changePasswordFormVisible = false">{{$t('message.cancel')}}</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -79,6 +105,15 @@ export default {
         password: '',
         password2: ''
       },
+
+      // 修改密码
+      changePasswordRequest: {
+        username: undefined,
+        oldPassword: undefined,
+        newPassword: undefined,
+        newPassword2: undefined
+      },
+      changePasswordFormVisible: false
     };
   },
   methods: {
@@ -106,7 +141,7 @@ export default {
 
     },
 
-    // 注册用户（仅用于报警通知）
+    // 注册用户
     registerUser() {
 
       if (this.userRegisterForm.password !== this.userRegisterForm.password2) {
@@ -120,7 +155,19 @@ export default {
         that.userRegisterFormVisible = false;
       }, that.userRegisterFormVisible = false);
     },
+
+    // 修改密码
+    changePassword() {
+      this.axios.post('/pwjbUser/changePassword', this.changePasswordRequest)
+    }
   },
+
+  mounted() {
+    console.log(window.location.search)
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    console.log(JSON.stringify(urlSearchParams))
+    console.log(urlSearchParams['usageType'])
+  }
 };
 </script>
 

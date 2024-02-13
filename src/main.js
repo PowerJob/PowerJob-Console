@@ -47,15 +47,14 @@ axios.interceptors.request.use((request) => {
   request.headers['Power_jwt'] = window.localStorage.getItem("Power_jwt");
   request.headers['AppId'] = window.localStorage.getItem("Power_appId");
 
-  let url = request.url;
-  let isListAppInfo = url.search("/appInfo/list") !== -1;
-  let isAppRegister = url.search("/appInfo/save") !== -1;
-  let isUserRegister = url.search("/user/save") !== -1;
-  let isAssertAppInfo = url.search("/appInfo/assert") !== -1;
-
-  if (isListAppInfo || isAppRegister || isUserRegister || isAssertAppInfo) {
-    return request;
-  }
+  // let url = request.url;
+  // let isListAppInfo = url.search("/appInfo/list") !== -1;
+  // let isAppRegister = url.search("/appInfo/save") !== -1;
+  // let isAssertAppInfo = url.search("/appInfo/assert") !== -1;
+  //
+  // if (isListAppInfo || isAppRegister  || isAssertAppInfo) {
+  //   return request;
+  // }
 
   /*
   TODO: 先注释原来的全局 appId 登录拦截逻辑，后续考虑兼容性问题
