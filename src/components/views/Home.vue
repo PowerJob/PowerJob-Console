@@ -116,7 +116,11 @@
                     runningInstanceCount: "N/A",
                     failedInstanceCount: "N/A",
                     serverTime: "UNKNOWN",
-                    timezone: "UNKNOWN"
+                    timezone: "UNKNOWN",
+                    scheduleServerInfo: {
+                      ip:'UNKNOWN',
+                      bornTime:undefined
+                    }
                 },
                 activeWorkerCount: "N/A",
                 workerList: []

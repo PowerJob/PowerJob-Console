@@ -247,7 +247,17 @@ export default {
       // 同步存储一份到 localStorage（后续主要使用 localStorage，鉴权全部在服务端，本地无脑存即可）
       window.localStorage.setItem('Power_appId', appInfo.id)
 
-      // 跳转到主界面
+      // 跳转到 APP 主界面
+      this.$router.push("/oms/home")
+    },
+
+    // 自动登录 APP，缩短绝大部分用户的操作路径
+    autoEnterApp() {
+      const appId = window.localStorage.getItem('Power_appId')
+      if (appId == undefined || appId == null || appId == '') {
+        return
+      }
+      console.log('Detect the existence of appId and enter automatically: ' + appId)
       this.$router.push("/oms/home")
     },
 
@@ -260,6 +270,9 @@ export default {
   },
 
   mounted() {
+
+    this.autoEnterApp()
+
     this.listApps()
     this.listNamespaces()
   }
