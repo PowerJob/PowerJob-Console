@@ -27,6 +27,10 @@
             </el-select>
           </el-form-item>
 
+          <el-form-item :label="$t('message.showMyRelated')">
+            <el-switch v-model="queryAppRequest.showMyRelated"></el-switch>
+          </el-form-item>
+
           <el-form-item>
             <el-button type="primary" @click="listApps">{{$t('message.query')}}</el-button>
             <el-button type="cancel" @click="onClickReset">{{$t('message.reset')}}</el-button>

@@ -14,7 +14,7 @@
           <el-menu-item index="/admin/app">
             <template slot="title">
               <!-- 图标 + 文字 -->
-              <i class="el-icon-monitor"/>
+              <i class="el-icon-apple"/>
               <span>{{$t('message.tabAppManage')}}</span>
             </template>
           </el-menu-item>
@@ -22,8 +22,24 @@
           <el-menu-item index="/admin/namespace">
             <template slot="title">
               <!-- 图标 + 文字 -->
-              <i class="el-icon-data-analysis"/>
+              <i class="el-icon-orange"/>
               <span>{{$t('message.tabNamespace')}}</span>
+            </template>
+          </el-menu-item>
+
+          <el-menu-item index="/admin/user">
+            <template slot="title">
+              <!-- 图标 + 文字 -->
+              <i class="el-icon-user"/>
+              <span>{{$t('message.tabPersonal')}}</span>
+            </template>
+          </el-menu-item>
+
+          <el-menu-item index="/admin/settings">
+            <template slot="title">
+              <!-- 图标 + 文字 -->
+              <i class="el-icon-setting"/>
+              <span>{{$t('message.tabSettings')}}</span>
             </template>
           </el-menu-item>
 

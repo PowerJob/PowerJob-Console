@@ -46,6 +46,7 @@
         <el-table-column :label="$t('message.operation')" width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
+            <el-button size="mini" type="text" @click="onClickDeleteNamespace(scope.row)">{{$t('message.delete')}}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -191,9 +192,9 @@ export default {
         }
       }).then(() => {
         that.$message.success(that.$t('message.success'));
+        this.listNamespaces();
       }, e => that.$message.error(e))
       this.modifiedNamespaceFormVisible = false;
-      this.listNamespaces();
     },
 
     // 点击 编辑按钮
@@ -202,6 +203,21 @@ export default {
       this.user_rule_form = JSON.parse(JSON.stringify(data.componentUserRoleInfo));
       this.modifiedNamespaceFormVisible = true;
     },
+
+    // 点击 删除命名空间
+    onClickDeleteNamespace(data) {
+      const url = '/namespace/delete?id=' + data.id
+      console.log('delete url:' + url)
+      this.axios.delete(url, {
+        'headers': {
+          'Content-Type': 'application/json',
+          'NamespaceId': data.id
+        }
+      }).then(ret => {
+        console.log('delete ret: ' + ret)
+        this.listNamespaces();
+      })
+    }
   },
   mounted() {
     this.listNamespaces()

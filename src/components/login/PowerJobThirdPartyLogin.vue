@@ -19,8 +19,8 @@
     <el-dialog :title="$t('message.userRegister')" :visible.sync="userRegisterFormVisible" width="35%" >
       <el-form :model="userRegisterForm" style="margin:0 5px">
 
-        <el-form-item :label="$t('message.name')">
-          <el-input v-model="userRegisterForm.username"/>
+        <el-form-item label="username">
+          <el-input v-model="userRegisterForm.username" placeholder="全局唯一标识，建议使用英文"/>
         </el-form-item>
 
         <el-form-item :label="$t('message.nick')">
@@ -92,7 +92,7 @@ export default {
       }
 
       let login_request = {
-        loginType: 'PowerJob',
+        loginType: 'PWJB',
         originParams: JSON.stringify(s_info)
       }
 
@@ -115,7 +115,7 @@ export default {
       }
 
       const that = this;
-      this.axios.post("/user/save", this.userRegisterForm).then(() => {
+      this.axios.post("/pwjbUser/create", this.userRegisterForm).then(() => {
         that.$message.success(this.$t('message.success'));
         that.userRegisterFormVisible = false;
       }, that.userRegisterFormVisible = false);

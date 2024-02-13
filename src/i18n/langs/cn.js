@@ -60,6 +60,8 @@ const cn = {
         'tabContainerOps': '容器',
         'tabTemplate': '模版生成',
         'tabContainerManager': '容器运维',
+        'tabSettings': '系统设置',
+        'tabPersonal': '个人中心',
 
         // 系统首页
         'omsServerTime': '服务器时间',
@@ -244,12 +246,13 @@ const cn = {
         'modifyTime': '修改时间',
         'creator': '创建人',
         'modifier': '修改人',
+        'showMyRelated': '只看我的',
 
         // permission
         'observer': '观察者',
         'qa': '测试员',
         'developer':'开发者',
-        'admin': '管理员'
+        'admin': '管理员',
     },
     ...zhLocale
 };

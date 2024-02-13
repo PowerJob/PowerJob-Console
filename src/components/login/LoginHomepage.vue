@@ -51,6 +51,7 @@ import LoginCard from './LoginCard.vue';
           }
         }, error => {
           window.localStorage.removeItem('Power_jwt');
+          window.localStorage.removeItem('Power_appId');
           that.$message.error(error)
         });
       },

@@ -58,6 +58,8 @@ const en = {
         'tabContainerOps': 'Container DevOps',
         'tabTemplate': 'Template generator',
         'tabContainerManager': 'Container Management',
+        'tabSettings': 'Settings',
+        'tabPersonal': 'Personal',
 
         'omsServerTime': 'Server Time',
         'omsServerTimezone': 'Server Timezone',
@@ -239,6 +241,7 @@ const en = {
         'modifyTime': 'ModifyTime',
         'creator': 'Creator',
         'modifier': 'Modifier',
+        'showMyRelated': 'ShowMyRelated',
 
         // permission
         'observer': 'Observer',

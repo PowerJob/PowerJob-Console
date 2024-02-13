@@ -48,6 +48,7 @@
 
           // 退出登录
           onClickLogout() {
+            window.localStorage.removeItem('Power_appId');
             window.localStorage.removeItem('Power_jwt')
             this.$router.push("/");
           },
