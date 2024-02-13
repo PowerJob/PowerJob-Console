@@ -39,10 +39,36 @@
 
       <el-form-item>
         <el-button type="primary" @click="onClickSaveNewUserInfo">{{$t('message.save')}}</el-button>
+        <el-button type="danger" v-if="userDetailInfo.accountType=='PWJB'" @click="onClickChangePassword">{{$t('message.changePassword')}}</el-button>
       </el-form-item>
 
     </el-form>
   </el-row>
+
+  <el-dialog :title="$t('message.changePassword')" :visible.sync="changePasswordFormVisible" width="35%" >
+    <el-form :model="changePasswordRequest" style="margin:0 5px">
+
+      <el-form-item label="username">
+        <el-input disabled v-model="changePasswordRequest.username"/>
+      </el-form-item>
+
+      <el-form-item :label="$t('message.oldPassword')">
+        <el-input v-model="changePasswordRequest.oldPassword"/>
+      </el-form-item>
+
+      <el-form-item :label="$t('message.newPassword')">
+        <el-input v-model="changePasswordRequest.newPassword"/>
+      </el-form-item>
+      <el-form-item :label="$t('message.newPassword2')">
+        <el-input v-model="changePasswordRequest.newPassword2"/>
+      </el-form-item>
+
+      <el-form-item>
+        <el-button type="primary" @click="submitChangePasswordRequest">{{$t('message.confirm')}}</el-button>
+        <el-button @click="changePasswordFormVisible = false">{{$t('message.cancel')}}</el-button>
+      </el-form-item>
+    </el-form>
+  </el-dialog>
 </div>
 </template>
 
@@ -71,7 +97,15 @@ export default {
         role2AppList: {
 
         }
-      }
+      },
+      // 修改密码
+      changePasswordRequest: {
+        username: undefined,
+        oldPassword: undefined,
+        newPassword: undefined,
+        newPassword2: undefined
+      },
+      changePasswordFormVisible: false
     }
   },
 
@@ -86,6 +120,20 @@ export default {
       this.axios.post('/user/modify', that.userDetailInfo).then(() => {
         Message.success("SUCCESS");
         that.fetchUserDetail();
+      })
+    },
+
+    // 修改密码
+    onClickChangePassword() {
+      this.changePasswordRequest.username = this.userDetailInfo.originUsername
+      this.changePasswordFormVisible = true
+    },
+
+    submitChangePasswordRequest() {
+      this.axios.post('/pwjbUser/changePassword', this.changePasswordRequest).then(() => {
+        Message.success('SUCCESS')
+      }, err => {
+        Message.error(err)
       })
     }
   },
