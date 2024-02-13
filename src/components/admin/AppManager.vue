@@ -223,9 +223,9 @@ export default {
         }
       }).then(() => {
         that.$message.success(that.$t('message.success'));
+        this.listApps();
       }, e => that.$message.error(e))
       this.modifiedAppFormVisible = false;
-      this.listApps();
     },
 
     // 点击 编辑按钮
