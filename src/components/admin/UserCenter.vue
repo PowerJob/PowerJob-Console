@@ -1,7 +1,7 @@
 <template>
 <div>
   <el-row>
-    <el-form :model="userDetailInfo" label-width="80px" style="width: 500px;">
+    <el-form :model="userDetailInfo" label-width="118px" style="width: 500px;">
       <el-form-item label="ID">
         <el-input disabled v-model="userDetailInfo.id"/>
       </el-form-item>
