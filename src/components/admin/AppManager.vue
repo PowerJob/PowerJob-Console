@@ -243,6 +243,10 @@ export default {
       };
       // 将 appId 存储到 VueStore
       this.$store.commit("initAppInfo", appInfo);
+
+      // 同步存储一份到 localStorage（后续主要使用 localStorage，鉴权全部在服务端，本地无脑存即可）
+      window.localStorage.setItem('Power_appId', appInfo.id)
+
       // 跳转到主界面
       this.$router.push("/oms/home")
     },

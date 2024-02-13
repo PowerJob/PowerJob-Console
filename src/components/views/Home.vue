@@ -9,20 +9,20 @@
                         {{$t('message.appName')}}
                     </div>
                     <div>
-                        {{this.$store.state.appInfo.appName}}
+                      {{ systemInfo.appName }}
                     </div>
                 </el-card>
             </el-col>
-                <el-col :span="6">
-                    <el-card shadow="always" style="text-align:center">
-                        <div>
-                            <a href="https://github.com/PowerJob/PowerJob" target="_blank">{{$t('message.githubURL')}}</a>
-                        </div>
-                        <div>
-                            <a href="https://github.com/PowerJob/PowerJob/wiki" target="_blank">{{$t('message.docURL')}}</a>
-                        </div>
-                    </el-card>
-                </el-col>
+          <el-col :span="6">
+            <el-card shadow="always">
+              <div>
+                {{$t('message.omsServerIP')}}：{{ systemInfo.scheduleServerInfo.ip }}
+              </div>
+              <div>
+                {{$t('message.omsServerBornTime')}}：{{this.common.timestamp2Str(systemInfo.scheduleServerInfo.bornTime) }}
+              </div>
+            </el-card>
+          </el-col>
             <el-col :span="6">
                 <el-card shadow="always">
                     <div>
@@ -111,6 +111,7 @@
         data() {
             return {
                 systemInfo: {
+                  appName: 'UNKNOWN',
                     jobCount: "N/A",
                     runningInstanceCount: "N/A",
                     failedInstanceCount: "N/A",
@@ -133,7 +134,7 @@
         },
         mounted() {
             let that = this;
-            let appId = that.$store.state.appInfo.id;
+            let appId = window.localStorage.getItem("Power_appId");
             // 请求 Worker 列表
             that.axios.get("/system/listWorker?appId=" + appId).then(res => {
                 res.sort((a,b) => a.status - b.status );

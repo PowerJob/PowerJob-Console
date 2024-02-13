@@ -45,6 +45,7 @@ new Vue({
 axios.interceptors.request.use((request) => {
 
   request.headers['Power_jwt'] = window.localStorage.getItem("Power_jwt");
+  request.headers['AppId'] = window.localStorage.getItem("Power_appId");
 
   let url = request.url;
   let isListAppInfo = url.search("/appInfo/list") !== -1;

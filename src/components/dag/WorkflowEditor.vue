@@ -360,7 +360,7 @@ export default {
     return {
       workflowInfo: {
         id: "",
-        appId: this.$store.state.appInfo.id,
+        appId: window.localStorage.getItem("Power_appId"),
         enable: true,
         maxWfInstanceNum: 1,
         notifyUserIds: [],
@@ -387,7 +387,7 @@ export default {
       // 导入任务相关
       importDrawerVisible: false,
       jobQueryContent: {
-        appId: this.$store.state.appInfo.id,
+        appId: window.localStorage.getItem("Power_appId"),
         index: 0,
         pageSize: 8,
         jobId: undefined,
@@ -755,7 +755,7 @@ export default {
       } else {
         this.workflowInfo.lifeCycle = null;
       }
-      this.workflowInfo.appId = this.$store.state.appInfo.id;
+      this.workflowInfo.appId = window.localStorage.getItem("Power_appId");
       this.getWorkflowInfo(true);
     }
   },

@@ -43,7 +43,7 @@ export default {
   name: "AdminConsoleSidebar",
   data() {
     return {
-      default_active_index: "/home"
+      default_active_index: "/admin/app"
     }
   }
 }
@@ -54,7 +54,7 @@ export default {
 .el-menu {
   text-align: left;
 }
-#sidebar{
+#admin_sidebar{
   display: flex;
 }
 .aside{

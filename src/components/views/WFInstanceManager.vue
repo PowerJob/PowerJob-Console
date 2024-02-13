@@ -104,7 +104,7 @@ export default {
     return {
       // 查询条件
       wfInstanceQueryContent: {
-        appId: this.$store.state.appInfo.id,
+        appId: window.localStorage.getItem("Power_appId"),
         index: 0,
         pageSize: 10,
         wfInstanceId: undefined,
@@ -159,7 +159,7 @@ export default {
         "/wfInstance/stop?wfInstanceId=" +
         data.wfInstanceId +
         "&appId=" +
-        this.$store.state.appInfo.id;
+        window.localStorage.getItem("Power_appId");
       this.axios.get(url).then(() => {
         that.$message.success(this.$t('message.success'));
         // 重新加载列表

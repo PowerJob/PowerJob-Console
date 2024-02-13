@@ -41,11 +41,12 @@ const cn = {
         'webhook': 'WebHook',
         'welcomeTitle': '欢迎使用 PowerJob!',
         'login': '登录',
-        'logout': '退出',
+        'logout': '退出登录',
         'changeAppInfo': '修改应用信息',
         'newPassword': '新密码',
         'newPassword2': '确认密码',
         'stayLogged': '保持登录状态',
+        'back2Home': '返回主页',
 
 
         // 左侧tab栏
@@ -61,8 +62,10 @@ const cn = {
         'tabContainerManager': '容器运维',
 
         // 系统首页
-        'omsServerTime': '调度服务器时间',
-        'omsServerTimezone': '调度服务器时区',
+        'omsServerTime': '服务器时间',
+        'omsServerTimezone': '服务器时区',
+        'omsServerIP': 'MasterIP',
+        'omsServerBornTime': '启动时间',
         'localBrowserTime': '本地时间',
         'localBrowserTimezone': '本地时区',
         'githubURL': '项目地址',

@@ -46,6 +46,7 @@ const en = {
         'newPassword': 'New Password',
         'newPassword2': 'Check New Password',
         'stayLogged': 'Keep me logged in',
+        'back2Home': 'Back to home',
 
         'tabAppManage': 'AppManage',
         'tabNamespace': 'Namespace',
@@ -60,6 +61,8 @@ const en = {
 
         'omsServerTime': 'Server Time',
         'omsServerTimezone': 'Server Timezone',
+        'omsServerIP': 'Server IP',
+        'omsServerBornTime': 'Server StartTIme',
         'localBrowserTime': 'Local Time',
         'localBrowserTimezone': 'Local Timezone',
         'githubURL': 'GitHub Repo',
