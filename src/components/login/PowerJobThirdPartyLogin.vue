@@ -90,10 +90,13 @@ export default {
   },
   methods: {
     doLogin() {
+      this.innerDoLogin(this.login_info.username, this.login_info.password, true)
+    },
 
+    innerDoLogin(name, pwd, real_login) {
       let s_info = {
-        username: this.login_info.username,
-        password: this.login_info.password,
+        username: name,
+        password: pwd,
         // 出于前端成本考虑暂不实现，有需求可在此扩展
         encryption: 'none'
       }
@@ -105,12 +108,13 @@ export default {
 
       this.axios.post('/auth/thirdPartyLoginDirect', login_request).then(ret => {
 
-        const jwtToken = ret.jwtToken
-        window.localStorage.setItem('Power_jwt', jwtToken);
+        if (real_login) {
+          const jwtToken = ret.jwtToken
+          window.localStorage.setItem('Power_jwt', jwtToken);
 
-        this.$router.push("/admin/app")
+          this.$router.push("/admin/app")
+        }
       })
-
     },
 
     // 注册用户
@@ -123,8 +127,13 @@ export default {
 
       const that = this;
       this.axios.post("/pwjbUser/create", this.userRegisterForm).then(() => {
-        that.$message.success(this.$t('message.success'));
         that.userRegisterFormVisible = false;
+
+        that.innerDoLogin(that.userRegisterForm.username, that.userRegisterForm.password, false)
+
+        // 直接登录一次，创建 PowerJob 的 USER 对象
+        that.$message.success(this.$t('message.success'));
+
       }, err => {
         Message.error(err);
         that.userRegisterFormVisible = false

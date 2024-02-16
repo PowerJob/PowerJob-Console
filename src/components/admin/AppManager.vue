@@ -52,6 +52,7 @@
         <el-table-column prop="id" label="ID" width="80"/>
         <el-table-column prop="appName" label="code" width="150"/>
         <el-table-column prop="title" :label="$t('message.name')" />
+        <el-table-column prop="namespaceName" label="namespace" />
         <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" />
         <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" />
         <el-table-column prop="creator" :label="$t('message.creator')" />
