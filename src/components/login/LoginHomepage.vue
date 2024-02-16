@@ -1,132 +1,168 @@
 <template>
-  <div id="container">
+  <div class="auth-container">
+    <h1>欢迎使用 PowerJob</h1>
+    <p>请选择您的登录方式</p>
 
-    <div id="login_card_container">
-      <LoginCard class="login_card_component"
-                 v-for="login in login_type_info"
-                 :key="login.type"
-                 :name="login.name"
-                 :image="login.iconUrl"
-                 :login-type="login.type">
-      </LoginCard>
-    </div>
+    <button v-for="(login, index) in login_type_info" :key="index" @click="onClickLoginTypeBottom(login)">{{login.name}}</button>
   </div>
 </template>
 
 <script>
-
-import LoginCard from './LoginCard.vue';
-
-  export default {
-    name: "LoginHomepage",
-    components: {
-      LoginCard
+export default {
+  name: 'LoginHomepage',
+  data() {
+    return {
+      login_type_info: [
+      ]
+    }
+  },
+  methods: {
+    fetchSupportLoginTypes() {
+      const that = this;
+      const url = "/auth/supportLoginTypes";
+      this.axios.get(url).then((result) => {
+        that.login_type_info = result;
+      }, error => that.$message.error(error));
     },
-    data() {
-      return {
-        login_type_info: [
-        ]
-      }
-    },
 
-    methods: {
-      fetchSupportLoginTypes() {
-        const that = this;
-        const url = "/auth/supportLoginTypes";
-        this.axios.get(url).then((result) => {
-          that.login_type_info = result;
-        }, error => that.$message.error(error));
-      },
+    onClickLoginTypeBottom(loginInfo) {
 
-      // 上下文登录（JWT ifLogin）
-      tryLogin() {
-        const that = this;
+      console.log('onClickLoginTypeBottom: ' + JSON.stringify(loginInfo));
 
-        const url = "/auth/ifLogin";
-        this.axios.get(url).then(ret => {
-          if (ret === null || ret === undefined) {
-            console.log('ifLogin failed, need reLogin')
-          } else {
-            this.$router.push("/admin/app")
-          }
-        }, error => {
-          window.localStorage.removeItem('Power_jwt');
-          window.localStorage.removeItem('Power_appId');
-          that.$message.error(error)
-        });
-      },
+      this.axios.get('/auth/thirdPartyLoginUrl?type=' + loginInfo.type).then(ret => {
 
-      // 处理第三方登录的回调请求
-      callbackLogin() {
-        const urlSearchParams = new URLSearchParams(window.location.search);
-        if (urlSearchParams.size === 0) {
-          console.log('no urlSearchParams, skip process callback')
+        // FE-REDIRECT 开头，则跳转到本地 vue 页面
+        let redirectUrl = ret.toString()
+        if (redirectUrl.startsWith('FE-REDIRECT:')) {
+          this.$router.push(redirectUrl.split(':')[1])
           return
         }
-        // 处理第三方回调
-        let callbackLoginUrl = '/auth/thirdPartyLoginCallback?'
-        // 显示键/值对
-        for (var pair of urlSearchParams.entries()) {
-          callbackLoginUrl = callbackLoginUrl + '&' + pair[0] + '=' + pair[1];
-        }
-        console.log('final url:' + callbackLoginUrl)
-        this.axios.get(callbackLoginUrl).then(ret => {
-          console.log('login success, user: ' + ret)
 
-          const jwtToken = ret.jwtToken
-          window.localStorage.setItem('Power_jwt', jwtToken);
-
-          this.$router.push("/admin/app")
-        })
-      }
+        // 否则直接打开 URL
+        window.open(ret, "_blank");
+      })
     },
-    mounted() {
-      this.fetchSupportLoginTypes()
-      this.callbackLogin()
-      this.tryLogin()
+
+    // 上下文登录（JWT ifLogin）
+    tryLogin() {
+      const that = this;
+
+      const url = "/auth/ifLogin";
+      this.axios.get(url).then(ret => {
+        if (ret === null || ret === undefined) {
+          console.log('ifLogin failed, need reLogin')
+        } else {
+          this.$router.push("/admin/app")
+        }
+      }, error => {
+        window.localStorage.removeItem('Power_jwt');
+        window.localStorage.removeItem('Power_appId');
+        that.$message.error(error)
+      });
+    },
+
+    // 处理第三方登录的回调请求
+    callbackLogin() {
+      const urlSearchParams = new URLSearchParams(window.location.search);
+      if (urlSearchParams.size === 0) {
+        console.log('no urlSearchParams, skip process callback')
+        return
+      }
+      // 处理第三方回调
+      let callbackLoginUrl = '/auth/thirdPartyLoginCallback?'
+      // 显示键/值对
+      for (var pair of urlSearchParams.entries()) {
+        callbackLoginUrl = callbackLoginUrl + '&' + pair[0] + '=' + pair[1];
+      }
+      console.log('final url:' + callbackLoginUrl)
+      this.axios.get(callbackLoginUrl).then(ret => {
+        console.log('login success, user: ' + ret)
+
+        const jwtToken = ret.jwtToken
+        window.localStorage.setItem('Power_jwt', jwtToken);
+
+        this.$router.push("/admin/app")
+      })
     }
+  },
+  mounted() {
+    this.fetchSupportLoginTypes()
+    this.callbackLogin()
+    this.tryLogin()
   }
+}
 </script>
 
-<style scoped>
-/*
-https://juejin.cn/post/7004622232378966046
-display: flex;会生成一个块状的flex容器盒子，使用display: inline-flex;会生成一个行内的flex容器盒子。如果我们使用块状元素，比如div标签，就可以使用flex，如果使用行内元素，就可以使用inline-flex
-flex-wrap：容器内元素是否可以换行，它有三个属性值：warp 换行第一行在上面，nowarp 不换行，wrap-reverse 换行第一行在下面
-flex-direction：主轴方向，它决定了容器内元素排列方向。 row：默认值，沿水平主轴从左到右排列，起点在左沿
-justify-content：元素在主轴的对齐方式，它有五个属性值：flex-start | flex-end | center | space-between | space-around;
- */
+<style>
+/* 全局样式重置，确保跨浏览器的一致性 */
+html, body, div, h1, p, button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
 
-#container {
+/* 应用字体和背景 */
+body {
+  font-family: 'Arial', sans-serif; /* 或者您页面中使用的字体 */
+  background-color: #f0f0f0; /* 页面背景颜色 */
+  color: #333; /* 默认文本颜色 */
+}
+
+/* 容器样式，用于居中和控制宽度 */
+.auth-container {
   width: 100%;
-  height: 100%;
-  //background-image: url("../../assets/banner.jpg");
-  background-color: #C7EDCC;
+  max-width: 400px; /* 最大宽度，根据您的设计调整 */
+  margin: 100px auto; /* 上下边距100px，自动水平居中 */
+  padding: 20px;
+  background-color: #ffffff; /* 容器背景颜色 */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 容器阴影效果 */
+  border-radius: 8px; /* 容器边角的圆滑度 */
 }
 
-#title_div {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* 标题样式 */
+.auth-container h1 {
+  font-size: 24px; /* 标题字体大小 */
+  color: #333; /* 标题颜色 */
+  margin-bottom: 20px; /* 标题下边距 */
 }
 
-#login_card_container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* 描述文本样式 */
+.auth-container p {
+  font-size: 16px; /* 描述文本字体大小 */
+  color: #666; /* 描述文本颜色 */
+  margin-bottom: 30px; /* 描述文本下边距 */
 }
 
-.login_card_component {
-
-  margin: 20px;
-  display: inline-flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-
+/* 按钮公共样式 */
+.auth-container button {
+  width: 100%; /* 按钮宽度 */
+  padding: 10px 0; /* 按钮上下内边距 */
+  margin-bottom: 15px; /* 按钮间距 */
+  font-size: 16px; /* 按钮字体大小 */
+  color: #ffffff; /* 按钮文字颜色 */
+  background-color: #1da1f2; /* 按钮背景颜色 */
+  border-radius: 4px; /* 按钮边角的圆滑度 */
+  cursor: pointer; /* 鼠标悬停时的指针样式 */
+  border: none; /* 去除边框 */
+  transition: background-color 0.3s ease; /* 颜色变换过渡效果 */
 }
+
+/* 按钮鼠标悬停样式 */
+.auth-container button:hover {
+  background-color: #0d95e8; /* 按钮背景颜色变深 */
+}
+
+/* 按钮不可点击状态样式 */
+.auth-container button:disabled {
+  background-color: #ccc; /* 灰色背景 */
+  cursor: not-allowed; /* 不允许点击的鼠标样式 */
+}
+
+/* 图片logo的样式 */
+.auth-container img.logo {
+  width: 50px; /* logo图片宽度 */
+  height: auto; /* logo图片高度自适应 */
+  margin-bottom: 20px; /* logo下边距 */
+}
+
 </style>
