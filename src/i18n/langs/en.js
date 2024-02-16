@@ -244,6 +244,7 @@ const en = {
         'creator': 'Creator',
         'modifier': 'Modifier',
         'showMyRelated': 'ShowMyRelated',
+        'permissionManage': 'Permission Manage',
 
         // permission
         'observer': 'Observer',

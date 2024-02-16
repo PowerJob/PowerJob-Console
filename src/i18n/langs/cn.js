@@ -249,6 +249,7 @@ const cn = {
         'creator': '创建人',
         'modifier': '修改人',
         'showMyRelated': '只看我的',
+        'permissionManage': '权限管理',
 
         // permission
         'observer': '观察者',

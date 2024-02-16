@@ -81,7 +81,7 @@
           <el-input v-model="modifiedNamespaceForm.extra"/>
         </el-form-item>
 
-        <el-form-item label="权限管控">
+        <el-form-item :label="$t('message.permissionManage')">
           <user-role :user-rule-form="user_rule_form"/>
         </el-form-item>
 

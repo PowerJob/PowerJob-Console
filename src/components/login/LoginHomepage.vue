@@ -4,8 +4,6 @@
     <p>{{$t('message.chooseLoginType')}}</p>
 
     <button v-for="(login, index) in login_type_info" :key="index" @click="onClickLoginTypeBottom(login)">{{login.name}}</button>
-
-    <el-checkbox v-model="stayLogged" >{{$t('message.stayLogged')}}</el-checkbox>
   </div>
 </template>
 
@@ -14,8 +12,7 @@ export default {
   name: 'LoginHomepage',
   data() {
     return {
-      // 是否保持登录状态
-      stayLogged: true,
+
       login_type_info: [
       ]
     }
@@ -83,10 +80,7 @@ export default {
         console.log('login success, user: ' + ret)
 
         const jwtToken = ret.jwtToken
-        // 勾选了保持登录状态，就开启自动登录，保存 JWT
-        if (this.stayLogged) {
-          window.localStorage.setItem('Power_jwt', jwtToken);
-        }
+        window.localStorage.setItem('Power_jwt', jwtToken);
 
         this.$router.push("/admin/app")
       })
