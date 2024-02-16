@@ -254,6 +254,7 @@ const cn = {
         'qa': '测试员',
         'developer':'开发者',
         'admin': '管理员',
+        'globalAdmin': '全局管理员',
     },
     ...zhLocale
 };

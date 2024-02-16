@@ -2,44 +2,44 @@
   <div>
     <el-form>
       <el-form-item :label="$t('message.observer')">
-        <el-select multiple v-model="userRuleForm.observer" placeholder="observer">
+        <el-select multiple v-model="userRuleForm.observer" placeholder="observer" style="width: 80%">
           <el-option
               v-for="item in user_list"
               :key="item.id"
-              :label="item.username"
+              :label="item.showName"
               :value="item.id">
           </el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item :label="$t('message.qa')">
-        <el-select multiple v-model="userRuleForm.qa" placeholder="observer">
+        <el-select multiple v-model="userRuleForm.qa" placeholder="observer" style="width: 80%">
           <el-option
               v-for="item in user_list"
               :key="item.id"
-              :label="item.username"
+              :label="item.showName"
               :value="item.id">
           </el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item :label="$t('message.developer')">
-        <el-select multiple v-model="userRuleForm.developer" placeholder="observer">
+        <el-select multiple v-model="userRuleForm.developer" placeholder="observer" style="width: 80%">
           <el-option
               v-for="item in user_list"
               :key="item.id"
-              :label="item.username"
+              :label="item.showName"
               :value="item.id">
           </el-option>
         </el-select>
       </el-form-item>
 
       <el-form-item :label="$t('message.admin')">
-        <el-select multiple v-model="userRuleForm.admin" placeholder="observer">
+        <el-select multiple v-model="userRuleForm.admin" placeholder="observer" style="width: 80%">
           <el-option
               v-for="item in user_list"
               :key="item.id"
-              :label="item.username"
+              :label="item.showName"
               :value="item.id">
           </el-option>
         </el-select>

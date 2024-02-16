@@ -248,7 +248,8 @@ const en = {
         'observer': 'Observer',
         'qa': 'QA',
         'developer':'Developer',
-        'admin': 'Admin'
+        'admin': 'Admin',
+        'globalAdmin': 'Global Admin',
     },
     ...enLocale
 };

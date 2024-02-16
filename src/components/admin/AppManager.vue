@@ -21,7 +21,7 @@
               <el-option
                   v-for="item in namespaceList"
                   :key="item.id"
-                  :label="item.frontName"
+                  :label="item.showName"
                   :value="item.id">
               </el-option>
             </el-select>
@@ -84,7 +84,7 @@
             <el-option
                 v-for="item in namespaceList"
                 :key="item.id"
-                :label="item.frontName"
+                :label="item.showName"
                 :value="item.id">
             </el-option>
           </el-select>
