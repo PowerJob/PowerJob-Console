@@ -8,7 +8,6 @@ Vue.use(VueRouter);
 const router = new VueRouter({
     routes: [
         { path: "/", redirect: '/loginHomepage' },
-        { path: "/welcome", component: () => import('./components/Welcome') },
         { path: "/loginHomepage", component: () => import('./components/login/LoginHomepage.vue') },
         { path: "/powerjobLogin", name: 'PowerJobThirdPartyLogin', component: () => import('./components/login/PowerJobThirdPartyLogin.vue') },
         {

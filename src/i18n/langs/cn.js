@@ -41,6 +41,7 @@ const cn = {
         'email': '邮箱地址',
         'webhook': 'WebHook',
         'welcomeTitle': '欢迎使用 PowerJob!',
+        'chooseLoginType':'请选择您的登录方式',
         'login': '登录',
         'logout': '退出登录',
         'changeAppInfo': '修改应用信息',

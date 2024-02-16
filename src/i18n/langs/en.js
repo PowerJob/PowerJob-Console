@@ -41,6 +41,7 @@ const en = {
         'email': 'Email',
         'webhook': 'Webhook',
         'welcomeTitle': 'Welcome to use PowerJob!',
+        'chooseLoginType':'Choose your LoginType',
         'login': 'Login',
         'logout': 'Logout',
         'changeAppInfo': 'Change AppInfo',

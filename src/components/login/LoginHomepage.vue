@@ -1,9 +1,11 @@
 <template>
   <div class="auth-container">
-    <h1>欢迎使用 PowerJob</h1>
-    <p>请选择您的登录方式</p>
+    <h1>{{$t('message.welcomeTitle')}}</h1>
+    <p>{{$t('message.chooseLoginType')}}</p>
 
     <button v-for="(login, index) in login_type_info" :key="index" @click="onClickLoginTypeBottom(login)">{{login.name}}</button>
+
+    <el-checkbox v-model="stayLogged" >{{$t('message.stayLogged')}}</el-checkbox>
   </div>
 </template>
 
@@ -12,6 +14,8 @@ export default {
   name: 'LoginHomepage',
   data() {
     return {
+      // 是否保持登录状态
+      stayLogged: true,
       login_type_info: [
       ]
     }
@@ -79,13 +83,35 @@ export default {
         console.log('login success, user: ' + ret)
 
         const jwtToken = ret.jwtToken
-        window.localStorage.setItem('Power_jwt', jwtToken);
+        // 勾选了保持登录状态，就开启自动登录，保存 JWT
+        if (this.stayLogged) {
+          window.localStorage.setItem('Power_jwt', jwtToken);
+        }
 
         this.$router.push("/admin/app")
       })
     }
   },
   mounted() {
+
+    // 加载默认语言配置文件
+    let localLang = window.localStorage.getItem('oms_lang');
+    console.log("language from localStorage is %o", localLang);
+    if (localLang != null) {
+      this.$i18n.locale = localLang;
+    }else {
+      let lang = navigator.language;
+      console.log("language from system is %o", lang);
+      switch (lang) {
+        case "zh-HK":
+        case "zh-TW":
+        case "zh-SG":
+        case "zh-CN": this.$i18n.locale = "cn"; break;
+        default:
+          this.$i18n.locale = "en";
+      }
+    }
+
     this.fetchSupportLoginTypes()
     this.callbackLogin()
     this.tryLogin()
