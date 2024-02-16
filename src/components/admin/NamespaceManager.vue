@@ -35,7 +35,7 @@
     <el-row>
       <el-table :data="namespaceResult.data" style="width: 100%">
         <el-table-column prop="id" label="ID" width="80"/>
-        <el-table-column prop="code" label="code" width="80"/>
+        <el-table-column prop="code" label="code"/>
         <el-table-column prop="name" :label="$t('message.name')" />
         <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" />
         <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" />

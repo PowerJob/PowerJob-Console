@@ -132,9 +132,15 @@ export default {
     submitChangePasswordRequest() {
       this.axios.post('/pwjbUser/changePassword', this.changePasswordRequest).then(() => {
         Message.success('SUCCESS')
+
+        window.localStorage.removeItem('Power_jwt');
+        window.localStorage.removeItem('Power_appId');
+        this.$router.push("/");
+
       }, err => {
         Message.error(err)
       })
+      this.changePasswordFormVisible = true
     }
   },
   mounted() {
