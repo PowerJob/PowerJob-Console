@@ -40,8 +40,8 @@
         <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" />
         <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" />
         <el-table-column prop="statusStr" :label="$t('message.status')" />
-        <el-table-column prop="creator" :label="$t('message.creator')" />
-        <el-table-column prop="modifier" :label="$t('message.modifier')" />
+        <el-table-column prop="creatorShowName" :label="$t('message.creator')" />
+        <el-table-column prop="modifierShowName" :label="$t('message.modifier')" />
 
         <el-table-column :label="$t('message.operation')" width="150">
           <template slot-scope="scope">
