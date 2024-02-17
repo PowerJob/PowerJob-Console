@@ -1,4 +1,6 @@
 module.exports = {
+  // https://gitee.com/KFCFans/PowerJob/issues/I7MU6J
+  publicPath: './',
   devServer: {
     proxy: {
       '/api': {
