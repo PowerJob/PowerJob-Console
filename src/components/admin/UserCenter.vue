@@ -1,49 +1,72 @@
 <template>
 <div>
-  <el-row>
-    <el-form :model="userDetailInfo" label-width="118px" style="width: 500px;">
-      <el-form-item label="ID">
-        <el-input disabled v-model="userDetailInfo.id"/>
-      </el-form-item>
-      <el-form-item label="username">
-        <el-input disabled v-model="userDetailInfo.username"/>
-      </el-form-item>
 
-      <el-form-item label="accountType">
-        <el-input disabled v-model="userDetailInfo.accountType"/>
-      </el-form-item>
+  <el-collapse v-model="activeNames" @change="handleCollapseChange">
+    <el-collapse-item :title="$t('message.personalInfo')" name="personalInfo">
+      <el-row>
+        <el-form :model="userDetailInfo" label-width="118px" style="width: 500px;">
+          <el-form-item label="ID">
+            <el-input disabled v-model="userDetailInfo.id"/>
+          </el-form-item>
+          <el-form-item label="username">
+            <el-input disabled v-model="userDetailInfo.username"/>
+          </el-form-item>
 
-      <el-form-item label="originUsername">
-        <el-input disabled v-model="userDetailInfo.originUsername"/>
-      </el-form-item>
+          <el-form-item label="accountType">
+            <el-input disabled v-model="userDetailInfo.accountType"/>
+          </el-form-item>
 
-      <el-form-item label="nick">
-        <el-input v-model="userDetailInfo.nick"/>
-      </el-form-item>
+          <el-form-item label="originUsername">
+            <el-input disabled v-model="userDetailInfo.originUsername"/>
+          </el-form-item>
 
-      <el-form-item label="phone">
-        <el-input v-model="userDetailInfo.phone"/>
-      </el-form-item>
+          <el-form-item label="nick">
+            <el-input v-model="userDetailInfo.nick"/>
+          </el-form-item>
 
-      <el-form-item label="email">
-        <el-input v-model="userDetailInfo.email"/>
-      </el-form-item>
+          <el-form-item label="phone">
+            <el-input v-model="userDetailInfo.phone"/>
+          </el-form-item>
 
-      <el-form-item label="webHook">
-        <el-input v-model="userDetailInfo.webHook"/>
-      </el-form-item>
+          <el-form-item label="email">
+            <el-input v-model="userDetailInfo.email"/>
+          </el-form-item>
 
-      <el-form-item label="globalRoles">
-        <el-input disabled v-model="userDetailInfo.globalRoles"/>
-      </el-form-item>
+          <el-form-item label="webHook">
+            <el-input v-model="userDetailInfo.webHook"/>
+          </el-form-item>
 
-      <el-form-item>
-        <el-button type="primary" @click="onClickSaveNewUserInfo">{{$t('message.save')}}</el-button>
-        <el-button type="danger" v-if="userDetailInfo.accountType=='PWJB'" @click="onClickChangePassword">{{$t('message.changePassword')}}</el-button>
-      </el-form-item>
+          <el-form-item label="globalRoles">
+            <el-input disabled v-model="userDetailInfo.globalRoles"/>
+          </el-form-item>
 
-    </el-form>
-  </el-row>
+          <el-form-item>
+            <el-button type="primary" @click="onClickSaveNewUserInfo">{{$t('message.save')}}</el-button>
+            <el-button type="danger" v-if="userDetailInfo.accountType=='PWJB'" @click="onClickChangePassword">{{$t('message.changePassword')}}</el-button>
+          </el-form-item>
+
+        </el-form>
+      </el-row>
+    </el-collapse-item>
+
+    <el-collapse-item :title="$t('message.appAdmin')" name="appAdmin">
+      <el-form :model="appAssertRequest" label-width="118px" style="width: 500px;">
+        <el-form-item label="appName">
+          <el-input v-model="appAssertRequest.appName"/>
+        </el-form-item>
+
+        <el-form-item label="password">
+          <el-input v-model="appAssertRequest.password"/>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="onClickAuthThenBecomeAdmin">{{$t('message.authThenBecomeAdmin')}}</el-button>
+        </el-form-item>
+      </el-form>
+    </el-collapse-item>
+  </el-collapse>
+
+
 
   <el-dialog :title="$t('message.changePassword')" :visible.sync="changePasswordFormVisible" width="35%" >
     <el-form :model="changePasswordRequest" style="margin:0 5px">
@@ -79,6 +102,11 @@ export default {
   name: 'UserCenter',
   data() {
     return {
+
+      // 激活的菜单列表
+      activeNames: [''],
+
+      // 用户详细信息
       userDetailInfo: {
         id: undefined,
         username: undefined,
@@ -105,11 +133,23 @@ export default {
         newPassword: undefined,
         newPassword2: undefined
       },
-      changePasswordFormVisible: false
+      changePasswordFormVisible: false,
+
+      // 使用 APP 账户密码成为管理员
+      appAssertRequest: {
+        appName: undefined,
+        password: undefined
+      }
     }
   },
 
   methods: {
+
+    //
+    handleCollapseChange(val) {
+      console.log(val);
+    },
+
     fetchUserDetail() {
       const that = this;
       this.axios.get('/user/detail').then(ret => that.userDetailInfo = ret)
@@ -141,6 +181,12 @@ export default {
         Message.error(err)
       })
       this.changePasswordFormVisible = true
+    },
+
+    onClickAuthThenBecomeAdmin() {
+      this.axios.post('/appInfo/becomeAdmin', this.appAssertRequest).then(() => {
+        Message.success('SUCCESS')
+      })
     }
   },
   mounted() {

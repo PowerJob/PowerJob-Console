@@ -252,6 +252,9 @@ const en = {
         'developer':'Developer',
         'admin': 'Admin',
         'globalAdmin': 'Global Admin',
+        'personalInfo': 'Personal Info',
+        'appAdmin': 'App Admin',
+        'authThenBecomeAdmin': 'Auth then become admin',
     },
     ...enLocale
 };
