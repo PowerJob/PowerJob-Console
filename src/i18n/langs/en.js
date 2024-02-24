@@ -66,6 +66,7 @@ const en = {
         'memoryLoad': 'Memory Load',
         'diskLoad': 'Disk Load',
         'lastActiveTime': 'Last Active Time',
+        'advanceConfig': 'Advance Config',
 
         // JobManage
         'jobId': 'Job ID',
@@ -152,6 +153,7 @@ const en = {
         'silenceWindow': 'SilenceWindow',
         'runByParameter': 'Run by parameter',
         'enteringParameter': 'Entering Parameter',
+        'taskTrackerBehavior':'TaskTracker Behavior',
 
         // workflowManage
         'wfId': 'Workflow ID',

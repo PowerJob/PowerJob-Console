@@ -318,6 +318,22 @@
                     </el-col>
                 </el-row>
               </el-form-item>
+
+              <el-form-item :label="$t('message.advanceConfig')">
+                <el-row>
+                  <el-col :span="6">
+                    <el-select v-model="modifiedJobForm.advancedRuntimeConfig.taskTrackerBehavior" :placeholder="$t('message.taskTrackerBehavior')">
+                      <el-option
+                          v-for="item in taskTrackerBehavior"
+                          :key="item.key"
+                          :label="item.label"
+                          :value="item.key">
+                      </el-option>
+                    </el-select>
+                  </el-col>
+                </el-row>
+              </el-form-item>
+
                 <el-form-item>
                     <el-button type="primary" @click="saveJob">{{$t('message.save')}}</el-button>
                     <el-button @click="modifiedJobFormVisible = false">{{$t('message.cancel')}}</el-button>
@@ -407,6 +423,9 @@
                         type: 1,
                         level: undefined,
                         loggerName: undefined
+                    },
+                    advancedRuntimeConfig: {
+                      taskTrackerBehavior: undefined,
                     }
                 },
                 // 任务查询请求对象
@@ -435,6 +454,8 @@
                 logType: [{key: 1, label: 'ONLINE'}, {key: 2, label: 'LOCAL'}, {key: 3, label: 'STDOUT'}, {key: 4, label: 'LOCAL_AND_ONLINE'}, {key: 999, label: 'NULL'}],
                 // 分发类型
                 dispatchStrategy: [{key: 'HEALTH_FIRST', label: 'HEALTH_FIRST'}, {key: 'RANDOM', label: 'RANDOM'}, {key: 'SPECIFY', label: 'SPECIFY'}],
+                // TaskTracker 表现
+                taskTrackerBehavior: [{key: 1, label: 'NORMAL'}, {key: 11, label: 'PADDLING'}],
                 // 用户列表
                 userList: [],
                 // 时间表达式校验窗口

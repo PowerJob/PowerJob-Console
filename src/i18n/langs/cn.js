@@ -69,6 +69,7 @@ const cn = {
         'memoryLoad': '内存占用',
         'diskLoad': '磁盘占用',
         'lastActiveTime': '上次在线时间',
+        'advanceConfig': '高级设置',
 
         // 任务管理
         'jobId': '任务 ID',
@@ -131,6 +132,7 @@ const cn = {
         'interval': '时间间隔',
         'timeRange': '时间范围',
         'weekRange': '星期范围',
+        'taskTrackerBehavior':'TaskTracker行为',
 
         // 任务实例管理
         'wfInstanceId': '工作流实例 ID',
