@@ -118,11 +118,11 @@
         <slot></slot>
         <el-row
           class="job-detail-text"
-          id="instanceTaskStats"
-          v-if="instanceDetail.instanceTaskStats && instanceDetail.nodeType != 2"
+          id="taskDetail"
+          v-if="instanceDetail.taskDetail && instanceDetail.nodeType != 2"
         >
-          <span class="power-job-text">{{ $t("message.instanceTaskStats") }}:</span>
-          <span class="title">{{ instanceDetail.instanceTaskStats }}</span>
+          <span class="power-job-text">{{ $t("message.taskDetail") }}:</span>
+          <span class="title">{{ instanceDetail.taskDetail }}</span>
         </el-row>
       </el-card>
     </div>

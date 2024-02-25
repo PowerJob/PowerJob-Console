@@ -151,7 +151,7 @@ const cn = {
         'failedCnt':'失败数',
         'expectedTriggerTime': '预计执行时间',
         'result': '任务结果',
-        'instanceTaskStats': 'Task 统计',
+        'taskDetail': 'Task 统计',
         // 'secondlyJobHistory': '最近 10 条秒级任务历史记录（秒级任务专用）',
         'secondlyJobHistory': '最近 10 条秒级任务历史记录',
         'queriedTaskDetailInfoList':'Task 查询结果记录',

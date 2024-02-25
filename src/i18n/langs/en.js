@@ -147,7 +147,7 @@ const en = {
         'failedCnt':'失败次数',
         'expectedTriggerTime': 'Expected trigger time',
         'result': 'Result',
-        'instanceTaskStats': 'InstanceTaskStats',
+        'taskDetail': 'InstanceTaskStats',
         'secondlyJobHistory': 'Secondly job history',
         'queriedTaskDetailInfoList':'Queried TaskDetailInfo',
         'subInstanceId': 'SubInstanceId',
