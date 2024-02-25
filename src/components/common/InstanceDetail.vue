@@ -118,11 +118,11 @@
         <slot></slot>
         <el-row
           class="job-detail-text"
-          id="taskDetail"
-          v-if="instanceDetail.taskDetail && instanceDetail.nodeType != 2"
+          id="instanceTaskStats"
+          v-if="instanceDetail.instanceTaskStats && instanceDetail.nodeType != 2"
         >
           <span class="power-job-text">{{ $t("message.subTaskInfo") }}:</span>
-          <span class="title">{{ instanceDetail.taskDetail }}</span>
+          <span class="title">{{ instanceDetail.instanceTaskStats }}</span>
         </el-row>
       </el-card>
     </div>
@@ -190,6 +190,13 @@ export default {
   data() {
     return {
       instanceDetail: {},
+
+      queryInstanceDetailRequest: {
+        instanceId: this.instanceId,
+        customQuery: "status in (5, 6) order by last_modified_time"
+      },
+
+      queriedTaskDetailInfoList: []
     };
   },
   methods: {
@@ -200,6 +207,7 @@ export default {
         let that = this;
         let url = "/instance/detail?instanceId=" + this.instanceId;
         this.axios.get(url).then((res) => (that.instanceDetail = res));
+        this.axios.post('/instance/detailPlus', that.queryInstanceDetailRequest).then(ret => that.queriedTaskDetailInfoList= ret)
       }
     },
     /** 查看详情 */
