@@ -221,13 +221,18 @@
                 :show-overflow-tooltip="true"
                 prop="taskName"
                 label="taskName"
-
             />
+
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="taskContent"
+                label="taskContent"
+            />
+
             <el-table-column
                 :show-overflow-tooltip="true"
                 prop="processorAddress"
                 label="processorAddress"
-
             />
 
             <el-table-column
@@ -241,6 +246,7 @@
                 :show-overflow-tooltip="true"
                 prop="statusStr"
                 :label="$t('message.status')"
+                width="80"
             />
             <el-table-column
                 :show-overflow-tooltip="true"

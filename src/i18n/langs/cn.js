@@ -148,7 +148,7 @@ const cn = {
         'createdTime': '创建时间',
         'lastModifiedTime': '最后编辑时间',
         'lastReportTime': '最后上报时间',
-        'failedCnt':'失败次数',
+        'failedCnt':'失败数',
         'expectedTriggerTime': '预计执行时间',
         'result': '任务结果',
         'instanceTaskStats': 'Task 统计',
