@@ -66,6 +66,7 @@ const en = {
         'memoryLoad': 'Memory Load',
         'diskLoad': 'Disk Load',
         'lastActiveTime': 'Last Active Time',
+        'advanceConfig': 'Advance Config',
 
         // JobManage
         'jobId': 'Job ID',
@@ -82,6 +83,7 @@ const en = {
         'jobParams': 'Job params',
         'timeExpressionType': 'Time expression type',
         'dispatchStrategy': 'Dispatch strategy',
+        'dispatchStrategyConfig': 'Dispatch strategy config',
         'timeExpressionPlaceHolder': 'Cron expression or number of millions for fixed_rate/fixed_delay job',
         'executeConfig': 'Execution config',
         'javaProcessorInfoPLH': 'Classname, eg: tech.powerjob.HelloWordProcessor',
@@ -139,10 +141,15 @@ const en = {
         'taskTrackerAddress': 'TaskTracker address',
         'startTime': 'Start time',
         'endTime': 'End time',
+        'createdTime': 'Created Time',
+        'lastModifiedTime': 'LastModifiedTime',
+        'lastReportTime': 'LastReportTime',
+        'failedCnt':'失败次数',
         'expectedTriggerTime': 'Expected trigger time',
         'result': 'Result',
-        'subTaskInfo': 'Task info',
+        'taskDetail': 'InstanceTaskStats',
         'secondlyJobHistory': 'Secondly job history',
+        'queriedTaskDetailInfoList':'Queried TaskDetailInfo',
         'subInstanceId': 'SubInstanceId',
         'instanceParams': 'InstanceParams',
         'lifeCycle': 'Life cycle',
@@ -151,6 +158,7 @@ const en = {
         'silenceWindow': 'SilenceWindow',
         'runByParameter': 'Run by parameter',
         'enteringParameter': 'Entering Parameter',
+        'taskTrackerBehavior':'TaskTracker Behavior',
 
         // workflowManage
         'wfId': 'Workflow ID',

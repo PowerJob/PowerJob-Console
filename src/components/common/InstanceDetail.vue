@@ -121,7 +121,7 @@
           id="taskDetail"
           v-if="instanceDetail.taskDetail && instanceDetail.nodeType != 2"
         >
-          <span class="power-job-text">{{ $t("message.subTaskInfo") }}:</span>
+          <span class="power-job-text">{{ $t("message.taskDetail") }}:</span>
           <span class="title">{{ instanceDetail.taskDetail }}</span>
         </el-row>
       </el-card>
@@ -178,8 +178,107 @@
           </el-table>
         </el-row>
       </el-card>
+
     </div>
+
+    <!-- MR任务 -->
+    <el-divider
+        content-position="center"
+        v-if="showQueriedTaskDetailInfoList"
+    >{{ $t("message.queriedTaskDetailInfoList") }}</el-divider>
+
+    <div
+        class="power-job-info"
+        v-if="showQueriedTaskDetailInfoList"
+        :style="{ width: fixedWidth ? fixedWidth : '100%' }"
+    >
+
+
+      <el-row>
+        <el-col :span="20">
+          <el-input v-model="queryInstanceDetailRequest.customQuery">
+            <template slot="prepend">select * from task_info where</template>
+            <template slot="append">limit 10</template>
+          </el-input>
+        </el-col>
+        <el-col :span="4">
+          <el-button type="primary" @click="fetchInstanceDetail">{{$t('message.query')}}</el-button>
+        </el-col>
+      </el-row>
+      <el-card>
+        <el-row>
+          <el-table
+              :data="instanceDetail.queriedTaskDetailInfoList"
+              style="width: 100%"
+          >
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="taskId"
+                label="taskId"
+                width="80"
+            />
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="taskName"
+                label="taskName"
+            />
+
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="taskContent"
+                label="taskContent"
+            />
+
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="processorAddress"
+                label="processorAddress"
+            />
+
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="failedCnt"
+                :label="$t('message.failedCnt')"
+                width="80"
+            />
+
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="statusStr"
+                :label="$t('message.status')"
+                width="80"
+            />
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="createdTimeStr"
+                :label="$t('message.createdTime')"
+
+            />
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="lastModifiedTimeStr"
+                :label="$t('message.lastModifiedTime')"
+
+            />
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="lastReportTimeStr"
+                :label="$t('message.lastReportTime')"
+
+            />
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="result"
+                :label="$t('message.result')"
+            />
+          </el-table>
+        </el-row>
+      </el-card>
+
+    </div>
+
   </div>
+
 </template>
 
 <script>
@@ -189,7 +288,17 @@ export default {
   props: ["instanceId", "fixedWidth", "resultAll", "nodeDetail"],
   data() {
     return {
-      instanceDetail: {},
+      instanceDetail: {
+        queriedTaskDetailInfoList: undefined
+      },
+
+      // 是否展示 queriedTaskDetailInfoList，只单向赋值为 true ，解决改变查询条件空数据后隐藏组件的问题
+      showQueriedTaskDetailInfoList: false,
+
+      queryInstanceDetailRequest: {
+        instanceId: this.instanceId,
+        customQuery: "status in (5, 6) order by last_modified_time desc"
+      },
     };
   },
   methods: {
@@ -198,8 +307,14 @@ export default {
         this.instanceDetail = this.nodeDetail;
       } else {
         let that = this;
-        let url = "/instance/detail?instanceId=" + this.instanceId;
-        this.axios.get(url).then((res) => (that.instanceDetail = res));
+        this.axios.post('/instance/detailPlus', that.queryInstanceDetailRequest).then(ret => {
+          that.instanceDetail= ret
+          if (that.instanceDetail.queriedTaskDetailInfoList !== undefined) {
+            if (that.instanceDetail.queriedTaskDetailInfoList.length !== 0) {
+              that.showQueriedTaskDetailInfoList = true
+            }
+          }
+        })
       }
     },
     /** 查看详情 */
