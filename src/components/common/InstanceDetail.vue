@@ -121,7 +121,7 @@
           id="instanceTaskStats"
           v-if="instanceDetail.instanceTaskStats && instanceDetail.nodeType != 2"
         >
-          <span class="power-job-text">{{ $t("message.subTaskInfo") }}:</span>
+          <span class="power-job-text">{{ $t("message.instanceTaskStats") }}:</span>
           <span class="title">{{ instanceDetail.instanceTaskStats }}</span>
         </el-row>
       </el-card>
@@ -178,8 +178,88 @@
           </el-table>
         </el-row>
       </el-card>
+
     </div>
+
+    <!-- MR任务 -->
+    <el-divider
+        content-position="center"
+        v-if="instanceDetail.queriedTaskDetailInfoList"
+    >{{ $t("message.queriedTaskDetailInfoList") }}</el-divider>
+
+    <div
+        class="power-job-info"
+        v-if="instanceDetail.queriedTaskDetailInfoList"
+        :style="{ width: fixedWidth ? fixedWidth : '100%' }"
+    >
+      <el-card>
+        <el-row>
+          <el-table
+              :data="instanceDetail.queriedTaskDetailInfoList"
+              style="width: 100%"
+          >
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="taskId"
+                label="taskId"
+                width="80"
+            />
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="taskName"
+                label="taskName"
+
+            />
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="processorAddress"
+                label="processorAddress"
+
+            />
+
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="failedCnt"
+                :label="$t('message.failedCnt')"
+                width="80"
+            />
+
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="statusStr"
+                :label="$t('message.status')"
+            />
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="createdTimeStr"
+                :label="$t('message.createdTime')"
+
+            />
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="lastModifiedTimeStr"
+                :label="$t('message.lastModifiedTime')"
+
+            />
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="lastReportTimeStr"
+                :label="$t('message.lastReportTime')"
+
+            />
+            <el-table-column
+                :show-overflow-tooltip="true"
+                prop="result"
+                :label="$t('message.result')"
+            />
+          </el-table>
+        </el-row>
+      </el-card>
+
+    </div>
+
   </div>
+
 </template>
 
 <script>
@@ -189,14 +269,14 @@ export default {
   props: ["instanceId", "fixedWidth", "resultAll", "nodeDetail"],
   data() {
     return {
-      instanceDetail: {},
+      instanceDetail: {
+        queriedTaskDetailInfoList: []
+      },
 
       queryInstanceDetailRequest: {
         instanceId: this.instanceId,
-        customQuery: "status in (5, 6) order by last_modified_time"
+        customQuery: "status in (5, 6) order by last_modified_time desc"
       },
-
-      queriedTaskDetailInfoList: []
     };
   },
   methods: {
@@ -205,9 +285,7 @@ export default {
         this.instanceDetail = this.nodeDetail;
       } else {
         let that = this;
-        let url = "/instance/detail?instanceId=" + this.instanceId;
-        this.axios.get(url).then((res) => (that.instanceDetail = res));
-        this.axios.post('/instance/detailPlus', that.queryInstanceDetailRequest).then(ret => that.queriedTaskDetailInfoList= ret)
+        this.axios.post('/instance/detailPlus', that.queryInstanceDetailRequest).then(ret => that.instanceDetail= ret)
       }
     },
     /** 查看详情 */
