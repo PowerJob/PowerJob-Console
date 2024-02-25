@@ -192,6 +192,19 @@
         v-if="instanceDetail.queriedTaskDetailInfoList"
         :style="{ width: fixedWidth ? fixedWidth : '100%' }"
     >
+
+
+      <el-row>
+        <el-col :span="20">
+          <el-input v-model="queryInstanceDetailRequest.customQuery">
+            <template slot="prepend">select * from task_info where</template>
+            <template slot="append">limit 10</template>
+          </el-input>
+        </el-col>
+        <el-col :span="4">
+          <el-button type="primary" @click="fetchInstanceDetail">{{$t('message.query')}}</el-button>
+        </el-col>
+      </el-row>
       <el-card>
         <el-row>
           <el-table
@@ -270,7 +283,7 @@ export default {
   data() {
     return {
       instanceDetail: {
-        queriedTaskDetailInfoList: []
+        queriedTaskDetailInfoList: undefined
       },
 
       queryInstanceDetailRequest: {
@@ -285,7 +298,14 @@ export default {
         this.instanceDetail = this.nodeDetail;
       } else {
         let that = this;
-        this.axios.post('/instance/detailPlus', that.queryInstanceDetailRequest).then(ret => that.instanceDetail= ret)
+        this.axios.post('/instance/detailPlus', that.queryInstanceDetailRequest).then(ret => {
+          that.instanceDetail= ret
+          if (that.instanceDetail.queriedTaskDetailInfoList !== undefined) {
+            if (that.instanceDetail.queriedTaskDetailInfoList.length === 0) {
+              that.instanceDetail.queriedTaskDetailInfoList = undefined
+            }
+          }
+        })
       }
     },
     /** 查看详情 */
