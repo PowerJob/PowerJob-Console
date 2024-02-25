@@ -184,12 +184,12 @@
     <!-- MR任务 -->
     <el-divider
         content-position="center"
-        v-if="instanceDetail.queriedTaskDetailInfoList"
+        v-if="showQueriedTaskDetailInfoList"
     >{{ $t("message.queriedTaskDetailInfoList") }}</el-divider>
 
     <div
         class="power-job-info"
-        v-if="instanceDetail.queriedTaskDetailInfoList"
+        v-if="showQueriedTaskDetailInfoList"
         :style="{ width: fixedWidth ? fixedWidth : '100%' }"
     >
 
@@ -292,6 +292,9 @@ export default {
         queriedTaskDetailInfoList: undefined
       },
 
+      // 是否展示 queriedTaskDetailInfoList，只单向赋值为 true ，解决改变查询条件空数据后隐藏组件的问题
+      showQueriedTaskDetailInfoList: false,
+
       queryInstanceDetailRequest: {
         instanceId: this.instanceId,
         customQuery: "status in (5, 6) order by last_modified_time desc"
@@ -307,8 +310,8 @@ export default {
         this.axios.post('/instance/detailPlus', that.queryInstanceDetailRequest).then(ret => {
           that.instanceDetail= ret
           if (that.instanceDetail.queriedTaskDetailInfoList !== undefined) {
-            if (that.instanceDetail.queriedTaskDetailInfoList.length === 0) {
-              that.instanceDetail.queriedTaskDetailInfoList = undefined
+            if (that.instanceDetail.queriedTaskDetailInfoList.length !== 0) {
+              that.showQueriedTaskDetailInfoList = true
             }
           }
         })
