@@ -23,38 +23,10 @@
                     <p style="color:#ffffff">Settings<i class="el-icon-arrow-down el-icon--right"/></p>
                 </span>
                 <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item command="changeAppInfo">{{$t('message.changeAppInfo')}}</el-dropdown-item>
+                    <el-dropdown-item command="back2Home">{{$t('message.back2Home')}}</el-dropdown-item>
                     <el-dropdown-item command="logout">{{$t('message.logout')}}</el-dropdown-item>
                 </el-dropdown-menu>
             </el-dropdown>
-
-            <!-- 修改应用信息 -->
-            <el-dialog :visible.sync="changeAppInfoDialogVisible" width="35%" >
-                <el-form :model="appInfo" style="margin:0 5px">
-
-                    <el-form-item :label="$t('message.appName')">
-                        <el-input v-model="appInfo.appName"/>
-                    </el-form-item>
-
-                  <el-form-item :label="$t('message.oldPassword')">
-                    <el-input v-model="appInfo.oldPassword"/>
-                  </el-form-item>
-
-                    <el-form-item :label="$t('message.newPassword')">
-                        <el-input v-model="appInfo.password"/>
-                    </el-form-item>
-
-                    <el-form-item :label="$t('message.newPassword2')">
-                        <el-input v-model="appInfo.password2"/>
-                    </el-form-item>
-
-                    <el-form-item>
-                        <el-button type="primary" @click="saveNewAppInfo">{{$t('message.save')}}</el-button>
-                        <el-button @click="changeAppInfoDialogVisible = false">{{$t('message.cancel')}}</el-button>
-                    </el-form-item>
-                </el-form>
-            </el-dialog>
-
         </div>
     </div>
 </template>
@@ -64,39 +36,27 @@
         name: "Navbar",
         data() {
             return {
-                changeAppInfoDialogVisible: false,
-                appInfo: {
-                    id: this.$store.state.appInfo.id,
-                    appName: this.$store.state.appInfo.appName,
-                    oldPassword: undefined,
-                    password: undefined,
-                    password2: undefined
-                }
             }
         },
         methods: {
-            // 退出当前应用
-            onClickCloseConsole: function () {
-                window.localStorage.removeItem('oms_auto_login');
-                this.$router.push("/");
-            },
+
+          // 返回主页
+          onClickBack2Home() {
+            window.localStorage.removeItem('Power_appId')
+            this.$router.push("/");
+          },
+
+          // 退出登录
+          onClickLogout() {
+            window.localStorage.removeItem('Power_appId');
+            window.localStorage.removeItem('Power_jwt')
+            this.$router.push("/");
+          },
             // 处理系统设置的指令时间
             handleSettings: function (cmd) {
                 switch (cmd) {
-                    case "logout": this.onClickCloseConsole(); break;
-                    case "changeAppInfo": this.changeAppInfoDialogVisible = true; break;
-                }
-            },
-            // 更新应用信息
-            saveNewAppInfo() {
-                if (this.appInfo.password === this.appInfo.password2) {
-                    const that = this;
-                    this.axios.post("/appInfo/save", this.appInfo).then(() => {
-                        that.$message.success(this.$t('message.success'));
-                        that.$router.push("/");
-                    }, e => that.$message.error(e));
-                }else {
-                    this.$message.error("the password doesn't match");
+                    case "logout": this.onClickLogout(); break;
+                    case "back2Home": this.onClickBack2Home(); break;
                 }
             }
         }

@@ -390,7 +390,7 @@
                     id: undefined,
                     jobName: "",
                     jobDescription: "",
-                    appId: this.$store.state.appInfo.id,
+                    appId: window.localStorage.getItem("Power_appId"),
                     jobParams: "",
                     timeExpressionType: "",
                     timeExpression: "",
@@ -430,7 +430,7 @@
                 },
                 // 任务查询请求对象
                 jobQueryContent: {
-                    appId: this.$store.state.appInfo.id,
+                    appId: window.localStorage.getItem("Power_appId"),
                     index: 0,
                     pageSize: 10,
                     jobId: undefined,
@@ -573,7 +573,7 @@
             // 点击 立即运行按钮
             onClickRun(data) {
                 let that = this;
-                let url = "/job/run?jobId=" + data.id + "&appId=" + that.$store.state.appInfo.id;
+                let url = "/job/run?jobId=" + data.id + "&appId=" + window.localStorage.getItem("Power_appId");
                 if (this.temporaryRowData && this.runParameter) {
                     url += `&instanceParams=${encodeURIComponent(this.runParameter)}`
                 }

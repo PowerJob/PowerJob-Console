@@ -22,28 +22,38 @@ const cn = {
         'back': '返回',
         'all': '全部',
         'more': '| 更多',
+        'add': '新增',
+        'extra': '额外信息',
+        'tag': '标签',
+        'enter': '进入',
 
         // 欢迎界面
         'appRegister': '执行应用注册',
-        'userRegister': '报警用户录入',
+        'userRegister': '注册',
+        'changePassword': '修改密码',
         'appNameInputPLH': '请输入应用名称',
         'appName': '应用名称',
         'appPassword': '密码',
         'register': '注册',
-        'name': '姓名',
+        'name': '名称',
+        'nick': '昵称',
         'phone': '手机号',
         'email': '邮箱地址',
         'webhook': 'WebHook',
         'welcomeTitle': '欢迎使用 PowerJob!',
-        'login': '登陆',
-        'logout': '退出',
+        'chooseLoginType':'请选择您的登录方式',
+        'login': '登录',
+        'logout': '退出登录',
         'changeAppInfo': '修改应用信息',
         'newPassword': '新密码',
         'newPassword2': '确认密码',
         'stayLogged': '保持登录状态',
+        'back2Home': '返回主页',
 
 
         // 左侧tab栏
+        'tabAppManage': '应用管理',
+        'tabNamespace': '命名空间',
         'tabHome': '系统首页',
         'tabJobManage': '任务管理',
         'tabJobInstance': '任务实例',
@@ -52,10 +62,14 @@ const cn = {
         'tabContainerOps': '容器',
         'tabTemplate': '模版生成',
         'tabContainerManager': '容器运维',
+        'tabSettings': '系统设置',
+        'tabPersonal': '个人中心',
 
         // 系统首页
-        'omsServerTime': '调度服务器时间',
-        'omsServerTimezone': '调度服务器时区',
+        'omsServerTime': '服务器时间',
+        'omsServerTimezone': '服务器时区',
+        'omsServerIP': 'MasterIP',
+        'omsServerBornTime': '启动时间',
         'localBrowserTime': '本地时间',
         'localBrowserTimezone': '本地时区',
         'githubURL': '项目地址',
@@ -235,7 +249,25 @@ const cn = {
         'export': '导出',
         'condition': '判断节点',
         'workflowChild': '子流程节点',
-        'importWorkflowTitle': '工作流节点引入'
+        'importWorkflowTitle': '工作流节点引入',
+
+        // namespace
+        'createTime': '创建时间',
+        'modifyTime': '修改时间',
+        'creator': '创建人',
+        'modifier': '修改人',
+        'showMyRelated': '只看我的',
+        'permissionManage': '权限管理',
+
+        // permission
+        'observer': '观察者',
+        'qa': '测试员',
+        'developer':'开发者',
+        'admin': '管理员',
+        'globalAdmin': '全局管理员',
+        'personalInfo': '个人信息',
+        'appAdmin': '应用管理员',
+        'authThenBecomeAdmin': '验证并成为管理员',
     },
     ...zhLocale
 };

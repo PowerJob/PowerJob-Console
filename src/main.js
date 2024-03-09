@@ -44,22 +44,29 @@ new Vue({
 //请求发送拦截，没有 appId 要求重新 "登录"
 axios.interceptors.request.use((request) => {
 
-  let url = request.url;
-  let isListAppInfo = url.search("/appInfo/list") !== -1;
-  let isAppRegister = url.search("/appInfo/save") !== -1;
-  let isUserRegister = url.search("/user/save") !== -1;
-  let isAssertAppInfo = url.search("/appInfo/assert") !== -1;
-
-  if (isListAppInfo || isAppRegister || isUserRegister || isAssertAppInfo) {
-    return request;
+  request.headers['Power_jwt'] = window.localStorage.getItem("Power_jwt");
+  if (request.headers['AppId'] == null) {
+    request.headers['AppId'] = window.localStorage.getItem("Power_appId");
   }
 
+  // let url = request.url;
+  // let isListAppInfo = url.search("/appInfo/list") !== -1;
+  // let isAppRegister = url.search("/appInfo/save") !== -1;
+  // let isAssertAppInfo = url.search("/appInfo/assert") !== -1;
+  //
+  // if (isListAppInfo || isAppRegister  || isAssertAppInfo) {
+  //   return request;
+  // }
+
+  /*
+  TODO: 先注释原来的全局 appId 登录拦截逻辑，后续考虑兼容性问题
   let appId = store.state.appInfo.id;
   if (appId === undefined || appId === null) {
     router.push("/");
     // remove no appId warn due to too much user report this is a bug...
     return Promise.reject();
   }
+   */
   return request;
 
 }, function (error) {
@@ -69,6 +76,14 @@ axios.interceptors.request.use((request) => {
 
 // 请求返回拦截，封装公共处理逻辑
 axios.interceptors.response.use((response) => {
+
+  // -100 为未登录约定状态码，前端全局拦截跳转登录页面
+  if (response.data.code === '-100') {
+    Message.warning("USER_NEED_LOGIN")
+    router.push("/");
+    return
+  }
+
   if (response.data.success === true) {
     return response.data.data;
   }

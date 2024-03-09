@@ -1,13 +1,15 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Console from "./components/Console";
+import AdminConsole from "./components/admin/AdminConsole.vue";
 
 Vue.use(VueRouter);
 
 const router = new VueRouter({
     routes: [
-        { path: "/", redirect: '/welcome' },
-        { path: "/welcome", component: () => import('./components/Welcome') },
+        { path: "/", redirect: '/loginHomepage' },
+        { path: "/loginHomepage", component: () => import('./components/login/LoginHomepage.vue') },
+        { path: "/powerjobLogin", name: 'PowerJobThirdPartyLogin', component: () => import('./components/login/PowerJobThirdPartyLogin.vue') },
         {
             path: "/oms", component: Console, redirect: "/oms/home", children: [
                 // 二级路由
@@ -23,6 +25,18 @@ const router = new VueRouter({
                 { path: "/oms/workflowEditor", name: "workflowEditor", meta: { title: '工作流编辑器' }, component: () => import('./components/dag/WorkflowEditor') }
             ]
         },
+
+        // 管理后台
+        {
+            path: "/admin", component: AdminConsole, redirect: "/admin/app", children: [
+                // 二级路由
+                { path: "/admin/app", meta: { title: '应用管理' }, component: () => import('./components/admin/AppManager.vue') },
+                { path: "/admin/namespace", meta: { title: '命名空间' }, component: () => import('./components/admin/NamespaceManager.vue') },
+                { path: "/admin/user", meta: { title: '用户设置' }, component: () => import('./components/admin/UserCenter.vue') },
+                { path: "/admin/settings", meta: { title: '系统设置' }, component: () => import('./components/admin/Settings.vue') }
+            ]
+        },
+
         // 调试用
         { path: "/sidebar", component: () => import('./components/bar/Sidebar') },
         { path: "/navbar", component: () => import('./components/bar/Navbar') },

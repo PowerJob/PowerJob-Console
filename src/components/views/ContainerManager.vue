@@ -97,7 +97,7 @@
                 },
                 sourceInfo : '',
                 id:'',
-                appId:this.$store.state.appInfo.id,
+                appId:window.localStorage.getItem("Power_appId"),
                 dialogVisible:false,
                 arrangeTitle:'',
                 arrangeVisible:false,
@@ -125,7 +125,7 @@
                    data.sourceType = 'FatJar'
                }
                this.axios.post("container/save",data).then(()=>{
-                   let appId = this.$store.state.appInfo.id;
+                   let appId = window.localStorage.getItem("Power_appId");
                    this.axios.get("/container/list?appId=" + appId).then(res => {
                        this.$message.info(this.$t('message.success'));
                        // 恢复默认表单
@@ -144,7 +144,7 @@
                 this.sourceInfo = response.data;
             },
             deleteItem(item,index){
-                let appId = this.$store.state.appInfo.id;
+                let appId = window.localStorage.getItem("Power_appId");
                 this.flyio.get("/container/delete?containerId="+ item.id+'&appId='+appId).then(res => {
                     console.log(res);
                     this.containerList.splice(index,1);
@@ -193,7 +193,7 @@
                 this.fileList  = [];
             },
             listOfItem(item){
-                let appId = this.$store.state.appInfo.id;
+                let appId = window.localStorage.getItem("Power_appId");
                 this.flyio.get("/container/listDeployedWorker?containerId="+ item.id+'&appId='+appId).then(res => {
                     if(res.data.data){
                         this.logs = res.data.data.split('\n');
@@ -220,7 +220,7 @@
         mounted() {
             this.calculateRequestUrl();
 
-            let appId = this.$store.state.appInfo.id;
+            let appId = window.localStorage.getItem("Power_appId");
             this.flyio.get("/container/list?appId=" + appId).then(res => {
                 console.log(res);
                 if(res.data.success){
