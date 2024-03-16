@@ -112,6 +112,7 @@
         </el-form-item>
 
         <el-form-item>
+          <el-button v-if="modifiedAppForm.id!=null" type="danger" @click="onClickDeleteApp">{{$t('message.delete')}}</el-button>
           <el-button type="primary" @click="onClickSaveApp">{{$t('message.save')}}</el-button>
           <el-button @click="modifiedAppFormVisible = false">{{$t('message.cancel')}}</el-button>
         </el-form-item>
@@ -231,6 +232,15 @@ export default {
         this.listApps();
       }, e => that.$message.error(e))
       this.modifiedAppFormVisible = false;
+    },
+
+    onClickDeleteApp() {
+      let that = this;
+      this.axios.post('/appInfo/delete?appId=' + that.modifiedAppForm.id).then(() => {
+        that.$message.success(that.$t('message.success'));
+        this.listApps();
+        this.modifiedAppFormVisible = false;
+      })
     },
 
     // 点击 编辑按钮

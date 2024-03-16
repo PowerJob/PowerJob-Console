@@ -193,7 +193,7 @@ export default {
       }).then(() => {
         that.$message.success(that.$t('message.success'));
         this.listNamespaces();
-      }, e => that.$message.error(e))
+      })
       this.modifiedNamespaceFormVisible = false;
     },
 
