@@ -26,6 +26,7 @@ const en = {
         'extra': 'Extra',
         'tag': 'Tag',
         'enter': 'Enter',
+        'fuzzyQuery': 'fuzzy query',
 
         // 欢迎界面
         'appRegister': 'App Registration',
@@ -62,6 +63,7 @@ const en = {
         'tabContainerManager': 'Container Management',
         'tabSettings': 'Settings',
         'tabPersonal': 'Personal',
+        'tabUserManager': 'UserManager',
 
         'omsServerTime': 'Server Time',
         'omsServerTimezone': 'Server Timezone',

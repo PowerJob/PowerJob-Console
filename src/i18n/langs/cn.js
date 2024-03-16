@@ -26,6 +26,7 @@ const cn = {
         'extra': '额外信息',
         'tag': '标签',
         'enter': '进入',
+        'fuzzyQuery': '模糊查询',
 
         // 欢迎界面
         'appRegister': '执行应用注册',
@@ -64,6 +65,7 @@ const cn = {
         'tabContainerManager': '容器运维',
         'tabSettings': '系统设置',
         'tabPersonal': '个人中心',
+        'tabUserManager': '用户管理',
 
         // 系统首页
         'omsServerTime': '服务器时间',

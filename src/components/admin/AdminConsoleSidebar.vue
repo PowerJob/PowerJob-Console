@@ -27,10 +27,10 @@
             </template>
           </el-menu-item>
 
-          <el-menu-item index="/admin/user">
+          <el-menu-item index="/admin/personal">
             <template slot="title">
               <!-- 图标 + 文字 -->
-              <i class="el-icon-user"/>
+              <i class="el-icon-goblet-square-full"/>
               <span>{{$t('message.tabPersonal')}}</span>
             </template>
           </el-menu-item>
@@ -40,6 +40,14 @@
               <!-- 图标 + 文字 -->
               <i class="el-icon-setting"/>
               <span>{{$t('message.tabSettings')}}</span>
+            </template>
+          </el-menu-item>
+
+          <el-menu-item index="/admin/user">
+            <template slot="title">
+              <!-- 图标 + 文字 -->
+              <i class="el-icon-user"/>
+              <span>{{$t('message.tabUserManager')}}</span>
             </template>
           </el-menu-item>
 

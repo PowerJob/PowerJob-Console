@@ -32,8 +32,10 @@ const router = new VueRouter({
                 // 二级路由
                 { path: "/admin/app", meta: { title: '应用管理' }, component: () => import('./components/admin/AppManager.vue') },
                 { path: "/admin/namespace", meta: { title: '命名空间' }, component: () => import('./components/admin/NamespaceManager.vue') },
-                { path: "/admin/user", meta: { title: '用户设置' }, component: () => import('./components/admin/UserCenter.vue') },
-                { path: "/admin/settings", meta: { title: '系统设置' }, component: () => import('./components/admin/Settings.vue') }
+                { path: "/admin/personal", meta: { title: '个人设置' }, component: () => import('./components/admin/UserCenter.vue') },
+                { path: "/admin/settings", meta: { title: '系统设置' }, component: () => import('./components/admin/Settings.vue') },
+                { path: "/admin/user", meta: { title: '用户管理' }, component: () => import('./components/admin/UserManager.vue') }
+
             ]
         },
 

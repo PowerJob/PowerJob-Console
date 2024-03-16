@@ -10,10 +10,10 @@
             <el-input v-model="queryAppRequest.appId" placeholder="ID"/>
           </el-form-item>
           <el-form-item label="appName">
-            <el-input v-model="queryAppRequest.appNameLike" placeholder="appName(Like)"/>
+            <el-input v-model="queryAppRequest.appNameLike" :placeholder="$t('message.fuzzyQuery')"/>
           </el-form-item>
           <el-form-item label="tag">
-            <el-input v-model="queryAppRequest.tagLike" placeholder="tags(Like)"/>
+            <el-input v-model="queryAppRequest.tagLike" :placeholder="$t('message.fuzzyQuery')"/>
           </el-form-item>
 
           <el-form-item label="namespace">
