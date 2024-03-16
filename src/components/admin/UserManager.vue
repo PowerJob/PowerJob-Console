@@ -34,12 +34,20 @@
         <el-table-column prop="phone" label="phone"/>
         <el-table-column prop="email" label="email"/>
 
+        <el-table-column :label="$t('message.status')" width="80">
+          <template slot-scope="scope">
+            <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="changeUserStatus(scope.row)"/>
+          </template>
+        </el-table-column>
+
       </el-table>
     </el-row>
   </div>
 </template>
 
 <script>
+import {Message} from "element-ui";
+
 export default {
   name: "UserManager",
   data() {
@@ -69,6 +77,22 @@ export default {
       this.axios.post("/user/query", this.queryUserRequest).then((res) => {
         that.userListResult = res;
       });
+    },
+
+    changeUserStatus(data) {
+      const that = this;
+      console.log('user status: ' + data.enable)
+      if (data.enable) {
+        that.axios.post("/user/enable?uid=" + data.id).then(() => {
+          Message.success('SUCCESS')
+          that.listUser()
+        });
+      } else {
+        that.axios.post("/user/disable?uid=" + data.id).then(() => {
+          Message.success('SUCCESS')
+          that.listUser()
+        });
+      }
     }
   },
   mounted() {
