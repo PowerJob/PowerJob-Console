@@ -43,7 +43,7 @@
         methods: {
             onSubmit() {
                  console.log('submit!');
-                this.flyio.post("/container/downloadContainerTemplate", this.form
+                this.axios.post("/container/downloadContainerTemplate", this.form
                 ,{
                     responseType:'blob'//服务器返回的数据类型
                 }).then((res)=>{
