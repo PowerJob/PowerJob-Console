@@ -173,7 +173,7 @@ export default {
       this.axios.post('/pwjbUser/changePassword', this.changePasswordRequest).then(() => {
         Message.success('SUCCESS')
 
-        window.localStorage.removeItem('Power_jwt');
+        window.localStorage.removeItem('PowerJwt');
         window.localStorage.removeItem('Power_appId');
         this.$router.push("/");
 

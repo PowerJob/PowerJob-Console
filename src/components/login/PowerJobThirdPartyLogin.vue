@@ -110,7 +110,7 @@ export default {
 
         if (real_login) {
           const jwtToken = ret.jwtToken
-          window.localStorage.setItem('Power_jwt', jwtToken);
+          window.localStorage.setItem('PowerJwt', jwtToken);
 
           this.$router.push("/admin/app")
         }

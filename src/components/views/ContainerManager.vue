@@ -108,7 +108,7 @@
                 fileList: [],
 
                 headersObj: {
-                  Power_jwt: undefined,
+                  PowerJwt: undefined,
                   AppId: undefined
                 }
             }
@@ -238,7 +238,7 @@
             this.listContainers();
 
             this.headersObj.AppId = window.localStorage.getItem("Power_appId")
-            this.headersObj.Power_jwt = window.localStorage.getItem("Power_jwt")
+            this.headersObj.PowerJwt = window.localStorage.getItem("PowerJwt")
         }
     }
 </script>

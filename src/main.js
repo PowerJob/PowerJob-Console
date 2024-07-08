@@ -39,7 +39,7 @@ new Vue({
 // 请求拦截，全局添加 JWT 和 APPID 信息
 axios.interceptors.request.use((request) => {
 
-  request.headers['Power_jwt'] = window.localStorage.getItem("Power_jwt");
+  request.headers['PowerJwt'] = window.localStorage.getItem("PowerJwt");
   if (request.headers['AppId'] == null) {
     request.headers['AppId'] = window.localStorage.getItem("Power_appId");
   }

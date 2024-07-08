@@ -56,7 +56,7 @@ export default {
           this.$router.push("/admin/app")
         }
       }, error => {
-        window.localStorage.removeItem('Power_jwt');
+        window.localStorage.removeItem('PowerJwt');
         window.localStorage.removeItem('Power_appId');
         that.$message.error(error)
       });
@@ -80,7 +80,7 @@ export default {
         console.log('login success, user: ' + ret)
 
         const jwtToken = ret.jwtToken
-        window.localStorage.setItem('Power_jwt', jwtToken);
+        window.localStorage.setItem('PowerJwt', jwtToken);
 
         this.$router.push("/admin/app")
       })

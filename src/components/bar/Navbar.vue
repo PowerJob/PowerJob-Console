@@ -49,7 +49,7 @@
           // 退出登录
           onClickLogout() {
             window.localStorage.removeItem('Power_appId');
-            window.localStorage.removeItem('Power_jwt')
+            window.localStorage.removeItem('PowerJwt')
             this.$router.push("/");
           },
             // 处理系统设置的指令时间
