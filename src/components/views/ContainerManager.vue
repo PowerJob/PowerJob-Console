@@ -26,8 +26,7 @@
                 :title="$t('message.newContainer')"
                 :visible.sync="dialogVisible"
                 width="50%"
-                v-on:close="closeEdit"
-                :before-close="handleClose">
+                v-on:close="closeEdit">
                 <el-form ref="form" :model="form" label-width="150px" class="genTable" label-position='left'>
                     <el-form-item :label="$t('message.containerName')">
                         <el-input v-model="form.containerName"></el-input>
@@ -59,6 +58,7 @@
                         :file-list = "fileList"
                         :on-success="onSuccess"
                         :action="`${requestUrl}/container/jarUpload`"
+                        :headers="headersObj"
                         multiple>
                     <i class="el-icon-upload"></i>
                     <div class="el-upload__text">Drag the file here, or <em>click on Upload</em></div>
@@ -79,6 +79,7 @@
 
 <script>
     import baseUrl from '../../main';
+    import {Message} from "element-ui";
 
     let ws;
     export default {
@@ -97,18 +98,24 @@
                 },
                 sourceInfo : '',
                 id:'',
-                appId:this.$store.state.appInfo.id,
+                appId:window.localStorage.getItem("Power_appId"),
                 dialogVisible:false,
                 arrangeTitle:'',
                 arrangeVisible:false,
                 containerList:[],
                 logs:[],
                 requestUrl :"",
-                fileList: []
+                fileList: [],
+
+                headersObj: {
+                  PowerJwt: undefined,
+                  AppId: undefined
+                }
             }
         },
         methods: {
             onSubmit() {
+              const that = this
                 // 接口参数
                 let data = {
                     appId:this.appId,
@@ -124,19 +131,18 @@
                    data.sourceInfo = this.sourceInfo;
                    data.sourceType = 'FatJar'
                }
-               this.axios.post("container/save",data).then(()=>{
-                   let appId = this.$store.state.appInfo.id;
-                   this.axios.get("/container/list?appId=" + appId).then(res => {
-                       this.$message.info(this.$t('message.success'));
-                       // 恢复默认表单
-                       this.dialogVisible = false;
-                       this.form.containerName = '';
-                       this.gitForm = {};
-                       this.sourceInfo = '';
-                       this.id = '';
-                       // 刷新容器表单
-                       this.containerList = res;
-                   });
+               this.axios.post("container/save",data).then(res=>{
+                 console.log('container save result:' + JSON.stringify(res))
+
+                 Message.success("SUCCESS");
+                 // 恢复默认表单
+                 that.dialogVisible = false;
+                 that.form.containerName = '';
+                 that.gitForm = {};
+                 that.sourceInfo = '';
+                 that.id = '';
+
+                 that.listContainers()
                });
             },
             // 文件上传成功后 修改来源信息
@@ -144,8 +150,8 @@
                 this.sourceInfo = response.data;
             },
             deleteItem(item,index){
-                let appId = this.$store.state.appInfo.id;
-                this.flyio.get("/container/delete?containerId="+ item.id+'&appId='+appId).then(res => {
+                let appId = window.localStorage.getItem("Power_appId");
+                this.axios.get("/container/delete?containerId="+ item.id+'&appId='+appId).then(res => {
                     console.log(res);
                     this.containerList.splice(index,1);
                     this.$message.info(this.$t('message.success'));
@@ -193,8 +199,8 @@
                 this.fileList  = [];
             },
             listOfItem(item){
-                let appId = this.$store.state.appInfo.id;
-                this.flyio.get("/container/listDeployedWorker?containerId="+ item.id+'&appId='+appId).then(res => {
+                let appId = window.localStorage.getItem("Power_appId");
+                this.axios.get("/container/listDeployedWorker?containerId="+ item.id+'&appId='+appId).then(res => {
                     if(res.data.data){
                         this.logs = res.data.data.split('\n');
                         this.arrangeTitle = this.$t('message.deployedWorkerList');
@@ -215,18 +221,24 @@
                 }else {
                     this.requestUrl = baseUrl;
                 }
-            }
+            },
+
+          listContainers() {
+            let appId = window.localStorage.getItem("Power_appId");
+            this.axios.get("/container/list?appId=" + appId).then(res => {
+              console.log(res);
+              if(res.data.success){
+                this.containerList = res.data.data;
+              }
+            });
+          }
         },
         mounted() {
             this.calculateRequestUrl();
+            this.listContainers();
 
-            let appId = this.$store.state.appInfo.id;
-            this.flyio.get("/container/list?appId=" + appId).then(res => {
-                console.log(res);
-                if(res.data.success){
-                    this.containerList = res.data.data;
-                }
-            });
+            this.headersObj.AppId = window.localStorage.getItem("Power_appId")
+            this.headersObj.PowerJwt = window.localStorage.getItem("PowerJwt")
         }
     }
 </script>

@@ -102,7 +102,7 @@
             return {
                 // 查询条件
                 workflowQueryContent: {
-                    appId: this.$store.state.appInfo.id,
+                    appId: window.localStorage.getItem("Power_appId"),
                     index: 0,
                     pageSize: 10,
                     workflowId: undefined,
@@ -148,7 +148,7 @@
             switchWorkflow(data) {
                 let that = this;
                 let path = data.enable ? "enable" : "disable";
-                let url = "/workflow/" + path + "?appId=" + this.$store.state.appInfo.id + "&workflowId=" + data.id;
+                let url = "/workflow/" + path + "?appId=" + window.localStorage.getItem("Power_appId") + "&workflowId=" + data.id;
                 this.axios.get(url, res => {
                     console.log(res);
                     that.listWorkflow();
@@ -167,7 +167,7 @@
             // 立即运行工作流
             onClickRunWorkflow(data) {
                 let that = this;
-                let url = "/workflow/run?appId=" + this.$store.state.appInfo.id + "&workflowId=" + data.id;
+                let url = "/workflow/run?appId=" + window.localStorage.getItem("Power_appId") + "&workflowId=" + data.id;
                 if (this.temporaryRowData && this.runParameter) {
                     url += `&initParams=${encodeURIComponent(this.runParameter)}`
                 }
@@ -192,7 +192,7 @@
             // 删除工作流
             onClickDeleteWorkflow(data) {
                 let that = this;
-                let url = "/workflow/delete?appId=" + this.$store.state.appInfo.id + "&workflowId=" + data.id;
+                let url = "/workflow/delete?appId=" + window.localStorage.getItem("Power_appId") + "&workflowId=" + data.id;
                 this.axios.get(url).then(() => {
                     that.$message.success(this.$t('message.success'));
                     that.listWorkflow();

@@ -178,7 +178,7 @@
                     edges: []
                 }
                 const wfInstanceId = this.$route.params.wfInstanceId;
-                let url = "/wfInstance/info?appId=" + this.$store.state.appInfo.id + "&wfInstanceId=" + wfInstanceId;
+                let url = "/wfInstance/info?appId=" + window.localStorage.getItem("Power_appId") + "&wfInstanceId=" + wfInstanceId;
                 let res = await this.axios.get(url)
                 this.wfInstanceDetail = res;
                 this.peworkflowDAG = res.peworkflowDAG;
@@ -191,7 +191,7 @@
                 if(!(this.selectNode && this.selectNode.get('model').status == 4)) return;
                 
                 const data = {
-                    appId: this.$store.state.appInfo.id,
+                    appId: window.localStorage.getItem("Power_appId"),
                     wfInstanceId: this.$route.params.wfInstanceId,
                     nodeId: this.selectNode.get('model').id
                 };
@@ -207,7 +207,7 @@
             /** 重试 */
             async restart() {
                 const data = {
-                    appId: this.$store.state.appInfo.id,
+                    appId: window.localStorage.getItem("Power_appId"),
                     wfInstanceId: this.$route.params.wfInstanceId,
                 };
                 await this.axios.get('/wfInstance/retry', {
@@ -220,7 +220,7 @@
             async stop() {
               let that = this;
               let url = "/wfInstance/stop?wfInstanceId=" + this.$route.params.wfInstanceId +
-                  "&appId=" + this.$store.state.appInfo.id;
+                  "&appId=" + window.localStorage.getItem("Power_appId");
               await this.axios.get(url).then(() => {
                 that.$message.success(this.$t('message.success'));
               });
