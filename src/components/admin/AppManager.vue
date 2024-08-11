@@ -236,7 +236,12 @@ export default {
 
     onClickDeleteApp() {
       let that = this;
-      this.axios.post('/appInfo/delete?appId=' + that.modifiedAppForm.id).then(() => {
+      this.axios.post('/appInfo/delete?appId=' + that.modifiedAppForm.id, {}, {
+        'headers': {
+          'Content-Type': 'application/json',
+          'AppId': that.modifiedAppForm.id
+        }
+      }).then(() => {
         that.$message.success(that.$t('message.success'));
         this.listApps();
         this.modifiedAppFormVisible = false;
