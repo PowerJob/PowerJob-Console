@@ -28,7 +28,7 @@
           </el-form-item>
 
           <el-form-item :label="$t('message.showMyRelated')">
-            <el-switch v-model="queryAppRequest.showMyRelated"></el-switch>
+            <el-switch v-model="queryAppRequest.showMyRelated" @change="listApps"></el-switch>
           </el-form-item>
 
           <el-form-item>
@@ -138,7 +138,7 @@ export default {
         namespaceId: undefined,
         appNameLike: undefined,
         tagLike: undefined,
-        showMyRelated: false,
+        showMyRelated: true,
         index:0,
         pageSize:10
       },
@@ -177,12 +177,12 @@ export default {
       this.queryAppRequest.namespaceId = undefined;
       this.queryAppRequest.appNameLike = undefined;
       this.queryAppRequest.tagLike = undefined;
-      this.queryAppRequest.showMyRelated = false;
+      this.queryAppRequest.showMyRelated = true;
       this.queryAppRequest.index = 0;
       this.listApps();
     },
 
-    // 查询 namespace
+    // 查询 app
     listApps() {
       const that = this;
       this.axios.post("/appInfo/list", this.queryAppRequest).then((res) => {
