@@ -120,7 +120,7 @@ export default {
 /* 使用轻纹理背景 */
 body {
   font-family: 'Arial', sans-serif;
-  background: #f0f0f0 url('https://www.transparenttextures.com/patterns/cubes.png') repeat; /* 浅灰色纹理背景 */
+  background: #f0f0f0 url('../../assets/fe_login_backgroup_cubes.png') repeat; /* 浅灰色纹理背景 */
   color: #343a40;
 }
 

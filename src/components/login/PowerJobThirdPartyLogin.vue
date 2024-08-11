@@ -3,63 +3,53 @@
     <div class="login-container">
       <h2>Login to PowerJob</h2>
 
-      <el-form ref="login_info" :model="login_info">
-        <el-form-item label="username">
-          <el-input v-model="login_info.username"></el-input>
-        </el-form-item>
-        <el-form-item label="password">
-          <el-input v-model="login_info.password"></el-input>
+      <el-form ref="login_info" :model="login_info" label-width="0">
+        <el-form-item>
+          <el-input v-model="login_info.username" placeholder="Username"></el-input>
         </el-form-item>
         <el-form-item>
+          <el-input v-model="login_info.password" placeholder="Password" show-password></el-input>
+        </el-form-item>
+        <el-form-item class="actions">
           <el-button size="medium" type="success" plain @click="userRegisterFormVisible = true">{{$t('message.userRegister')}}</el-button>
           <el-button size="medium" type="primary" @click="doLogin">{{$t('message.login')}}</el-button>
         </el-form-item>
       </el-form>
 
-      <!-- 用户注册弹窗 -->
-      <el-dialog :title="$t('message.userRegister')" :visible.sync="userRegisterFormVisible" width="35%" >
-        <el-form :model="userRegisterForm" style="margin:0 5px">
-
-          <el-form-item label="username">
-            <el-input v-model="userRegisterForm.username" placeholder="全局唯一标识，建议使用英文"/>
+      <!-- User registration dialog -->
+      <el-dialog :title="$t('message.userRegister')" :visible.sync="userRegisterFormVisible" width="400px">
+        <el-form :model="userRegisterForm" label-width="120px">
+          <el-form-item label="Username">
+            <el-input v-model="userRegisterForm.username" placeholder="Unique identifier, use English"></el-input>
           </el-form-item>
-
           <el-form-item :label="$t('message.nick')">
-            <el-input v-model="userRegisterForm.nick"/>
+            <el-input v-model="userRegisterForm.nick"></el-input>
           </el-form-item>
-
           <el-form-item :label="$t('message.phone')">
-            <el-input v-model="userRegisterForm.phone"/>
+            <el-input v-model="userRegisterForm.phone"></el-input>
           </el-form-item>
-
           <el-form-item :label="$t('message.email')">
-            <el-input v-model="userRegisterForm.email"/>
+            <el-input v-model="userRegisterForm.email"></el-input>
           </el-form-item>
-
           <el-form-item :label="$t('message.webhook')">
-            <el-input v-model="userRegisterForm.webHook"/>
+            <el-input v-model="userRegisterForm.webHook"></el-input>
           </el-form-item>
-
           <el-form-item :label="$t('message.newPassword')">
-            <el-input type="password" v-model="userRegisterForm.password"/>
+            <el-input type="password" v-model="userRegisterForm.password" show-password></el-input>
           </el-form-item>
-
           <el-form-item :label="$t('message.newPassword2')">
-            <el-input type="password" v-model="userRegisterForm.password2"/>
+            <el-input type="password" v-model="userRegisterForm.password2" show-password></el-input>
           </el-form-item>
-
-          <el-form-item>
+          <el-form-item class="actions">
             <el-button type="primary" @click="registerUser">{{$t('message.register')}}</el-button>
             <el-button @click="userRegisterFormVisible = false">{{$t('message.cancel')}}</el-button>
           </el-form-item>
-
         </el-form>
       </el-dialog>
-
-
     </div>
   </div>
 </template>
+
 
 <script>
 import {Message} from "element-ui";
@@ -147,22 +137,53 @@ export default {
 </script>
 
 <style scoped>
+#container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
 
 .login-container {
-  max-width: 400px;
-  margin: 50px auto;
-  padding: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 360px;
+  padding: 30px 25px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 
 h2 {
-  text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  font-weight: 500;
+  color: #333;
 }
 
-#container {
+.el-form-item {
+  margin-bottom: 15px;
 }
 
+.el-input {
+  width: 100%;
+  border-radius: 5px;
+}
 
+.actions {
+  display: flex;
+  justify-content: space-between;
+}
 
+.el-dialog {
+  .el-input {
+    width: 100%;
+    border-radius: 5px;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+  }
+}
 </style>
+
