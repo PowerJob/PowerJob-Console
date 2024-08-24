@@ -262,6 +262,7 @@ const en = {
         'developer':'Developer',
         'admin': 'Admin',
         'globalAdmin': 'Global Admin',
+        'systemConfig': 'System Config',
         'personalInfo': 'Personal Info',
         'appAdmin': 'App Admin',
         'authThenBecomeAdmin': 'Auth then become admin',

@@ -267,6 +267,7 @@ const cn = {
         'developer':'开发者',
         'admin': '管理员',
         'globalAdmin': '全局管理员',
+        'systemConfig': '系统参数',
         'personalInfo': '个人信息',
         'appAdmin': '应用管理员',
         'authThenBecomeAdmin': '验证并成为管理员',
