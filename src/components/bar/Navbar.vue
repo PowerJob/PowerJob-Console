@@ -43,7 +43,7 @@
           // 返回主页
           onClickBack2Home() {
             window.localStorage.removeItem('Power_appId')
-            this.$router.push("/");
+            this.$router.push("/admin/app");
           },
 
           // 退出登录

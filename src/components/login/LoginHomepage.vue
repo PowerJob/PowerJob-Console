@@ -57,7 +57,7 @@ export default {
         if (ret === null || ret === undefined) {
           console.log('ifLogin failed, need reLogin')
         } else {
-          this.$router.push("/admin/app")
+          this.$router.push("/");
         }
       }, error => {
         window.localStorage.removeItem('PowerJwt');
