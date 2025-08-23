@@ -1,8 +1,16 @@
 <template>
   <div class="instance-manager">
 
+    <!-- Tab Section -->
+    <div class="tabs-section">
+      <el-tabs type="card" v-model="instanceQueryContent.type" @tab-click="listInstanceInfos">
+        <el-tab-pane :label="$t('message.normalInstance')" name="NORMAL" />
+        <el-tab-pane :label="$t('message.wfInstance')" name="WORKFLOW" />
+      </el-tabs>
+    </div>
+
     <!-- Search Section -->
-    <div class="pj-form-section">
+    <div class="pj-form-section" style="padding-top: 0; margin-top: 0;">
       <div class="search-container">
         <div class="search-form">
           <el-form :inline="true" :model="instanceQueryContent" class="el-form--inline">
@@ -65,16 +73,8 @@
       </div>
     </div>
 
-    <!-- Tab Section -->
-    <div class="tabs-section">
-      <el-tabs type="card" v-model="instanceQueryContent.type" @tab-click="listInstanceInfos">
-        <el-tab-pane :label="$t('message.normalInstance')" name="NORMAL" />
-        <el-tab-pane :label="$t('message.wfInstance')" name="WORKFLOW" />
-      </el-tabs>
-    </div>
-
     <!-- Table Section -->
-    <div class="pj-table">
+    <div class="pj-table" style="margin-top: var(--pj-space-sm);">
       <el-table
         :data="instancePageResult.data"
         style="width: 100%"
@@ -415,6 +415,12 @@ export default {
   background: transparent;
 }
 
+/* Compact spacing */
+:deep(.pj-form-section) {
+  margin-bottom: var(--pj-space-sm) !important;
+  padding: var(--pj-space-sm) !important;
+}
+
 /* Search Section */
 .search-container {
   display: flex;
@@ -429,6 +435,10 @@ export default {
   min-width: 500px;
 }
 
+.search-form :deep(.el-form--inline .el-form-item) {
+  margin-bottom: var(--pj-space-xs);
+}
+
 .action-buttons {
   display: flex;
   gap: var(--pj-space-sm);
@@ -437,11 +447,11 @@ export default {
 
 /* Tabs Section */
 .tabs-section {
-  margin: var(--pj-space-md) 0;
+  margin: var(--pj-space-sm) 0 var(--pj-space-xs);
 }
 
 .tabs-section :deep(.el-tabs__header) {
-  margin-bottom: var(--pj-space-md);
+  margin-bottom: var(--pj-space-xs);
 }
 
 .tabs-section :deep(.el-tabs__nav) {
