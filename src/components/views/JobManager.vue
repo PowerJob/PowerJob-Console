@@ -97,7 +97,6 @@
                             <el-button 
                                 size="small" 
                                 type="primary" 
-                                plain
                                 @click="onClickModify(scope.row)"
                             >
                                 <el-icon><Edit /></el-icon>
@@ -106,14 +105,13 @@
                             <el-button 
                                 size="small" 
                                 type="success" 
-                                plain
                                 @click="onClickRun(scope.row)"
                             >
                                 <el-icon><VideoPlay /></el-icon>
                                 {{$t('message.run')}}
                             </el-button>
                             <el-dropdown trigger="click" @command="(cmd) => handleCommand(cmd, scope.row)">
-                                <el-button size="small" type="info" plain>
+                                <el-button size="small" type="info">
                                     {{$t('message.more')}}
                                     <el-icon class="ml-1"><ArrowDown /></el-icon>
                                 </el-button>
@@ -163,12 +161,14 @@
         </div>
 
 
-        <el-dialog 
-            :close-on-click-modal="false" 
-            v-model="modifiedJobFormVisible" 
-            width="90%"
+        <el-drawer 
+            v-model="modifiedJobFormVisible"
+            direction="rtl"
+            size="80%"
+            class="job-form-drawer"
             :title="modifiedJobForm.id ? $t('message.editJob') : $t('message.newJob')"
-            class="job-form-dialog"
+            :close-on-click-modal="false"
+            :close-on-press-escape="false"
         >
             <el-form :model="modifiedJobForm" label-width="140px" class="job-form-content">
 
@@ -459,13 +459,19 @@
                 </el-row>
               </el-form-item>
 
-                <el-form-item>
-                    <el-button type="primary" @click="saveJob">{{$t('message.save')}}</el-button>
-                    <el-button @click="modifiedJobFormVisible = false">{{$t('message.cancel')}}</el-button>
-                </el-form-item>
-
             </el-form>
-        </el-dialog>
+            
+            <template #footer>
+                <div class="drawer-footer">
+                    <el-button @click="modifiedJobFormVisible = false">
+                        {{$t('message.cancel')}}
+                    </el-button>
+                    <el-button type="primary" @click="saveJob" :loading="saveLoading">
+                        {{$t('message.save')}}
+                    </el-button>
+                </div>
+            </template>
+        </el-drawer>
 
         <el-dialog :close-on-click-modal="false" v-model="timeExpressionValidatorVisible" v-if='timeExpressionValidatorVisible'>
             <TimeExpressionValidator :time-expression="modifiedJobForm.timeExpression" :time-expression-type="modifiedJobForm.timeExpressionType"/>
@@ -527,6 +533,7 @@
         data() {
             return {
                 modifiedJobFormVisible: false,
+                saveLoading: false,
                 // 新建任务对象
                 modifiedJobForm: {
                     id: undefined,
@@ -622,29 +629,37 @@
         methods: {
             // 保存变更，包括新增和修改
             async saveJob() {
-                const { lifeCycle, alarmConfig } = this.modifiedJobForm;
-                if (lifeCycle && Array.isArray(lifeCycle)) {
-                    const start = lifeCycle[0];
-                    const end = lifeCycle[1];
-                    this.modifiedJobForm.lifeCycle = {
-                        start,
-                        end
+                this.saveLoading = true;
+                try {
+                    const { lifeCycle, alarmConfig } = this.modifiedJobForm;
+                    if (lifeCycle && Array.isArray(lifeCycle)) {
+                        const start = lifeCycle[0];
+                        const end = lifeCycle[1];
+                        this.modifiedJobForm.lifeCycle = {
+                            start,
+                            end
+                        }
                     }
+                    if (!alarmConfig.alertThreshold) {
+                        alarmConfig.alertThreshold = 0;
+                    }
+                    if (!alarmConfig.statisticWindowLen) {
+                        alarmConfig.statisticWindowLen = 0;
+                    }
+                    if (!alarmConfig.silenceWindowLen) {
+                        alarmConfig.silenceWindowLen = 0;
+                    }
+                    this.modifiedJobForm.alarmConfig = alarmConfig;
+                    await this.axios.post("/job/save", this.modifiedJobForm);
+                    this.modifiedJobFormVisible = false;
+                    ElMessage.success(this.$t('message.success'));
+                    this.listJobInfos();
+                } catch (error) {
+                    console.error('保存任务失败:', error);
+                    ElMessage.error('保存失败，请重试');
+                } finally {
+                    this.saveLoading = false;
                 }
-                if (!alarmConfig.alertThreshold) {
-                    alarmConfig.alertThreshold = 0;
-                }
-                if (!alarmConfig.statisticWindowLen) {
-                    alarmConfig.statisticWindowLen = 0;
-                }
-                if (!alarmConfig.silenceWindowLen) {
-                    alarmConfig.silenceWindowLen = 0;
-                }
-                this.modifiedJobForm.alarmConfig = alarmConfig;
-                await this.axios.post("/job/save", this.modifiedJobForm);
-                this.modifiedJobFormVisible = false;
-                ElMessage.success(this.$t('message.success'));
-                this.listJobInfos();
             },
             // 列出符合当前搜索条件的任务
             listJobInfos() {
@@ -1114,11 +1129,44 @@
     }
 }
 
-/* Job Form Dialog Specific Styles */
-.job-form-dialog {
-    :deep(.el-dialog__body) {
-        padding: var(--pj-space-xl);
+/* Job Form Drawer Specific Styles */
+.job-form-drawer {
+    :deep(.el-drawer__body) {
+        padding: var(--pj-space-lg) var(--pj-space-md);
+        overflow-y: auto;
     }
+
+    :deep(.el-drawer__header) {
+        padding: var(--pj-space-md) var(--pj-space-lg);
+        border-bottom: 1px solid #e4e7ed;
+        margin-bottom: 0;
+        min-height: auto;
+
+        .el-drawer__title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--pj-text-primary);
+            margin: 0;
+        }
+        
+        .el-drawer__close-btn {
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    }
+}
+
+.drawer-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--pj-space-md);
+    padding: var(--pj-space-lg) var(--pj-space-xl);
+    border-top: 1px solid #e4e7ed;
+    background: #fafbfc;
+}
+
+.drawer-footer .el-button {
+    min-width: 100px;
 }
 
 .job-form-content {
