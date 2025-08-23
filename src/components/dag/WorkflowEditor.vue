@@ -883,7 +883,7 @@ export default {
 </style>
 <!-- can't use scope, or dag will be the black block, maybe this is the bug of d3.js -->
 <style>
-svg {
+.power-power-flow svg {
   font-size: 16px;
   border: 1px solid red;
 }

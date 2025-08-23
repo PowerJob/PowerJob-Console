@@ -13,7 +13,7 @@
                     <el-menu-item index="/oms/home">
                         <template #title>
                             <!-- 图标 + 文字 -->
-                            <i class="el-icon-monitor"/>
+                            <el-icon><Monitor /></el-icon>
                             <span>{{$t('message.tabHome')}}</span>
                         </template>
                     </el-menu-item>
@@ -21,7 +21,7 @@
                     <el-menu-item index="/oms/job">
                         <template #title>
                             <!-- 图标 + 文字 -->
-                            <i class="el-icon-data-analysis"/>
+                            <el-icon><DataAnalysis /></el-icon>
                             <span>{{$t('message.tabJobManage')}}</span>
                         </template>
                     </el-menu-item>
@@ -29,7 +29,7 @@
                     <el-menu-item index="/oms/instance">
                         <template #title>
                             <!-- 图标 + 文字 -->
-                            <i class="el-icon-s-data"/>
+                            <el-icon><DataBoard /></el-icon>
                             <span>{{$t('message.tabJobInstance')}}</span>
                         </template>
                     </el-menu-item>
@@ -37,7 +37,7 @@
                     <el-menu-item index="/oms/workflow">
                         <template #title>
                             <!-- 图标 + 文字 -->
-                            <i class="el-icon-share"/>
+                            <el-icon><Share /></el-icon>
                             <span>{{$t('message.tabWorkflowManage')}}</span>
                         </template>
                     </el-menu-item>
@@ -45,15 +45,15 @@
                     <el-menu-item index="/oms/wfinstance">
                         <template #title>
                             <!-- 图标 + 文字 -->
-                            <i class="el-icon-s-operation"/>
+                            <el-icon><Operation /></el-icon>
                             <span>{{$t('message.tabWfInstance')}}</span>
                         </template>
                     </el-menu-item>
 
 
-                    <el-submenu index="/oms/">
+                    <el-submenu index="/oms/container">
                         <template #title>
-                            <i class="el-icon-data-analysis"/>
+                            <el-icon><FolderOpened /></el-icon>
                             <span>{{$t('message.tabContainerOps')}}</span>
                         </template>
                         <el-menu-item index="/oms/template">{{$t('message.tabTemplate')}}</el-menu-item>
@@ -72,8 +72,18 @@
 </template>
 
 <script>
-    export default {
+import { Monitor, DataAnalysis, DataBoard, Share, Operation, FolderOpened } from '@element-plus/icons-vue'
+
+export default {
         name: "Sidebar",
+        components: {
+            Monitor,
+            DataAnalysis, 
+            DataBoard,
+            Share,
+            Operation,
+            FolderOpened
+        },
         data() {
             return {
                 default_active_index: "/home"

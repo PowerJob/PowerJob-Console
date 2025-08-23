@@ -204,10 +204,6 @@ export default {
 
 <style>
 
-  svg{
-    font-size: 10px;
-    border: 1px solid red;
-  }
 
   text {
     font-weight: 300;
