@@ -161,9 +161,9 @@
             onClickModifyWorkflow(data) {
                 this.$router.push({
                     name: 'workflowEditor',
-                    params: {
+                    query: {
                         modify: true,
-                        workflowInfo: data
+                        workflowId: data.id
                     }
                 })
             },
@@ -204,7 +204,7 @@
             onClickNewWorkflow() {
                 this.$router.push({
                     name: 'workflowEditor',
-                    params: {
+                    query: {
                         modify: false
                     }
                 })
@@ -221,12 +221,9 @@
                 this.axios.post(`/workflow/copy?workflowId=${data.id}&appId=${this.workflowQueryContent.appId}`).then(res => {
                     this.$router.push({
                         name: 'workflowEditor',
-                        params: {
+                        query: {
                             modify: true,
-                            workflowInfo: {
-                                ...data,
-                                id: res
-                            }
+                            workflowId: res
                         }
                     });
                     this.copyLoading = false;

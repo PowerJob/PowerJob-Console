@@ -59,7 +59,8 @@
             type="datetimerange"
             :start-placeholder="$t('message.startTime')"
             :end-placeholder="$t('message.finishedTime')"
-            value-format="timestamp"
+            value-format="x"
+            format="YYYY-MM-DD HH:mm:ss"
           >
           </el-date-picker>
         </el-form-item>
@@ -552,6 +553,14 @@ export default {
         },
       });
       this.workflowInfo = { ...this.workflowInfo, ...res };
+      
+      // 处理lifeCycle数据格式，转换为Element Plus日期选择器期望的格式
+      if (res.lifeCycle && typeof res.lifeCycle === 'object' && res.lifeCycle.start && res.lifeCycle.end) {
+        this.workflowInfo.lifeCycle = [res.lifeCycle.start, res.lifeCycle.end];
+      } else {
+        this.workflowInfo.lifeCycle = null;
+      }
+      
       if (res.peworkflowDAG) {
         this.taskList = res.peworkflowDAG.nodes;
         this.peworkflowDAG = res.peworkflowDAG;
@@ -584,17 +593,27 @@ export default {
           };
         }),
       };
-      const { lifeCycle } = this.workflowInfo;
-      if (lifeCycle && Array.isArray(lifeCycle)) {
-        const start = lifeCycle[0];
-        const end = lifeCycle[1];
-        this.workflowInfo.lifeCycle = {
-          start,
-          end,
-        };
+      // 处理生命周期时间范围
+      let processedWorkflowInfo = { ...this.workflowInfo };
+      const { lifeCycle } = processedWorkflowInfo;
+      
+      if (lifeCycle && Array.isArray(lifeCycle) && lifeCycle.length === 2) {
+        // Element Plus 返回数组格式 [startTimestamp, endTimestamp]
+        const [start, end] = lifeCycle;
+        if (start && end && !isNaN(start) && !isNaN(end)) {
+          processedWorkflowInfo.lifeCycle = {
+            start: parseInt(start),
+            end: parseInt(end)
+          };
+        } else {
+          processedWorkflowInfo.lifeCycle = null;
+        }
+      } else {
+        // 空值或无效值处理
+        processedWorkflowInfo.lifeCycle = null;
       }
       const res = await this.axios.post("/workflow/save", {
-        ...this.workflowInfo,
+        ...processedWorkflowInfo,
         dag: dagInfo,
       });
       ElMessage.success(this.$t("message.success"));
@@ -747,18 +766,30 @@ export default {
     that.axios.get("/user/list").then((res) => (that.userList = res));
 
     // 读取传递数据，如果是修改，需要先将数据绘制上去
-    let modify = this.$route.params.modify;
-    if (modify) {
-      this.workflowInfo = this.$route.params.workflowInfo;
-      if (this.workflowInfo.lifeCycle) {
-        const { start, end } = this.workflowInfo.lifeCycle;
-        this.workflowInfo.lifeCycle = [start, end]
-      } else {
-        this.workflowInfo.lifeCycle = null;
-      }
+    let modify = this.$route.query.modify === 'true';
+    let workflowId = this.$route.query.workflowId;
+    
+    if (modify && workflowId) {
+      // 编辑或复制工作流，通过workflowId获取完整数据
+      this.workflowInfo.id = workflowId;
       this.workflowInfo.appId = window.localStorage.getItem("Power_appId");
       this.getWorkflowInfo(true);
+    } else if (modify) {
+      // 兼容旧的params方式（如果仍然存在）
+      let routeWorkflowInfo = this.$route.params.workflowInfo;
+      if (routeWorkflowInfo) {
+        this.workflowInfo = routeWorkflowInfo;
+        if (this.workflowInfo.lifeCycle) {
+          const { start, end } = this.workflowInfo.lifeCycle;
+          this.workflowInfo.lifeCycle = [start, end]
+        } else {
+          this.workflowInfo.lifeCycle = null;
+        }
+        this.workflowInfo.appId = window.localStorage.getItem("Power_appId");
+        this.getWorkflowInfo(true);
+      }
     }
+    // 如果modify为false或不存在，表示是新建工作流，保持默认的workflowInfo
   },
   watch: {
     "nodeInfo.enable": {
