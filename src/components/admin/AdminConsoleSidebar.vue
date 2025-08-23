@@ -14,7 +14,7 @@
           <el-menu-item index="/admin/app">
             <template #title>
               <!-- 图标 + 文字 -->
-              <i class="el-icon-apple"/>
+              <el-icon><Operation/></el-icon>
               <span>{{$t('message.tabAppManage')}}</span>
             </template>
           </el-menu-item>
@@ -22,7 +22,7 @@
           <el-menu-item index="/admin/namespace">
             <template #title>
               <!-- 图标 + 文字 -->
-              <i class="el-icon-orange"/>
+              <el-icon><FolderOpened/></el-icon>
               <span>{{$t('message.tabNamespace')}}</span>
             </template>
           </el-menu-item>
@@ -30,7 +30,7 @@
           <el-menu-item index="/admin/personal">
             <template #title>
               <!-- 图标 + 文字 -->
-              <i class="el-icon-goblet-square-full"/>
+              <el-icon><UserFilled/></el-icon>
               <span>{{$t('message.tabPersonal')}}</span>
             </template>
           </el-menu-item>
@@ -38,7 +38,7 @@
           <el-menu-item index="/admin/settings">
             <template #title>
               <!-- 图标 + 文字 -->
-              <i class="el-icon-setting"/>
+              <el-icon><Setting/></el-icon>
               <span>{{$t('message.tabSettings')}}</span>
             </template>
           </el-menu-item>
@@ -46,7 +46,7 @@
           <el-menu-item index="/admin/user">
             <template #title>
               <!-- 图标 + 文字 -->
-              <i class="el-icon-user"/>
+              <el-icon><User/></el-icon>
               <span>{{$t('message.tabUserManager')}}</span>
             </template>
           </el-menu-item>
@@ -63,8 +63,17 @@
 </template>
 
 <script>
+import { Operation, FolderOpened, UserFilled, Setting, User } from '@element-plus/icons-vue'
+
 export default {
   name: "AdminConsoleSidebar",
+  components: {
+    Operation,
+    FolderOpened,
+    UserFilled,
+    Setting,
+    User
+  },
   data() {
     return {
       default_active_index: "/admin/app"
