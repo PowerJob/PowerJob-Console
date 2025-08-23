@@ -82,38 +82,36 @@
         stripe
       >
         <el-table-column :show-overflow-tooltip="true" prop="jobId" :label="$t('message.jobId')" width="80" />
-        <el-table-column :show-overflow-tooltip="true" prop="jobName" :label="$t('message.jobName')" />
+        <el-table-column :show-overflow-tooltip="true" prop="jobName" :label="$t('message.jobName')" min-width="120" />
         <el-table-column
           v-if="instanceQueryContent.type === 'WORKFLOW'"
           :show-overflow-tooltip="true"
           prop="wfInstanceId"
           :label="$t('message.wfInstanceId')"
-          width="155"
+          width="180"
         />
-        <el-table-column :show-overflow-tooltip="true" prop="instanceId" :label="$t('message.instanceId')" />
-        <el-table-column prop="status" :label="$t('message.status')" width="160">
+        <el-table-column :show-overflow-tooltip="true" prop="instanceId" :label="$t('message.instanceId')" width="200" />
+        <el-table-column prop="status" :label="$t('message.status')" width="100">
           <template #default="scope">{{fetchStatus(scope.row.status)}}</template>
         </el-table-column>
-        <el-table-column  prop="actualTriggerTime" :label="$t('message.triggerTime')" width="150"/>
-        <el-table-column  prop="finishedTime" :label="$t('message.finishedTime')" width="150"/>
+        <el-table-column  prop="actualTriggerTime" :label="$t('message.triggerTime')" width="160"/>
+        <el-table-column  prop="finishedTime" :label="$t('message.finishedTime')" width="160"/>
 
-        <el-table-column :label="$t('message.operation')" width="300" fixed="right">
+        <el-table-column :label="$t('message.operation')" width="220" fixed="right">
           <template #default="scope">
             <div class="operation-buttons-group">
               <el-button
-                link
                 size="small"
                 type="primary"
                 @click="onClickShowDetail(scope.row)"
               >{{$t('message.detail')}}</el-button>
               <el-button
-                link
                 size="small"
                 type="success"
                 @click="onClickShowLog(scope.row)"
               >{{$t('message.log')}}</el-button>
               <el-dropdown trigger="click" @command="(cmd) => handleCommand(cmd, scope.row)">
-                <el-button link size="small" type="info">
+                <el-button size="small" type="info">
                   更多<el-icon class="ml-1"><ArrowDown /></el-icon>
                 </el-button>
                 <template #dropdown>
@@ -138,7 +136,9 @@
       <el-pagination
         :total="this.instancePageResult.totalItems"
         :page-size="this.instancePageResult.pageSize"
+        :current-page="this.instanceQueryContent.index + 1"
         @current-change="onClickChangeInstancePage"
+        @size-change="handleSizeChange"
         layout="total, sizes, prev, pager, next, jumper"
         :page-sizes="[10, 20, 50, 100]"
         :hide-on-single-page="false"
@@ -299,6 +299,12 @@ export default {
     onClickChangeInstancePage(index) {
       // 后端从0开始，前端从1开始
       this.instanceQueryContent.index = index - 1;
+      this.listInstanceInfos();
+    },
+    // 改变页面大小
+    handleSizeChange(newSize) {
+      this.instanceQueryContent.pageSize = newSize;
+      this.instanceQueryContent.index = 0;
       this.listInstanceInfos();
     },
     instanceTableRowClassName({ row }) {
@@ -476,21 +482,29 @@ export default {
 .operation-buttons-group {
   display: flex;
   align-items: center;
-  gap: var(--pj-space-xs, 4px);
+  gap: var(--pj-space-xs, 6px);
   flex-wrap: nowrap;
   white-space: nowrap;
+  justify-content: center;
 }
 
 .operation-buttons-group .el-button {
   margin: 0;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border-radius: var(--pj-radius-sm, 4px);
   font-size: 12px;
   min-width: auto;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 .operation-buttons-group .el-button + .el-button {
   margin-left: 0;
+}
+
+.operation-buttons-group .el-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Utility class for margin-left */

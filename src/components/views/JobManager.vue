@@ -215,7 +215,6 @@
                         <el-col :span="6">
                             <el-button 
                                 type="primary" 
-                                plain
                                 @click="onClickValidateTimeExpression"
                                 style="width: 100%"
                             >
