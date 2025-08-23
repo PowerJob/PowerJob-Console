@@ -1,103 +1,166 @@
 <template>
-    <div id="job_manager">
+    <div class="job-manager">
 
-        <!--第一行，条件搜索栏（row布局：gutter代表栅格间隔，span代表占用格数）-->
-        <el-row :gutter="20">
-
-            <!-- 左侧搜索栏，占地面积 16/24 -->
-            <el-col :span="16">
-                <el-form :inline="true" :model="jobQueryContent" class="el-form--inline">
-                    <el-form-item :label="$t('message.jobId')">
-                        <el-input v-model="jobQueryContent.jobId" :placeholder="$t('message.jobId')"/>
-                    </el-form-item>
-                    <el-form-item :label="$t('message.keyword')">
-                        <el-input v-model="jobQueryContent.keyword" :placeholder="$t('message.keyword')"/>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button type="primary" @click="listJobInfos">{{$t('message.query')}}</el-button>
-                        <el-button type="cancel" @click="onClickReset">{{$t('message.reset')}}</el-button>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-
-            <!-- 右侧新增任务按钮，占地面积 4/24 -->
-            <el-col :span="4">
-                <div style="float:right;">
-                    <el-button type="success" @click="onClickJobInputButton">{{$t('message.inputJob')}}</el-button>
+        <!-- Search and Action Section -->
+        <div class="pj-form-section">
+            <div class="search-container">
+                <div class="search-form">
+                    <el-form :inline="true" :model="jobQueryContent" class="el-form--inline">
+                        <el-form-item :label="$t('message.jobId')">
+                            <el-input 
+                                v-model="jobQueryContent.jobId" 
+                                :placeholder="$t('message.jobId')"
+                                clearable
+                                style="width: 200px;"
+                            />
+                        </el-form-item>
+                        <el-form-item :label="$t('message.keyword')">
+                            <el-input 
+                                v-model="jobQueryContent.keyword" 
+                                :placeholder="$t('message.keyword')"
+                                clearable
+                                style="width: 200px;"
+                            />
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="listJobInfos">
+                                <el-icon class="mr-1"><Search /></el-icon>
+                                {{$t('message.query')}}
+                            </el-button>
+                            <el-button @click="onClickReset">{{$t('message.reset')}}</el-button>
+                        </el-form-item>
+                    </el-form>
                 </div>
-            </el-col>
-            <el-col :span="4">
-                <div style="float:right;padding-right:10px">
-                <el-button type="primary" @click="onClickNewJob">{{$t('message.newJob')}}</el-button>
+                
+                <div class="action-buttons">
+                    <el-button type="success" @click="onClickJobInputButton">
+                        <el-icon class="mr-1"><Upload /></el-icon>
+                        {{$t('message.inputJob')}}
+                    </el-button>
+                    <el-button type="primary" @click="onClickNewJob">
+                        <el-icon class="mr-1"><Plus /></el-icon>
+                        {{$t('message.newJob')}}
+                    </el-button>
                 </div>
-            </el-col>
-        </el-row>
+            </div>
+        </div>
 
-        <!--第二行，任务数据表格-->
-        <el-row>
-            <el-table :data="jobInfoPageResult.data" style="width: 100%">
-                <el-table-column prop="id" :label="$t('message.jobId')" width="80"/>
-                <el-table-column prop="jobName" :label="$t('message.jobName')" />
-                <el-table-column :label="$t('message.scheduleInfo')" >
+        <!-- Table Section -->
+        <div class="pj-table">
+            <el-table 
+                :data="jobInfoPageResult.data" 
+                style="width: 100%"
+                stripe
+                @sort-change="handleSortChange"
+            >
+                <el-table-column prop="id" :label="$t('message.jobId')" width="80" sortable/>
+                <el-table-column prop="jobName" :label="$t('message.jobName')" min-width="150" show-overflow-tooltip />
+                <el-table-column :label="$t('message.scheduleInfo')" min-width="250" show-overflow-tooltip>
                     <template #default="scope">
-                        {{scope.row.timeExpressionType}}  {{scope.row.timeExpression}}
+                        <div class="schedule-info-enhanced">
+                            <div class="schedule-type">
+                                <el-tag size="small" type="info">{{scope.row.timeExpressionType}}</el-tag>
+                            </div>
+                            <div class="schedule-expression" :title="scope.row.timeExpression">
+                                {{scope.row.timeExpression}}
+                            </div>
+                        </div>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('message.executeType')">
+                <el-table-column :label="$t('message.executeType')" width="140" show-overflow-tooltip>
                     <template #default="scope">
-                        {{translateExecuteType(scope.row.executeType)}}
+                        <el-tag size="small" effect="plain" :title="translateExecuteType(scope.row.executeType)">
+                            {{translateExecuteType(scope.row.executeType)}}
+                        </el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('message.processorType')">
+                <el-table-column :label="$t('message.processorType')" width="160" show-overflow-tooltip>
                     <template #default="scope">
-                        {{translateProcessorType(scope.row.processorType)}}
+                        <el-tag size="small" effect="plain" type="warning" :title="translateProcessorType(scope.row.processorType)">
+                            {{translateProcessorType(scope.row.processorType)}}
+                        </el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('message.status')" width="80">
+                <el-table-column :label="$t('message.status')" width="80" align="center">
                     <template #default="scope">
-                        <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="changeJobStatus(scope.row)"/>
+                        <el-switch 
+                            v-model="scope.row.enable" 
+                            :active-color="'var(--pj-success)'" 
+                            :inactive-color="'var(--pj-error)'"
+                            @change="changeJobStatus(scope.row)"
+                        />
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('message.operation')" width="150">
+                <el-table-column :label="$t('message.operation')" width="250" align="center" fixed="right">
                     <template #default="scope">
-                        <el-button size="mini" type="text" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
-                        <el-button size="mini" type="text" @click="onClickRun(scope.row)">{{$t('message.run')}}</el-button>
-                        <el-dropdown trigger="click">
-                            <el-button size="mini" type="text">{{$t('message.more')}}</el-button>
-                            <template #dropdown>
-                                <el-dropdown-menu>
-                                <el-dropdown-item>
-                                    <el-button size="mini" type="text" @click="onClickRunByParameter(scope.row)">{{$t('message.runByParameter')}}</el-button>
-                                </el-dropdown-item>
-                                <el-dropdown-item>
-                                    <el-button size="mini" type="text" @click="onClickRunHistory(scope.row)">{{$t('message.runHistory')}}</el-button>
-                                </el-dropdown-item>
-                                <el-dropdown-item>
-                                  <el-button size="mini" type="text" @click="onClickCopyJob(scope.row)">{{$t('message.copy')}}</el-button>
-                                </el-dropdown-item>
-                                <el-dropdown-item>
-                                    <el-button size="mini" type="text" @click="onClickJobExportButton(scope.row)">{{$t('message.export')}}</el-button>
-                                </el-dropdown-item>
-                                <el-dropdown-item>
-                                    <el-button size="mini" type="text" @click="onClickDeleteJob(scope.row)">{{$t('message.delete')}}</el-button>
-                                </el-dropdown-item>
-                                </el-dropdown-menu>
-                            </template>
-                        </el-dropdown>
+                        <div class="operation-buttons-enhanced">
+                            <el-button 
+                                size="small" 
+                                type="primary" 
+                                plain
+                                @click="onClickModify(scope.row)"
+                            >
+                                <el-icon><Edit /></el-icon>
+                                {{$t('message.edit')}}
+                            </el-button>
+                            <el-button 
+                                size="small" 
+                                type="success" 
+                                plain
+                                @click="onClickRun(scope.row)"
+                            >
+                                <el-icon><VideoPlay /></el-icon>
+                                {{$t('message.run')}}
+                            </el-button>
+                            <el-dropdown trigger="click" @command="(cmd) => handleCommand(cmd, scope.row)">
+                                <el-button size="small" type="info" plain>
+                                    {{$t('message.more')}}
+                                    <el-icon class="ml-1"><ArrowDown /></el-icon>
+                                </el-button>
+                                <template #dropdown>
+                                    <el-dropdown-menu>
+                                        <el-dropdown-item command="runByParameter">
+                                            <el-icon><Setting /></el-icon>
+                                            {{$t('message.runByParameter')}}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item command="runHistory">
+                                            <el-icon><Clock /></el-icon>
+                                            {{$t('message.runHistory')}}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item command="copy">
+                                            <el-icon><CopyDocument /></el-icon>
+                                            {{$t('message.copy')}}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item command="export">
+                                            <el-icon><Download /></el-icon>
+                                            {{$t('message.export')}}
+                                        </el-dropdown-item>
+                                        <el-dropdown-item command="delete" divided>
+                                            <el-icon><Delete /></el-icon>
+                                            <span style="color: var(--pj-error);">{{$t('message.delete')}}</span>
+                                        </el-dropdown-item>
+                                    </el-dropdown-menu>
+                                </template>
+                            </el-dropdown>
+                        </div>
                     </template>
                 </el-table-column>
             </el-table>
-        </el-row>
+        </div>
 
-        <!-- 第三行，分页插件 -->
-        <el-row>
+        <!-- Pagination Section -->
+        <div class="pagination-container">
             <el-pagination
-                    layout="prev, pager, next"
-                    :total="this.jobInfoPageResult.totalItems"
-                    :page-size="this.jobInfoPageResult.pageSize"
-                    @current-change="onClickChangePage"
-                    :hide-on-single-page="true"/>
-        </el-row>
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="this.jobInfoPageResult.totalItems"
+                :page-size="this.jobInfoPageResult.pageSize"
+                :page-sizes="[10, 20, 50, 100]"
+                @current-change="onClickChangePage"
+                @size-change="handleSizeChange"
+                :hide-on-single-page="false"
+                background
+            />
+        </div>
 
 
         <el-dialog :close-on-click-modal="false" v-model="modifiedJobFormVisible" width="80%">
@@ -382,9 +445,25 @@
     import DailyTimeIntervalForm from "../common/DailyTimeIntervalForm";
     import Exporter from "../common/Exporter";
     import { ElMessage } from 'element-plus';
+    import { Search, Upload, Plus, ArrowDown, Edit, VideoPlay, Setting, Clock, CopyDocument, Download, Delete } from '@element-plus/icons-vue';
     export default {
         name: "JobManager",
-        components: {Exporter, TimeExpressionValidator, DailyTimeIntervalForm},
+        components: {
+            Exporter, 
+            TimeExpressionValidator, 
+            DailyTimeIntervalForm,
+            Search,
+            Upload,
+            Plus,
+            ArrowDown,
+            Edit,
+            VideoPlay,
+            Setting,
+            Clock,
+            CopyDocument,
+            Download,
+            Delete
+        },
         data() {
             return {
                 modifiedJobFormVisible: false,
@@ -705,6 +784,40 @@
                 if (this.jobExporterMode === 'INPUT') {
                     this.listJobInfos();
                 }
+            },
+            // Enhanced methods for better UX
+            handleSortChange(sort) {
+                console.log('Sort changed:', sort);
+            },
+            handleSizeChange(newSize) {
+                this.jobQueryContent.pageSize = newSize;
+                this.jobQueryContent.index = 0;
+                this.listJobInfos();
+            },
+            handleCommand(command, row) {
+                switch (command) {
+                    case 'runByParameter':
+                        this.onClickRunByParameter(row);
+                        break;
+                    case 'runHistory':
+                        this.onClickRunHistory(row);
+                        break;
+                    case 'copy':
+                        this.onClickCopyJob(row);
+                        break;
+                    case 'export':
+                        this.onClickJobExportButton(row);
+                        break;
+                    case 'delete':
+                        this.$confirm(this.$t('message.deleteConfirm'), this.$t('message.warning'), {
+                            confirmButtonText: this.$t('message.confirm'),
+                            cancelButtonText: this.$t('message.cancel'),
+                            type: 'warning'
+                        }).then(() => {
+                            this.onClickDeleteJob(row);
+                        });
+                        break;
+                }
             }
         },
         mounted() {
@@ -726,19 +839,304 @@
 </script>
 
 <style scoped>
+/* Modern Job Manager Styles */
+.job-manager {
+    padding: 0;
+    background: transparent;
+}
+
+/* Search Section */
+.search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--pj-space-lg);
+}
+
+.search-form {
+    flex: 1;
+    min-width: 400px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: var(--pj-space-sm);
+    flex-shrink: 0;
+}
+
+/* Enhanced Schedule Info Styling */
+.schedule-info-enhanced {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pj-space-xs);
+    min-width: 0;
+}
+
+.schedule-info-enhanced .schedule-type {
+    flex-shrink: 0;
+}
+
+.schedule-info-enhanced .schedule-expression {
+    font-size: 12px;
+    color: var(--pj-text-secondary);
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: help;
+}
+
+/* Legacy support */
+.schedule-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pj-space-xs);
+}
+
+.schedule-info .expression {
+    font-size: 12px;
+    color: var(--pj-text-secondary);
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+/* Enhanced Operation Buttons */
+.operation-buttons-enhanced {
+    display: flex;
+    align-items: center;
+    gap: var(--pj-space-sm);
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.operation-buttons-enhanced .el-button {
+    border-radius: var(--pj-radius-sm);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin: 0;
+}
+
+.operation-buttons-enhanced .el-button .el-icon {
+    margin-right: 4px;
+}
+
+.operation-buttons-enhanced .el-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Dropdown menu enhancements */
+.operation-buttons-enhanced :deep(.el-dropdown-menu) {
+    .el-dropdown-menu__item {
+        display: flex;
+        align-items: center;
+        gap: var(--pj-space-sm);
+        
+        .el-icon {
+            width: 16px;
+            height: 16px;
+        }
+    }
+}
+
+/* Legacy Operation Buttons */
+.operation-buttons {
+    display: flex;
+    align-items: center;
+    gap: var(--pj-space-xs);
+    flex-wrap: wrap;
+}
+
+/* Pagination */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    padding: var(--pj-space-lg) 0;
+    background: var(--pj-bg-white);
+    border-radius: var(--pj-radius-lg);
+    margin-top: var(--pj-space-md);
+    box-shadow: var(--pj-shadow-card);
+}
+
+/* Utility Classes */
+.mr-1 {
+    margin-right: var(--pj-space-xs);
+}
+
+.ml-1 {
+    margin-left: var(--pj-space-xs);
+}
+
+/* Enhanced Form Styles */
+:deep(.el-form--inline .el-form-item) {
+    margin-right: var(--pj-space-lg);
+    margin-bottom: var(--pj-space-md);
+}
+
+:deep(.el-form-item__label) {
+    color: var(--pj-text-secondary);
+    font-weight: 500;
+}
+
+:deep(.el-input__wrapper) {
+    border-radius: var(--pj-radius-sm);
+    transition: all 0.3s ease;
+}
+
+:deep(.el-input__wrapper:hover) {
+    box-shadow: 0 0 8px rgba(0, 150, 136, 0.2);
+}
+
+/* Table Enhancements */
+:deep(.el-table) {
+    .el-table__header-wrapper th {
+        background: #fafbfc;
+        color: var(--pj-text-secondary);
+        font-weight: 600;
+        border-bottom: 2px solid #e4e7ed;
+    }
+    
+    .el-table__body-wrapper tr:hover {
+        background: var(--pj-bg-hover);
+    }
+    
+    .el-button--link {
+        padding: 4px 8px;
+        margin: 0 2px;
+        border-radius: var(--pj-radius-sm);
+        
+        &:hover {
+            background: rgba(0, 150, 136, 0.1);
+        }
+    }
+}
+
+/* Tag Enhancements */
+:deep(.el-tag) {
+    border-radius: var(--pj-radius-sm);
+    font-weight: 500;
+}
+
+/* Switch Styling */
+:deep(.el-switch) {
+    --el-switch-on-color: var(--pj-success);
+    --el-switch-off-color: var(--pj-error);
+}
+
+/* Dialog Enhancements */
+:deep(.el-dialog) {
+    border-radius: var(--pj-radius-lg);
+    box-shadow: var(--pj-shadow-hover);
+    
+    .el-dialog__header {
+        padding: var(--pj-space-lg);
+        background: #fafbfc;
+        border-bottom: 1px solid #e4e7ed;
+        border-radius: var(--pj-radius-lg) var(--pj-radius-lg) 0 0;
+        
+        .el-dialog__title {
+            font-weight: 600;
+            color: var(--pj-text-primary);
+        }
+    }
+    
+    .el-dialog__body {
+        padding: var(--pj-space-lg);
+    }
+    
+    .el-dialog__footer {
+        padding: var(--pj-space-lg);
+        background: #fafbfc;
+        border-top: 1px solid #e4e7ed;
+        border-radius: 0 0 var(--pj-radius-lg) var(--pj-radius-lg);
+    }
+}
+
+/* Table responsive enhancements */
+:deep(.el-table) {
+    .el-table__header-wrapper th {
+        white-space: nowrap;
+        padding: 12px 8px;
+    }
+    
+    .el-table__body-wrapper td {
+        padding: 12px 8px;
+    }
+    
+    .el-table__fixed-right {
+        box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Tag enhancements for better readability */
+:deep(.el-tag) {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .operation-buttons-enhanced {
+        gap: var(--pj-space-xs);
+    }
+    
+    .operation-buttons-enhanced .el-button {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .search-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-form {
+        min-width: auto;
+    }
+    
+    .action-buttons {
+        justify-content: flex-end;
+    }
+    
+    .schedule-info-enhanced .schedule-expression {
+        max-width: 180px;
+    }
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .operation-buttons {
+        justify-content: center;
+    }
+    
+    .pagination-container {
+        :deep(.el-pagination) {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    }
+}
+
+/* Legacy styles (kept for compatibility) */
 .job-editor-number {
     display: flex;
 }
+
 .job-input-number {
     background-color: #F5F7FA;
     color: #909399;
-    /* vertical-align: middle; */
-    /* display: table-cell; */
     position: relative;
     border: 1px solid #DCDFE6;
     border-radius: 4px;
     padding: 0 20px;
-    /* width: 1px; */
     white-space: nowrap;
     display: block;
     border-top-right-radius: 0px;
@@ -746,6 +1144,7 @@
     line-height: 38px;
     width: auto;
 }
+
 .el-input-number {
     width: 100px;
 }

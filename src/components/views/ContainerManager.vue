@@ -174,6 +174,11 @@
                 this.dialogVisible = true;
             },
             arrangeItem(item){
+                // 关闭现有的 WebSocket 连接（如果存在）
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.close();
+                }
+                
                 let wsBase = this.requestUrl.replace("http","ws") + "/container/deploy/";
                 let wsUrl = wsBase + item.id;
                 ws = new WebSocket(wsUrl);
@@ -192,10 +197,17 @@
                 ws.onclose = ()=>{
                     console.log("Connection closed.");
                 };
+                
+                ws.onerror = (error)=>{
+                    console.error("WebSocket error:", error);
+                    ElMessage.error("WebSocket connection failed");
+                };
             },
             // 关闭部署页面时 关闭ws避免dialog内的信息有上台机器信息
             closeArrange(){
-                ws.close();
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.close();
+                }
                 this.logs = [];
             },
             closeEdit(){
@@ -243,6 +255,12 @@
 
             this.headersObj.AppId = window.localStorage.getItem("Power_appId")
             this.headersObj.PowerJwt = window.localStorage.getItem("PowerJwt")
+        },
+        beforeUnmount() {
+            // 组件销毁前关闭 WebSocket 连接
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.close();
+            }
         }
     }
 </script>

@@ -1,63 +1,85 @@
 <template>
-  <div id="instance_manager">
-    <!-- 第一行，搜索区 -->
-    <el-row>
-      <el-col :span="22">
-        <el-form :inline="true" :model="instanceQueryContent" class="el-form--inline">
-          <el-form-item :label="$t('message.jobId')">
-            <el-input v-model="instanceQueryContent.jobId" :placeholder="$t('message.jobId')" />
-          </el-form-item>
-          <el-form-item :label="$t('message.instanceId')">
-            <el-input
-              v-model="instanceQueryContent.instanceId"
-              :placeholder="$t('message.instanceId')"
-            />
-          </el-form-item>
-          <el-form-item
-            v-if="instanceQueryContent.type === 'WORKFLOW'"
-            :label="$t('message.wfInstanceId')"
-          >
-            <el-input
-              v-model="instanceQueryContent.wfInstanceId"
-              :placeholder="$t('message.wfInstanceId')"
-            />
-          </el-form-item>
-          <el-form-item :label="$t('message.status')">
-            <el-select v-model="instanceQueryContent.status" :placeholder="$t('message.status')">
-              <el-option
-                v-for="item in instanceStatusOptions"
-                :key="item.key"
-                :label="item.label"
-                :value="item.key"
-              ></el-option>
-            </el-select>
-          </el-form-item>
+  <div class="instance-manager">
 
-          <el-form-item>
-            <el-button type="primary" @click="listInstanceInfos">{{$t('message.query')}}</el-button>
-            <el-button type="cancel" @click="onClickRest">{{$t('message.reset')}}</el-button>
-          </el-form-item>
-        </el-form>
-      </el-col>
-      <el-col :span="2">
-        <div style="float:right;padding-right:10px">
-          <el-button type="primary" @click="listInstanceInfos">{{$t('message.refresh')}}</el-button>
+    <!-- Search Section -->
+    <div class="pj-form-section">
+      <div class="search-container">
+        <div class="search-form">
+          <el-form :inline="true" :model="instanceQueryContent" class="el-form--inline">
+            <el-form-item :label="$t('message.jobId')">
+              <el-input 
+                v-model="instanceQueryContent.jobId" 
+                :placeholder="$t('message.jobId')" 
+                clearable
+                style="width: 180px;"
+              />
+            </el-form-item>
+            <el-form-item :label="$t('message.instanceId')">
+              <el-input
+                v-model="instanceQueryContent.instanceId"
+                :placeholder="$t('message.instanceId')"
+                clearable
+                style="width: 200px;"
+              />
+            </el-form-item>
+            <el-form-item
+              v-if="instanceQueryContent.type === 'WORKFLOW'"
+              :label="$t('message.wfInstanceId')"
+            >
+              <el-input
+                v-model="instanceQueryContent.wfInstanceId"
+                :placeholder="$t('message.wfInstanceId')"
+                clearable
+                style="width: 200px;"
+              />
+            </el-form-item>
+            <el-form-item :label="$t('message.status')">
+              <el-select 
+                v-model="instanceQueryContent.status" 
+                :placeholder="$t('message.status')"
+                clearable
+                style="width: 140px;"
+              >
+                <el-option
+                  v-for="item in instanceStatusOptions"
+                  :key="item.key"
+                  :label="item.label"
+                  :value="item.key"
+                />
+              </el-select>
+            </el-form-item>
+          </el-form>
         </div>
-      </el-col>
-    </el-row>
+        
+        <div class="action-buttons">
+          <el-button @click="onClickRest">{{$t('message.reset')}}</el-button>
+          <el-button type="primary" @click="listInstanceInfos">
+            <el-icon class="mr-1"><Search /></el-icon>
+            {{$t('message.query')}}
+          </el-button>
+          <el-button type="info" @click="listInstanceInfos">
+            <el-icon class="mr-1"><Refresh /></el-icon>
+            {{$t('message.refresh')}}
+          </el-button>
+        </div>
+      </div>
+    </div>
 
-    <!-- 第二行，切换器 -->
-    <el-tabs type="card" v-model="instanceQueryContent.type" @tab-click="listInstanceInfos">
-      <el-tab-pane :label="$t('message.normalInstance')" name="NORMAL" />
-      <el-tab-pane :label="$t('message.wfInstance')" name="WORKFLOW" />
-    </el-tabs>
+    <!-- Tab Section -->
+    <div class="tabs-section">
+      <el-tabs type="card" v-model="instanceQueryContent.type" @tab-click="listInstanceInfos">
+        <el-tab-pane :label="$t('message.normalInstance')" name="NORMAL" />
+        <el-tab-pane :label="$t('message.wfInstance')" name="WORKFLOW" />
+      </el-tabs>
+    </div>
 
-    <!-- 第三行，表单 -->
-    <el-row>
+    <!-- Table Section -->
+    <div class="pj-table">
       <el-table
         :data="instancePageResult.data"
         style="width: 100%"
         :row-class-name="instanceTableRowClassName"
+        stripe
       >
         <el-table-column :show-overflow-tooltip="true" prop="jobId" :label="$t('message.jobId')" width="80" />
         <el-table-column :show-overflow-tooltip="true" prop="jobName" :label="$t('message.jobName')" />
@@ -75,44 +97,54 @@
         <el-table-column  prop="actualTriggerTime" :label="$t('message.triggerTime')" width="150"/>
         <el-table-column  prop="finishedTime" :label="$t('message.finishedTime')" width="150"/>
 
-        <el-table-column :label="$t('message.operation')" width="285">
+        <el-table-column :label="$t('message.operation')" width="300" fixed="right">
           <template #default="scope">
-            <el-button
-              size="mini"
-              type="primary"
-              @click="onClickShowDetail(scope.row)"
-            >{{$t('message.detail')}}</el-button>
-            <el-button
-              size="mini"
-              type="success"
-              @click="onClickShowLog(scope.row)"
-            >{{$t('message.log')}}</el-button>
-            <el-button
-              size="mini"
-              type="warning"
-              @click="onClickRetryJob(scope.row)"
-            >{{$t('message.reRun')}}</el-button>
-            <el-button
-              size="mini"
-              type="danger"
-              @click="onClickStop(scope.row)"
-            >{{$t('message.stop')}}</el-button>
+            <div class="operation-buttons-group">
+              <el-button
+                link
+                size="small"
+                type="primary"
+                @click="onClickShowDetail(scope.row)"
+              >{{$t('message.detail')}}</el-button>
+              <el-button
+                link
+                size="small"
+                type="success"
+                @click="onClickShowLog(scope.row)"
+              >{{$t('message.log')}}</el-button>
+              <el-dropdown trigger="click" @command="(cmd) => handleCommand(cmd, scope.row)">
+                <el-button link size="small" type="info">
+                  更多<el-icon class="ml-1"><ArrowDown /></el-icon>
+                </el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item command="retry">
+                      <span style="color: var(--pj-warning);">{{$t('message.reRun')}}</span>
+                    </el-dropdown-item>
+                    <el-dropdown-item command="stop" divided>
+                      <span style="color: var(--pj-error);">{{$t('message.stop')}}</span>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </div>
           </template>
         </el-table-column>
       </el-table>
-    </el-row>
+    </div>
 
-    <!-- 第四行，分页插件 -->
-    <el-row>
-      <el-col :span="24">
-        <el-pagination
-          :total="this.instancePageResult.totalItems"
-          :page-size="this.instancePageResult.pageSize"
-          @current-change="onClickChangeInstancePage"
-          layout="prev, pager, next"
-        />
-      </el-col>
-    </el-row>
+    <!-- Pagination Section -->
+    <div class="pagination-container">
+      <el-pagination
+        :total="this.instancePageResult.totalItems"
+        :page-size="this.instancePageResult.pageSize"
+        @current-change="onClickChangeInstancePage"
+        layout="total, sizes, prev, pager, next, jumper"
+        :page-sizes="[10, 20, 50, 100]"
+        :hide-on-single-page="false"
+        background
+      />
+    </div>
 
     <!--  任务实例详情弹出框 -->
     <el-dialog v-model="instanceDetailVisible" v-if="instanceDetailVisible" width="80%">
@@ -156,10 +188,14 @@
 <script>
 import InstanceDetail from "../common/InstanceDetail";
 import { ElMessage } from 'element-plus';
+import { ArrowDown, Search, Refresh } from '@element-plus/icons-vue';
 export default {
   name: "InstanceManager",
   components: {
-    InstanceDetail
+    InstanceDetail,
+    ArrowDown,
+    Search,
+    Refresh
   },
   data() {
     return {
@@ -316,6 +352,23 @@ export default {
     // 获取状态
     fetchStatus(s) {
       return this.common.translateInstanceStatus(s);
+    },
+    // 处理下拉菜单命令
+    handleCommand(command, row) {
+      switch (command) {
+        case 'retry':
+          this.onClickRetryJob(row);
+          break;
+        case 'stop':
+          this.$confirm(this.$t('message.confirmStop'), this.$t('message.warning'), {
+            confirmButtonText: this.$t('message.confirm'),
+            cancelButtonText: this.$t('message.cancel'),
+            type: 'warning'
+          }).then(() => {
+            this.onClickStop(row);
+          });
+          break;
+      }
     }
   },
   mounted() {
@@ -348,5 +401,138 @@ export default {
 .power-instance-detail-log {
   max-height: 500px;
   overflow-y: scroll;
+}
+
+/* Modern Instance Manager Styles */
+.instance-manager {
+  padding: 0;
+  background: transparent;
+}
+
+/* Search Section */
+.search-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--pj-space-lg);
+}
+
+.search-form {
+  flex: 1;
+  min-width: 500px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--pj-space-sm);
+  flex-shrink: 0;
+}
+
+/* Tabs Section */
+.tabs-section {
+  margin: var(--pj-space-md) 0;
+}
+
+.tabs-section :deep(.el-tabs__header) {
+  margin-bottom: var(--pj-space-md);
+}
+
+.tabs-section :deep(.el-tabs__nav) {
+  border: 1px solid #e4e7ed;
+  border-radius: var(--pj-radius-lg);
+  padding: 2px;
+  background: #f5f7fa;
+}
+
+.tabs-section :deep(.el-tabs__item) {
+  border-radius: var(--pj-radius-sm);
+  transition: all 0.3s ease;
+  
+  &.is-active {
+    background: var(--pj-bg-white);
+    color: var(--pj-primary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Pagination */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  padding: var(--pj-space-lg) 0;
+  background: var(--pj-bg-white);
+  border-radius: var(--pj-radius-lg);
+  margin-top: var(--pj-space-md);
+  box-shadow: var(--pj-shadow-card);
+}
+
+/* Utility Classes */
+.mr-1 {
+  margin-right: var(--pj-space-xs);
+}
+
+/* Operation Buttons Group */
+.operation-buttons-group {
+  display: flex;
+  align-items: center;
+  gap: var(--pj-space-xs, 4px);
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.operation-buttons-group .el-button {
+  margin: 0;
+  padding: 4px 8px;
+  border-radius: var(--pj-radius-sm, 4px);
+  font-size: 12px;
+  min-width: auto;
+}
+
+.operation-buttons-group .el-button + .el-button {
+  margin-left: 0;
+}
+
+/* Utility class for margin-left */
+.ml-1 {
+  margin-left: var(--pj-space-xs, 4px);
+}
+
+/* Enhanced table styling */
+:deep(.el-table) {
+  .el-table__fixed-right {
+    box-shadow: -1px 0 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Dropdown menu styling */
+:deep(.el-dropdown-menu) {
+  .el-dropdown-menu__item {
+    padding: 8px 16px;
+    
+    &:hover {
+      background: var(--pj-bg-hover, #f5f5f5);
+    }
+  }
+}
+
+/* Responsive design for operation buttons */
+@media (max-width: 1200px) {
+  .operation-buttons-group {
+    justify-content: flex-start;
+    gap: 2px;
+  }
+}
+
+@media (max-width: 768px) {
+  .operation-buttons-group {
+    flex-wrap: wrap;
+    gap: 2px;
+  }
+  
+  .operation-buttons-group .el-button {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
 }
 </style>

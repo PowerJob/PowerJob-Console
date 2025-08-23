@@ -1,11 +1,46 @@
-/*
-Write your variables here. All available variables can be
-found in element-ui/packages/theme-chalk/src/common/var.scss.
-For example, to overwrite the theme color:
-*/
-$--color-primary: teal;
+/* Modern PowerJob Console Theme Variables */
+
+// Primary brand colors
+$--color-primary: #009688;
+$--color-primary-light-1: #26a69a;
+$--color-primary-light-2: #4db6ac;
+$--color-primary-light-3: #80cbc4;
+$--color-primary-light-4: #b2dfdb;
+$--color-primary-light-5: #e0f2f1;
+$--color-primary-dark-1: #00897b;
+$--color-primary-dark-2: #00796b;
+
+// Success/Error colors
+$--color-success: #4caf50;
+$--color-warning: #ff9800;
+$--color-danger: #f44336;
+$--color-info: #2196f3;
+
+// Text colors
+$--color-text-primary: #212121;
+$--color-text-regular: #424242;
+$--color-text-secondary: #757575;
+$--color-text-placeholder: #9e9e9e;
+
+// Background colors
+$--color-white: #ffffff;
+$--background-color-base: #f5f7fa;
+
+// Border colors
+$--border-color-base: #dcdfe6;
+$--border-color-light: #e4e7ed;
+$--border-color-lighter: #ebeef5;
+$--border-color-extra-light: #f2f6fc;
+
+// Border radius
+$--border-radius-base: 6px;
+$--border-radius-small: 4px;
+
+// Box shadows
+$--box-shadow-base: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+$--box-shadow-dark: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 12px rgba(0, 0, 0, 0.08);
 
 /* icon font path, required */
-$--font-path: '~element-ui/lib/theme-chalk/fonts';
+$--font-path: '~element-plus/theme-chalk/fonts';
 
-@import "~element-ui/packages/theme-chalk/src/index";
+@import "~element-plus/theme-chalk/src/index";
