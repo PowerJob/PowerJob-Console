@@ -289,14 +289,6 @@
                                 </el-option>
                             </el-select>
                         </el-col>
-                        <el-col :span="6" v-if="modifiedJobForm.dispatchStrategy=='SPECIFY'">
-                            <el-input 
-                                :placeholder="$t('message.dispatchStrategyConfig')" 
-                                v-model="modifiedJobForm.dispatchStrategyConfig"
-                            >
-                                <template #prepend>{{$t('message.dispatchStrategyConfig')}}</template>
-                            </el-input>
-                        </el-col>
                         <el-col :span="6">
                             <el-input 
                                 :placeholder="$t('message.maxInstanceNum')" 
@@ -313,8 +305,6 @@
                                 <template #prepend>{{$t('message.threadConcurrency')}}</template>
                             </el-input>
                         </el-col>
-                    </el-row>
-                    <el-row :gutter="16" style="margin-top: 16px;" v-if="modifiedJobForm.dispatchStrategy!='SPECIFY'">
                         <el-col :span="6">
                             <el-input 
                                 :placeholder="$t('message.timeout')" 
@@ -324,13 +314,13 @@
                             </el-input>
                         </el-col>
                     </el-row>
-                    <el-row :gutter="16" style="margin-top: 16px;" v-else>
-                        <el-col :span="6" :offset="6">
+                    <el-row :gutter="16" style="margin-top: 16px;" v-if="modifiedJobForm.dispatchStrategy=='SPECIFY'">
+                        <el-col :span="12">
                             <el-input 
-                                :placeholder="$t('message.timeout')" 
-                                v-model="modifiedJobForm.instanceTimeLimit"
+                                :placeholder="$t('message.dispatchStrategyConfig')" 
+                                v-model="modifiedJobForm.dispatchStrategyConfig"
                             >
-                                <template #prepend>{{$t('message.timeout')}}</template>
+                                <template #prepend>{{$t('message.dispatchStrategyConfig')}}</template>
                             </el-input>
                         </el-col>
                     </el-row>
