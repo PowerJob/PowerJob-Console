@@ -21,7 +21,7 @@ const en = {
         'stop': 'Stop',
         'back': 'Back',
         'all': 'ALL',
-        'more': '| More',
+        'more': ' More',
         'add': 'Add',
         'extra': 'Extra',
         'tag': 'Tag',

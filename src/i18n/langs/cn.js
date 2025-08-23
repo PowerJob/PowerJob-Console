@@ -21,7 +21,7 @@ const cn = {
         'stop': '停止',
         'back': '返回',
         'all': '全部',
-        'more': '| 更多',
+        'more': ' 更多',
         'add': '新增',
         'extra': '额外信息',
         'tag': '标签',
