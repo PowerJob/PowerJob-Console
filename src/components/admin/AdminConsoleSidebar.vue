@@ -12,7 +12,7 @@
 
           <!-- vue router，实现点击跳转 -->
           <el-menu-item index="/admin/app">
-            <template slot="title">
+            <template #title>
               <!-- 图标 + 文字 -->
               <i class="el-icon-apple"/>
               <span>{{$t('message.tabAppManage')}}</span>
@@ -20,7 +20,7 @@
           </el-menu-item>
 
           <el-menu-item index="/admin/namespace">
-            <template slot="title">
+            <template #title>
               <!-- 图标 + 文字 -->
               <i class="el-icon-orange"/>
               <span>{{$t('message.tabNamespace')}}</span>
@@ -28,7 +28,7 @@
           </el-menu-item>
 
           <el-menu-item index="/admin/personal">
-            <template slot="title">
+            <template #title>
               <!-- 图标 + 文字 -->
               <i class="el-icon-goblet-square-full"/>
               <span>{{$t('message.tabPersonal')}}</span>
@@ -36,7 +36,7 @@
           </el-menu-item>
 
           <el-menu-item index="/admin/settings">
-            <template slot="title">
+            <template #title>
               <!-- 图标 + 文字 -->
               <i class="el-icon-setting"/>
               <span>{{$t('message.tabSettings')}}</span>
@@ -44,7 +44,7 @@
           </el-menu-item>
 
           <el-menu-item index="/admin/user">
-            <template slot="title">
+            <template #title>
               <!-- 图标 + 文字 -->
               <i class="el-icon-user"/>
               <span>{{$t('message.tabUserManager')}}</span>

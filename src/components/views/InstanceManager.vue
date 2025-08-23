@@ -70,13 +70,13 @@
         />
         <el-table-column :show-overflow-tooltip="true" prop="instanceId" :label="$t('message.instanceId')" />
         <el-table-column prop="status" :label="$t('message.status')" width="160">
-          <template slot-scope="scope">{{fetchStatus(scope.row.status)}}</template>
+          <template #default="scope">{{fetchStatus(scope.row.status)}}</template>
         </el-table-column>
         <el-table-column  prop="actualTriggerTime" :label="$t('message.triggerTime')" width="150"/>
         <el-table-column  prop="finishedTime" :label="$t('message.finishedTime')" width="150"/>
 
         <el-table-column :label="$t('message.operation')" width="285">
-          <template slot-scope="scope">
+          <template #default="scope">
             <el-button
               size="mini"
               type="primary"
@@ -115,14 +115,14 @@
     </el-row>
 
     <!--  任务实例详情弹出框 -->
-    <el-dialog :visible.sync="instanceDetailVisible" v-if="instanceDetailVisible" width="80%">
+    <el-dialog v-model="instanceDetailVisible" v-if="instanceDetailVisible" width="80%">
       <div class="power-instance-detail-log">
         <InstanceDetail :instance-id="currentInstanceId" :resultAll="true" />
       </div>
     </el-dialog>
 
     <!-- 任务运行日志弹出框 -->
-    <el-dialog :visible.sync="instanceLogVisible" width="80%">
+    <el-dialog v-model="instanceLogVisible" width="80%">
       <el-row>
           <el-col :span="24" class="power-instance-log-download" style="margin-bottom:20px">
             <el-button
@@ -155,6 +155,7 @@
 
 <script>
 import InstanceDetail from "../common/InstanceDetail";
+import { ElMessage } from 'element-plus';
 export default {
   name: "InstanceManager",
   components: {
@@ -241,7 +242,7 @@ export default {
         "&appId=" +
           window.localStorage.getItem("Power_appId");
       this.axios.get(url).then(() => {
-        that.$message.success(this.$t("message.success"));
+        ElMessage.success(this.$t("message.success"));
         that.listInstanceInfos();
       });
     },
@@ -253,7 +254,7 @@ export default {
           "&appId=" +
           window.localStorage.getItem("Power_appId");
       this.axios.get(url).then(() => {
-        that.$message.success(this.$t("message.success"));
+        ElMessage.success(this.$t("message.success"));
         // 重新加载列表
         that.listInstanceInfos();
       });

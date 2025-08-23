@@ -1,9 +1,6 @@
-import Vue from "vue"
-import Vuex from "vuex"
+import { createStore } from "vuex"
 
-Vue.use(Vuex);
-
-const store = new Vuex.Store({
+const store = createStore({
     state: {
         // 包含两个属性：id和appName
         appInfo: {}

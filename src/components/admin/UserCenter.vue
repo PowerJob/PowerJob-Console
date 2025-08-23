@@ -68,7 +68,7 @@
 
 
 
-  <el-dialog :title="$t('message.changePassword')" :visible.sync="changePasswordFormVisible" width="35%" >
+  <el-dialog :title="$t('message.changePassword')" v-model="changePasswordFormVisible" width="35%" >
     <el-form :model="changePasswordRequest" style="margin:0 5px">
 
       <el-form-item label="username">
@@ -96,7 +96,7 @@
 </template>
 
 <script>
-import {Message} from "element-ui";
+import { ElMessage } from "element-plus";
 
 export default {
   name: 'UserCenter',
@@ -158,7 +158,7 @@ export default {
     onClickSaveNewUserInfo() {
       const that = this;
       this.axios.post('/user/modify', that.userDetailInfo).then(() => {
-        Message.success("SUCCESS");
+        ElMessage.success("SUCCESS");
         that.fetchUserDetail();
       })
     },
@@ -171,21 +171,21 @@ export default {
 
     submitChangePasswordRequest() {
       this.axios.post('/pwjbUser/changePassword', this.changePasswordRequest).then(() => {
-        Message.success('SUCCESS')
+        ElMessage.success('SUCCESS')
 
         window.localStorage.removeItem('PowerJwt');
         window.localStorage.removeItem('Power_appId');
         this.$router.push("/");
 
       }, err => {
-        Message.error(err)
+        ElMessage.error(err)
       })
       this.changePasswordFormVisible = true
     },
 
     onClickAuthThenBecomeAdmin() {
       this.axios.post('/appInfo/becomeAdmin', this.appAssertRequest).then(() => {
-        Message.success('SUCCESS')
+        ElMessage.success('SUCCESS')
       })
     }
   },

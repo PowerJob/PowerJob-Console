@@ -35,7 +35,7 @@
         <el-table-column prop="email" label="email"/>
 
         <el-table-column :label="$t('message.status')" width="80">
-          <template slot-scope="scope">
+          <template #default="scope">
             <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="changeUserStatus(scope.row)"/>
           </template>
         </el-table-column>
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import {Message} from "element-ui";
+import { ElMessage } from "element-plus";
 
 export default {
   name: "UserManager",
@@ -84,12 +84,12 @@ export default {
       console.log('user status: ' + data.enable)
       if (data.enable) {
         that.axios.post("/user/enable?uid=" + data.id).then(() => {
-          Message.success('SUCCESS')
+          ElMessage.success('SUCCESS')
           that.listUser()
         });
       } else {
         that.axios.post("/user/disable?uid=" + data.id).then(() => {
-          Message.success('SUCCESS')
+          ElMessage.success('SUCCESS')
           that.listUser()
         });
       }

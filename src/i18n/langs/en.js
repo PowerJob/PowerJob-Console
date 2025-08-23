@@ -1,4 +1,4 @@
-import enLocale from 'element-ui/lib/locale/lang/en'
+import enLocale from 'element-plus/es/locale/lang/en'
 
 const en = {
     message: {

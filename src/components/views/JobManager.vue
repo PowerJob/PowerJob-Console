@@ -39,32 +39,33 @@
                 <el-table-column prop="id" :label="$t('message.jobId')" width="80"/>
                 <el-table-column prop="jobName" :label="$t('message.jobName')" />
                 <el-table-column :label="$t('message.scheduleInfo')" >
-                    <template slot-scope="scope">
+                    <template #default="scope">
                         {{scope.row.timeExpressionType}}  {{scope.row.timeExpression}}
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('message.executeType')">
-                    <template slot-scope="scope">
+                    <template #default="scope">
                         {{translateExecuteType(scope.row.executeType)}}
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('message.processorType')">
-                    <template slot-scope="scope">
+                    <template #default="scope">
                         {{translateProcessorType(scope.row.processorType)}}
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('message.status')" width="80">
-                    <template slot-scope="scope">
+                    <template #default="scope">
                         <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="changeJobStatus(scope.row)"/>
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('message.operation')" width="150">
-                    <template slot-scope="scope">
+                    <template #default="scope">
                         <el-button size="mini" type="text" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
                         <el-button size="mini" type="text" @click="onClickRun(scope.row)">{{$t('message.run')}}</el-button>
                         <el-dropdown trigger="click">
                             <el-button size="mini" type="text">{{$t('message.more')}}</el-button>
-                            <el-dropdown-menu slot="dropdown">
+                            <template #dropdown>
+                                <el-dropdown-menu>
                                 <el-dropdown-item>
                                     <el-button size="mini" type="text" @click="onClickRunByParameter(scope.row)">{{$t('message.runByParameter')}}</el-button>
                                 </el-dropdown-item>
@@ -80,7 +81,8 @@
                                 <el-dropdown-item>
                                     <el-button size="mini" type="text" @click="onClickDeleteJob(scope.row)">{{$t('message.delete')}}</el-button>
                                 </el-dropdown-item>
-                            </el-dropdown-menu>
+                                </el-dropdown-menu>
+                            </template>
                         </el-dropdown>
                     </template>
                 </el-table-column>
@@ -98,7 +100,7 @@
         </el-row>
 
 
-        <el-dialog :close-on-click-modal="false" :visible.sync="modifiedJobFormVisible" width="80%">
+        <el-dialog :close-on-click-modal="false" v-model="modifiedJobFormVisible" width="80%">
             <el-form :model="modifiedJobForm" label-width="120px">
 
                 <el-form-item :label="$t('message.jobName')">
@@ -185,23 +187,23 @@
 
                       <el-col :span="5">
                         <el-input v-if="modifiedJobForm.dispatchStrategy=='SPECIFY'" :placeholder="$t('message.dispatchStrategyConfig')" v-model="modifiedJobForm.dispatchStrategyConfig" class="ruleContent">
-                          <template slot="prepend">{{$t('message.dispatchStrategyConfig')}}</template>
+                          <template #prepend>{{$t('message.dispatchStrategyConfig')}}</template>
                         </el-input>
                       </el-col>
 
                         <el-col :span="5">
                             <el-input :placeholder="$t('message.maxInstanceNum')" v-model="modifiedJobForm.maxInstanceNum" class="ruleContent">
-                                <template slot="prepend">{{$t('message.maxInstanceNum')}}</template>
+                                <template #prepend>{{$t('message.maxInstanceNum')}}</template>
                             </el-input>
                         </el-col>
                         <el-col :span="5">
                             <el-input :placeholder="$t('message.threadConcurrency')" v-model="modifiedJobForm.concurrency" class="ruleContent">
-                                <template slot="prepend">{{$t('message.threadConcurrency')}}</template>
+                                <template #prepend>{{$t('message.threadConcurrency')}}</template>
                             </el-input>
                         </el-col>
                         <el-col :span="5">
                             <el-input :placeholder="$t('message.timeout')" v-model="modifiedJobForm.instanceTimeLimit" class="ruleContent">
-                                <template slot="prepend">{{$t('message.timeout')}}</template>
+                                <template #prepend>{{$t('message.timeout')}}</template>
                             </el-input>
                         </el-col>
                     </el-row>
@@ -210,12 +212,12 @@
                     <el-row>
                         <el-col :span="12">
                             <el-input :placeholder="$t('message.taskRetryTimes')" v-model="modifiedJobForm.instanceRetryNum" class="ruleContent">
-                                <template slot="prepend">{{$t('message.taskRetryTimes')}}</template>
+                                <template #prepend>{{$t('message.taskRetryTimes')}}</template>
                             </el-input>
                         </el-col>
                         <el-col :span="12">
                             <el-input :placeholder="$t('message.subTaskRetryTimes')" v-model="modifiedJobForm.taskRetryNum" class="ruleContent">
-                                <template slot="prepend">{{$t('message.subTaskRetryTimes')}}</template>
+                                <template #prepend>{{$t('message.subTaskRetryTimes')}}</template>
                             </el-input>
                         </el-col>
                     </el-row>
@@ -224,17 +226,17 @@
                     <el-row>
                         <el-col :span="8">
                             <el-input :placeholder="$t('message.minCPU')" v-model="modifiedJobForm.minCpuCores" class="ruleContent">
-                                <template slot="prepend">{{$t('message.minCPU')}}</template>
+                                <template #prepend>{{$t('message.minCPU')}}</template>
                             </el-input>
                         </el-col>
                         <el-col :span="8">
                             <el-input :placeholder="$t('message.minMemory')" v-model="modifiedJobForm.minMemorySpace" class="ruleContent">
-                                <template slot="prepend">{{$t('message.minMemory')}}</template>
+                                <template #prepend>{{$t('message.minMemory')}}</template>
                             </el-input>
                         </el-col>
                         <el-col :span="8">
                             <el-input :placeholder="$t('message.minDisk')" v-model="modifiedJobForm.minDiskSpace" class="ruleContent">
-                                <template slot="prepend">{{$t('message.minDisk')}}</template>
+                                <template #prepend>{{$t('message.minDisk')}}</template>
                             </el-input>
                         </el-col>
                     </el-row>
@@ -243,12 +245,12 @@
                     <el-row>
                         <el-col :span="16">
                             <el-input :placeholder="$t('message.designatedWorkerAddressPLH')" v-model="modifiedJobForm.designatedWorkers" class="ruleContent">
-                                <template slot="prepend">{{$t('message.designatedWorkerAddress')}}</template>
+                                <template #prepend>{{$t('message.designatedWorkerAddress')}}</template>
                             </el-input>
                         </el-col>
                         <el-col :span="8">
                             <el-input :placeholder="$t('message.maxWorkerNumPLH')" v-model="modifiedJobForm.maxWorkerCount" class="ruleContent">
-                                <template slot="prepend">{{$t('message.maxWorkerNum')}}</template>
+                                <template #prepend>{{$t('message.maxWorkerNum')}}</template>
                             </el-input>
                         </el-col>
                     </el-row>
@@ -267,7 +269,7 @@
                         </el-col>
                         <el-col :span="6">
                             <el-input v-model="modifiedJobForm.alarmConfig.alertThreshold">
-                                <template slot="prepend">{{$t('message.alertThreshold')}}</template>
+                                <template #prepend>{{$t('message.alertThreshold')}}</template>
                             </el-input>
                             <!-- <div class="job-editor-number">
                                 <div class="job-input-number">{{$t('message.alertThreshold')}}</div>
@@ -276,13 +278,13 @@
                         </el-col>
                         <el-col :span="6">
                             <el-input v-model="modifiedJobForm.alarmConfig.statisticWindowLen">
-                                <template slot="prepend">{{$t('message.statisticWindow') + '(s)'}}</template>
+                                <template #prepend>{{$t('message.statisticWindow') + '(s)'}}</template>
                             </el-input>
                             <!-- <el-input-number v-model="modifiedJobForm.alarmConfig.statisticWindowLen" :placeholder="$t('message.statisticWindow') + '(s)'" controls-position="right" :min="0"></el-input-number> -->
                         </el-col>
                         <el-col :span="6">
                             <el-input v-model="modifiedJobForm.alarmConfig.silenceWindowLen">
-                                <template slot="prepend">{{$t('message.silenceWindow') + '(s)'}}</template>
+                                <template #prepend>{{$t('message.silenceWindow') + '(s)'}}</template>
                             </el-input>
                             <!-- <el-input-number v-model="modifiedJobForm.alarmConfig.silenceWindowLen" :placeholder="$t('message.silenceWindow') + '(s)'" controls-position="right" :min="0"></el-input-number> -->
                         </el-col>
@@ -313,7 +315,7 @@
                     </el-col>
                     <el-col :span="12">
                         <el-input v-if="[2, 4].includes(modifiedJobForm.logConfig.type)" v-model="modifiedJobForm.logConfig.loggerName">
-                            <template slot="prepend">{{$t('message.loggerName')}}</template>
+                            <template #prepend>{{$t('message.loggerName')}}</template>
                         </el-input>
                     </el-col>
                 </el-row>
@@ -342,17 +344,17 @@
             </el-form>
         </el-dialog>
 
-        <el-dialog :close-on-click-modal="false" :visible.sync="timeExpressionValidatorVisible" v-if='timeExpressionValidatorVisible'>
+        <el-dialog :close-on-click-modal="false" v-model="timeExpressionValidatorVisible" v-if='timeExpressionValidatorVisible'>
             <TimeExpressionValidator :time-expression="modifiedJobForm.timeExpression" :time-expression-type="modifiedJobForm.timeExpressionType"/>
         </el-dialog>
 
         <!-- 时间表达式编辑 -->
-        <el-dialog :close-on-click-modal="false" :visible.sync="timeExpressionEditorVisible" v-if='timeExpressionEditorVisible'>
+        <el-dialog :close-on-click-modal="false" v-model="timeExpressionEditorVisible" v-if='timeExpressionEditorVisible'>
           <DailyTimeIntervalForm :timeExpression="modifiedJobForm.timeExpression" @contentChanged="eventFromDailyTimeIntervalExpress"></DailyTimeIntervalForm>
         </el-dialog>
 
         <!-- 任务导入导出 -->
-        <el-dialog :close-on-click-modal="false" :visible.sync="jobExporterDialogVisible" v-if='jobExporterDialogVisible'>
+        <el-dialog :close-on-click-modal="false" v-model="jobExporterDialogVisible" v-if='jobExporterDialogVisible'>
             <Exporter type="JOB" :mode="jobExporterMode" :target-id="jobExporterTargetId"  @finished="eventFromExporter"></Exporter>
         </el-dialog>
 
@@ -367,10 +369,10 @@
                 :placeholder="$t('message.enteringParameter')"
                 v-model="runParameter">
             </el-input>
-            <span slot="footer" class="dialog-footer">
+            <template #footer class="dialog-footer">
                 <el-button @click="onClickRunCancel">{{$t('message.cancel')}}</el-button>
                 <el-button type="primary" @click="onClickRun(temporaryRowData)" :loading="runLoading">{{$t('message.run')}}</el-button>
-            </span>
+            </template>
         </el-dialog>
     </div>
 </template>
@@ -379,6 +381,7 @@
     import TimeExpressionValidator from "../common/TimeExpressionValidator";
     import DailyTimeIntervalForm from "../common/DailyTimeIntervalForm";
     import Exporter from "../common/Exporter";
+    import { ElMessage } from 'element-plus';
     export default {
         name: "JobManager",
         components: {Exporter, TimeExpressionValidator, DailyTimeIntervalForm},
@@ -499,7 +502,7 @@
                 this.modifiedJobForm.alarmConfig = alarmConfig;
                 await this.axios.post("/job/save", this.modifiedJobForm);
                 this.modifiedJobFormVisible = false;
-                this.$message.success(this.$t('message.success'));
+                ElMessage.success(this.$t('message.success'));
                 this.listJobInfos();
             },
             // 列出符合当前搜索条件的任务
@@ -572,14 +575,13 @@
             },
             // 点击 立即运行按钮
             onClickRun(data) {
-                let that = this;
                 let url = "/job/run?jobId=" + data.id + "&appId=" + window.localStorage.getItem("Power_appId");
                 if (this.temporaryRowData && this.runParameter) {
                     url += `&instanceParams=${encodeURIComponent(this.runParameter)}`
                 }
                 this.runLoading = true;
                 this.axios.get(url).then(() => {
-                    that.$message.success(this.$t('message.success'));
+                    ElMessage.success(this.$t('message.success'));
                     this.temporaryRowData = null;
                     this.runLoading = false
                 }).catch(() => {
@@ -600,7 +602,7 @@
                 let that = this;
                 let url = "/job/delete?jobId=" + data.id;
                 this.axios.get(url).then(() => {
-                    that.$message.success(this.$t('message.success'));
+                    ElMessage.success(this.$t('message.success'));
                     that.listJobInfos();
                 });
             },

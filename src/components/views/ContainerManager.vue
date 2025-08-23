@@ -1,10 +1,12 @@
 <template>
     <div>
         <el-card class="box-card">
-        <div slot="header" class="clearfix">
-            <span></span>
-            <el-button style="float: right; " type="primary" @click="dialogVisible=true">{{$t('message.newContainer')}}</el-button>
-        </div>
+        <template #header>
+            <div class="clearfix">
+                <span></span>
+                <el-button style="float: right; " type="primary" @click="dialogVisible=true">{{$t('message.newContainer')}}</el-button>
+            </div>
+        </template>
         <div class="wrapper">
             <div v-for="(item,key) in containerList" :key="key" class="item">
                 <div class="containerText"><span class='value'>{{$t('message.containerId')}}</span><span class='value'>{{item.id}}</span></div>
@@ -24,7 +26,7 @@
         </el-card>
             <el-dialog
                 :title="$t('message.newContainer')"
-                :visible.sync="dialogVisible"
+                v-model="dialogVisible"
                 width="50%"
                 v-on:close="closeEdit">
                 <el-form ref="form" :model="form" label-width="150px" class="genTable" label-position='left'>
@@ -62,7 +64,9 @@
                         multiple>
                     <i class="el-icon-upload"></i>
                     <div class="el-upload__text">Drag the file here, or <em>click on Upload</em></div>
-                    <div class="el-upload__tip" slot="tip">{{$t('message.uploadTips')}}</div>
+                    <template #tip>
+                        <div class="el-upload__tip">{{$t('message.uploadTips')}}</div>
+                    </template>
                     </el-upload>
                 </el-form-item>
                 <el-form-item>
@@ -70,7 +74,7 @@
                     </el-form-item>
                 </el-form>
             </el-dialog>
-            <el-dialog :title="arrangeTitle" :visible.sync="arrangeVisible" v-on:close="closeArrange"  >
+            <el-dialog :title="arrangeTitle" v-model="arrangeVisible" v-on:close="closeArrange"  >
                 <h4 v-for="log in logs" :key="log">{{log}}</h4>
             </el-dialog>
     </div>
@@ -79,7 +83,7 @@
 
 <script>
     import baseUrl from '../../main';
-    import {Message} from "element-ui";
+    import { ElMessage } from "element-plus";
 
     let ws;
     export default {
@@ -134,7 +138,7 @@
                this.axios.post("container/save",data).then(res=>{
                  console.log('container save result:' + JSON.stringify(res))
 
-                 Message.success("SUCCESS");
+                 ElMessage.success("SUCCESS");
                  // 恢复默认表单
                  that.dialogVisible = false;
                  that.form.containerName = '';
@@ -154,7 +158,7 @@
                 this.axios.get("/container/delete?containerId="+ item.id+'&appId='+appId).then(res => {
                     console.log(res);
                     this.containerList.splice(index,1);
-                    this.$message.info(this.$t('message.success'));
+                    ElMessage.info(this.$t('message.success'));
                 });
             },
             editItem(item){

@@ -17,7 +17,7 @@
       </el-form>
 
       <!-- User registration dialog -->
-      <el-dialog :title="$t('message.userRegister')" :visible.sync="userRegisterFormVisible" width="400px">
+      <el-dialog :title="$t('message.userRegister')" v-model="userRegisterFormVisible" width="400px">
         <el-form :model="userRegisterForm" label-width="120px">
           <el-form-item label="Username">
             <el-input v-model="userRegisterForm.username" placeholder="Unique identifier, use English"></el-input>
@@ -52,7 +52,7 @@
 
 
 <script>
-import {Message} from "element-ui";
+import { ElMessage } from "element-plus";
 
 export default {
   name: 'PowerJobThirdPartyLogin',
@@ -122,10 +122,10 @@ export default {
         that.innerDoLogin(that.userRegisterForm.username, that.userRegisterForm.password, false)
 
         // 直接登录一次，创建 PowerJob 的 USER 对象
-        that.$message.success(this.$t('message.success'));
+        ElMessage.success(this.$t('message.success'));
 
       }, err => {
-        Message.error(err);
+        ElMessage.error(err);
         that.userRegisterFormVisible = false
       });
     }

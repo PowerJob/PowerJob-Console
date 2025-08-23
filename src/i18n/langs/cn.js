@@ -1,4 +1,4 @@
-import zhLocale from 'element-ui/lib/locale/lang/zh-CN'
+import zhLocale from 'element-plus/es/locale/lang/zh-cn'
 const cn = {
     message: {
 

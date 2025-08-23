@@ -59,7 +59,7 @@
         <el-table-column prop="modifierShowName" :label="$t('message.modifier')" />
 
         <el-table-column :label="$t('message.operation')" width="150">
-          <template slot-scope="scope">
+          <template #default="scope">
             <el-button size="mini" type="text" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
             <el-button size="mini" type="text" @click="onClickEnter(scope.row)">{{$t('message.enter')}}</el-button>
           </template>
@@ -77,7 +77,7 @@
           :hide-on-single-page="true"/>
     </el-row>
 
-    <el-dialog :close-on-click-modal="false" :visible.sync="modifiedAppFormVisible" width="80%">
+    <el-dialog :close-on-click-modal="false" v-model="modifiedAppFormVisible" width="80%">
       <el-form :model="modifiedAppForm" label-width="120px">
 
         <el-form-item label="namespace">
@@ -125,6 +125,7 @@
 // import UserRole from "../common/UserRole.vue";
 
 import UserRole from "../common/UserRole.vue";
+import { ElMessage } from 'element-plus';
 
 export default {
   name: "AppManager",
@@ -228,9 +229,9 @@ export default {
           'AppId': that.modifiedAppForm.id
         }
       }).then(() => {
-        that.$message.success(that.$t('message.success'));
+        ElMessage.success(that.$t('message.success'));
         this.listApps();
-      }, e => that.$message.error(e))
+      }, e => ElMessage.error(e))
       this.modifiedAppFormVisible = false;
     },
 
@@ -242,7 +243,7 @@ export default {
           'AppId': that.modifiedAppForm.id
         }
       }).then(() => {
-        that.$message.success(that.$t('message.success'));
+        ElMessage.success(that.$t('message.success'));
         this.listApps();
         this.modifiedAppFormVisible = false;
       })

@@ -8,7 +8,7 @@
             placement="top"
             effect="light"
           >
-            <i class="el-icon-document-add"></i>
+            <el-icon><DocumentAdd /></el-icon>
           </el-tooltip>
         </div>
         <div @click="importJudgeNode" v-if="mode !== 'view'">
@@ -38,7 +38,7 @@
             placement="top"
             effect="light"
           >
-            <i class="el-icon-zoom-out"></i>
+            <el-icon><ZoomOut /></el-icon>
           </el-tooltip>
         </div>
         <div @click="handleZoomIn">
@@ -47,7 +47,7 @@
             placement="top"
             effect="light"
           >
-            <i class="el-icon-zoom-in"></i>
+            <el-icon><ZoomIn /></el-icon>
           </el-tooltip>
         </div>
         <div @click="handleAutoFit">
@@ -56,7 +56,7 @@
             placement="top"
             effect="light"
           >
-            <i class="el-icon-aim"></i>
+            <el-icon><Aim /></el-icon>
           </el-tooltip>
         </div>
         <div @click="fullScreen">
@@ -65,7 +65,7 @@
             placement="top"
             effect="light"
           >
-            <i class="el-icon-full-screen"></i>
+            <el-icon><FullScreen /></el-icon>
           </el-tooltip>
         </div>
       </div>
@@ -84,6 +84,7 @@
 </template>
 <script>
 import Workflow from "power-workflow";
+import { DocumentAdd, ZoomOut, ZoomIn, Aim, FullScreen } from '@element-plus/icons-vue';
 
 const defaultSize = {
   width: (document.body.clientWidth - 254) * 0.7,
@@ -105,6 +106,13 @@ const dagSize = {
 
 export default {
   name: "PowerWorkflow",
+  components: {
+    DocumentAdd,
+    ZoomOut,
+    ZoomIn,
+    Aim,
+    FullScreen
+  },
   data() {
     return {
       size: {

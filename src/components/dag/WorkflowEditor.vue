@@ -200,7 +200,7 @@
           </PowerWorkflow>
           <el-drawer
             :title="$t('message.importJobTitle')"
-            :visible.sync="importDrawerVisible"
+            v-model="importDrawerVisible"
             direction="rtl"
             size="60%"
           >
@@ -248,7 +248,7 @@
                   :label="$t('message.jobName')"
                 />
                 <el-table-column :label="$t('message.operation')">
-                  <template slot-scope="scope">
+                  <template #default="scope">
                     <el-button size="medium" @click="importTask([scope.row])">{{
                       $t("message.import")
                     }}</el-button>
@@ -269,7 +269,7 @@
       </div>
     </el-row>
     <el-dialog
-      :visible.sync="timeExpressionValidatorVisible"
+      v-model="timeExpressionValidatorVisible"
       v-if="timeExpressionValidatorVisible"
     >
       <TimeExpressionValidator
@@ -279,7 +279,7 @@
     </el-dialog>
     <el-drawer
       :title="$t('message.importWorkflowTitle')"
-      :visible.sync="workflowVisible"
+      v-model="workflowVisible"
       direction="rtl"
       size="60%"
     >
@@ -296,6 +296,7 @@ import JSEditor from "./JSEditor.vue";
 import TimeExpressionValidator from "../common/TimeExpressionValidator";
 import PowerWorkflow from "./PowerWorkflow";
 import WorkflowManager from "../views/WorkflowManager";
+import { ElMessage } from 'element-plus';
 
 function nodeInfoChange(icon, index) {
   return function (value) {
@@ -596,7 +597,7 @@ export default {
         ...this.workflowInfo,
         dag: dagInfo,
       });
-      this.$message.success(this.$t("message.success"));
+      ElMessage.success(this.$t("message.success"));
       if (!this.workflowInfo.id) this.workflowInfo.id = res;
     },
     /** 导入任务节点数据 */
@@ -679,12 +680,12 @@ export default {
         skipWhenFailed: this.nodeInfo.skipWhenFailed,
       };
 
-      this.$message.success(this.$t("message.success"));
+      ElMessage.success(this.$t("message.success"));
     },
     /** 批量导入工作流 */
     async onBulkImport() {
       if (this.multipleSelection.length === 0) {
-        this.$message.warning(this.$t("message.noSelect"));
+        ElMessage.warning(this.$t("message.noSelect"));
         return;
       }
       await this.importTask(this.multipleSelection);

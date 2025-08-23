@@ -99,14 +99,15 @@
                 <div class="power-job-content-slot">
                   {{ instanceDetail.result }}
                 </div>
-                <span
-                  class="power-job-content"
-                  slot="reference"
-                  :style="{
-                    width: fixedWidth ? `${fixedWidth - 200}px` : '400px',
-                  }"
-                  >{{ instanceDetail.result }}</span
-                >
+                <template #reference>
+                  <span
+                    class="power-job-content"
+                    :style="{
+                      width: fixedWidth ? `${fixedWidth - 200}px` : '400px',
+                    }"
+                    >{{ instanceDetail.result }}</span
+                  >
+                </template>
                 <!-- <i class="el-icon-chat-dot-square result" slot="reference"></i> -->
               </el-popover>
               <span v-if="resultAll" class="title">{{
@@ -166,7 +167,7 @@
               :label="$t('message.status')"
               width="140"
             >
-              <template slot-scope="scope">{{
+              <template #default="scope">{{
                 common.translateInstanceStatus(scope.row.status)
               }}</template>
             </el-table-column>
@@ -197,8 +198,8 @@
       <el-row>
         <el-col :span="20">
           <el-input v-model="queryInstanceDetailRequest.customQuery">
-            <template slot="prepend">select * from task_info where</template>
-            <template slot="append">limit 10</template>
+            <template #prepend>select * from task_info where</template>
+            <template #append>limit 10</template>
           </el-input>
         </el-col>
         <el-col :span="4">

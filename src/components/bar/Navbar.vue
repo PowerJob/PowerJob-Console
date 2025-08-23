@@ -12,20 +12,24 @@
                 <span class="el-dropdown-link">
                     <p style="color:#ffffff">Language<i class="el-icon-arrow-down el-icon--right"/></p>
                 </span>
-                <el-dropdown-menu slot="dropdown">
+                <template #dropdown>
+                    <el-dropdown-menu>
                     <el-dropdown-item command="en">English</el-dropdown-item>
                     <el-dropdown-item command="cn">简体中文</el-dropdown-item>
-                </el-dropdown-menu>
+                    </el-dropdown-menu>
+                </template>
             </el-dropdown>
 
             <el-dropdown @command="handleSettings">
                 <span class="el-dropdown-link">
                     <p style="color:#ffffff">Settings<i class="el-icon-arrow-down el-icon--right"/></p>
                 </span>
-                <el-dropdown-menu slot="dropdown">
+                <template #dropdown>
+                    <el-dropdown-menu>
                     <el-dropdown-item command="back2Home">{{$t('message.back2Home')}}</el-dropdown-item>
                     <el-dropdown-item command="logout">{{$t('message.logout')}}</el-dropdown-item>
-                </el-dropdown-menu>
+                    </el-dropdown-menu>
+                </template>
             </el-dropdown>
         </div>
     </div>

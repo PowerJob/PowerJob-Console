@@ -34,27 +34,29 @@
             <el-table-column :show-overflow-tooltip="true" prop="id" :label="$t('message.wfId')" width="120"/>
             <el-table-column :show-overflow-tooltip="true" prop="wfName" :label="$t('message.wfName')"/>
             <el-table-column :show-overflow-tooltip="true" :label="$t('message.scheduleInfo')" >
-                <template slot-scope="scope">
+                <template #default="scope">
                     {{scope.row.timeExpressionType}}  {{scope.row.timeExpression}}
                 </template>
             </el-table-column>
             <el-table-column :show-overflow-tooltip="true" :label="$t('message.status')" width="80" v-if="!isWorkflow">
-                <template slot-scope="scope">
+                <template #default="scope">
                     <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="switchWorkflow(scope.row)"/>
                 </template>
             </el-table-column>
             <el-table-column :show-overflow-tooltip="true" :label="$t('message.operation')" :width="isWorkflow ? 100 : 300">
-                <template slot-scope="scope">
+                <template #default="scope">
                     <div v-if="!isWorkflow">
                         <el-button size="mini" @click="onClickModifyWorkflow(scope.row)">{{$t('message.edit')}}</el-button>
                         <el-button size="mini" @click="onClickCopy(scope.row)" :loading="copyLoading">{{$t('message.copy')}}</el-button>
                         <el-dropdown>
                             <el-button :style="{marginRight: '10px', marginLeft: '10px'}" size="mini" @click="onClickRunWorkflow(scope.row)">{{$t('message.run')}}</el-button>
-                            <el-dropdown-menu slot="dropdown">
+                            <template #dropdown>
+                                <el-dropdown-menu>
                                 <el-dropdown-item>
                                     <el-button size="mini" type="text" @click="onClickRunByParameter(scope.row)">{{$t('message.runByParameter')}}</el-button>
                                 </el-dropdown-item>
-                            </el-dropdown-menu>
+                                </el-dropdown-menu>
+                            </template>
                         </el-dropdown>
                         <el-button size="mini" type="danger" @click="onClickDeleteWorkflow(scope.row)">{{$t('message.delete')}}</el-button>
                     </div>
@@ -86,15 +88,16 @@
                 :placeholder="$t('message.enteringParameter')"
                 v-model="runParameter">
             </el-input>
-            <span slot="footer" class="dialog-footer">
+            <template #footer class="dialog-footer">
                 <el-button @click="onClickRunCancel">{{$t('message.cancel')}}</el-button>
                 <el-button type="primary" @click="onClickRunWorkflow(temporaryRowData)" :loading="runLoading">{{$t('message.run')}}</el-button>
-            </span>
+            </template>
         </el-dialog>
 </div>
 </template>
 
 <script>
+    import { ElMessage } from 'element-plus';
     export default {
         name: "WorkflowManager",
         props: ['isWorkflow'],
@@ -166,14 +169,13 @@
             },
             // 立即运行工作流
             onClickRunWorkflow(data) {
-                let that = this;
                 let url = "/workflow/run?appId=" + window.localStorage.getItem("Power_appId") + "&workflowId=" + data.id;
                 if (this.temporaryRowData && this.runParameter) {
                     url += `&initParams=${encodeURIComponent(this.runParameter)}`
                 }
                 this.runLoading = true;
                 this.axios.get(url).then(() => {
-                    that.$message.success(this.$t('message.success'))
+                    ElMessage.success(this.$t('message.success'))
                     this.temporaryRowData = null;
                     this.runLoading = false
                 }).catch(() => {
@@ -194,7 +196,7 @@
                 let that = this;
                 let url = "/workflow/delete?appId=" + window.localStorage.getItem("Power_appId") + "&workflowId=" + data.id;
                 this.axios.get(url).then(() => {
-                    that.$message.success(this.$t('message.success'));
+                    ElMessage.success(this.$t('message.success'));
                     that.listWorkflow();
                 });
             },
@@ -228,7 +230,7 @@
                         }
                     });
                     this.copyLoading = false;
-                    this.$message.success(this.$t('message.success'));
+                    ElMessage.success(this.$t('message.success'));
                 }).catch(() => {
                     this.copyLoading = false;
                 })

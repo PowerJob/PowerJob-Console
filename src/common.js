@@ -25,24 +25,24 @@ let timestamp2Str = ts => {
 // 公共函数，涉及到 i18n ，放进 common.js 报错，暂时先放在这里吧
 let translateInstanceStatus = status => {
     switch (status) {
-        case 1: return i18n.t('message.waitingDispatch');
-        case 2: return i18n.t('message.waitingWorkerReceive');
-        case 3: return i18n.t('message.running');
-        case 4: return i18n.t('message.failed');
-        case 5: return i18n.t('message.success');
-        case 9: return i18n.t('message.canceled');
-        case 10: return i18n.t('message.stopped');
+        case 1: return i18n.global.t('message.waitingDispatch');
+        case 2: return i18n.global.t('message.waitingWorkerReceive');
+        case 3: return i18n.global.t('message.running');
+        case 4: return i18n.global.t('message.failed');
+        case 5: return i18n.global.t('message.success');
+        case 9: return i18n.global.t('message.canceled');
+        case 10: return i18n.global.t('message.stopped');
         default: return "unknown";
     }
 };
 
 let translateWfInstanceStatus = status => {
     switch (status) {
-        case 1: return i18n.t('message.wfWaiting');
-        case 2: return i18n.t('message.running');
-        case 3: return i18n.t('message.failed');
-        case 4: return i18n.t('message.success');
-        case 10: return i18n.t('message.stopped');
+        case 1: return i18n.global.t('message.wfWaiting');
+        case 2: return i18n.global.t('message.running');
+        case 3: return i18n.global.t('message.failed');
+        case 4: return i18n.global.t('message.success');
+        case 10: return i18n.global.t('message.stopped');
         default: return "unknown";
     }
 };
@@ -50,7 +50,7 @@ let translateWfInstanceStatus = status => {
 // 更换语言
 let switchLanguage = cmd => {
     console.log("switch language to %o", cmd);
-    i18n.locale = cmd;
+    i18n.global.locale.value = cmd;
     // 存储到LangStorage
     window.localStorage.setItem('oms_lang', cmd)
 };

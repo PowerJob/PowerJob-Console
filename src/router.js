@@ -1,11 +1,9 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import Console from "./components/Console";
 import AdminConsole from "./components/admin/AdminConsole.vue";
 
-Vue.use(VueRouter);
-
-const router = new VueRouter({
+const router = createRouter({
+    history: createWebHashHistory(),
     routes: [
         { path: "/", redirect: '/loginHomepage' },
         { path: "/loginHomepage", component: () => import('./components/login/LoginHomepage.vue') },

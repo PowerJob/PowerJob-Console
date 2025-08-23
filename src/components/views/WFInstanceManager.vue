@@ -60,7 +60,7 @@
         <el-table-column :show-overflow-tooltip="true" prop="workflowName" :label="$t('message.wfName')" />
         <el-table-column :show-overflow-tooltip="true" prop="wfInstanceId" :label="$t('message.wfInstanceId')" />
         <el-table-column :show-overflow-tooltip="true" prop="status" :label="$t('message.status')" width="160">
-          <template slot-scope="scope">
+          <template #default="scope">
             {{fetchWFStatus(scope.row.status)}}
           </template>
         </el-table-column>
@@ -68,7 +68,7 @@
         <el-table-column :show-overflow-tooltip="true" prop="finishedTime" :label="$t('message.finishedTime')" />
 
         <el-table-column :show-overflow-tooltip="true" :label="$t('message.operation')" width="225">
-          <template slot-scope="scope">
+          <template #default="scope">
             <el-button type="primary" size="mini" @click="onClickShowDetail(scope.row)"
               >{{$t('message.detail')}}</el-button
             >
@@ -98,6 +98,7 @@
 </template>
 
 <script>
+import { ElMessage } from 'element-plus';
 export default {
   name: "WFInstanceManager",
   data() {
@@ -161,7 +162,7 @@ export default {
         "&appId=" +
         window.localStorage.getItem("Power_appId");
       this.axios.get(url).then(() => {
-        that.$message.success(this.$t('message.success'));
+        ElMessage.success(this.$t('message.success'));
         // 重新加载列表
         that.listInstanceInfos();
       });

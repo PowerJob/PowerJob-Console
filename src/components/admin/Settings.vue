@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import {Message} from "element-ui";
+import { ElMessage } from "element-plus";
 
 export default {
   name: 'Settings',
@@ -55,7 +55,7 @@ export default {
         admin: this.adminUserIds
       }
       this.axios.post('/auth/saveGlobalAdmin', param).then(() => {
-        Message.success('SUCCESS')
+        ElMessage.success('SUCCESS')
       })
     }
   },

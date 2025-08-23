@@ -1,23 +1,13 @@
 <template>
   <div class="code-edit">
-    <MonacoEditor
-      :code="code"
-      :key="randomKey"
-      theme="vs"
-      :height="300"
-      :options="options"
-      @mounted="onMounted"
-      @codeChange="onCodeChange"
-    >
-
-    </MonacoEditor>
+    <div ref="monacoEditor" style="height: 300px; width: 100%;"></div>
   </div>
 </template>
 <script>
-import MonacoEditor from "vue-monaco-editor";
+import loader from '@monaco-editor/loader';
+
 export default {
   name: 'WorkflowEditor',
-  components: { MonacoEditor },
   props: ['code'],
   data() {
     return {
@@ -25,17 +15,48 @@ export default {
       editor: null,
       options: {
         selectOnLineNumbers: false,
+        theme: 'vs',
+        language: 'javascript',
+        value: this.code || ''
       },
       randomKey: 1231231,
     }
   },
+  mounted() {
+    this.initMonacoEditor();
+  },
+  beforeUnmount() {
+    if (this.editor) {
+      this.editor.dispose();
+    }
+  },
   methods: {
+    async initMonacoEditor() {
+      const monaco = await loader.init();
+      this.editor = monaco.editor.create(this.$refs.monacoEditor, {
+        ...this.options,
+        value: this.code || ''
+      });
+      
+      this.editor.onDidChangeModelContent(() => {
+        this.$emit('onCodeChange', this.editor.getValue());
+      });
+      
+      this.$emit('mounted', this.editor);
+    },
     onMounted(editor) {
       this.editor = editor;
     },
     onCodeChange() {
       this.$emit('onCodeChange', this.editor.getValue());
     },
+  },
+  watch: {
+    code(newCode) {
+      if (this.editor && newCode !== this.editor.getValue()) {
+        this.editor.setValue(newCode || '');
+      }
+    }
   }
 }
 </script>

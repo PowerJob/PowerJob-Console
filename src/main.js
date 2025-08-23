@@ -1,9 +1,10 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
-import ElementUI from 'element-ui'
-import { Message } from 'element-ui';
+import ElementPlus from 'element-plus'
+import { ElMessage } from 'element-plus'
+import 'element-plus/dist/index.css'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import './styles.scss'
-import './plugins/element.js'
 import i18n from './i18n/i18n'
 import './iconfont.css';
 
@@ -14,27 +15,33 @@ import router from "./router";
 import store from "./store";
 import common from "./common";
 
-Vue.use(ElementUI);
 // let baseURL = "http://139.224.83.134:7700";
 let baseURL = process.env.VUE_APP_BASE_URL;
 // let baseURL = '/api';
 
 let timeout = 10000;
 
-Vue.prototype.common = common;
 /* ******* axios config ******* */
-Vue.prototype.axios = axios;
 axios.defaults.baseURL = baseURL;
 axios.defaults.timeout = timeout;
 
-Vue.config.productionTip = false;
+const app = createApp(App);
 
-new Vue({
-  router,
-  store,
-  i18n,
-  render: h => h(App),
-}).$mount('#app');
+// Register Element Plus icons
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
+
+app.use(ElementPlus);
+app.use(router);
+app.use(store);
+app.use(i18n);
+
+// Global properties
+app.config.globalProperties.common = common;
+app.config.globalProperties.axios = axios;
+
+app.mount('#app');
 
 // 请求拦截，全局添加 JWT 和 APPID 信息
 axios.interceptors.request.use((request) => {
@@ -56,7 +63,7 @@ axios.interceptors.response.use((response) => {
 
   // -100 为未登录约定状态码，前端全局拦截跳转登录页面
   if (response.data.code === '-100') {
-    Message.warning("USER_NEED_LOGIN")
+    ElMessage.warning("USER_NEED_LOGIN")
     router.push("/");
     return
   }
@@ -71,10 +78,10 @@ axios.interceptors.response.use((response) => {
   if (response.data.success === true) {
     return response.data.data;
   }
-  Message.warning("ERROR：" + response.data.message);
+  ElMessage.warning("ERROR：" + response.data.message);
   return Promise.reject(response.data.msg);
 }, (error) => {
-  Message.error(error.toString());
+  ElMessage.error(error.toString());
   return Promise.reject(error);
 });
 

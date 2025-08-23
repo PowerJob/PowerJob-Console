@@ -16,19 +16,20 @@
         data() {
             return {
                 nextNTriggerTime: [],
+                encodedTimeExpression: ''
             }
         },
         methods: {
             checkTimeExpression() {
                 let that = this;
-                let url = "/validate/timeExpression?timeExpressionType=" + this.timeExpressionType + "&timeExpression=" + this.timeExpression;
+                let url = "/validate/timeExpression?timeExpressionType=" + this.timeExpressionType + "&timeExpression=" + this.encodedTimeExpression;
                 this.axios.get(url).then(res => that.nextNTriggerTime = res);
             }
         },mounted() {
             console.log("type:" + this.timeExpressionType);
             console.log("expression:" + this.timeExpression);
-            this.timeExpression = encodeURIComponent(this.timeExpression);
-            console.log("expressionAfterEncodeURIComponent: " + this.timeExpression);
+            this.encodedTimeExpression = encodeURIComponent(this.timeExpression);
+            console.log("expressionAfterEncodeURIComponent: " + this.encodedTimeExpression);
             this.checkTimeExpression();
         }
     }

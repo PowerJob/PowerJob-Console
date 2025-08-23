@@ -44,7 +44,7 @@
         <el-table-column prop="modifierShowName" :label="$t('message.modifier')" />
 
         <el-table-column :label="$t('message.operation')" width="150">
-          <template slot-scope="scope">
+          <template #default="scope">
             <el-button size="mini" type="text" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
             <el-button size="mini" type="text" @click="onClickDeleteNamespace(scope.row)">{{$t('message.delete')}}</el-button>
           </template>
@@ -63,7 +63,7 @@
     </el-row>
 
 
-    <el-dialog :close-on-click-modal="false" :visible.sync="modifiedNamespaceFormVisible" width="80%">
+    <el-dialog :close-on-click-modal="false" v-model="modifiedNamespaceFormVisible" width="80%">
       <el-form :model="modifiedNamespaceForm" label-width="120px">
         <el-form-item label="code">
           <el-input v-model="modifiedNamespaceForm.code"/>
@@ -96,6 +96,7 @@
 
 <script>
 import UserRole from "../common/UserRole.vue";
+import { ElMessage } from 'element-plus';
 
 export default {
   name: "NamespaceManager",
@@ -191,7 +192,7 @@ export default {
           'NamespaceId': that.modifiedNamespaceForm.id
         }
       }).then(() => {
-        that.$message.success(that.$t('message.success'));
+        ElMessage.success(that.$t('message.success'));
         this.listNamespaces();
       })
       this.modifiedNamespaceFormVisible = false;

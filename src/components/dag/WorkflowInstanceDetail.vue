@@ -58,7 +58,9 @@
                         <div class="power-work-info-item-content">
                             <JsonViewer :value="JSON.parse(wfInstanceDetail.wfContext)" />
                         </div>
-                        <span class="power-work-info-item-context" slot="reference">{{wfInstanceDetail.wfContext}}</span>
+                        <template #reference>
+                            <span class="power-work-info-item-context">{{wfInstanceDetail.wfContext}}</span>
+                        </template>
                         <!-- <i class="el-icon-chat-dot-square result" slot="reference"></i> -->
                     </el-popover>
                 </el-col>
@@ -131,7 +133,7 @@
             </div>
         </el-row>
 
-        <el-dialog :visible.sync="instanceDetailVisible" v-if='instanceDetailVisible'>
+        <el-dialog v-model="instanceDetailVisible" v-if='instanceDetailVisible'>
             <InstanceDetail :instance-id="currentInstanceId" :nodeDetail="nodeDetail" />
         </el-dialog>
     </div>
@@ -142,6 +144,7 @@
     import PowerWorkFlow from './PowerWorkflow';
     import JsonViewer from 'vue-json-viewer';
     import JSEditor from "./JSEditor";
+    import { ElMessage } from 'element-plus';
     export default {
         name: "WorkflowInstanceDetail",
         components: {
@@ -201,7 +204,7 @@
                 });
                 
                 this.changeStatusSuccess();
-                this.$message.success(this.$t("message.success"));
+                ElMessage.success(this.$t("message.success"));
             },
 
             /** 重试 */
@@ -218,11 +221,10 @@
 
             // 点击停止实例
             async stop() {
-              let that = this;
               let url = "/wfInstance/stop?wfInstanceId=" + this.$route.params.wfInstanceId +
                   "&appId=" + window.localStorage.getItem("Power_appId");
               await this.axios.get(url).then(() => {
-                that.$message.success(this.$t('message.success'));
+                ElMessage.success(this.$t('message.success'));
               });
               await this.fetchWfInstanceInfo()
             },
@@ -262,7 +264,7 @@
                     console.log('1111');
                     this.nodeDetail = model;
                 } else {
-                    if(!instanceId) this.$message.warning(this.$t('message.ntfClickNoInstanceNode'));
+                    if(!instanceId) ElMessage.warning(this.$t('message.ntfClickNoInstanceNode'));
                     this.nodeDetail = null;
                 }
                 

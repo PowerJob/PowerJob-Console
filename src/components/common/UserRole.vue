@@ -2,7 +2,7 @@
   <div>
     <el-form>
       <el-form-item :label="$t('message.observer')">
-        <el-select multiple v-model="userRuleForm.observer" placeholder="observer" style="width: 80%">
+        <el-select multiple v-model="localUserRuleForm.observer" placeholder="observer" style="width: 80%" @change="updateObserver">
           <el-option
               v-for="item in user_list"
               :key="item.id"
@@ -13,7 +13,7 @@
       </el-form-item>
 
       <el-form-item :label="$t('message.qa')">
-        <el-select multiple v-model="userRuleForm.qa" placeholder="observer" style="width: 80%">
+        <el-select multiple v-model="localUserRuleForm.qa" placeholder="observer" style="width: 80%" @change="updateQa">
           <el-option
               v-for="item in user_list"
               :key="item.id"
@@ -24,7 +24,7 @@
       </el-form-item>
 
       <el-form-item :label="$t('message.developer')">
-        <el-select multiple v-model="userRuleForm.developer" placeholder="observer" style="width: 80%">
+        <el-select multiple v-model="localUserRuleForm.developer" placeholder="observer" style="width: 80%" @change="updateDeveloper">
           <el-option
               v-for="item in user_list"
               :key="item.id"
@@ -35,7 +35,7 @@
       </el-form-item>
 
       <el-form-item :label="$t('message.admin')">
-        <el-select multiple v-model="userRuleForm.admin" placeholder="observer" style="width: 80%">
+        <el-select multiple v-model="localUserRuleForm.admin" placeholder="observer" style="width: 80%" @change="updateAdmin">
           <el-option
               v-for="item in user_list"
               :key="item.id"
@@ -68,7 +68,14 @@ export default {
   data() {
     return {
       // 用户列表
-      user_list: []
+      user_list: [],
+      // 本地副本
+      localUserRuleForm: {
+        observer: [],
+        qa: [],
+        developer: [],
+        admin: [],
+      }
     }
   },
 
@@ -79,6 +86,28 @@ export default {
       that.axios.get("/user/list").then(res => {
         that.user_list = res
       });
+    },
+    updateObserver() {
+      this.$emit('update:userRuleForm', { ...this.localUserRuleForm });
+    },
+    updateQa() {
+      this.$emit('update:userRuleForm', { ...this.localUserRuleForm });
+    },
+    updateDeveloper() {
+      this.$emit('update:userRuleForm', { ...this.localUserRuleForm });
+    },
+    updateAdmin() {
+      this.$emit('update:userRuleForm', { ...this.localUserRuleForm });
+    }
+  },
+
+  watch: {
+    userRuleForm: {
+      handler(newVal) {
+        this.localUserRuleForm = { ...newVal };
+      },
+      deep: true,
+      immediate: true
     }
   },
   mounted() {

@@ -11,7 +11,7 @@
                 <el-menu :router="true" :default-active="default_active_index" class="aside">
                     <!-- vue router，实现点击跳转 -->
                     <el-menu-item index="/oms/home">
-                        <template slot="title">
+                        <template #title>
                             <!-- 图标 + 文字 -->
                             <i class="el-icon-monitor"/>
                             <span>{{$t('message.tabHome')}}</span>
@@ -19,7 +19,7 @@
                     </el-menu-item>
 
                     <el-menu-item index="/oms/job">
-                        <template slot="title">
+                        <template #title>
                             <!-- 图标 + 文字 -->
                             <i class="el-icon-data-analysis"/>
                             <span>{{$t('message.tabJobManage')}}</span>
@@ -27,7 +27,7 @@
                     </el-menu-item>
 
                     <el-menu-item index="/oms/instance">
-                        <template slot="title">
+                        <template #title>
                             <!-- 图标 + 文字 -->
                             <i class="el-icon-s-data"/>
                             <span>{{$t('message.tabJobInstance')}}</span>
@@ -35,7 +35,7 @@
                     </el-menu-item>
 
                     <el-menu-item index="/oms/workflow">
-                        <template slot="title">
+                        <template #title>
                             <!-- 图标 + 文字 -->
                             <i class="el-icon-share"/>
                             <span>{{$t('message.tabWorkflowManage')}}</span>
@@ -43,7 +43,7 @@
                     </el-menu-item>
 
                     <el-menu-item index="/oms/wfinstance">
-                        <template slot="title">
+                        <template #title>
                             <!-- 图标 + 文字 -->
                             <i class="el-icon-s-operation"/>
                             <span>{{$t('message.tabWfInstance')}}</span>
@@ -52,7 +52,7 @@
 
 
                     <el-submenu index="/oms/">
-                        <template slot="title">
+                        <template #title>
                             <i class="el-icon-data-analysis"/>
                             <span>{{$t('message.tabContainerOps')}}</span>
                         </template>

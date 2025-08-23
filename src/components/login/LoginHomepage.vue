@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import { ElMessage } from 'element-plus';
 export default {
   name: 'LoginHomepage',
   data() {
@@ -27,7 +28,7 @@ export default {
       const url = "/auth/supportLoginTypes";
       this.axios.get(url).then((result) => {
         that.login_type_info = result;
-      }, error => that.$message.error(error));
+      }, error => ElMessage.error(error));
     },
 
     onClickLoginTypeBottom(loginInfo) {
@@ -50,7 +51,6 @@ export default {
 
     // 上下文登录（JWT ifLogin）
     tryLogin() {
-      const that = this;
 
       const url = "/auth/ifLogin";
       this.axios.get(url).then(ret => {
@@ -62,7 +62,7 @@ export default {
       }, error => {
         window.localStorage.removeItem('PowerJwt');
         window.localStorage.removeItem('Power_appId');
-        that.$message.error(error)
+        ElMessage.error(error)
       });
     },
 
