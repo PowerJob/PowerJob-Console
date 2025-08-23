@@ -59,7 +59,13 @@
                     <template #default="scope">
                         <div class="schedule-info-enhanced">
                             <div class="schedule-type">
-                                <el-tag size="small" type="info">{{scope.row.timeExpressionType}}</el-tag>
+                                <el-tag 
+                                    size="small" 
+                                    :type="getScheduleTypeColor(scope.row.timeExpressionType)"
+                                    :effect="getScheduleTypeEffect(scope.row.timeExpressionType)"
+                                >
+                                    {{translateTimeExpressionType(scope.row.timeExpressionType)}}
+                                </el-tag>
                             </div>
                             <div class="schedule-expression" :title="scope.row.timeExpression">
                                 {{scope.row.timeExpression}}
@@ -69,7 +75,12 @@
                 </el-table-column>
                 <el-table-column :label="$t('message.executeType')" width="140" show-overflow-tooltip>
                     <template #default="scope">
-                        <el-tag size="small" effect="plain" :title="translateExecuteType(scope.row.executeType)">
+                        <el-tag 
+                            size="small" 
+                            :type="getExecuteTypeColor(scope.row.executeType)"
+                            :effect="getExecuteTypeEffect(scope.row.executeType)"
+                            :title="translateExecuteType(scope.row.executeType)"
+                        >
                             {{translateExecuteType(scope.row.executeType)}}
                         </el-tag>
                     </template>
@@ -824,6 +835,62 @@
                 }
                 return this.$t('message.builtIn');
             },
+            // 翻译时间表达式类型
+            translateTimeExpressionType(timeExpressionType) {
+                switch (timeExpressionType) {
+                    case "API": return "API";
+                    case "CRON": return "CRON";
+                    case "FIXED_RATE": return this.$t('message.fixRate');
+                    case "FIXED_DELAY": return this.$t('message.fixDelay');
+                    case "WORKFLOW": return this.$t('message.workflow');
+                    case "DAILY_TIME_INTERVAL": return this.$t('message.dailyTimeInterval');
+                    default: return timeExpressionType;
+                }
+            },
+            // 获取定时信息标签颜色
+            getScheduleTypeColor(timeExpressionType) {
+                switch (timeExpressionType) {
+                    case "API": return "success";        // 绿色 - API触发
+                    case "CRON": return "primary";       // 蓝色 - CRON表达式
+                    case "FIXED_RATE": return "warning"; // 黄色 - 固定速率
+                    case "FIXED_DELAY": return "info";   // 灰色 - 固定延迟
+                    case "WORKFLOW": return "danger";    // 红色 - 工作流
+                    case "DAILY_TIME_INTERVAL": return "";  // 默认色 - 每日时间间隔
+                    default: return "info";
+                }
+            },
+            // 获取定时信息标签效果
+            getScheduleTypeEffect(timeExpressionType) {
+                switch (timeExpressionType) {
+                    case "API": return "light";          // API触发 - 浅色
+                    case "CRON": return "dark";          // CRON - 深色
+                    case "FIXED_RATE": return "light";   // 固定速率 - 浅色
+                    case "FIXED_DELAY": return "plain";  // 固定延迟 - 普通
+                    case "WORKFLOW": return "light";     // 工作流 - 浅色
+                    case "DAILY_TIME_INTERVAL": return "dark"; // 每日时间间隔 - 深色
+                    default: return "plain";
+                }
+            },
+            // 获取执行类型标签颜色
+            getExecuteTypeColor(executeType) {
+                switch (executeType) {
+                    case "STANDALONE": return "primary"; // 蓝色 - 单机执行
+                    case "BROADCAST": return "success";  // 绿色 - 广播执行
+                    case "MAP": return "warning";        // 黄色 - Map处理
+                    case "MAP_REDUCE": return "danger";  // 红色 - MapReduce处理
+                    default: return "info";
+                }
+            },
+            // 获取执行类型标签效果
+            getExecuteTypeEffect(executeType) {
+                switch (executeType) {
+                    case "STANDALONE": return "light";   // 单机执行 - 浅色
+                    case "BROADCAST": return "dark";     // 广播执行 - 深色
+                    case "MAP": return "light";          // Map处理 - 浅色
+                    case "MAP_REDUCE": return "dark";    // MapReduce处理 - 深色
+                    default: return "plain";
+                }
+            },
             // 点击校验
             onClickValidateTimeExpression() {
                 this.timeExpressionValidatorVisible = true;
@@ -1266,6 +1333,84 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    font-weight: 500;
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-size: 12px;
+    line-height: 1.2;
+    transition: all 0.3s ease;
+}
+
+/* Enhanced schedule type tags */
+.schedule-info-enhanced .schedule-type .el-tag {
+    min-width: fit-content;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-info-enhanced .schedule-type .el-tag:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Custom colors for schedule types */
+:deep(.el-tag.el-tag--success.el-tag--light) {
+    background-color: #f0f9ff;
+    border-color: #b5f5ec;
+    color: #08979c;
+}
+
+:deep(.el-tag.el-tag--primary.el-tag--dark) {
+    background-color: #1890ff;
+    border-color: #1890ff;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+:deep(.el-tag.el-tag--warning.el-tag--light) {
+    background-color: #fffbe6;
+    border-color: #ffe58f;
+    color: #d46b08;
+}
+
+:deep(.el-tag.el-tag--info.el-tag--plain) {
+    background-color: #fafafa;
+    border-color: #d9d9d9;
+    color: #595959;
+}
+
+:deep(.el-tag.el-tag--danger.el-tag--light) {
+    background-color: #fff2f0;
+    border-color: #ffccc7;
+    color: #cf1322;
+}
+
+:deep(.el-tag.el-tag--dark) {
+    background-color: #262626;
+    border-color: #262626;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Custom colors for execute types */
+:deep(.el-tag.el-tag--primary.el-tag--light) {
+    background-color: #e6f7ff;
+    border-color: #91d5ff;
+    color: #096dd9;
+}
+
+:deep(.el-tag.el-tag--success.el-tag--dark) {
+    background-color: #52c41a;
+    border-color: #52c41a;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+:deep(.el-tag.el-tag--danger.el-tag--dark) {
+    background-color: #ff4d4f;
+    border-color: #ff4d4f;
+    color: #ffffff;
+    font-weight: 600;
 }
 
 /* Responsive Design */
