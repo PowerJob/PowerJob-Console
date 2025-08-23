@@ -163,8 +163,14 @@
         </div>
 
 
-        <el-dialog :close-on-click-modal="false" v-model="modifiedJobFormVisible" width="80%">
-            <el-form :model="modifiedJobForm" label-width="120px">
+        <el-dialog 
+            :close-on-click-modal="false" 
+            v-model="modifiedJobFormVisible" 
+            width="90%"
+            :title="modifiedJobForm.id ? $t('message.editJob') : $t('message.newJob')"
+            class="job-form-dialog"
+        >
+            <el-form :model="modifiedJobForm" label-width="140px" class="job-form-content">
 
                 <el-form-item :label="$t('message.jobName')">
                     <el-input v-model="modifiedJobForm.jobName"/>
@@ -176,23 +182,45 @@
                     <el-input v-model="modifiedJobForm.jobParams" type="textarea"/>
                 </el-form-item>
                 <el-form-item :label="$t('message.scheduleInfo')">
-                    <el-row>
-                        <el-col :span="8">
-                            <el-select v-model="modifiedJobForm.timeExpressionType" :placeholder="$t('message.timeExpressionType')">
+                    <el-row :gutter="16">
+                        <el-col :span="6">
+                            <el-select 
+                                v-model="modifiedJobForm.timeExpressionType" 
+                                :placeholder="$t('message.timeExpressionType')"
+                                style="width: 300px"
+                            >
                                 <el-option
-                                        v-for="item in timeExpressionTypeOptions"
-                                        :key="item.key"
-                                        :label="item.label"
-                                        :value="item.key">
+                                    v-for="item in timeExpressionTypeOptions"
+                                    :key="item.key"
+                                    :label="item.label"
+                                    :value="item.key">
                                 </el-option>
                             </el-select>
                         </el-col>
                         <el-col :span="12">
-                            <el-input v-model="modifiedJobForm.timeExpression" :placeholder="$t('message.timeExpressionPlaceHolder')" v-if="['CRON', 'FIXED_DELAY', 'FIXED_RATE'].includes(modifiedJobForm.timeExpressionType)" />
-                            <el-button type="primary" @click="onClickEditTimeExpression"  v-if="['DAILY_TIME_INTERVAL'].includes(modifiedJobForm.timeExpressionType)">点击编辑</el-button>
+                            <el-input 
+                                v-if="['CRON', 'FIXED_DELAY', 'FIXED_RATE'].includes(modifiedJobForm.timeExpressionType)"
+                                v-model="modifiedJobForm.timeExpression" 
+                                :placeholder="$t('message.timeExpressionPlaceHolder')" 
+                            />
+                            <el-button 
+                                v-if="['DAILY_TIME_INTERVAL'].includes(modifiedJobForm.timeExpressionType)"
+                                type="primary" 
+                                @click="onClickEditTimeExpression"
+                                style="width: 100%"
+                            >
+                                点击编辑
+                            </el-button>
                         </el-col>
-                        <el-col :span="4">
-                            <el-button type="text" @click="onClickValidateTimeExpression" style="padding-left: 10px">{{$t('message.validateTimeExpression')}}</el-button>
+                        <el-col :span="6">
+                            <el-button 
+                                type="primary" 
+                                plain
+                                @click="onClickValidateTimeExpression"
+                                style="width: 100%"
+                            >
+                                {{$t('message.validateTimeExpression')}}
+                            </el-button>
                         </el-col>
                     </el-row>
                 </el-form-item>
@@ -207,38 +235,52 @@
                 </el-date-picker>
               </el-form-item>
                 <el-form-item :label="$t('message.executeConfig')">
-                    <el-row>
-                        <el-col :span="5">
-                            <el-select v-model="modifiedJobForm.executeType" :placeholder="$t('message.executeType')">
-                                <el-option
-                                        v-for="item in executeTypeOptions"
-                                        :key="item.key"
-                                        :label="item.label"
-                                        :value="item.key">
-                                </el-option>
-                            </el-select>
-                        </el-col>
-
+                    <el-row :gutter="16">
                         <el-col :span="6">
-                            <el-select v-model="modifiedJobForm.processorType" :placeholder="$t('message.processorType')">
+                            <el-select 
+                                v-model="modifiedJobForm.executeType" 
+                                :placeholder="$t('message.executeType')"
+                                style="width: 200px"
+                            >
                                 <el-option
-                                        v-for="item in processorTypeOptions"
-                                        :key="item.key"
-                                        :label="item.label"
-                                        :value="item.key">
+                                    v-for="item in executeTypeOptions"
+                                    :key="item.key"
+                                    :label="item.label"
+                                    :value="item.key">
                                 </el-option>
                             </el-select>
                         </el-col>
-
-                        <el-col :span="13">
-                            <el-input v-model="modifiedJobForm.processorInfo" :placeholder="verifyPlaceholder(modifiedJobForm.processorType)" />
+                        <el-col :span="6">
+                            <el-select 
+                                v-model="modifiedJobForm.processorType" 
+                                :placeholder="$t('message.processorType')"
+                                style="width: 200px"
+                            >
+                                <el-option
+                                    v-for="item in processorTypeOptions"
+                                    :key="item.key"
+                                    :label="item.label"
+                                    :value="item.key">
+                                </el-option>
+                            </el-select>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-input 
+                                v-model="modifiedJobForm.processorInfo" 
+                                :placeholder="verifyPlaceholder(modifiedJobForm.processorType)"
+                                style="width: 500px"
+                            />
                         </el-col>
                     </el-row>
                 </el-form-item>
                 <el-form-item :label="$t('message.runtimeConfig')">
-                    <el-row>
-                        <el-col :span="4">
-                            <el-select v-model="modifiedJobForm.dispatchStrategy" :placeholder="$t('message.dispatchStrategy')">
+                    <el-row :gutter="16">
+                        <el-col :span="6">
+                            <el-select 
+                                v-model="modifiedJobForm.dispatchStrategy" 
+                                :placeholder="$t('message.dispatchStrategy')"
+                                style="width: 100%"
+                            >
                                 <el-option
                                     v-for="item in dispatchStrategy"
                                     :key="item.key"
@@ -247,25 +289,47 @@
                                 </el-option>
                             </el-select>
                         </el-col>
-
-                      <el-col :span="5">
-                        <el-input v-if="modifiedJobForm.dispatchStrategy=='SPECIFY'" :placeholder="$t('message.dispatchStrategyConfig')" v-model="modifiedJobForm.dispatchStrategyConfig" class="ruleContent">
-                          <template #prepend>{{$t('message.dispatchStrategyConfig')}}</template>
-                        </el-input>
-                      </el-col>
-
-                        <el-col :span="5">
-                            <el-input :placeholder="$t('message.maxInstanceNum')" v-model="modifiedJobForm.maxInstanceNum" class="ruleContent">
+                        <el-col :span="6" v-if="modifiedJobForm.dispatchStrategy=='SPECIFY'">
+                            <el-input 
+                                :placeholder="$t('message.dispatchStrategyConfig')" 
+                                v-model="modifiedJobForm.dispatchStrategyConfig"
+                            >
+                                <template #prepend>{{$t('message.dispatchStrategyConfig')}}</template>
+                            </el-input>
+                        </el-col>
+                        <el-col :span="6">
+                            <el-input 
+                                :placeholder="$t('message.maxInstanceNum')" 
+                                v-model="modifiedJobForm.maxInstanceNum"
+                            >
                                 <template #prepend>{{$t('message.maxInstanceNum')}}</template>
                             </el-input>
                         </el-col>
-                        <el-col :span="5">
-                            <el-input :placeholder="$t('message.threadConcurrency')" v-model="modifiedJobForm.concurrency" class="ruleContent">
+                        <el-col :span="6">
+                            <el-input 
+                                :placeholder="$t('message.threadConcurrency')" 
+                                v-model="modifiedJobForm.concurrency"
+                            >
                                 <template #prepend>{{$t('message.threadConcurrency')}}</template>
                             </el-input>
                         </el-col>
-                        <el-col :span="5">
-                            <el-input :placeholder="$t('message.timeout')" v-model="modifiedJobForm.instanceTimeLimit" class="ruleContent">
+                    </el-row>
+                    <el-row :gutter="16" style="margin-top: 16px;" v-if="modifiedJobForm.dispatchStrategy!='SPECIFY'">
+                        <el-col :span="6">
+                            <el-input 
+                                :placeholder="$t('message.timeout')" 
+                                v-model="modifiedJobForm.instanceTimeLimit"
+                            >
+                                <template #prepend>{{$t('message.timeout')}}</template>
+                            </el-input>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="16" style="margin-top: 16px;" v-else>
+                        <el-col :span="6" :offset="6">
+                            <el-input 
+                                :placeholder="$t('message.timeout')" 
+                                v-model="modifiedJobForm.instanceTimeLimit"
+                            >
                                 <template #prepend>{{$t('message.timeout')}}</template>
                             </el-input>
                         </el-col>
@@ -319,9 +383,15 @@
                     </el-row>
                 </el-form-item>
                 <el-form-item :label="$t('message.alarmConfig')">
-                    <el-row>
-                        <el-col :span="6">
-                            <el-select :style="{width: '100%'}" v-model="modifiedJobForm.notifyUserIds" multiple filterable :placeholder="$t('message.alarmSelectorPLH')">
+                    <el-row :gutter="16">
+                        <el-col :span="8">
+                            <el-select 
+                                v-model="modifiedJobForm.notifyUserIds" 
+                                multiple 
+                                filterable 
+                                :placeholder="$t('message.alarmSelectorPLH')"
+                                style="width: 100%"
+                            >
                                 <el-option
                                     v-for="user in userList"
                                     :key="user.id"
@@ -355,7 +425,7 @@
                 </el-form-item>
 
               <el-form-item :label="$t('message.logConfig')">
-                <el-row>
+                <el-row style="width: 100%;">
                   <el-col :span="6">
                       <el-select v-model="modifiedJobForm.logConfig.type" :placeholder="$t('message.logType')">
                           <el-option
@@ -384,10 +454,10 @@
                 </el-row>
               </el-form-item>
 
-              <el-form-item :label="$t('message.advanceConfig')">
+              <el-form-item :label="$t('message.advanceConfig')" style="width: 100%;">
                 <el-row>
                   <el-col :span="6">
-                    <el-select v-model="modifiedJobForm.advancedRuntimeConfig.taskTrackerBehavior" :placeholder="$t('message.taskTrackerBehavior')">
+                    <el-select v-model="modifiedJobForm.advancedRuntimeConfig.taskTrackerBehavior" :placeholder="$t('message.taskTrackerBehavior')" style="width: 200px;">
                       <el-option
                           v-for="item in taskTrackerBehavior"
                           :key="item.key"
@@ -838,7 +908,7 @@
     }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* Modern Job Manager Styles */
 .job-manager {
     padding: 0;
@@ -1042,6 +1112,8 @@
     
     .el-dialog__body {
         padding: var(--pj-space-lg);
+        max-height: 70vh;
+        overflow-y: auto;
     }
     
     .el-dialog__footer {
@@ -1049,6 +1121,89 @@
         background: #fafbfc;
         border-top: 1px solid #e4e7ed;
         border-radius: 0 0 var(--pj-radius-lg) var(--pj-radius-lg);
+    }
+}
+
+/* Job Form Dialog Specific Styles */
+.job-form-dialog {
+    :deep(.el-dialog__body) {
+        padding: var(--pj-space-xl);
+    }
+}
+
+.job-form-content {
+    max-width: 100%;
+    
+    .el-form-item {
+        margin-bottom: var(--pj-space-lg);
+        
+        .el-form-item__label {
+            font-weight: 500;
+            color: var(--pj-text-primary);
+            line-height: 1.6;
+        }
+        
+        .el-form-item__content {
+            .el-input,
+            .el-select,
+            .el-date-picker {
+                .el-input__wrapper {
+                    border-radius: var(--pj-radius-sm);
+                    transition: all 0.3s ease;
+                    
+                    &:hover {
+                        border-color: var(--pj-primary-light);
+                    }
+                    
+                    &.is-focus {
+                        border-color: var(--pj-primary);
+                        box-shadow: 0 0 8px rgba(0, 150, 136, 0.2);
+                    }
+                }
+            }
+            
+            .el-select {
+                .el-select__wrapper {
+                    border-radius: var(--pj-radius-sm);
+                    
+                    &:hover {
+                        border-color: var(--pj-primary-light);
+                    }
+                    
+                    &.is-focused {
+                        border-color: var(--pj-primary);
+                        box-shadow: 0 0 8px rgba(0, 150, 136, 0.2);
+                    }
+                }
+            }
+        }
+    }
+    
+    // 改善 textarea 的样式
+    :deep(.el-textarea) {
+        .el-textarea__inner {
+            border-radius: var(--pj-radius-sm);
+            min-height: 80px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+            
+            &:focus {
+                border-color: var(--pj-primary);
+                box-shadow: 0 0 8px rgba(0, 150, 136, 0.2);
+            }
+        }
+    }
+    
+    // 优化按钮组
+    .el-form-item:last-child {
+        margin-bottom: 0;
+        text-align: center;
+        padding-top: var(--pj-space-lg);
+        border-top: 1px solid #f0f0f0;
+        
+        .el-button {
+            margin: 0 var(--pj-space-sm);
+            min-width: 100px;
+        }
     }
 }
 
