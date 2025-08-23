@@ -26,7 +26,7 @@
         </el-form-item>
 
         <el-form-item :label="$t('message.scheduleInfo')">
-          <el-row>
+          <el-row style="width: 100%">
             <el-col :span="6">
               <el-select
                 v-model="workflowInfo.timeExpressionType"
