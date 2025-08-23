@@ -145,12 +145,7 @@ export default {
     },
     // 查看工作流详情
     onClickShowDetail(data) {
-      this.$router.push({
-        name: 'WorkflowInstanceDetail',
-        params: {
-          wfInstanceId: data.wfInstanceId
-        }
-      })
+      this.$router.push(`/oms/wfInstanceDetail/${data.wfInstanceId}`)
     },
 
     // 停止工作流

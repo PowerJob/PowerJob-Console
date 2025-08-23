@@ -79,7 +79,7 @@
     </el-row>
     <el-dialog
             :title="$t('message.runByParameter')"
-            :visible="!!temporaryRowData"
+            v-model="runByParameterVisible"
             width="50%"
         >
             <el-input
@@ -127,7 +127,9 @@
                 // 运行参数
                 runParameter: null,
                 // 运行loading
-                runLoading: false
+                runLoading: false,
+                // 参数运行对话框可见性
+                runByParameterVisible: false
             }
         },
         methods: {
@@ -177,6 +179,8 @@
                 this.axios.get(url).then(() => {
                     ElMessage.success(this.$t('message.success'))
                     this.temporaryRowData = null;
+                    this.runParameter = null;
+                    this.runByParameterVisible = false;
                     this.runLoading = false
                 }).catch(() => {
                     this.runLoading = false
@@ -185,11 +189,14 @@
             // 参数运行
             onClickRunByParameter(data) {
                 this.temporaryRowData = data;
+                this.runParameter = '';
+                this.runByParameterVisible = true;
             },
             // 取消参数运行
             onClickRunCancel() {
                 this.temporaryRowData = null;
                 this.runParameter = null;
+                this.runByParameterVisible = false;
             },
             // 删除工作流
             onClickDeleteWorkflow(data) {

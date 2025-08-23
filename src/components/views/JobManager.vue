@@ -360,7 +360,7 @@
 
         <el-dialog
             :title="$t('message.runByParameter')"
-            :visible="!!temporaryRowData"
+            v-model="runByParameterVisible"
             width="50%"
         >
             <el-input
@@ -471,6 +471,8 @@
                 runParameter: null,
                 // 运行loading
                 runLoading: false,
+                // 参数运行对话框可见性
+                runByParameterVisible: false,
 
                 // 任务导入导出相关功能
                 jobExporterMode: undefined,
@@ -583,6 +585,8 @@
                 this.axios.get(url).then(() => {
                     ElMessage.success(this.$t('message.success'));
                     this.temporaryRowData = null;
+                    this.runParameter = null;
+                    this.runByParameterVisible = false;
                     this.runLoading = false
                 }).catch(() => {
                     this.runLoading = false
@@ -591,11 +595,14 @@
             // 参数运行
             onClickRunByParameter(data) {
                 this.temporaryRowData = data;
+                this.runParameter = '';
+                this.runByParameterVisible = true;
             },
             // 取消参数运行
             onClickRunCancel() {
                 this.temporaryRowData = null;
                 this.runParameter = null;
+                this.runByParameterVisible = false;
             },
             // 点击 删除任务
             onClickDeleteJob(data) {

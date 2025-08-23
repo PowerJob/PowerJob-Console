@@ -172,6 +172,11 @@
                 nodeDetail: null
             }
         },
+        computed: {
+            wfInstanceId() {
+                return this.$route.params.wfInstanceId;
+            }
+        },
         methods: {
             /** 获取数据 */
             async fetchWfInstanceInfo() {
@@ -180,12 +185,24 @@
                     nodes: [],
                     edges: []
                 }
-                const wfInstanceId = this.$route.params.wfInstanceId;
+                const wfInstanceId = this.wfInstanceId;
+                
+                // 验证wfInstanceId是否存在
+                if (!wfInstanceId) {
+                    ElMessage.error('工作流实例ID不能为空');
+                    this.$router.push('/oms/wfinstance');
+                    return;
+                }
+                
                 let url = "/wfInstance/info?appId=" + window.localStorage.getItem("Power_appId") + "&wfInstanceId=" + wfInstanceId;
-                let res = await this.axios.get(url)
-                this.wfInstanceDetail = res;
-                this.peworkflowDAG = res.peworkflowDAG;
-                // this.initDag()
+                try {
+                    let res = await this.axios.get(url)
+                    this.wfInstanceDetail = res;
+                    this.peworkflowDAG = res.peworkflowDAG;
+                } catch (error) {
+                    ElMessage.error('获取工作流实例详情失败');
+                    console.error('Failed to fetch workflow instance detail:', error);
+                }
             },
 
             /** 标记成功 */
@@ -195,7 +212,7 @@
                 
                 const data = {
                     appId: window.localStorage.getItem("Power_appId"),
-                    wfInstanceId: this.$route.params.wfInstanceId,
+                    wfInstanceId: this.wfInstanceId,
                     nodeId: this.selectNode.get('model').id
                 };
 
@@ -211,7 +228,7 @@
             async restart() {
                 const data = {
                     appId: window.localStorage.getItem("Power_appId"),
-                    wfInstanceId: this.$route.params.wfInstanceId,
+                    wfInstanceId: this.wfInstanceId,
                 };
                 await this.axios.get('/wfInstance/retry', {
                     params: data
@@ -221,7 +238,7 @@
 
             // 点击停止实例
             async stop() {
-              let url = "/wfInstance/stop?wfInstanceId=" + this.$route.params.wfInstanceId +
+              let url = "/wfInstance/stop?wfInstanceId=" + this.wfInstanceId +
                   "&appId=" + window.localStorage.getItem("Power_appId");
               await this.axios.get(url).then(() => {
                 ElMessage.success(this.$t('message.success'));

@@ -324,12 +324,7 @@ export default {
         path: '/oms/wfinstance',
       })
       setTimeout(() => {
-        this.$router.push({
-          name: 'WorkflowInstanceDetail',
-          params: {
-            wfInstanceId: this.nodeDetail.instanceId
-          }
-        })
+        this.$router.push(`/oms/wfInstanceDetail/${this.nodeDetail.instanceId}`)
       }, 20)
     }
   },
