@@ -1,13 +1,5 @@
 <template>
   <div class="pj-admin-container">
-    <!-- 页面头部 -->
-    <div class="pj-page-header pj-tech-bg">
-      <h1 class="pj-page-title">
-        <el-icon class="pj-title-icon"><Folder /></el-icon>
-        命名空间管理
-      </h1>
-      <p class="pj-page-description">管理多租户命名空间，实现资源隔离和权限控制</p>
-    </div>
 
     <!-- 搜索条件卡片 -->
     <div class="pj-search-card">
@@ -60,16 +52,16 @@
         </div>
       </div>
       
-      <el-table :data="namespaceResult.data" style="width: 100%" v-loading="loading">
+      <el-table :data="namespaceResult.data" style="width: 100%" v-loading="loading" table-layout="auto">
         <el-table-column prop="id" label="ID" width="80" align="center" />
-        <el-table-column prop="code" label="空间代码" width="150" show-overflow-tooltip>
+        <el-table-column prop="code" label="空间代码" min-width="180" show-overflow-tooltip>
           <template #default="scope">
             <el-tag size="small" type="info">{{ scope.row.code }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="name" :label="$t('message.name')" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" width="160" />
-        <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" width="160" />
+        <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" width="170" />
+        <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" width="170" />
         <el-table-column :label="$t('message.status')" width="100" align="center">
           <template #default="scope">
             <el-tag 
@@ -79,10 +71,10 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="creatorShowName" :label="$t('message.creator')" width="120" show-overflow-tooltip />
-        <el-table-column prop="modifierShowName" :label="$t('message.modifier')" width="120" show-overflow-tooltip />
+        <el-table-column prop="creatorShowName" :label="$t('message.creator')" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="modifierShowName" :label="$t('message.modifier')" min-width="120" show-overflow-tooltip />
 
-        <el-table-column :label="$t('message.operation')" width="150" fixed="right">
+        <el-table-column :label="$t('message.operation')" width="140" fixed="right">
           <template #default="scope">
             <div class="pj-action-group">
               <el-button size="small" type="text" @click="onClickModify(scope.row)" :icon="Edit">
@@ -398,5 +390,30 @@ export default {
 /* 组件特定样式 */
 .el-tag {
   border-radius: var(--pj-border-radius-sm);
+}
+
+/* 表格优化 */
+.el-table {
+  --el-table-border-color: var(--pj-border-color);
+  --el-table-text-color: var(--pj-text-primary);
+  --el-table-header-text-color: var(--pj-text-primary);
+  --el-table-header-bg-color: var(--pj-bg-secondary);
+}
+
+.el-table .cell {
+  white-space: nowrap;
+}
+
+/* 确保按钮组紧凑显示 */
+.pj-action-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.pj-action-group .el-button {
+  margin: 0;
+  padding: 4px 8px;
 }
 </style>
