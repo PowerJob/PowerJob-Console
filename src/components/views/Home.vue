@@ -2,7 +2,56 @@
   <div class="home-dashboard">
     <!-- 核心指标 + Worker状态概览 - 双栏布局 -->
     <div class="main-content">
-      <!-- 左侧：核心指标 -->
+      <!-- 左侧：系统信息 -->
+      <div class="system-info-panel">
+        <div class="section-title">系统信息</div>
+
+        <div class="system-info-grid">
+          <div class="system-info-item">
+            <div class="info-icon">
+              <el-icon><Monitor /></el-icon>
+            </div>
+            <div class="info-content">
+              <div class="info-label">应用名称</div>
+              <div class="info-value">{{ systemInfo.appName }}</div>
+            </div>
+          </div>
+
+          <div class="system-info-item">
+            <div class="info-icon">
+              <el-icon><Connection /></el-icon>
+            </div>
+            <div class="info-content">
+              <div class="info-label">Master IP</div>
+              <div class="info-value">{{ systemInfo.scheduleServerInfo.ip }}</div>
+              <div class="info-subtitle">运行时间: {{formatUptime(systemInfo.scheduleServerInfo.bornTime)}}</div>
+            </div>
+          </div>
+
+          <div class="system-info-item">
+            <div class="info-icon">
+              <el-icon><Clock /></el-icon>
+            </div>
+            <div class="info-content">
+              <div class="info-label">服务器时区</div>
+              <div class="info-value">{{ systemInfo.timezone }}</div>
+              <div class="info-subtitle">{{ formatServerTime(systemInfo.serverTime) }}</div>
+            </div>
+          </div>
+
+          <div class="system-info-item">
+            <div class="info-icon">
+              <el-icon><LocationInformation /></el-icon>
+            </div>
+            <div class="info-content">
+              <div class="info-label">本地时区</div>
+              <div class="info-value">{{ getLocalTimezone() }}</div>
+              <div class="info-subtitle">{{ getCurrentTime() }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 右侧：核心指标 -->
       <div class="metrics-panel">
         <div class="section-title">核心指标</div>
         <div class="metrics-grid">
@@ -45,56 +94,6 @@
             <div class="metric-info">
               <div class="metric-number">{{activeWorkerCount}}</div>
               <div class="metric-label">{{$t('message.workerNum')}}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 右侧：系统信息 -->
-      <div class="system-info-panel">
-        <div class="section-title">系统信息</div>
-        
-        <div class="system-info-grid">
-          <div class="system-info-item">
-            <div class="info-icon">
-              <el-icon><Monitor /></el-icon>
-            </div>
-            <div class="info-content">
-              <div class="info-label">应用名称</div>
-              <div class="info-value">{{ systemInfo.appName }}</div>
-            </div>
-          </div>
-
-          <div class="system-info-item">
-            <div class="info-icon">
-              <el-icon><Connection /></el-icon>
-            </div>
-            <div class="info-content">
-              <div class="info-label">Master IP</div>
-              <div class="info-value">{{ systemInfo.scheduleServerInfo.ip }}</div>
-              <div class="info-subtitle">运行时间: {{formatUptime(systemInfo.scheduleServerInfo.bornTime)}}</div>
-            </div>
-          </div>
-
-          <div class="system-info-item">
-            <div class="info-icon">
-              <el-icon><Clock /></el-icon>
-            </div>
-            <div class="info-content">
-              <div class="info-label">服务器时区</div>
-              <div class="info-value">{{ systemInfo.timezone }}</div>
-              <div class="info-subtitle">{{ formatServerTime(systemInfo.serverTime) }}</div>
-            </div>
-          </div>
-
-          <div class="system-info-item">
-            <div class="info-icon">
-              <el-icon><LocationInformation /></el-icon>
-            </div>
-            <div class="info-content">
-              <div class="info-label">本地时区</div>
-              <div class="info-value">{{ getLocalTimezone() }}</div>
-              <div class="info-subtitle">{{ getCurrentTime() }}</div>
             </div>
           </div>
         </div>
