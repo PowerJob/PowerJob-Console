@@ -96,14 +96,12 @@
 <script>
 import { ElMessage } from "element-plus";
 import { 
-  UserFilled, 
   User 
 } from '@element-plus/icons-vue';
 
 export default {
   name: "UserManager",
   components: {
-    UserFilled,
     User
   },
   data() {
@@ -143,7 +141,7 @@ export default {
     changeUserStatus(data) {
       const that = this;
       // 设置当前用户为切换状态
-      that.$set(data, '_switching', true);
+      data._switching = true;
       
       console.log('user status: ' + data.enable)
       const action = data.enable ? 'enable' : 'disable';
@@ -151,11 +149,11 @@ export default {
       
       that.axios.post(url).then(() => {
         ElMessage.success(data.enable ? '用户已启用' : '用户已禁用');
-        that.$set(data, '_switching', false);
+        data._switching = false;
       }).catch(error => {
         // 操作失败，还原状态
         data.enable = !data.enable;
-        that.$set(data, '_switching', false);
+        data._switching = false;
         ElMessage.error('操作失败: ' + error);
       });
     },
