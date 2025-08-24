@@ -4,10 +4,10 @@
     <!-- 搜索条件卡片 -->
     <div class="pj-search-card">
       <el-form :inline="true" :model="queryNamespaceRequest" class="el-form--inline">
-        <el-form-item label="空间代码">
+        <el-form-item label="namespace">
           <el-input 
             v-model="queryNamespaceRequest.codeLike" 
-            placeholder="请输入空间代码"
+            placeholder="namespace"
             style="width: 160px;"
             clearable />
         </el-form-item>
@@ -127,10 +127,10 @@
 
         <el-row :gutter="24">
           <el-col :span="12">
-            <el-form-item label="空间代码" prop="code">
+            <el-form-item label="namespace" prop="code">
               <el-input 
                 v-model="modifiedNamespaceForm.code"
-                placeholder="请输入空间代码"
+                placeholder="code"
                 :disabled="modifiedNamespaceForm.id != null" />
             </el-form-item>
           </el-col>
@@ -139,7 +139,7 @@
             <el-form-item :label="$t('message.name')" prop="name">
               <el-input 
                 v-model="modifiedNamespaceForm.name"
-                placeholder="请输入空间名称" />
+                placeholder="name" />
             </el-form-item>
           </el-col>
         </el-row>
