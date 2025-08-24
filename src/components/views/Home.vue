@@ -547,7 +547,7 @@ export default {
 
   .system-info-item {
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 12px;
     padding: 12px;
     background: #f8fafc;
@@ -579,7 +579,8 @@ export default {
       min-width: 0;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
+      height: 100%;
 
       .info-label {
         font-size: 12px;
@@ -592,7 +593,7 @@ export default {
         font-size: 14px;
         font-weight: 600;
         color: var(--pj-text-primary);
-        margin-bottom: 2px;
+        margin-bottom: auto;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -602,6 +603,7 @@ export default {
         font-size: 11px;
         color: var(--pj-text-disabled);
         line-height: 1.2;
+        margin-top: auto;
       }
     }
   }
