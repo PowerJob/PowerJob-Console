@@ -106,9 +106,10 @@
         <div class="section-title">
           Worker节点列表
           <div class="worker-summary">
-            <el-tag type="success" size="small">在线 {{getOnlineWorkerCount()}}</el-tag>
-            <el-tag type="warning" size="small">警告 {{getWarningWorkerCount()}}</el-tag>
-            <el-tag type="danger" size="small">离线 {{getOfflineWorkerCount()}}</el-tag>
+            <el-tag type="success" size="small">低负载 {{getOnlineWorkerCount()}}</el-tag>
+            <el-tag type="warning" size="small">中负载 {{getWarningWorkerCount()}}</el-tag>
+            <el-tag type="danger" size="small">高负载 {{getDangerousWorkerCount()}}</el-tag>
+            <el-tag type="info" size="small">已离线 {{getOfflineWorkerCount()}}</el-tag>
           </div>
         </div>
       </div>
@@ -120,50 +121,51 @@
           :row-class-name="workerTableRowClassName"
           :default-sort="{prop: 'status', order: 'ascending'}"
           size="small"
+          table-layout="fixed"
         >
-          <el-table-column width="50">
+          <el-table-column width="50" align="center">
             <template #default="scope">
               <div class="worker-status-indicator" :class="getWorkerStatusClass(scope.row.status)"></div>
             </template>
           </el-table-column>
-          <el-table-column prop="address" :label="$t('message.workerAddress')" min-width="160" show-overflow-tooltip />
-          <el-table-column :label="$t('message.cpuLoad')" width="100" sortable>
+          <el-table-column prop="address" :label="$t('message.workerAddress')" min-width="180" show-overflow-tooltip />
+          <el-table-column prop="version" label="版本" width="120" show-overflow-tooltip align="center">
             <template #default="scope">
-              <div class="load-cell">
-                <div class="load-bar">
-                  <div class="load-progress" :style="{width: scope.row.cpuLoad, backgroundColor: getLoadColor(scope.row.cpuLoad)}"></div>
-                </div>
-                <span class="load-text">{{scope.row.cpuLoad}}</span>
-              </div>
+              <span v-if="scope.row.version" class="version-text">{{scope.row.version}}</span>
+              <span v-else class="text-placeholder">-</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('message.memoryLoad')" width="100" sortable>
+          <el-table-column :label="$t('message.cpuLoad')" width="140" sortable align="center">
             <template #default="scope">
-              <div class="load-cell">
-                <div class="load-bar">
-                  <div class="load-progress" :style="{width: scope.row.memoryLoad, backgroundColor: getLoadColor(scope.row.memoryLoad)}"></div>
-                </div>
-                <span class="load-text">{{scope.row.memoryLoad}}</span>
+              <div class="load-cell" v-if="scope.row.cpuLoad">
+                <span class="load-text">{{formatLoadDisplay(scope.row.cpuLoad)}}</span>
               </div>
+              <span v-else class="text-placeholder">-</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('message.diskLoad')" width="100" sortable>
+          <el-table-column :label="$t('message.memoryLoad')" width="140" sortable align="center">
             <template #default="scope">
-              <div class="load-cell">
-                <div class="load-bar">
-                  <div class="load-progress" :style="{width: scope.row.diskLoad, backgroundColor: getLoadColor(scope.row.diskLoad)}"></div>
-                </div>
-                <span class="load-text">{{scope.row.diskLoad}}</span>
+              <div class="load-cell" v-if="scope.row.memoryLoad">
+                <span class="load-text">{{formatLoadDisplay(scope.row.memoryLoad)}}</span>
               </div>
+              <span v-else class="text-placeholder">-</span>
             </template>
           </el-table-column>
-          <el-table-column prop="tag" label="标签" width="80" show-overflow-tooltip>
+          <el-table-column :label="$t('message.diskLoad')" width="140" sortable align="center">
+            <template #default="scope">
+              <div class="load-cell" v-if="scope.row.diskLoad">
+                <span class="load-text">{{formatLoadDisplay(scope.row.diskLoad)}}</span>
+              </div>
+              <span v-else class="text-placeholder">-</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="tag" label="标签" width="120" show-overflow-tooltip align="center">
             <template #default="scope">
               <el-tag v-if="scope.row.tag" size="small" type="info">{{scope.row.tag}}</el-tag>
               <span v-else class="text-placeholder">-</span>
             </template>
           </el-table-column>
-          <el-table-column prop="lastActiveTime" :label="$t('message.lastActiveTime')" width="140" sortable />
+          <el-table-column prop="lastActiveTime" :label="$t('message.lastActiveTime')" width="150" sortable align="center" />
         </el-table>
       </div>
     </div>
@@ -222,8 +224,27 @@ export default {
     },
     
     // 获取负载条颜色
-    getLoadColor(load) {
-      const percentage = parseFloat(load);
+    getLoadColor(loadStr) {
+      if (!loadStr || typeof loadStr !== 'string') return '#d9d9d9';
+      
+      let percentage = 0;
+      
+      // 处理类似 "6.8 / 11 cores" 的格式
+      if (loadStr.includes('/')) {
+        const parts = loadStr.split('/');
+        if (parts.length >= 2) {
+          const current = parseFloat(parts[0].trim());
+          const total = parseFloat(parts[1].split(' ')[0].trim());
+          if (!isNaN(current) && !isNaN(total) && total > 0) {
+            percentage = (current / total) * 100;
+          }
+        }
+      } else {
+        // 处理百分比格式
+        percentage = parseFloat(loadStr);
+        if (isNaN(percentage)) return '#d9d9d9';
+      }
+      
       if (percentage < 50) return '#52c41a';
       if (percentage < 80) return '#fa8c16';
       return '#ff4d4f';
@@ -268,6 +289,11 @@ export default {
     getWarningWorkerCount() {
       return this.workerList.filter(w => w.status === 2).length;
     },
+
+    // 统计警告Worker数量
+    getDangerousWorkerCount() {
+      return this.workerList.filter(w => w.status === 3).length;
+    },
     
     // 统计离线Worker数量  
     getOfflineWorkerCount() {
@@ -277,6 +303,58 @@ export default {
     // 更新当前时间
     updateCurrentTime() {
       this.currentTime = this.getCurrentTime();
+    },
+
+    // 格式化负载百分比用于进度条
+    formatLoadPercentage(loadStr) {
+      if (!loadStr || typeof loadStr !== 'string') return '0%';
+      
+      // 处理类似 "6.8 / 11 cores" 的格式
+      if (loadStr.includes('/')) {
+        const parts = loadStr.split('/');
+        if (parts.length >= 2) {
+          const current = parseFloat(parts[0].trim());
+          const total = parseFloat(parts[1].split(' ')[0].trim());
+          if (!isNaN(current) && !isNaN(total) && total > 0) {
+            return Math.min(100, (current / total) * 100) + '%';
+          }
+        }
+      }
+      
+      // 处理百分比格式
+      const percentage = parseFloat(loadStr);
+      if (!isNaN(percentage)) {
+        return Math.min(100, percentage) + '%';
+      }
+      
+      return '0%';
+    },
+
+    // 格式化负载显示文本
+    formatLoadDisplay(loadStr) {
+      if (!loadStr || typeof loadStr !== 'string') return '-';
+      
+      // 处理类似 "6.8 / 11 cores" 的格式
+      if (loadStr.includes('/')) {
+        const parts = loadStr.split('/');
+        if (parts.length >= 2) {
+          const current = parseFloat(parts[0].trim());
+          const total = parseFloat(parts[1].split(' ')[0].trim());
+          if (!isNaN(current) && !isNaN(total) && total > 0) {
+            const percentage = (current / total) * 100;
+            return percentage.toFixed(1) + '%';
+          }
+        }
+        return loadStr; // 保留原始格式作为后备
+      }
+      
+      // 处理百分比格式
+      const percentage = parseFloat(loadStr);
+      if (!isNaN(percentage)) {
+        return percentage.toFixed(1) + '%';
+      }
+      
+      return loadStr;
     }
   },
   
@@ -573,6 +651,14 @@ export default {
     }
   }
 
+  .pj-table {
+    overflow-x: auto;
+    
+    .el-table {
+      min-width: 800px;
+    }
+  }
+
   .worker-status-indicator {
     width: 10px;
     height: 10px;
@@ -602,6 +688,7 @@ export default {
     display: flex;
     align-items: center;
     gap: 8px;
+    width: 100%;
     
     .load-bar {
       flex: 1;
@@ -609,6 +696,7 @@ export default {
       background: #f0f0f0;
       border-radius: 3px;
       overflow: hidden;
+      min-width: 60px;
       
       .load-progress {
         height: 100%;
@@ -620,14 +708,25 @@ export default {
     .load-text {
       font-size: 11px;
       color: var(--pj-text-secondary);
-      min-width: 35px;
+      min-width: 40px;
       text-align: right;
+      flex-shrink: 0;
     }
   }
   
   .text-placeholder {
     color: var(--pj-text-disabled);
     font-style: italic;
+  }
+
+  .version-text {
+    font-size: 12px;
+    color: var(--pj-text-primary);
+    font-weight: 500;
+    background: #f0f2f5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
   }
 }
 
