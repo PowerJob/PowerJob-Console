@@ -99,56 +99,19 @@
       </el-row>
     </div>
   </div>
-  
-  <!-- 系统信息卡片 -->
-  <div class="pj-table-card" style="margin-top: 24px;">
-    <div class="pj-table-header">
-      <h3 class="pj-table-title">
-        <el-icon style="margin-right: 8px;"><InfoFilled /></el-icon>
-        系统信息
-      </h3>
-    </div>
-    
-    <div style="padding: 24px;">
-      <el-row :gutter="24">
-        <el-col :lg="8" :md="12" :sm="24">
-          <div class="pj-stats-card">
-            <div class="pj-stats-value">{{ user_list.length }}</div>
-            <div class="pj-stats-label">总用户数</div>
-          </div>
-        </el-col>
-        <el-col :lg="8" :md="12" :sm="24">
-          <div class="pj-stats-card">
-            <div class="pj-stats-value">{{ adminUserIds.length }}</div>
-            <div class="pj-stats-label">全局管理员</div>
-          </div>
-        </el-col>
-        <el-col :lg="8" :md="12" :sm="24">
-          <div class="pj-stats-card">
-            <div class="pj-stats-value">PowerJob</div>
-            <div class="pj-stats-label">系统版本</div>
-          </div>
-        </el-col>
-      </el-row>
-    </div>
-  </div>
 </div>
 </template>
 
 <script>
 import { ElMessage } from "element-plus";
-import { 
-  Setting, 
+import {
   UserFilled,
-  InfoFilled
 } from '@element-plus/icons-vue';
 
 export default {
   name: 'Settings',
   components: {
-    Setting,
     UserFilled,
-    InfoFilled
   },
   data() {
     return {
@@ -280,11 +243,5 @@ export default {
   color: var(--pj-text-secondary);
   font-size: 12px;
   margin-top: 2px;
-}
-
-/* 统计卡片样式增强 */
-.pj-stats-card {
-  border: 1px solid var(--pj-border-color);
-  margin-bottom: 16px;
 }
 </style>
