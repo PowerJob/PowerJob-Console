@@ -1,13 +1,5 @@
 <template>
 <div class="pj-admin-container">
-  <!-- 页面头部 -->
-  <div class="pj-page-header pj-tech-bg">
-    <h1 class="pj-page-title">
-      <el-icon class="pj-title-icon"><User /></el-icon>
-      个人中心
-    </h1>
-    <p class="pj-page-description">管理个人账户信息和安全设置</p>
-  </div>
 
   <el-row :gutter="24">
     <!-- 个人信息卡片 -->

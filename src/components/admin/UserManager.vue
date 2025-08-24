@@ -1,13 +1,5 @@
 <template>
   <div class="pj-admin-container">
-    <!-- 页面头部 -->
-    <div class="pj-page-header pj-tech-bg">
-      <h1 class="pj-page-title">
-        <el-icon class="pj-title-icon"><UserFilled /></el-icon>
-        用户管理
-      </h1>
-      <p class="pj-page-description">管理系统用户账号，包括用户状态控制和信息查询</p>
-    </div>
 
     <!-- 搜索条件卡片 -->
     <div class="pj-search-card">

@@ -1,13 +1,5 @@
 <template>
 <div class="pj-admin-container">
-  <!-- 页面头部 -->
-  <div class="pj-page-header pj-tech-bg">
-    <h1 class="pj-page-title">
-      <el-icon class="pj-title-icon"><Setting /></el-icon>
-      系统设置
-    </h1>
-    <p class="pj-page-description">管理系统全局配置和权限设置</p>
-  </div>
 
   <!-- 全局管理员设置卡片 -->
   <div class="pj-table-card">

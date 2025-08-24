@@ -179,7 +179,10 @@
         </el-divider>
         
         <el-form-item>
-          <user-role :user-rule-form="user_rule_form" style="width: 100%;" />
+          <user-role 
+            :user-rule-form="user_rule_form" 
+            @update:userRuleForm="handleUserRoleUpdate"
+            style="width: 100%;" />
         </el-form-item>
 
         <el-form-item style="margin-top: 32px;">
@@ -205,7 +208,6 @@
 import UserRole from "../common/UserRole.vue";
 import { ElMessage } from 'element-plus';
 import { 
-  Folder, 
   FolderRemove
 } from '@element-plus/icons-vue';
 
@@ -213,7 +215,6 @@ export default {
   name: "NamespaceManager",
   components: {
     UserRole,
-    Folder,
     FolderRemove
   },
   data() {
@@ -375,6 +376,11 @@ export default {
           ElMessage.error('复制失败');
         });
       }
+    },
+    
+    // 处理用户权限更新
+    handleUserRoleUpdate(newUserRoleData) {
+      this.user_rule_form = { ...newUserRoleData };
     }
   },
   mounted() {
