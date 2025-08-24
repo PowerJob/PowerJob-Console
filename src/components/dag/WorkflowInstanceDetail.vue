@@ -16,7 +16,7 @@
         <el-row class="power-work-info-item">
             <el-col :span="24">
                 {{$t('message.status')}}：
-                <span class="title">{{ this.common.translateWfInstanceStatus(wfInstanceDetail.status) }}</span>
+                <span class="title">{{ common.translateWfInstanceStatus(wfInstanceDetail.status) }}</span>
             </el-col>
         </el-row>
 
@@ -90,12 +90,12 @@
                     <template v-slot:tool>
                         <div @click="markedSuccess">
                             <el-tooltip :content="$t('message.markerSuccess')" placement="top" effect="light">
-                              <i class="el-icon-document-checked" :style="{'color': selectNode && selectNode.get('model').status == 4 ? '#3D3E3E' : '#BBBBBB'}"></i>
+                              <el-icon><DocumentChecked :style="{'color': selectNode && selectNode.get('model').status == 4 ? '#3D3E3E' : '#BBBBBB'}" /></el-icon>
                             </el-tooltip>
                         </div>
                         <div @click="fetchWfInstanceInfo">
                             <el-tooltip :content="$t('message.refresh')" placement="top" effect="light">
-                              <i class="el-icon-refresh"></i>
+                              <el-icon><Refresh /></el-icon>
                             </el-tooltip>
                         </div>
                     </template>
@@ -144,7 +144,8 @@
     import PowerWorkFlow from './PowerWorkflow';
     import JsonViewer from 'vue-json-viewer';
     import JSEditor from "./JSEditor";
-    import { ElMessage } from 'element-plus';
+    import { ElMessage, ElIcon } from 'element-plus';
+    import { DocumentChecked, Refresh } from '@element-plus/icons-vue';
     export default {
         name: "WorkflowInstanceDetail",
         components: {
@@ -152,7 +153,10 @@
             // WorkFlow,
             PowerWorkFlow,
             JsonViewer,
-            JSEditor
+            JSEditor,
+            DocumentChecked,
+            Refresh,
+            ElIcon
         },
         data() {
             return {
@@ -326,16 +330,16 @@
         font-weight: bold;
     }
 
-    svg {
+    .power-power-flow svg {
         font-size: 16px;
     }
 
-    .node rect {
+    .power-power-flow .node rect {
         stroke: #606266;
         fill: #fff;
     }
 
-    .edgePath path {
+    .power-power-flow .edgePath path {
         stroke: #606266;
         fill: #333;
         stroke-width: 1.5px;
@@ -360,6 +364,28 @@
         overflow:hidden;
         text-overflow:ellipsis;
         display: inline-block;
+    }
+
+    /* 修复工具栏中Element Plus图标的样式 */
+    :deep(.job-tools svg) {
+        font-size: 20px !important;
+        color: #3d3e3e !important;
+        width: 20px !important;
+        height: 20px !important;
+    }
+    
+    /* 确保图标容器正确显示 */
+    :deep(.job-tools .el-icon) {
+        font-size: 20px !important;
+        color: #3d3e3e !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* 确保工具栏按钮间距正确 */
+    :deep(.job-tools > div + div) {
+        margin-left: 24px !important;
     }
     
 </style>
