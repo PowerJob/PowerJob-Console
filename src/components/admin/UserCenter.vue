@@ -236,14 +236,12 @@
 <script>
 import { ElMessage } from "element-plus";
 import { 
-  User, 
   UserFilled
 } from '@element-plus/icons-vue';
 
 export default {
   name: 'UserCenter',
   components: {
-    User,
     UserFilled
   },
   data() {
