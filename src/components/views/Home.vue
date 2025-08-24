@@ -425,6 +425,7 @@ export default {
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   margin-bottom: 16px;
+  align-items: start;
 }
 
 /* 左侧核心指标面板 */
@@ -447,6 +448,7 @@ export default {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
+    align-items: stretch;
   }
 
   .metric-item {
@@ -459,6 +461,7 @@ export default {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    min-height: 80px;
 
     &:hover {
       transform: translateY(-2px);
@@ -479,6 +482,9 @@ export default {
     .metric-info {
       flex: 1;
       min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
 
       .metric-number {
         font-size: 20px;
@@ -536,6 +542,7 @@ export default {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
+    align-items: stretch;
   }
 
   .system-info-item {
@@ -546,6 +553,7 @@ export default {
     background: #f8fafc;
     border-radius: 8px;
     transition: all 0.3s ease;
+    min-height: 80px;
 
     &:hover {
       background: #e6f7ff;
@@ -569,6 +577,9 @@ export default {
     .info-content {
       flex: 1;
       min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
 
       .info-label {
         font-size: 12px;
