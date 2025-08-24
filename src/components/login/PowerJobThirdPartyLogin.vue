@@ -403,14 +403,25 @@ export default {
 
 .modern-form-item {
   margin-bottom: 24px;
+  width: 100%;
 }
 
 .input-wrapper {
   position: relative;
+  width: 100%;
+}
+
+:deep(.modern-form-item .el-form-item__content) {
+  width: 100% !important;
 }
 
 /* Element Plus Input 样式覆盖 */
+:deep(.modern-input) {
+  width: 100% !important;
+}
+
 :deep(.modern-input .el-input__wrapper) {
+  width: 100% !important;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 12px;
