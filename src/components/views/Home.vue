@@ -1,25 +1,5 @@
 <template>
   <div class="home-dashboard">
-    <!-- 顶部系统信息条 - 紧凑设计 -->
-    <div class="system-info-bar">
-      <div class="info-item">
-        <el-icon class="info-icon"><Monitor /></el-icon>
-        <span class="info-text">{{ systemInfo.appName }}</span>
-      </div>
-      <div class="info-item">
-        <el-icon class="info-icon"><Connection /></el-icon>
-        <span class="info-text">{{ systemInfo.scheduleServerInfo.ip }}</span>
-      </div>
-      <div class="info-item">
-        <el-icon class="info-icon"><Clock /></el-icon>
-        <span class="info-text">{{ systemInfo.timezone }}</span>
-      </div>
-      <div class="sync-status">
-        <el-icon class="sync-icon"><Refresh /></el-icon>
-        <span>实时同步</span>
-      </div>
-    </div>
-
     <!-- 核心指标 + Worker状态概览 - 双栏布局 -->
     <div class="main-content">
       <!-- 左侧：核心指标 -->
@@ -121,58 +101,26 @@
       </div>
     </div>
 
-    <!-- Worker节点状态概览 -->
-    <div class="worker-status-section">
+    <!-- Worker节点列表 -->
+    <div class="workers-section">
       <div class="section-header">
         <div class="section-title">
-          Worker节点状态
+          Worker节点列表
           <div class="worker-summary">
             <el-tag type="success" size="small">在线 {{getOnlineWorkerCount()}}</el-tag>
             <el-tag type="warning" size="small">警告 {{getWarningWorkerCount()}}</el-tag>
             <el-tag type="danger" size="small">离线 {{getOfflineWorkerCount()}}</el-tag>
           </div>
         </div>
-        <el-button size="small" @click="toggleTableView">
-          {{ showDetailTable ? '隐藏详情' : '显示详情' }}
-        </el-button>
-      </div>
-
-      <!-- Worker节点网格显示 -->
-      <div class="worker-grid-overview">
-        <div 
-          v-for="(worker, index) in workerList" 
-          :key="index"
-          class="worker-node"
-          :class="getWorkerStatusClass(worker.status)"
-          :title="`${worker.address} - CPU:${worker.cpuLoad} 内存:${worker.memoryLoad} 磁盘:${worker.diskLoad}`"
-        >
-          <div class="worker-dot"></div>
-          <div class="worker-info">
-            <div class="worker-address">{{ worker.address }}</div>
-            <div class="worker-loads">
-              <span class="load-item">CPU {{ worker.cpuLoad }}</span>
-              <span class="load-item">内存 {{ worker.memoryLoad }}</span>
-              <span class="load-item">磁盘 {{ worker.diskLoad }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Worker详细信息表格 -->
-    <div class="workers-detail-section">
-      <div class="section-header">
-        <h3>Worker节点详细信息</h3>
       </div>
       
-      <div class="pj-table" v-show="showDetailTable">
+      <div class="pj-table">
         <el-table 
           :data="workerList" 
           style="width: 100%" 
           :row-class-name="workerTableRowClassName"
           :default-sort="{prop: 'status', order: 'ascending'}"
           size="small"
-          :max-height="400"
         >
           <el-table-column width="50">
             <template #default="scope">
@@ -251,8 +199,7 @@ export default {
       },
       activeWorkerCount: "N/A",
       workerList: [],
-      currentTime: '',
-      showDetailTable: false
+      currentTime: ''
     }
   },
   methods: {
@@ -331,11 +278,6 @@ export default {
     // 更新当前时间
     updateCurrentTime() {
       this.currentTime = this.getCurrentTime();
-    },
-
-    // 切换详细表格显示
-    toggleTableView() {
-      this.showDetailTable = !this.showDetailTable;
     }
   },
   
@@ -603,12 +545,11 @@ export default {
   }
 }
 
-/* Worker节点状态概览区域 */
-.worker-status-section {
+/* Worker节点列表区域 */
+.workers-section {
   background: var(--pj-bg-white);
   border-radius: 12px;
   padding: 16px;
-  margin-bottom: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
   .section-header {
@@ -630,125 +571,6 @@ export default {
         gap: 8px;
         flex-wrap: wrap;
       }
-    }
-  }
-
-  .worker-grid-overview {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 12px;
-    max-height: 400px;
-    overflow-y: auto;
-
-    .worker-node {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px;
-      background: #f8fafc;
-      border-radius: 8px;
-      border-left: 4px solid transparent;
-      transition: all 0.3s ease;
-      cursor: pointer;
-
-      &:hover {
-        background: #e6f7ff;
-        transform: translateX(2px);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      }
-
-      .worker-dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        flex-shrink: 0;
-      }
-
-      .worker-info {
-        flex: 1;
-        min-width: 0;
-
-        .worker-address {
-          font-size: 13px;
-          font-weight: 600;
-          color: var(--pj-text-primary);
-          margin-bottom: 4px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-
-        .worker-loads {
-          display: flex;
-          gap: 6px;
-          flex-wrap: wrap;
-
-          .load-item {
-            font-size: 11px;
-            color: var(--pj-text-secondary);
-            background: rgba(0, 0, 0, 0.06);
-            padding: 2px 6px;
-            border-radius: 4px;
-            white-space: nowrap;
-          }
-        }
-      }
-
-      &.online {
-        border-left-color: var(--pj-success);
-        .worker-dot {
-          background: var(--pj-success);
-          box-shadow: 0 0 8px rgba(82, 196, 26, 0.3);
-        }
-      }
-
-      &.warning {
-        border-left-color: var(--pj-warning);
-        .worker-dot {
-          background: var(--pj-warning);
-          animation: pulse 2s infinite;
-        }
-      }
-
-      &.offline {
-        border-left-color: #d9d9d9;
-        .worker-dot {
-          background: #d9d9d9;
-        }
-        .worker-info {
-          opacity: 0.6;
-        }
-      }
-
-      &.error {
-        border-left-color: var(--pj-error);
-        .worker-dot {
-          background: var(--pj-error);
-          animation: blink 1s infinite;
-        }
-      }
-    }
-  }
-}
-
-/* Worker详细信息表格区域 */
-.workers-detail-section {
-  background: var(--pj-bg-white);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-
-    h3 {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--pj-text-primary);
     }
   }
 
@@ -864,10 +686,6 @@ export default {
   .system-info-panel .system-info-grid {
     grid-template-columns: 1fr;
   }
-  
-  .worker-status-section .worker-grid-overview {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  }
 }
 
 @media (max-width: 768px) {
@@ -890,10 +708,6 @@ export default {
   }
   
   .system-info-panel .system-info-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .worker-status-section .worker-grid-overview {
     grid-template-columns: 1fr;
   }
 }
