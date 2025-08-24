@@ -388,6 +388,17 @@
         margin-left: 24px !important;
     }
     
+    /* 确保我们的按钮容器与其他按钮保持相同的高度和对齐 */
+    :deep(.job-tools > div) {
+        box-sizing: border-box !important;
+        height: 30px !important;
+        width: 30px !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        cursor: pointer !important;
+    }
+    
 </style>
 
 <style>
