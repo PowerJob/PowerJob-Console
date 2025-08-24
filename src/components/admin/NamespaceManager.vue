@@ -54,7 +54,7 @@
       
       <el-table :data="namespaceResult.data" style="width: 100%" v-loading="loading" table-layout="auto">
         <el-table-column prop="id" label="ID" width="80" align="center" />
-        <el-table-column prop="code" label="空间代码" min-width="180" show-overflow-tooltip>
+        <el-table-column prop="code" label="code" min-width="180" show-overflow-tooltip>
           <template #default="scope">
             <el-tag size="small" type="info">{{ scope.row.code }}</el-tag>
           </template>
@@ -65,7 +65,7 @@
         <el-table-column :label="$t('message.status')" width="100" align="center">
           <template #default="scope">
             <el-tag 
-              :type="scope.row.statusStr === '正常' ? 'success' : 'danger'"
+              :type="scope.row.statusStr === 'ENABLE' ? 'success' : 'danger'"
               size="small">
               {{ scope.row.statusStr }}
             </el-tag>
