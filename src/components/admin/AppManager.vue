@@ -1,87 +1,39 @@
 <template>
-  <div id="app_manager">
-    <!--第一行，条件搜索栏（row布局：gutter代表栅格间隔，span代表占用格数）-->
-    <el-row :gutter="20">
+  <div class="pj-admin-container">
+    
+    <!-- 搜索条件卡片 -->
+    <div class="pj-search-card">
+      <el-form :inline="true" :model="queryAppRequest" class="el-form--inline">
+        <el-form-item label="应用ID">
+          <el-input 
+            v-model="queryAppRequest.appId" 
+            placeholder="请输入应用ID"
+            style="width: 140px;"
+            clearable />
+        </el-form-item>
+        
+        <el-form-item label="应用名称">
+          <el-input 
+            v-model="queryAppRequest.appNameLike" 
+            :placeholder="$t('message.fuzzyQuery')"
+            style="width: 180px;"
+            clearable />
+        </el-form-item>
+        
+        <el-form-item label="标签">
+          <el-input 
+            v-model="queryAppRequest.tagLike" 
+            :placeholder="$t('message.fuzzyQuery')"
+            style="width: 160px;"
+            clearable />
+        </el-form-item>
 
-      <!-- 左侧搜索栏，占地面积 16/24 -->
-      <el-col :span="16">
-        <el-form :inline="true" :model="queryAppRequest" class="el-form--inline">
-          <el-form-item label="ID">
-            <el-input v-model="queryAppRequest.appId" placeholder="ID"/>
-          </el-form-item>
-          <el-form-item label="appName">
-            <el-input v-model="queryAppRequest.appNameLike" :placeholder="$t('message.fuzzyQuery')"/>
-          </el-form-item>
-          <el-form-item label="tag">
-            <el-input v-model="queryAppRequest.tagLike" :placeholder="$t('message.fuzzyQuery')"/>
-          </el-form-item>
-
-          <el-form-item label="namespace">
-            <el-select v-model="queryAppRequest.namespaceId" placeholder="namespace">
-              <el-option
-                  v-for="item in namespaceList"
-                  :key="item.id"
-                  :label="item.showName"
-                  :value="item.id">
-              </el-option>
-            </el-select>
-          </el-form-item>
-
-          <el-form-item :label="$t('message.showMyRelated')">
-            <el-switch v-model="queryAppRequest.showMyRelated" @change="listApps"></el-switch>
-          </el-form-item>
-
-          <el-form-item>
-            <el-button type="primary" @click="listApps">{{$t('message.query')}}</el-button>
-            <el-button type="cancel" @click="onClickReset">{{$t('message.reset')}}</el-button>
-          </el-form-item>
-        </el-form>
-      </el-col>
-
-      <!-- 右侧新增任务按钮，占地面积 4/24 -->
-      <el-col :span="4">
-        <div style="float:right;padding-right:10px">
-          <el-button type="primary" @click="onClickNewApps">{{$t('message.add')}}</el-button>
-        </div>
-      </el-col>
-    </el-row>
-
-    <!--第二行，任务数据表格-->
-    <el-row>
-      <el-table :data="appResult.data" style="width: 100%">
-        <el-table-column prop="id" label="ID" width="80"/>
-        <el-table-column prop="appName" label="code" width="150"/>
-        <el-table-column prop="title" :label="$t('message.name')" />
-        <el-table-column prop="namespaceName" label="namespace" />
-        <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" />
-        <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" />
-        <el-table-column prop="creatorShowName" :label="$t('message.creator')" />
-        <el-table-column prop="modifierShowName" :label="$t('message.modifier')" />
-
-        <el-table-column :label="$t('message.operation')" width="150">
-          <template #default="scope">
-            <el-button size="mini" type="text" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
-            <el-button size="mini" type="text" @click="onClickEnter(scope.row)">{{$t('message.enter')}}</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-row>
-
-    <!-- 第三行，分页插件 -->
-    <el-row>
-      <el-pagination
-          layout="prev, pager, next"
-          :total="this.appResult.totalItems"
-          :page-size="this.appResult.pageSize"
-          @current-change="onClickChangePage"
-          :hide-on-single-page="true"/>
-    </el-row>
-
-    <el-dialog :close-on-click-modal="false" v-model="modifiedAppFormVisible" width="80%">
-      <el-form :model="modifiedAppForm" label-width="120px">
-
-        <el-form-item label="namespace">
-          <el-select v-model="modifiedAppForm.namespaceId" placeholder="namespace">
+        <el-form-item label="命名空间">
+          <el-select 
+            v-model="queryAppRequest.namespaceId" 
+            placeholder="请选择命名空间"
+            style="width: 180px;"
+            clearable>
             <el-option
                 v-for="item in namespaceList"
                 :key="item.id"
@@ -91,30 +43,195 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="appName">
-          <el-input v-model="modifiedAppForm.appName"/>
-        </el-form-item>
-        <el-form-item :label="$t('message.name')">
-          <el-input v-model="modifiedAppForm.title"/>
-        </el-form-item>
-        <el-form-item :label="$t('message.password')">
-          <el-input v-model="modifiedAppForm.password"/>
-        </el-form-item>
-        <el-form-item :label="$t('message.tag')">
-          <el-input v-model="modifiedAppForm.tags"/>
-        </el-form-item>
-        <el-form-item :label="$t('message.extra')">
-          <el-input v-model="modifiedAppForm.extra"/>
-        </el-form-item>
-
-        <el-form-item :label="$t('message.permissionManage')">
-          <user-role :user-rule-form="user_rule_form"/>
+        <el-form-item :label="$t('message.showMyRelated')">
+          <el-switch 
+            v-model="queryAppRequest.showMyRelated" 
+            @change="listApps"
+            active-color="#2563eb" />
         </el-form-item>
 
         <el-form-item>
-          <el-button v-if="modifiedAppForm.id!=null" type="danger" @click="onClickDeleteApp">{{$t('message.delete')}}</el-button>
-          <el-button type="primary" @click="onClickSaveApp">{{$t('message.save')}}</el-button>
-          <el-button @click="modifiedAppFormVisible = false">{{$t('message.cancel')}}</el-button>
+          <div class="pj-search-actions">
+            <el-button type="primary" @click="listApps" :icon="Search">
+              {{$t('message.query')}}
+            </el-button>
+            <el-button @click="onClickReset" :icon="Refresh">
+              {{$t('message.reset')}}
+            </el-button>
+          </div>
+        </el-form-item>
+      </el-form>
+    </div>
+
+    <!-- 数据表格卡片 -->
+    <div class="pj-table-card">
+      <div class="pj-table-header">
+        <h3 class="pj-table-title">应用列表</h3>
+        <div class="pj-table-actions">
+          <el-button type="primary" @click="onClickNewApps" :icon="Plus">
+            {{$t('message.add')}}
+          </el-button>
+        </div>
+      </div>
+      
+      <el-table :data="appResult.data" style="width: 100%" v-loading="loading">
+        <el-table-column prop="id" label="ID" width="80" align="center" />
+        <el-table-column prop="appName" label="应用代码" width="150" show-overflow-tooltip>
+          <template #default="scope">
+            <el-tag size="small" type="info">{{ scope.row.appName }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="title" :label="$t('message.name')" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="namespaceName" label="命名空间" width="120" show-overflow-tooltip>
+          <template #default="scope">
+            <el-tag size="small" v-if="scope.row.namespaceName">{{ scope.row.namespaceName }}</el-tag>
+            <span v-else class="pj-text-tertiary">未分配</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" width="160" />
+        <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" width="160" />
+        <el-table-column prop="creatorShowName" :label="$t('message.creator')" width="120" show-overflow-tooltip />
+        <el-table-column prop="modifierShowName" :label="$t('message.modifier')" width="120" show-overflow-tooltip />
+
+        <el-table-column :label="$t('message.operation')" width="150" fixed="right">
+          <template #default="scope">
+            <div class="pj-action-group">
+              <el-button size="small" type="text" @click="onClickModify(scope.row)" :icon="Edit">
+                {{$t('message.edit')}}
+              </el-button>
+              <el-button size="small" type="text" @click="onClickEnter(scope.row)" :icon="Right">
+                {{$t('message.enter')}}
+              </el-button>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <!-- 分页 -->
+      <div class="pj-table-footer" v-if="appResult.data && appResult.data.length > 0">
+        <el-pagination
+            layout="total, prev, pager, next, jumper"
+            :total="this.appResult.totalItems"
+            :page-size="this.appResult.pageSize"
+            @current-change="onClickChangePage"
+            :hide-on-single-page="false"/>
+      </div>
+      
+      <!-- 空状态 -->
+      <div v-if="!loading && (!appResult.data || appResult.data.length === 0)" class="pj-empty-state">
+        <el-icon class="pj-empty-icon"><DocumentRemove /></el-icon>
+        <div class="pj-empty-text">暂无应用数据</div>
+      </div>
+    </div>
+
+    <!-- 应用编辑对话框 -->
+    <el-dialog 
+      :title="modifiedAppForm.id ? '编辑应用' : '新建应用'" 
+      v-model="modifiedAppFormVisible" 
+      width="800px"
+      :close-on-click-modal="false"
+      destroy-on-close>
+      <el-form 
+        :model="modifiedAppForm" 
+        :rules="formRules"
+        ref="appFormRef"
+        label-width="120px">
+
+        <el-row :gutter="24">
+          <el-col :span="12">
+            <el-form-item label="命名空间" prop="namespaceId">
+              <el-select 
+                v-model="modifiedAppForm.namespaceId" 
+                placeholder="请选择命名空间"
+                style="width: 100%;"
+                clearable>
+                <el-option
+                    v-for="item in namespaceList"
+                    :key="item.id"
+                    :label="item.showName"
+                    :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+          
+          <el-col :span="12">
+            <el-form-item label="应用代码" prop="appName">
+              <el-input 
+                v-model="modifiedAppForm.appName"
+                placeholder="请输入应用代码"
+                :disabled="modifiedAppForm.id != null" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="24">
+          <el-col :span="12">
+            <el-form-item :label="$t('message.name')" prop="title">
+              <el-input 
+                v-model="modifiedAppForm.title"
+                placeholder="请输入应用名称" />
+            </el-form-item>
+          </el-col>
+          
+          <el-col :span="12">
+            <el-form-item :label="$t('message.password')" prop="password">
+              <el-input 
+                v-model="modifiedAppForm.password"
+                type="password"
+                placeholder="请输入应用密码"
+                show-password />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-form-item :label="$t('message.tag')">
+          <el-input 
+            v-model="modifiedAppForm.tags"
+            placeholder="请输入标签，多个标签用逗号分隔" />
+        </el-form-item>
+        
+        <el-form-item :label="$t('message.extra')">
+          <el-input 
+            v-model="modifiedAppForm.extra"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入额外配置信息" />
+        </el-form-item>
+
+        <el-divider content-position="left">
+          <span style="font-weight: 600; color: var(--pj-text-secondary);">{{$t('message.permissionManage')}}</span>
+        </el-divider>
+        
+        <el-form-item>
+          <user-role 
+            :user-rule-form="user_rule_form" 
+            @update:userRuleForm="handleUserRoleUpdate"
+            style="width: 100%;" />
+        </el-form-item>
+
+        <el-form-item style="margin-top: 32px;">
+          <div style="display: flex; justify-content: space-between; width: 100%;">
+            <el-button 
+              v-if="modifiedAppForm.id!=null" 
+              type="danger" 
+              @click="onClickDeleteApp"
+              :icon="Delete">
+              {{$t('message.delete')}}
+            </el-button>
+            <div style="display: flex; gap: 12px; margin-left: auto;">
+              <el-button @click="modifiedAppFormVisible = false" :icon="Close">
+                {{$t('message.cancel')}}
+              </el-button>
+              <el-button 
+                type="primary" 
+                @click="onClickSaveApp"
+                :loading="saving"
+                :icon="Check">
+                {{$t('message.save')}}
+              </el-button>
+            </div>
+          </div>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -122,15 +239,18 @@
 </template>
 
 <script>
-// import UserRole from "../common/UserRole.vue";
-
 import UserRole from "../common/UserRole.vue";
 import { ElMessage } from 'element-plus';
+import { 
+  DocumentRemove
+} from '@element-plus/icons-vue';
 
 export default {
   name: "AppManager",
-  components: {UserRole},
-  // components: {UserRole},
+  components: {
+    UserRole,
+    DocumentRemove
+  },
   data() {
     return {
       // 查询 APP 请求
@@ -166,9 +286,26 @@ export default {
 
       // 显示变量
       modifiedAppFormVisible: false,
+      loading: false,
+      saving: false,
 
       // namespace，用于驱动下拉列表
-      namespaceList: []
+      namespaceList: [],
+      
+      // 表单验证规则
+      formRules: {
+        appName: [
+          { required: true, message: '请输入应用代码', trigger: 'blur' },
+          { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
+        ],
+        title: [
+          { required: true, message: '请输入应用名称', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入应用密码', trigger: 'blur' },
+          { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
+        ]
+      }
     }
   },
   methods: {
@@ -185,9 +322,13 @@ export default {
 
     // 查询 app
     listApps() {
+      this.loading = true;
       const that = this;
       this.axios.post("/appInfo/list", this.queryAppRequest).then((res) => {
         that.appResult = res;
+        that.loading = false;
+      }).catch(() => {
+        that.loading = false;
       });
     },
 
@@ -219,20 +360,31 @@ export default {
     },
 
     onClickSaveApp() {
-      let that = this;
-      this.modifiedAppForm['componentUserRoleInfo'] = this.user_rule_form;
+      this.$refs.appFormRef.validate((valid) => {
+        if (valid) {
+          this.saving = true;
+          let that = this;
+          this.modifiedAppForm['componentUserRoleInfo'] = this.user_rule_form;
 
-      console.log("modifiedAppForm: " + JSON.stringify(this.modifiedAppForm))
-      this.axios.post("/appInfo/save", this.modifiedAppForm, {
-        'headers': {
-          'Content-Type': 'application/json',
-          'AppId': that.modifiedAppForm.id
+          console.log("modifiedAppForm: " + JSON.stringify(this.modifiedAppForm))
+          this.axios.post("/appInfo/save", this.modifiedAppForm, {
+            'headers': {
+              'Content-Type': 'application/json',
+              'AppId': that.modifiedAppForm.id
+            }
+          }).then(() => {
+            ElMessage.success(that.$t('message.success'));
+            this.listApps();
+            this.modifiedAppFormVisible = false;
+            this.saving = false;
+          }).catch(e => {
+            ElMessage.error(e);
+            this.saving = false;
+          });
+        } else {
+          ElMessage.warning('请检查表单填写是否正确');
         }
-      }).then(() => {
-        ElMessage.success(that.$t('message.success'));
-        this.listApps();
-      }, e => ElMessage.error(e))
-      this.modifiedAppFormVisible = false;
+      });
     },
 
     onClickDeleteApp() {
@@ -287,6 +439,11 @@ export default {
       this.axios.post("/namespace/listAll", this.queryAppRequest).then((res) => {
         that.namespaceList = res;
       });
+    },
+    
+    // 处理用户权限更新
+    handleUserRoleUpdate(newUserRoleData) {
+      this.user_rule_form = { ...newUserRoleData };
     }
   },
 
@@ -301,5 +458,14 @@ export default {
 </script>
 
 <style scoped>
+@import '../../styles/admin-theme.scss';
 
+/* 组件特定样式 */
+.pj-text-tertiary {
+  color: var(--pj-text-tertiary);
+}
+
+.el-tag {
+  border-radius: var(--pj-border-radius-sm);
+}
 </style>
