@@ -128,7 +128,7 @@
               <div class="worker-status-indicator" :class="getWorkerStatusClass(scope.row.status)"></div>
             </template>
           </el-table-column>
-          <el-table-column prop="address" :label="$t('message.workerAddress')" min-width="180" show-overflow-tooltip />
+          <el-table-column prop="address" :label="$t('message.workerAddress')"/>
           <el-table-column prop="version" label="版本" width="120" show-overflow-tooltip align="center">
             <template #default="scope">
               <span v-if="scope.row.version" class="version-text">{{scope.row.version}}</span>
@@ -175,14 +175,14 @@
 <script>
 import { 
   Monitor, Connection, Clock, LocationInformation, 
-  Refresh, Setting, VideoPlay, Warning, Bell, Server 
+  Setting, VideoPlay, Warning, Server
 } from '@element-plus/icons-vue';
 
 export default {
   name: "Home",
   components: {
     Monitor, Connection, Clock, LocationInformation,
-    Refresh, Setting, VideoPlay, Warning, Bell, Server
+     Setting, VideoPlay, Warning, Server
   },
   data() {
     return {
@@ -218,36 +218,10 @@ export default {
       switch (status) {
         case 1: return 'online';
         case 2: return 'warning';
+        case 3: return 'error';
         case 9999: return 'offline';
         default: return 'error';
       }
-    },
-    
-    // 获取负载条颜色
-    getLoadColor(loadStr) {
-      if (!loadStr || typeof loadStr !== 'string') return '#d9d9d9';
-      
-      let percentage = 0;
-      
-      // 处理类似 "6.8 / 11 cores" 的格式
-      if (loadStr.includes('/')) {
-        const parts = loadStr.split('/');
-        if (parts.length >= 2) {
-          const current = parseFloat(parts[0].trim());
-          const total = parseFloat(parts[1].split(' ')[0].trim());
-          if (!isNaN(current) && !isNaN(total) && total > 0) {
-            percentage = (current / total) * 100;
-          }
-        }
-      } else {
-        // 处理百分比格式
-        percentage = parseFloat(loadStr);
-        if (isNaN(percentage)) return '#d9d9d9';
-      }
-      
-      if (percentage < 50) return '#52c41a';
-      if (percentage < 80) return '#fa8c16';
-      return '#ff4d4f';
     },
     
     // 格式化运行时间
