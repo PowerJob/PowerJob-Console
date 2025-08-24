@@ -452,15 +452,30 @@ export default {
 }
 
 /* 按钮样式 */
+.actions-section {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 8px;
+}
+
+:deep(.actions-section .el-form-item__content) {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
 .button-group {
   display: flex;
   gap: 16px;
   justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 .modern-btn {
   position: relative;
-  padding: 16px 32px;
+  padding: 16px 24px;
   font-size: 16px;
   font-weight: 500;
   color: #ffffff;
@@ -469,8 +484,12 @@ export default {
   cursor: pointer;
   overflow: hidden;
   transition: all 0.3s ease;
-  min-width: 140px;
+  min-width: 130px;
+  width: 130px;
   backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .login-btn {
