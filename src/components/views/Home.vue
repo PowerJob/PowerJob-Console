@@ -60,8 +60,8 @@
               <el-icon><Setting /></el-icon>
             </div>
             <div class="metric-info">
-              <div class="metric-number">{{systemInfo.jobCount}}</div>
               <div class="metric-label">{{$t('message.totalJobNum')}}</div>
+              <div class="metric-number">{{systemInfo.jobCount}}</div>
             </div>
           </div>
           
@@ -70,8 +70,8 @@
               <el-icon><VideoPlay /></el-icon>
             </div>
             <div class="metric-info">
-              <div class="metric-number">{{systemInfo.runningInstanceCount}}</div>
               <div class="metric-label">{{$t('message.runningInstanceNum')}}</div>
+              <div class="metric-number">{{systemInfo.runningInstanceCount}}</div>
             </div>
             <div class="running-pulse"></div>
           </div>
@@ -81,8 +81,8 @@
               <el-icon><Warning /></el-icon>
             </div>
             <div class="metric-info">
-              <div class="metric-number">{{systemInfo.failedInstanceCount}}</div>
               <div class="metric-label">{{$t('message.recentFailedInstanceNum')}}</div>
+              <div class="metric-number">{{systemInfo.failedInstanceCount}}</div>
             </div>
             <div class="failure-indicator" v-if="systemInfo.failedInstanceCount > 0"></div>
           </div>
@@ -92,8 +92,8 @@
               <el-icon><Platform /></el-icon>
             </div>
             <div class="metric-info">
-              <div class="metric-number">{{activeWorkerCount}}</div>
               <div class="metric-label">{{$t('message.workerNum')}}</div>
+              <div class="metric-number">{{activeWorkerCount}}</div>
             </div>
           </div>
         </div>
@@ -490,7 +490,7 @@ export default {
         font-size: 20px;
         font-weight: 700;
         color: var(--pj-text-primary);
-        line-height: 1;
+        line-height: 1.2;
       }
 
       .metric-label {
@@ -547,28 +547,30 @@ export default {
 
   .system-info-item {
     display: flex;
-    align-items: stretch;
+    align-items: center;
     gap: 12px;
     padding: 12px;
     background: #f8fafc;
     border-radius: 8px;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
     min-height: 80px;
 
     &:hover {
       background: #e6f7ff;
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .info-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
+      font-size: 18px;
       flex-shrink: 0;
       color: white;
     }
@@ -578,8 +580,7 @@ export default {
       min-width: 0;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
+      justify-content: center;
 
       .info-label {
         font-size: 12px;
@@ -589,10 +590,10 @@ export default {
       }
 
       .info-value {
-        font-size: 14px;
+        font-size: 16px;
         font-weight: 600;
         color: var(--pj-text-primary);
-        margin-bottom: auto;
+        line-height: 1.2;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -602,7 +603,7 @@ export default {
         font-size: 11px;
         color: var(--pj-text-disabled);
         line-height: 1.2;
-        margin-top: auto;
+        margin-top: 4px;
       }
     }
     
