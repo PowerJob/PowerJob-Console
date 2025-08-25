@@ -154,7 +154,7 @@ export default {
         // 操作失败，还原状态
         data.enable = !data.enable;
         data._switching = false;
-        ElMessage.error('操作失败: ' + error);
+        ElMessage.error(this.$t('message.operationFailed') + error);
       });
     },
     

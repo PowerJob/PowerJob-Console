@@ -306,6 +306,67 @@ const cn = {
         'personalInfo': '个人信息',
         'appAdmin': '应用管理员',
         'authThenBecomeAdmin': '验证并成为管理员',
+
+        // form validation messages
+        'pleaseEnterContainerName': '请输入容器名称',
+        'lengthBetween2And50': '长度在 2 到 50 个字符',
+        'pleaseSelectContainerType': '请选择容器类型',
+        'pleaseEnterGitRepoUrl': '请输入 Git 仓库地址',
+        'pleaseEnterValidUrl': '请输入有效的 URL',
+        'pleaseEnterBranchName': '请输入分支名称',
+        'pleaseEnterAppCode': '请输入应用代码',
+        'pleaseEnterAppName': '请输入应用名称',
+        'pleaseEnterAppPassword': '请输入应用密码',
+        'passwordMinLength6': '密码长度不能少于6位',
+        'pleaseEnterNickname': '请输入昵称',
+        'pleaseEnterCorrectPhone': '请输入正确的手机号',
+        'pleaseEnterCorrectEmail': '请输入正确的邮箱地址',
+        'pleaseEnterOldPassword': '请输入旧密码',
+        'pleaseEnterNewPassword': '请输入新密码',
+        'pleaseEnterNewPasswordAgain': '请再次输入新密码',
+
+        // route titles
+        'routeHome': '主页',
+        'routeJobManage': '任务管理',
+        'routeInstanceManage': '实例管理',
+        'routeWorkflowManage': '工作流管理',
+        'routeWfInstanceManage': '工作流实例管理',
+        'routeTemplateGenerate': '模版生成',
+        'routeContainerManage': '容器管理',
+        'routeWfInstanceDetail': '工作流实例详情',
+        'routeWorkflowEditor': '工作流编辑器',
+        'routeAppManage': '应用管理',
+        'routeNamespace': '命名空间',
+        'routePersonalSettings': '个人设置',
+        'routeSystemSettings': '系统设置',
+        'routeUserManage': '用户管理',
+
+        // error messages
+        'saveFailedRetry': '保存失败，请重试',
+        'checkFormCorrect': '请检查表单填写是否正确',
+        'deployConnectionFailed': '部署连接失败',
+
+        // placeholders
+        'pleaseEnterContent': '请输入内容',
+        'pleaseEnterAppId': '请输入应用ID',
+        'pleaseSelectNamespace': '请选择命名空间',
+        'pleaseEnterTag': '请输入标签',
+        'pleaseEnterTags': '请输入标签，多个标签用逗号分隔',
+        'pleaseEnterExtraConfig': '请输入额外配置信息',
+        'pleaseEnterPhone': '请输入手机号',
+        'pleaseEnterEmail': '请输入邮箱地址',
+        'pleaseEnterWebhook': '请输入Webhook地址用于接收通知',
+
+        // success/error messages
+        'modifySuccess': '修改成功',
+        'modifyFailed': '修改失败: ',
+        'passwordModifySuccess': '密码修改成功，请重新登录',
+        'passwordModifyFailed': '密码修改失败: ',
+        'becomeAdminSuccess': '成功成为应用管理员',
+        'applyFailed': '申请失败: ',
+        'operationFailed': '操作失败: ',
+        'tokenCopied': '令牌已复制到剪贴板',
+        'copyFailed': '复制失败',
     },
     ...zhLocale
 };

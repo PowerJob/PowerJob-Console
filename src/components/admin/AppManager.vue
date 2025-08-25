@@ -7,7 +7,7 @@
         <el-form-item label="应用ID">
           <el-input 
             v-model="queryAppRequest.appId" 
-            placeholder="请输入应用ID"
+            :placeholder="$t('message.pleaseEnterAppId')"
             style="width: 140px;"
             clearable />
         </el-form-item>
@@ -31,7 +31,7 @@
         <el-form-item label="命名空间">
           <el-select 
             v-model="queryAppRequest.namespaceId" 
-            placeholder="请选择命名空间"
+            :placeholder="$t('message.pleaseSelectNamespace')"
             style="width: 180px;"
             clearable>
             <el-option
@@ -142,7 +142,7 @@
             <el-form-item label="命名空间" prop="namespaceId">
               <el-select 
                 v-model="modifiedAppForm.namespaceId" 
-                placeholder="请选择命名空间"
+                :placeholder="$t('message.pleaseSelectNamespace')"
                 style="width: 100%;"
                 clearable>
                 <el-option
@@ -159,7 +159,7 @@
             <el-form-item label="应用代码" prop="appName">
               <el-input 
                 v-model="modifiedAppForm.appName"
-                placeholder="请输入应用代码"
+                :placeholder="$t('message.pleaseEnterAppCode')"
                 :disabled="modifiedAppForm.id != null" />
             </el-form-item>
           </el-col>
@@ -170,7 +170,7 @@
             <el-form-item :label="$t('message.name')" prop="title">
               <el-input 
                 v-model="modifiedAppForm.title"
-                placeholder="请输入应用名称" />
+                :placeholder="$t('message.pleaseEnterAppName')" />
             </el-form-item>
           </el-col>
           
@@ -179,7 +179,7 @@
               <el-input 
                 v-model="modifiedAppForm.password"
                 type="password"
-                placeholder="请输入应用密码"
+                :placeholder="$t('message.pleaseEnterAppPassword')"
                 show-password />
             </el-form-item>
           </el-col>
@@ -188,7 +188,7 @@
         <el-form-item :label="$t('message.tag')">
           <el-input 
             v-model="modifiedAppForm.tags"
-            placeholder="请输入标签，多个标签用逗号分隔" />
+            :placeholder="$t('message.pleaseEnterTags')" />
         </el-form-item>
         
         <el-form-item :label="$t('message.extra')">
@@ -196,7 +196,7 @@
             v-model="modifiedAppForm.extra"
             type="textarea"
             :rows="3"
-            placeholder="请输入额外配置信息" />
+            :placeholder="$t('message.pleaseEnterExtraConfig')" />
         </el-form-item>
 
         <el-divider content-position="left">
@@ -295,15 +295,15 @@ export default {
       // 表单验证规则
       formRules: {
         appName: [
-          { required: true, message: '请输入应用代码', trigger: 'blur' },
-          { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
+          { required: true, message: this.$t('message.pleaseEnterAppCode'), trigger: 'blur' },
+          { min: 2, max: 50, message: this.$t('message.lengthBetween2And50'), trigger: 'blur' }
         ],
         title: [
-          { required: true, message: '请输入应用名称', trigger: 'blur' }
+          { required: true, message: this.$t('message.pleaseEnterAppName'), trigger: 'blur' }
         ],
         password: [
-          { required: true, message: '请输入应用密码', trigger: 'blur' },
-          { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
+          { required: true, message: this.$t('message.pleaseEnterAppPassword'), trigger: 'blur' },
+          { min: 6, message: this.$t('message.passwordMinLength6'), trigger: 'blur' }
         ]
       }
     }
@@ -382,7 +382,7 @@ export default {
             this.saving = false;
           });
         } else {
-          ElMessage.warning('请检查表单填写是否正确');
+          ElMessage.warning(this.$t('message.checkFormCorrect'));
         }
       });
     },

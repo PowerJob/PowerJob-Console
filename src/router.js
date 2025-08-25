@@ -11,16 +11,16 @@ const router = createRouter({
         {
             path: "/oms", component: Console, redirect: "/oms/home", children: [
                 // 二级路由
-                { path: "/oms/home", meta: { title: '主页' }, component: () => import('./components/views/Home') },
-                { path: "/oms/job", meta: { title: '任务管理' }, component: () => import('./components/views/JobManager') },
-                { path: "/oms/instance", name: "instanceManager", meta: { title: '实例管理' }, component: () => import('./components/views/InstanceManager') },
-                { path: "/oms/workflow", meta: { title: '工作流管理' }, component: () => import('./components/views/WorkflowManager') },
-                { path: "/oms/wfinstance", meta: { title: '工作流管理' }, component: () => import('./components/views/WFInstanceManager') },
-                { path: "/oms/template", meta: { title: '模版生成' }, component: () => import('./components/views/ContainerTemplate') },
-                { path: "/oms/containermanage", meta: { title: '容器管理' }, component: () => import('./components/views/ContainerManager') },
+                { path: "/oms/home", meta: { titleKey: 'message.routeHome' }, component: () => import('./components/views/Home') },
+                { path: "/oms/job", meta: { titleKey: 'message.routeJobManage' }, component: () => import('./components/views/JobManager') },
+                { path: "/oms/instance", name: "instanceManager", meta: { titleKey: 'message.routeInstanceManage' }, component: () => import('./components/views/InstanceManager') },
+                { path: "/oms/workflow", meta: { titleKey: 'message.routeWorkflowManage' }, component: () => import('./components/views/WorkflowManager') },
+                { path: "/oms/wfinstance", meta: { titleKey: 'message.routeWfInstanceManage' }, component: () => import('./components/views/WFInstanceManager') },
+                { path: "/oms/template", meta: { titleKey: 'message.routeTemplateGenerate' }, component: () => import('./components/views/ContainerTemplate') },
+                { path: "/oms/containermanage", meta: { titleKey: 'message.routeContainerManage' }, component: () => import('./components/views/ContainerManager') },
 
-                { path: "/oms/wfInstanceDetail/:wfInstanceId", name: "WorkflowInstanceDetail", meta: { title: '工作流实例详情' }, component: () => import('./components/dag/WorkflowInstanceDetail') },
-                { path: "/oms/workflowEditor", name: "workflowEditor", meta: { title: '工作流编辑器' }, component: () => import('./components/dag/WorkflowEditor') }
+                { path: "/oms/wfInstanceDetail/:wfInstanceId", name: "WorkflowInstanceDetail", meta: { titleKey: 'message.routeWfInstanceDetail' }, component: () => import('./components/dag/WorkflowInstanceDetail') },
+                { path: "/oms/workflowEditor", name: "workflowEditor", meta: { titleKey: 'message.routeWorkflowEditor' }, component: () => import('./components/dag/WorkflowEditor') }
             ]
         },
 
@@ -28,11 +28,11 @@ const router = createRouter({
         {
             path: "/admin", component: AdminConsole, redirect: "/admin/app", children: [
                 // 二级路由
-                { path: "/admin/app", meta: { title: '应用管理' }, component: () => import('./components/admin/AppManager.vue') },
-                { path: "/admin/namespace", meta: { title: '命名空间' }, component: () => import('./components/admin/NamespaceManager.vue') },
-                { path: "/admin/personal", meta: { title: '个人设置' }, component: () => import('./components/admin/UserCenter.vue') },
-                { path: "/admin/settings", meta: { title: '系统设置' }, component: () => import('./components/admin/Settings.vue') },
-                { path: "/admin/user", meta: { title: '用户管理' }, component: () => import('./components/admin/UserManager.vue') }
+                { path: "/admin/app", meta: { titleKey: 'message.routeAppManage' }, component: () => import('./components/admin/AppManager.vue') },
+                { path: "/admin/namespace", meta: { titleKey: 'message.routeNamespace' }, component: () => import('./components/admin/NamespaceManager.vue') },
+                { path: "/admin/personal", meta: { titleKey: 'message.routePersonalSettings' }, component: () => import('./components/admin/UserCenter.vue') },
+                { path: "/admin/settings", meta: { titleKey: 'message.routeSystemSettings' }, component: () => import('./components/admin/Settings.vue') },
+                { path: "/admin/user", meta: { titleKey: 'message.routeUserManage' }, component: () => import('./components/admin/UserManager.vue') }
 
             ]
         },

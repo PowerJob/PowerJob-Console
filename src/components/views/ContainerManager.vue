@@ -427,20 +427,20 @@ export default {
             },
             formRules: {
                 containerName: [
-                    { required: true, message: '请输入容器名称', trigger: 'blur' },
-                    { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
+                    { required: true, message: this.$t('message.pleaseEnterContainerName'), trigger: 'blur' },
+                    { min: 2, max: 50, message: this.$t('message.lengthBetween2And50'), trigger: 'blur' }
                 ],
                 sourceType: [
-                    { required: true, message: '请选择容器类型', trigger: 'change' }
+                    { required: true, message: this.$t('message.pleaseSelectContainerType'), trigger: 'change' }
                 ]
             },
             gitFormRules: {
                 repo: [
-                    { required: true, message: '请输入 Git 仓库地址', trigger: 'blur' },
-                    { type: 'url', message: '请输入有效的 URL', trigger: 'blur' }
+                    { required: true, message: this.$t('message.pleaseEnterGitRepoUrl'), trigger: 'blur' },
+                    { type: 'url', message: this.$t('message.pleaseEnterValidUrl'), trigger: 'blur' }
                 ],
                 branch: [
-                    { required: true, message: '请输入分支名称', trigger: 'blur' }
+                    { required: true, message: this.$t('message.pleaseEnterBranchName'), trigger: 'blur' }
                 ]
             }
         }

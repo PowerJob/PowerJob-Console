@@ -53,14 +53,14 @@
                 <el-form-item label="昵称" prop="nick">
                   <el-input 
                     v-model="userDetailInfo.nick"
-                    placeholder="请输入昵称" />
+                    :placeholder="$t('message.pleaseEnterNickname')" />
                 </el-form-item>
               </el-col>
               <el-col :span="12">
                 <el-form-item label="手机号" prop="phone">
                   <el-input 
                     v-model="userDetailInfo.phone"
-                    placeholder="请输入手机号" />
+                    :placeholder="$t('message.pleaseEnterPhone')" />
                 </el-form-item>
               </el-col>
             </el-row>
@@ -68,13 +68,13 @@
             <el-form-item label="邮箱" prop="email">
               <el-input 
                 v-model="userDetailInfo.email"
-                placeholder="请输入邮箱地址" />
+                :placeholder="$t('message.pleaseEnterEmail')" />
             </el-form-item>
 
             <el-form-item label="Webhook URL">
               <el-input 
                 v-model="userDetailInfo.webHook"
-                placeholder="请输入Webhook地址用于接收通知" />
+                :placeholder="$t('message.pleaseEnterWebhook')" />
             </el-form-item>
 
             <el-form-item label="全局角色">
@@ -134,14 +134,14 @@
             <el-form-item label="应用名" prop="appName">
               <el-input 
                 v-model="appAssertRequest.appName"
-                placeholder="请输入应用名称" />
+                :placeholder="$t('message.pleaseEnterAppName')" />
             </el-form-item>
 
             <el-form-item label="应用密码" prop="password">
               <el-input 
                 v-model="appAssertRequest.password"
                 type="password"
-                placeholder="请输入应用密码"
+                :placeholder="$t('message.pleaseEnterAppPassword')"
                 show-password />
             </el-form-item>
 
@@ -290,33 +290,33 @@ export default {
       // 表单验证规则
       personalInfoRules: {
         nick: [
-          { required: true, message: '请输入昵称', trigger: 'blur' }
+          { required: true, message: this.$t('message.pleaseEnterNickname'), trigger: 'blur' }
         ],
         phone: [
-          { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+          { pattern: /^1[3-9]\d{9}$/, message: this.$t('message.pleaseEnterCorrectPhone'), trigger: 'blur' }
         ],
         email: [
-          { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
+          { type: 'email', message: this.$t('message.pleaseEnterCorrectEmail'), trigger: 'blur' }
         ]
       },
       adminRules: {
         appName: [
-          { required: true, message: '请输入应用名称', trigger: 'blur' }
+          { required: true, message: this.$t('message.pleaseEnterAppName'), trigger: 'blur' }
         ],
         password: [
-          { required: true, message: '请输入应用密码', trigger: 'blur' }
+          { required: true, message: this.$t('message.pleaseEnterAppPassword'), trigger: 'blur' }
         ]
       },
       passwordRules: {
         oldPassword: [
-          { required: true, message: '请输入旧密码', trigger: 'blur' }
+          { required: true, message: this.$t('message.pleaseEnterOldPassword'), trigger: 'blur' }
         ],
         newPassword: [
-          { required: true, message: '请输入新密码', trigger: 'blur' },
-          { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
+          { required: true, message: this.$t('message.pleaseEnterNewPassword'), trigger: 'blur' },
+          { min: 6, message: this.$t('message.passwordMinLength6'), trigger: 'blur' }
         ],
         newPassword2: [
-          { required: true, message: '请再次输入新密码', trigger: 'blur' },
+          { required: true, message: this.$t('message.pleaseEnterNewPasswordAgain'), trigger: 'blur' },
           { validator: this.validatePassword2, trigger: 'blur' }
         ]
       }
@@ -336,15 +336,15 @@ export default {
           this.saving = true;
           const that = this;
           this.axios.post('/user/modify', that.userDetailInfo).then(() => {
-            ElMessage.success("修改成功");
+            ElMessage.success(this.$t('message.modifySuccess'));
             that.fetchUserDetail();
             that.saving = false;
           }).catch(e => {
-            ElMessage.error('修改失败: ' + e);
+            ElMessage.error(this.$t('message.modifyFailed') + e);
             that.saving = false;
           });
         } else {
-          ElMessage.warning('请检查表单填写是否正确');
+          ElMessage.warning(this.$t('message.checkFormCorrect'));
         }
       });
     },
@@ -360,18 +360,18 @@ export default {
         if (valid) {
           this.changingPassword = true;
           this.axios.post('/pwjbUser/changePassword', this.changePasswordRequest).then(() => {
-            ElMessage.success('密码修改成功，请重新登录');
+            ElMessage.success(this.$t('message.passwordModifySuccess'));
             
             window.localStorage.removeItem('PowerJwt');
             window.localStorage.removeItem('Power_appId');
             this.$router.push("/");
             
           }).catch(err => {
-            ElMessage.error('密码修改失败: ' + err);
+            ElMessage.error(this.$t('message.passwordModifyFailed') + err);
             this.changingPassword = false;
           });
         } else {
-          ElMessage.warning('请检查表单填写是否正确');
+          ElMessage.warning(this.$t('message.checkFormCorrect'));
         }
       });
     },
@@ -381,17 +381,17 @@ export default {
         if (valid) {
           this.applying = true;
           this.axios.post('/appInfo/becomeAdmin', this.appAssertRequest).then(() => {
-            ElMessage.success('成功成为应用管理员');
+            ElMessage.success(this.$t('message.becomeAdminSuccess'));
             // 清空表单
             this.appAssertRequest.appName = undefined;
             this.appAssertRequest.password = undefined;
             this.applying = false;
           }).catch(e => {
-            ElMessage.error('申请失败: ' + e);
+            ElMessage.error(this.$t('message.applyFailed') + e);
             this.applying = false;
           });
         } else {
-          ElMessage.warning('请检查表单填写是否正确');
+          ElMessage.warning(this.$t('message.checkFormCorrect'));
         }
       });
     },

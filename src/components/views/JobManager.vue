@@ -664,7 +664,7 @@
                     this.listJobInfos();
                 } catch (error) {
                     console.error('保存任务失败:', error);
-                    ElMessage.error('保存失败，请重试');
+                    ElMessage.error(this.$t('message.saveFailedRetry'));
                 } finally {
                     this.saveLoading = false;
                 }

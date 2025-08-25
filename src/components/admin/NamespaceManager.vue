@@ -337,7 +337,7 @@ export default {
             this.saving = false;
           });
         } else {
-          ElMessage.warning('请检查表单填写是否正确');
+          ElMessage.warning(this.$t('message.checkFormCorrect'));
         }
       });
     },
@@ -360,10 +360,10 @@ export default {
         }
       }).then(ret => {
         console.log('delete ret: ' + ret)
-        ElMessage.success('删除成功');
+        ElMessage.success(this.$t('message.deleteSuccess'));
         this.listNamespaces();
       }).catch(e => {
-        ElMessage.error('删除失败: ' + e);
+        ElMessage.error(this.$t('message.deleteFailed') + ': ' + e);
       });
     },
     
@@ -371,9 +371,9 @@ export default {
     copyToken() {
       if (this.modifiedNamespaceForm.token) {
         navigator.clipboard.writeText(this.modifiedNamespaceForm.token).then(() => {
-          ElMessage.success('令牌已复制到剪贴板');
+          ElMessage.success(this.$t('message.tokenCopied'));
         }).catch(() => {
-          ElMessage.error('复制失败');
+          ElMessage.error(this.$t('message.copyFailed'));
         });
       }
     },

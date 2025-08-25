@@ -301,6 +301,67 @@ const en = {
         'personalInfo': 'Personal Info',
         'appAdmin': 'App Admin',
         'authThenBecomeAdmin': 'Auth then become admin',
+
+        // form validation messages
+        'pleaseEnterContainerName': 'Please enter container name',
+        'lengthBetween2And50': 'Length should be between 2 and 50 characters',
+        'pleaseSelectContainerType': 'Please select container type',
+        'pleaseEnterGitRepoUrl': 'Please enter Git repository URL',
+        'pleaseEnterValidUrl': 'Please enter valid URL',
+        'pleaseEnterBranchName': 'Please enter branch name',
+        'pleaseEnterAppCode': 'Please enter app code',
+        'pleaseEnterAppName': 'Please enter app name',
+        'pleaseEnterAppPassword': 'Please enter app password',
+        'passwordMinLength6': 'Password length must be at least 6 characters',
+        'pleaseEnterNickname': 'Please enter nickname',
+        'pleaseEnterCorrectPhone': 'Please enter correct phone number',
+        'pleaseEnterCorrectEmail': 'Please enter correct email address',
+        'pleaseEnterOldPassword': 'Please enter old password',
+        'pleaseEnterNewPassword': 'Please enter new password',
+        'pleaseEnterNewPasswordAgain': 'Please enter new password again',
+
+        // route titles
+        'routeHome': 'Home',
+        'routeJobManage': 'Job Management',
+        'routeInstanceManage': 'Instance Management',
+        'routeWorkflowManage': 'Workflow Management',
+        'routeWfInstanceManage': 'Workflow Instance Management',
+        'routeTemplateGenerate': 'Template Generator',
+        'routeContainerManage': 'Container Management',
+        'routeWfInstanceDetail': 'Workflow Instance Detail',
+        'routeWorkflowEditor': 'Workflow Editor',
+        'routeAppManage': 'App Management',
+        'routeNamespace': 'Namespace',
+        'routePersonalSettings': 'Personal Settings',
+        'routeSystemSettings': 'System Settings',
+        'routeUserManage': 'User Management',
+
+        // error messages
+        'saveFailedRetry': 'Save failed, please retry',
+        'checkFormCorrect': 'Please check if the form is filled correctly',
+        'deployConnectionFailed': 'Deploy connection failed',
+
+        // placeholders
+        'pleaseEnterContent': 'Please enter content',
+        'pleaseEnterAppId': 'Please enter app ID',
+        'pleaseSelectNamespace': 'Please select namespace',
+        'pleaseEnterTag': 'Please enter tag',
+        'pleaseEnterTags': 'Please enter tags, separated by commas',
+        'pleaseEnterExtraConfig': 'Please enter extra configuration',
+        'pleaseEnterPhone': 'Please enter phone number',
+        'pleaseEnterEmail': 'Please enter email address',
+        'pleaseEnterWebhook': 'Please enter Webhook URL for notifications',
+
+        // success/error messages
+        'modifySuccess': 'Modify successful',
+        'modifyFailed': 'Modify failed: ',
+        'passwordModifySuccess': 'Password modified successfully, please login again',
+        'passwordModifyFailed': 'Password modify failed: ',
+        'becomeAdminSuccess': 'Successfully became application administrator',
+        'applyFailed': 'Apply failed: ',
+        'operationFailed': 'Operation failed: ',
+        'tokenCopied': 'Token copied to clipboard',
+        'copyFailed': 'Copy failed',
     },
     ...enLocale
 };
