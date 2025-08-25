@@ -573,4 +573,57 @@ export default {
     padding: 2px 6px;
   }
 }
+
+/* 任务状态行字体颜色样式 */
+:deep(.el-table .waiting-dispatch-row) {
+  color: #ea580c !important;  /* 橙色 - 等待派发 */
+  font-weight: 500;
+}
+
+:deep(.el-table .waiting-worker-row) {
+  color: #2563eb !important;  /* 蓝色 - 等待Worker接收 */
+  font-weight: 500;
+}
+
+:deep(.el-table .running-row) {
+  color: #0891b2 !important;  /* 青色 - 运行中 */
+  font-weight: 600;
+  animation: pulse-text 2s infinite;
+}
+
+:deep(.el-table .success-row) {
+  color: #16a34a !important;  /* 绿色 - 成功 */
+  font-weight: 600;
+}
+
+:deep(.el-table .failed-row) {
+  color: #dc2626 !important;  /* 红色 - 失败 */
+  font-weight: 600;
+}
+
+:deep(.el-table .canceled-row) {
+  color: #6b7280 !important;  /* 灰色 - 取消 */
+  font-weight: 500;
+}
+
+:deep(.el-table .stopped-row) {
+  color: #d97706 !important;  /* 黄色 - 手动停止 */
+  font-weight: 500;
+}
+
+/* 运行中状态的文字闪烁动画效果 */
+@keyframes pulse-text {
+  0% {
+    color: #0891b2;
+    opacity: 1;
+  }
+  50% {
+    color: #0284c7;
+    opacity: 0.8;
+  }
+  100% {
+    color: #0891b2;
+    opacity: 1;
+  }
+}
 </style>
