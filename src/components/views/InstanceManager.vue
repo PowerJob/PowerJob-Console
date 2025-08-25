@@ -309,15 +309,29 @@ export default {
     },
     instanceTableRowClassName({ row }) {
       switch (row.status) {
+        // 等待派发
+        case 1:
+          return "waiting-dispatch-row";
+        // 等待Worker接收  
+        case 2:
+          return "waiting-worker-row";
+        // 运行中
+        case 3:
+          return "running-row";
         // 失败
         case 4:
-          return "error-row";
+          return "failed-row";
         // 成功
         case 5:
           return "success-row";
+        // 取消
         case 9:
+          return "canceled-row";
+        // 手动停止
         case 10:
-          return "warning-row";
+          return "stopped-row";
+        default:
+          return "";
       }
     },
     // 查看日志
