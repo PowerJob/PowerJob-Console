@@ -135,7 +135,7 @@
               <span v-else class="text-placeholder">-</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('message.cpuLoad')" width="140" sortable align="center">
+          <el-table-column :label="$t('message.cpuLoad')" width="150" sortable align="center">
             <template #default="scope">
               <div class="load-cell" v-if="scope.row.cpuLoad">
                 <span class="load-text">{{formatLoadDisplay(scope.row.cpuLoad)}}</span>
@@ -143,7 +143,7 @@
               <span v-else class="text-placeholder">-</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('message.memoryLoad')" width="140" sortable align="center">
+          <el-table-column :label="$t('message.memoryLoad')" width="180" sortable align="center">
             <template #default="scope">
               <div class="load-cell" v-if="scope.row.memoryLoad">
                 <span class="load-text">{{formatLoadDisplay(scope.row.memoryLoad)}}</span>
@@ -151,7 +151,7 @@
               <span v-else class="text-placeholder">-</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('message.diskLoad')" width="140" sortable align="center">
+          <el-table-column :label="$t('message.diskLoad')" width="180" sortable align="center">
             <template #default="scope">
               <div class="load-cell" v-if="scope.row.diskLoad">
                 <span class="load-text">{{formatLoadDisplay(scope.row.diskLoad)}}</span>

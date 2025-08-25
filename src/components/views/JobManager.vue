@@ -2,7 +2,7 @@
     <div class="job-manager">
 
         <!-- Search and Action Section -->
-        <div class="pj-form-section">
+        <div class="pj-form-section" style="padding-top: 0; margin-top: 0;">
             <div class="search-container">
                 <div class="search-form">
                     <el-form :inline="true" :model="jobQueryContent" class="el-form--inline">
@@ -11,7 +11,7 @@
                                 v-model="jobQueryContent.jobId" 
                                 :placeholder="$t('message.jobId')"
                                 clearable
-                                style="width: 200px;"
+                                style="width: 180px;"
                             />
                         </el-form-item>
                         <el-form-item :label="$t('message.keyword')">
@@ -19,20 +19,22 @@
                                 v-model="jobQueryContent.keyword" 
                                 :placeholder="$t('message.keyword')"
                                 clearable
-                                style="width: 200px;"
+                                style="width: 180px;"
                             />
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button type="primary" @click="listJobInfos">
-                                <el-icon class="mr-1"><Search /></el-icon>
-                                {{$t('message.query')}}
-                            </el-button>
-                            <el-button @click="onClickReset">{{$t('message.reset')}}</el-button>
                         </el-form-item>
                     </el-form>
                 </div>
                 
                 <div class="action-buttons">
+                    <el-button @click="onClickReset">{{$t('message.reset')}}</el-button>
+                    <el-button type="primary" @click="listJobInfos">
+                        <el-icon class="mr-1"><Search /></el-icon>
+                        {{$t('message.query')}}
+                    </el-button>
+                    <el-button type="info" @click="listJobInfos">
+                        <el-icon class="mr-1"><Refresh /></el-icon>
+                        {{$t('message.refresh')}}
+                    </el-button>
                     <el-button type="success" @click="onClickJobInputButton">
                         <el-icon class="mr-1"><Upload /></el-icon>
                         {{$t('message.inputJob')}}
@@ -46,7 +48,7 @@
         </div>
 
         <!-- Table Section -->
-        <div class="pj-table">
+        <div class="pj-table" style="margin-top: var(--pj-space-sm);">
             <el-table 
                 :data="jobInfoPageResult.data" 
                 style="width: 100%"
@@ -516,7 +518,7 @@
     import DailyTimeIntervalForm from "../common/DailyTimeIntervalForm";
     import Exporter from "../common/Exporter";
     import { ElMessage } from 'element-plus';
-    import { Search, Upload, Plus, ArrowDown, Edit, VideoPlay, Setting, Clock, CopyDocument, Download, Delete } from '@element-plus/icons-vue';
+    import { Search, Upload, Plus, ArrowDown, Edit, VideoPlay, Setting, Clock, CopyDocument, Download, Delete, Refresh } from '@element-plus/icons-vue';
     export default {
         name: "JobManager",
         components: {
@@ -533,7 +535,8 @@
             Clock,
             CopyDocument,
             Download,
-            Delete
+            Delete,
+            Refresh
         },
         data() {
             return {
@@ -947,6 +950,12 @@
     background: transparent;
 }
 
+/* Compact spacing */
+:deep(.pj-form-section) {
+  margin-bottom: var(--pj-space-sm) !important;
+  padding: var(--pj-space-sm) !important;
+}
+
 /* Search Section */
 .search-container {
     display: flex;
@@ -958,7 +967,11 @@
 
 .search-form {
     flex: 1;
-    min-width: 400px;
+    min-width: 500px;
+}
+
+.search-form :deep(.el-form--inline .el-form-item) {
+  margin-bottom: var(--pj-space-xs);
 }
 
 .action-buttons {
