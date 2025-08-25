@@ -51,14 +51,14 @@
                     </el-menu-item>
 
 
-                    <el-submenu index="/oms/container">
+                    <el-sub-menu index="/oms/container">
                         <template #title>
-                            <el-icon><FolderOpened /></el-icon>
+                            <el-icon><Present /></el-icon>
                             <span>{{$t('message.tabContainerOps')}}</span>
                         </template>
                         <el-menu-item index="/oms/template">{{$t('message.tabTemplate')}}</el-menu-item>
                         <el-menu-item index="/oms/containermanage">{{$t('message.tabContainerManager')}}</el-menu-item>
-                    </el-submenu>
+                    </el-sub-menu>
 
                 </el-menu>
             </el-aside>
@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import { Monitor, DataAnalysis, DataBoard, Share, Operation, FolderOpened } from '@element-plus/icons-vue'
+import { Monitor, DataAnalysis, DataBoard, Share, Operation } from '@element-plus/icons-vue'
 
 export default {
         name: "Sidebar",
@@ -81,8 +81,7 @@ export default {
             DataAnalysis, 
             DataBoard,
             Share,
-            Operation,
-            FolderOpened
+            Operation
         },
         data() {
             return {
@@ -170,8 +169,8 @@ export default {
             }
         }
         
-        .el-submenu {
-            .el-submenu__title {
+        .el-sub-menu {
+            .el-sub-menu__title {
                 height: 56px;
                 line-height: 56px;
                 margin: 0 var(--pj-space-sm);
