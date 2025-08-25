@@ -736,7 +736,7 @@ export default {
 <style scoped>
 /* Main container */
 .container-manager {
-  padding: 24px;
+  padding: 0px;
   background: #f8f9fa;
   min-height: calc(100vh - 60px);
 }
