@@ -24,7 +24,7 @@
             <div class="info-content">
               <div class="info-label">Master IP</div>
               <div class="info-value">{{ systemInfo.scheduleServerInfo.ip }}</div>
-              <div class="info-subtitle">运行时间: {{formatUptime(systemInfo.scheduleServerInfo.bornTime)}}</div>
+              <div class="info-subtitle">启动时间: {{formatServerTime(systemInfo.scheduleServerInfo.bornTime)}}</div>
             </div>
           </div>
 
@@ -89,7 +89,7 @@
           
           <div class="metric-item workers">
             <div class="metric-icon">
-              <el-icon><Server /></el-icon>
+              <el-icon><Platform /></el-icon>
             </div>
             <div class="metric-info">
               <div class="metric-number">{{activeWorkerCount}}</div>
@@ -175,14 +175,14 @@
 <script>
 import { 
   Monitor, Connection, Clock, LocationInformation, 
-  Setting, VideoPlay, Warning, Server
+  Setting, VideoPlay, Warning, Platform
 } from '@element-plus/icons-vue';
 
 export default {
   name: "Home",
   components: {
     Monitor, Connection, Clock, LocationInformation,
-     Setting, VideoPlay, Warning, Server
+     Setting, VideoPlay, Warning, Platform
   },
   data() {
     return {
@@ -570,7 +570,6 @@ export default {
       justify-content: center;
       font-size: 16px;
       flex-shrink: 0;
-      background: linear-gradient(135deg, var(--pj-primary), var(--pj-primary-light));
       color: white;
     }
 
@@ -605,6 +604,23 @@ export default {
         line-height: 1.2;
         margin-top: auto;
       }
+    }
+    
+    // 为不同的系统信息图标分配不同颜色
+    &:nth-child(1) .info-icon {
+      background: linear-gradient(135deg, #1890ff, #40a9ff); // 蓝色 - 应用名称
+    }
+    
+    &:nth-child(2) .info-icon {
+      background: linear-gradient(135deg, #52c41a, #73d13d); // 绿色 - Master IP
+    }
+    
+    &:nth-child(3) .info-icon {
+      background: linear-gradient(135deg, #fa8c16, #ffa940); // 橙色 - 服务器时区
+    }
+    
+    &:nth-child(4) .info-icon {
+      background: linear-gradient(135deg, #722ed1, #9254de); // 紫色 - 本地时区
     }
   }
 }
