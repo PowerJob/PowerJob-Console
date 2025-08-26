@@ -81,6 +81,38 @@
             <span class="title">{{ instanceDetail.instanceParams }}</span>
           </el-col>
         </el-row>
+        <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
+          <el-col :span="24">
+            <span class="power-job-text"
+              >业务外建:</span
+            >
+            <span class="title">{{ instanceDetail.outerKey }}</span>
+          </el-col>
+        </el-row>
+        <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
+          <el-col :span="24">
+            <span class="power-job-text"
+              >业务扩展数据:</span
+            >
+            <span class="title">{{ instanceDetail.extendValue }}</span>
+          </el-col>
+        </el-row>
+        <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
+          <el-col :span="24">
+            <span class="power-job-text"
+              >运行时配置:</span
+            >
+            <span class="title">{{ instanceDetail.runtimeParams }}</span>
+          </el-col>
+        </el-row>
+        <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
+          <el-col :span="24">
+            <span class="power-job-text"
+              >调度元信息:</span
+            >
+            <span class="title">{{ instanceDetail.meta }}</span>
+          </el-col>
+        </el-row>
         <el-row class="job-detail-text">
           <el-col :span="24">
             <div
