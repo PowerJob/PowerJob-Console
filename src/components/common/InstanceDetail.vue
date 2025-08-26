@@ -102,7 +102,7 @@
             <span class="power-job-text"
               >运行时配置:</span
             >
-            <span class="title">{{ instanceDetail.runtimeParams }}</span>
+            <span class="title">{{ instanceDetail.runtimeConfig }}</span>
           </el-col>
         </el-row>
         <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">

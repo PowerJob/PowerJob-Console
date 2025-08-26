@@ -536,7 +536,7 @@
                 
                 <el-form-item :label="$t('message.designatedWorkersRuntime')">
                     <el-input
-                        v-model="advancedRunForm.runtimeParams.designatedWorkers"
+                        v-model="advancedRunForm.runtimeConfig.designatedWorkers"
                         :placeholder="$t('message.designatedWorkersRuntimePlaceholder')">
                     </el-input>
                 </el-form-item>
@@ -671,7 +671,7 @@
                     delay: null,
                     outerKey: '',
                     extendValue: '',
-                    runtimeParams: {
+                  runtimeConfig: {
                         designatedWorkers: ''
                     }
                 },
@@ -811,7 +811,7 @@
                     delay: null,
                     outerKey: '',
                     extendValue: '',
-                    runtimeParams: {
+                  runtimeConfig: {
                         designatedWorkers: ''
                     }
                 };
@@ -834,7 +834,7 @@
                     delay: null,
                     outerKey: '',
                     extendValue: '',
-                    runtimeParams: {
+                  runtimeConfig: {
                         designatedWorkers: ''
                     }
                 };
@@ -859,8 +859,8 @@
                     if (!payload.extendValue) {
                         delete payload.extendValue;
                     }
-                    if (!payload.runtimeParams.designatedWorkers) {
-                        delete payload.runtimeParams;
+                    if (!payload.runtimeConfig.designatedWorkers) {
+                        delete payload.runtimeConfig;
                     }
                     
                     await this.axios.post("/job/runPlus", payload);
