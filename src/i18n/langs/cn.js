@@ -177,7 +177,16 @@ const cn = {
         'alertThreshold': '错误阈值',
         'statisticWindow': '统计窗口',
         'silenceWindow': '沉默窗口',
-        'runByParameter': '参数运行',
+        'runByParameter': '高级运行',
+        'advancedRun': '高级运行',
+        'delay': '延迟执行(ms)',
+        'outerKey': '外键',
+        'extendValue': '扩展属性',
+        'designatedWorkersRuntime': '指定机器执行',
+        'delayPlaceholder': '延迟执行时间，单位毫秒',
+        'outerKeyPlaceholder': '用于OPENAPI场景业务绑定',
+        'extendValuePlaceholder': '用于OPENAPI场景上下文参数透传',
+        'designatedWorkersRuntimePlaceholder': '指定机器执行配置',
         'enteringParameter': '填写参数',
 
 

@@ -497,17 +497,54 @@
         <el-dialog
             :title="$t('message.runByParameter')"
             v-model="runByParameterVisible"
-            width="50%"
+            width="60%"
+            :close-on-click-modal="false"
         >
-            <el-input
-                type="textarea"
-                :rows="4"
-                :placeholder="$t('message.enteringParameter')"
-                v-model="runParameter">
-            </el-input>
+            <el-form :model="advancedRunForm" label-width="140px" class="advanced-run-form">
+                <el-form-item :label="$t('message.instanceParams')">
+                    <el-input
+                        type="textarea"
+                        :rows="4"
+                        :placeholder="$t('message.enteringParameter')"
+                        v-model="advancedRunForm.instanceParams">
+                    </el-input>
+                </el-form-item>
+                
+                <el-form-item :label="$t('message.delay')">
+                    <el-input-number
+                        v-model="advancedRunForm.delay"
+                        :placeholder="$t('message.delayPlaceholder')"
+                        :min="0"
+                        controls-position="right"
+                        style="width: 100%">
+                    </el-input-number>
+                </el-form-item>
+                
+                <el-form-item :label="$t('message.outerKey')">
+                    <el-input
+                        v-model="advancedRunForm.outerKey"
+                        :placeholder="$t('message.outerKeyPlaceholder')">
+                    </el-input>
+                </el-form-item>
+                
+                <el-form-item :label="$t('message.extendValue')">
+                    <el-input
+                        v-model="advancedRunForm.extendValue"
+                        :placeholder="$t('message.extendValuePlaceholder')">
+                    </el-input>
+                </el-form-item>
+                
+                <el-form-item :label="$t('message.designatedWorkersRuntime')">
+                    <el-input
+                        v-model="advancedRunForm.runtimeParams.designatedWorkers"
+                        :placeholder="$t('message.designatedWorkersRuntimePlaceholder')">
+                    </el-input>
+                </el-form-item>
+            </el-form>
+            
             <template #footer class="dialog-footer">
-                <el-button @click="onClickRunCancel">{{$t('message.cancel')}}</el-button>
-                <el-button type="primary" @click="onClickRun(temporaryRowData)" :loading="runLoading">{{$t('message.run')}}</el-button>
+                <el-button @click="onClickAdvancedRunCancel">{{$t('message.cancel')}}</el-button>
+                <el-button type="primary" @click="onClickAdvancedRun" :loading="runLoading">{{$t('message.run')}}</el-button>
             </template>
         </el-dialog>
     </div>
@@ -627,6 +664,17 @@
                 runLoading: false,
                 // 参数运行对话框可见性
                 runByParameterVisible: false,
+                // 高级运行表单
+                advancedRunForm: {
+                    jobId: null,
+                    instanceParams: '',
+                    delay: null,
+                    outerKey: '',
+                    extendValue: '',
+                    runtimeParams: {
+                        designatedWorkers: ''
+                    }
+                },
 
                 // 任务导入导出相关功能
                 jobExporterMode: undefined,
@@ -757,6 +805,17 @@
             // 参数运行
             onClickRunByParameter(data) {
                 this.temporaryRowData = data;
+                this.advancedRunForm = {
+                    jobId: data.id,
+                    instanceParams: '',
+                    delay: null,
+                    outerKey: '',
+                    extendValue: '',
+                    runtimeParams: {
+                        designatedWorkers: ''
+                    }
+                };
+                // 为了兼容性，保留原有逻辑
                 this.runParameter = '';
                 this.runByParameterVisible = true;
             },
@@ -765,6 +824,54 @@
                 this.temporaryRowData = null;
                 this.runParameter = null;
                 this.runByParameterVisible = false;
+            },
+            // 取消高级运行
+            onClickAdvancedRunCancel() {
+                this.temporaryRowData = null;
+                this.advancedRunForm = {
+                    jobId: null,
+                    instanceParams: '',
+                    delay: null,
+                    outerKey: '',
+                    extendValue: '',
+                    runtimeParams: {
+                        designatedWorkers: ''
+                    }
+                };
+                this.runByParameterVisible = false;
+            },
+            // 高级运行
+            async onClickAdvancedRun() {
+                try {
+                    this.runLoading = true;
+                    const payload = {
+                        ...this.advancedRunForm,
+                        jobId: this.temporaryRowData.id
+                    };
+                    
+                    // 过滤空值
+                    if (!payload.delay) {
+                        delete payload.delay;
+                    }
+                    if (!payload.outerKey) {
+                        delete payload.outerKey;
+                    }
+                    if (!payload.extendValue) {
+                        delete payload.extendValue;
+                    }
+                    if (!payload.runtimeParams.designatedWorkers) {
+                        delete payload.runtimeParams;
+                    }
+                    
+                    await this.axios.post("/job/runPlus", payload);
+                    ElMessage.success(this.$t('message.success'));
+                    this.onClickAdvancedRunCancel();
+                } catch (error) {
+                    console.error('高级运行失败:', error);
+                    ElMessage.error('运行失败，请重试');
+                } finally {
+                    this.runLoading = false;
+                }
             },
             // 点击 删除任务
             onClickDeleteJob(data) {
@@ -1432,6 +1539,47 @@
         :deep(.el-pagination) {
             flex-wrap: wrap;
             justify-content: center;
+        }
+    }
+}
+
+/* Advanced Run Form Styles */
+.advanced-run-form {
+    .el-form-item {
+        margin-bottom: var(--pj-space-lg);
+        
+        .el-form-item__label {
+            font-weight: 500;
+            color: var(--pj-text-primary);
+        }
+        
+        .el-input,
+        .el-input-number {
+            .el-input__wrapper {
+                border-radius: var(--pj-radius-sm);
+                transition: all 0.3s ease;
+                
+                &:hover {
+                    border-color: var(--pj-primary-light);
+                }
+                
+                &.is-focus {
+                    border-color: var(--pj-primary);
+                    box-shadow: 0 0 8px rgba(0, 150, 136, 0.2);
+                }
+            }
+        }
+        
+        .el-textarea {
+            .el-textarea__inner {
+                border-radius: var(--pj-radius-sm);
+                font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+                
+                &:focus {
+                    border-color: var(--pj-primary);
+                    box-shadow: 0 0 8px rgba(0, 150, 136, 0.2);
+                }
+            }
         }
     }
 }
