@@ -166,9 +166,44 @@
             </template>
           </el-table-column>
           <el-table-column prop="lastActiveTime" :label="$t('message.lastActiveTime')" width="150" sortable align="center" />
+          <el-table-column label="操作" width="80" align="center">
+            <template #default="scope">
+              <el-button 
+                type="primary" 
+                size="small" 
+                @click="showWorkerDetails(scope.row)"
+                :disabled="!scope.row.workerInfo"
+              >
+                详情
+              </el-button>
+            </template>
+          </el-table-column>
         </el-table>
       </div>
     </div>
+
+    <!-- Worker详情弹窗 -->
+    <el-dialog 
+      v-model="workerDetailsVisible" 
+      title="Worker详情信息" 
+      width="600px"
+      :append-to-body="true"
+    >
+      <div class="worker-details-content">
+        <div class="worker-basic-info">
+          <h4>基础信息</h4>
+          <p><strong>地址:</strong> {{ selectedWorker?.address }}</p>
+          <p><strong>版本:</strong> {{ selectedWorker?.version || '-' }}</p>
+        </div>
+        
+        <div class="worker-info-section">
+          <h4>详细信息 (workerInfo)</h4>
+          <div class="json-viewer">
+            <pre>{{ formatWorkerInfo(selectedWorker?.workerInfo) }}</pre>
+          </div>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -200,7 +235,9 @@ export default {
       },
       activeWorkerCount: "N/A",
       workerList: [],
-      currentTime: ''
+      currentTime: '',
+      workerDetailsVisible: false,
+      selectedWorker: null
     }
   },
   methods: {
@@ -222,20 +259,6 @@ export default {
         case 9999: return 'offline';
         default: return 'error';
       }
-    },
-    
-    // 格式化运行时间
-    formatUptime(bornTime) {
-      if (!bornTime) return '未知';
-      const now = Date.now();
-      const diff = now - bornTime;
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      
-      if (days > 0) {
-        return `${days}天${hours}小时`;
-      }
-      return `${hours}小时`;
     },
     
     // 格式化服务器时间
@@ -329,6 +352,22 @@ export default {
       }
       
       return loadStr;
+    },
+
+    // 显示Worker详情
+    showWorkerDetails(worker) {
+      this.selectedWorker = worker;
+      this.workerDetailsVisible = true;
+    },
+
+    // 格式化workerInfo JSON数据
+    formatWorkerInfo(workerInfo) {
+      if (!workerInfo) return '暂无详细信息';
+      try {
+        return JSON.stringify(workerInfo, null, 2);
+      } catch (error) {
+        return '数据格式错误';
+      }
     }
   },
   
@@ -811,6 +850,61 @@ export default {
   
   .system-info-panel .system-info-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Worker详情弹窗样式 */
+.worker-details-content {
+  .worker-basic-info {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e8e8e8;
+    
+    h4 {
+      margin: 0 0 12px 0;
+      color: var(--pj-text-primary);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    p {
+      margin: 8px 0;
+      color: var(--pj-text-secondary);
+      font-size: 13px;
+      
+      strong {
+        color: var(--pj-text-primary);
+        margin-right: 8px;
+      }
+    }
+  }
+  
+  .worker-info-section {
+    h4 {
+      margin: 0 0 12px 0;
+      color: var(--pj-text-primary);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .json-viewer {
+      background: #f5f7fa;
+      border: 1px solid #e4e7ed;
+      border-radius: 4px;
+      max-height: 400px;
+      overflow-y: auto;
+      
+      pre {
+        margin: 0;
+        padding: 16px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 12px;
+        line-height: 1.5;
+        color: #2c3e50;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+    }
   }
 }
 </style>
