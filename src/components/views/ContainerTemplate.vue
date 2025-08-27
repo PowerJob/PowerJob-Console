@@ -17,6 +17,9 @@
                 <el-radio-group v-model="form.javaVersion">
                 <el-radio label="8"></el-radio>
                 <el-radio label= "11"></el-radio>
+                  <el-radio label= "17"></el-radio>
+                  <el-radio label= "21"></el-radio>
+                  <el-radio label= "25"></el-radio>
                 </el-radio-group>
             </el-form-item>
             <el-form-item>
