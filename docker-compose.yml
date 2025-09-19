@@ -1,0 +1,13 @@
+services:
+  console:
+    restart: always
+    container_name: powerjob-console
+    image: powerjob/powerjob-console:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+      API_HOST: 127.0.0.1
+      PORT: 7700
+    ports:
+    - "8880:80"

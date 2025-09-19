@@ -15,9 +15,8 @@ import store from "./store";
 import common from "./common";
 
 Vue.use(ElementUI);
-// let baseURL = "http://139.224.83.134:7700";
-let baseURL = process.env.VUE_APP_BASE_URL;
-// let baseURL = '/api';
+// let baseURL = process.env.VUE_APP_BASE_URL;
+let baseURL = '/api';
 
 let timeout = 10000;
 
