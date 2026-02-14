@@ -84,7 +84,7 @@
         <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
           <el-col :span="24">
             <span class="power-job-text"
-              >业务外建:</span
+              >业务外键:</span
             >
             <span class="title">{{ instanceDetail.outerKey }}</span>
           </el-col>
