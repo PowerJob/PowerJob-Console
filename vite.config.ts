@@ -23,7 +23,8 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       // 源码引入：import 时直接解析到 src 目录
       '@echo009/power-workflow-next': path.resolve(workflowNextRoot, 'src/index.ts'),
-    }
+    },
+    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
   },
   server: {
     port: 8080,
