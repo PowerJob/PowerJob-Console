@@ -8,7 +8,7 @@
 <script>
 import { createRoot } from 'react-dom/client';
 import { createElement } from 'react';
-import { WorkflowCanvas } from '@echo009/power-workflow-next';
+import { WorkflowCanvas, getWorkflowState } from '@echo009/power-workflow-next';
 import '../../../power-workflow-next/dist/power-workflow-next.css';
 
 export default {
@@ -46,11 +46,7 @@ export default {
   },
   data() {
     return {
-      reactRoot: null,
-      workflowState: {
-        nodes: [],
-        edges: []
-      }
+      reactRoot: null
     };
   },
   mounted() {
@@ -82,11 +78,15 @@ export default {
 
       const { reactNodes, reactEdges } = this.convertToReactFormat(this.nodes, this.edges);
 
+      // 获取当前语言设置
+      const currentLocale = this.$i18n?.locale?.value || localStorage.getItem('oms_lang') || 'cn';
+      const reactLocale = currentLocale === 'cn' ? 'zh-CN' : 'en-US';
+
       const props = {
         nodes: reactNodes,
         edges: reactEdges,
         mode: this.mode,
-        defaultLocale: this.$i18n.locale.value === 'cn' ? 'zh-CN' : 'en-US',
+        defaultLocale: reactLocale,
         showToolbar: this.showToolbar,
         showMinimap: this.showMinimap,
         jobOptions: this.jobOptions,
@@ -250,7 +250,16 @@ export default {
      * 获取当前工作流数据（供父组件调用）
      */
     getWorkflowData() {
-      return this.convertToVueFormat(this.workflowState.nodes, this.workflowState.edges);
+      // 从 Zustand store 获取当前状态
+      const state = getWorkflowState();
+      if (state && state.nodes && state.edges) {
+        return this.convertToVueFormat(state.nodes, state.edges);
+      }
+      // 降级：返回 props 中的数据
+      return this.convertToVueFormat(
+        this.convertToReactFormat(this.nodes, this.edges).reactNodes,
+        this.convertToReactFormat(this.nodes, this.edges).reactEdges
+      );
     },
 
     /**
