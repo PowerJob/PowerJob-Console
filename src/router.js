@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import Console from "./components/Console";
+import Console from "./components/Console.vue";
 import AdminConsole from "./components/admin/AdminConsole.vue";
 
 const router = createRouter({
