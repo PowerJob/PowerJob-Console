@@ -15,6 +15,8 @@ import {
   LocaleProvider,
   getWorkflowState,
   layoutNodes,
+  assignOptimalHandles,
+  getOptimalHandlesForEdge,
 } from '@echo009/power-workflow-next';
 
 export default {
@@ -93,18 +95,78 @@ export default {
 
       const { reactNodes, reactEdges } = this.convertToReactFormat(this.nodes, this.edges);
       const positionMap = new Map((this.runtimeNodes || []).map((node) => [node.id, node.position]));
+      const sourceNodeMap = new Map((this.nodes || []).map((node) => [String(node.nodeId), node]));
       const mergedNodes = reactNodes.map((node) => {
         const cachedPosition = positionMap.get(node.id);
-        return cachedPosition ? { ...node, position: cachedPosition } : node;
+        const sourceNode = sourceNodeMap.get(node.id);
+        const hasExplicitPosition =
+          typeof sourceNode?.positionX === 'number' && typeof sourceNode?.positionY === 'number';
+        return !hasExplicitPosition && cachedPosition ? { ...node, position: cachedPosition } : node;
       });
-      this.runtimeNodes = mergedNodes;
-      this.runtimeEdges = reactEdges;
+      const layoutDirection = this.resolveLayoutDirection(mergedNodes, reactEdges);
+      const hasAllNodePositions = (this.nodes || []).every(
+        (node) => typeof node.positionX === 'number' && typeof node.positionY === 'number'
+      );
+      const normalizedNodes = hasAllNodePositions
+        ? mergedNodes
+        : layoutNodes(mergedNodes, reactEdges, { direction: layoutDirection });
+      const normalizedEdges = this.fillMissingEdgeHandles(normalizedNodes, reactEdges, layoutDirection);
+      this.runtimeNodes = normalizedNodes;
+      this.runtimeEdges = normalizedEdges;
 
       // 获取当前语言设置
       const currentLocale = this.$i18n?.locale?.value || localStorage.getItem('oms_lang') || 'cn';
       const reactLocale = currentLocale === 'cn' ? 'zh-CN' : 'en-US';
 
       this.renderRuntimeComponent(reactLocale);
+    },
+    resolveLayoutDirection(nodes, edges) {
+      const handleScore = (edges || []).reduce(
+        (acc, edge) => {
+          const sourceHandle = edge.sourceHandle;
+          const targetHandle = edge.targetHandle;
+          if (sourceHandle === 'right' || targetHandle === 'left') acc.horizontal += 1;
+          if (sourceHandle === 'bottom' || targetHandle === 'top') acc.vertical += 1;
+          return acc;
+        },
+        { horizontal: 0, vertical: 0 }
+      );
+      if (handleScore.horizontal || handleScore.vertical) {
+        return handleScore.vertical > handleScore.horizontal ? 'vertical' : 'horizontal';
+      }
+
+      const nodeMap = new Map((nodes || []).map((node) => [node.id, node]));
+      let horizontal = 0;
+      let vertical = 0;
+      (edges || []).forEach((edge) => {
+        const sourceNode = nodeMap.get(edge.source);
+        const targetNode = nodeMap.get(edge.target);
+        if (!sourceNode || !targetNode) return;
+        const dx = Math.abs((targetNode.position?.x ?? 0) - (sourceNode.position?.x ?? 0));
+        const dy = Math.abs((targetNode.position?.y ?? 0) - (sourceNode.position?.y ?? 0));
+        if (dx >= dy) horizontal += 1;
+        else vertical += 1;
+      });
+      return vertical > horizontal ? 'vertical' : 'horizontal';
+    },
+    fillMissingEdgeHandles(nodes, edges, direction) {
+      const nodeMap = new Map((nodes || []).map((node) => [node.id, node]));
+      return (edges || []).map((edge) => {
+        if (edge.sourceHandle && edge.targetHandle) return edge;
+        const sourceNode = nodeMap.get(edge.source);
+        const targetNode = nodeMap.get(edge.target);
+        if (!sourceNode || !targetNode) return edge;
+        const { sourceHandleId, targetHandleId } = getOptimalHandlesForEdge(
+          sourceNode,
+          targetNode,
+          { direction }
+        );
+        return {
+          ...edge,
+          sourceHandle: edge.sourceHandle || sourceHandleId,
+          targetHandle: edge.targetHandle || targetHandleId,
+        };
+      });
     },
     /**
      * 使用 runtime 状态渲染 React 组件
@@ -463,17 +525,21 @@ export default {
     },
 
     /**
-     * 事件处理：工具栏 - 自动布局
+     * 事件处理：工具栏 - 自动布局（使用 runtimeNodes/runtimeEdges，受控模式下 Zustand store 为空）
      */
     handleAutoLayout(direction) {
-      const state = getWorkflowState();
-      if (!state?.nodes?.length && !state?.edges?.length) {
+      const nodes = this.runtimeNodes || [];
+      const edges = this.runtimeEdges || [];
+      if (!nodes.length && !edges.length) {
         this.$emit('auto-layout', { direction });
         return;
       }
-      const { nodes, edges } = state;
       const layoutedNodes = layoutNodes(nodes, edges, { direction });
-      const { vueNodes, vueEdges } = this.convertToVueFormat(layoutedNodes, edges);
+      const layoutedEdges = assignOptimalHandles(layoutedNodes, edges, { direction });
+      this.runtimeNodes = layoutedNodes;
+      this.runtimeEdges = layoutedEdges;
+      this.scheduleRuntimeRender();
+      const { vueNodes, vueEdges } = this.convertToVueFormat(layoutedNodes, layoutedEdges);
       this.$emit('auto-layout-applied', { vueNodes, vueEdges });
     },
 
