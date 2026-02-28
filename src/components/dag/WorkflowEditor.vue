@@ -496,7 +496,12 @@ export default {
         const tempNodes = this.taskList.filter(
           (n) => (typeof n.nodeId === 'number' && n.nodeId < 0) || String(n.nodeId).startsWith('temp-')
         );
-        const preserved = tempNodes.filter((n) => !stateIds.has(n.nodeId));
+        const removedIds = new Set(
+          (changes || []).filter((c) => c.type === 'remove').map((c) => String(c.id))
+        );
+        const preserved = tempNodes.filter(
+          (n) => !stateIds.has(n.nodeId) && !removedIds.has(String(n.nodeId))
+        );
         const fromState = state.vueNodes.map((n) => ({
           nodeId: n.nodeId,
           nodeType: n.nodeType,
