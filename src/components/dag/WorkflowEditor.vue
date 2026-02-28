@@ -641,6 +641,10 @@ export default {
         this.getWorkflowInfo();
       }
     }
+
+    // 无论新建或编辑，进入页面即加载任务/工作流选项，供编辑面板「目标任务」下拉使用
+    this.listJobInfos();
+    this.loadWorkflowOptions();
   },
 };
 </script>
