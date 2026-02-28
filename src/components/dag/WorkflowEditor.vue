@@ -265,7 +265,7 @@ export default {
       this.timeExpressionValidatorVisible = true;
     },
 
-    /** 节点选中处理 */
+    /** 节点选中处理（节点属性由 power-workflow-next 自带 EditorPanel 展示） */
     handleNodeSelected(node) {
       this.selectedNodeId = node.id;
     },

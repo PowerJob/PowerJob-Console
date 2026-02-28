@@ -7,9 +7,15 @@
 
 <script>
 import { createRoot } from 'react-dom/client';
-import { createElement } from 'react';
+import { createElement, Fragment } from 'react';
 import { applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
-import { WorkflowCanvas, getWorkflowState, layoutNodes } from '@echo009/power-workflow-next';
+import {
+  WorkflowCanvas,
+  EditorPanel,
+  LocaleProvider,
+  getWorkflowState,
+  layoutNodes,
+} from '@echo009/power-workflow-next';
 
 export default {
   name: 'ReactWorkflowBridge',
@@ -49,7 +55,9 @@ export default {
       reactRoot: null,
       runtimeNodes: [],
       runtimeEdges: [],
-      runtimeRenderRaf: null
+      runtimeRenderRaf: null,
+      /** 当前选中节点 ID（用于显示 power-workflow-next 自带的 EditorPanel） */
+      selectedNodeId: null,
     };
   },
   mounted() {
@@ -105,7 +113,7 @@ export default {
       if (!this.reactRoot) return;
       const currentLocale = this.$i18n?.locale?.value || localStorage.getItem('oms_lang') || 'cn';
       const locale = reactLocale || (currentLocale === 'cn' ? 'zh-CN' : 'en-US');
-      const props = {
+      const canvasProps = {
         nodes: this.runtimeNodes,
         edges: this.runtimeEdges,
         mode: this.mode,
@@ -129,7 +137,23 @@ export default {
         onExport: this.handleExport,
         onImport: this.handleImport,
       };
-      this.reactRoot.render(createElement(WorkflowCanvas, props));
+      const editingNode =
+        this.selectedNodeId != null
+          ? (this.runtimeNodes || []).find((n) => n.id === this.selectedNodeId) ?? null
+          : null;
+      const editorPanelProps = {
+        node: editingNode,
+        open: !!editingNode,
+        onClose: this.handleEditorPanelClose,
+        onSave: this.handleEditorPanelSave,
+        jobOptions: this.jobOptions,
+        workflowOptions: this.workflowOptions,
+      };
+      const content = createElement(Fragment, null, [
+        createElement(WorkflowCanvas, canvasProps),
+        createElement(EditorPanel, editorPanelProps),
+      ]);
+      this.reactRoot.render(createElement(LocaleProvider, { defaultLocale: locale }, content));
     },
     /**
      * 按帧节流重渲染，避免高频节点变更导致 CPU 飙升
@@ -373,17 +397,39 @@ export default {
     },
 
     /**
-     * 事件处理：节点点击
+     * 事件处理：节点点击（打开 power-workflow-next 自带 EditorPanel）
      */
     handleNodeClick(_event, node) {
+      this.selectedNodeId = node.id;
+      this.renderRuntimeComponent();
       this.$emit('node-selected', node);
     },
 
     /**
-     * 事件处理：画布点击（取消选中）
+     * 事件处理：画布点击（取消选中、关闭 EditorPanel）
      */
     handlePaneClick() {
+      this.selectedNodeId = null;
+      this.renderRuntimeComponent();
       this.$emit('selection-cleared');
+    },
+
+    /** EditorPanel 关闭 */
+    handleEditorPanelClose() {
+      this.selectedNodeId = null;
+      this.renderRuntimeComponent();
+    },
+
+    /** EditorPanel 保存：更新 runtime 节点并通知 Vue */
+    handleEditorPanelSave(nodeId, data) {
+      const index = (this.runtimeNodes || []).findIndex((n) => n.id === nodeId);
+      if (index !== -1) {
+        const next = [...this.runtimeNodes];
+        next[index] = { ...next[index], data: { ...next[index].data, ...data } };
+        this.runtimeNodes = next;
+      }
+      this.scheduleRuntimeRender();
+      this.$emit('node-data-change', { nodeId, data });
     },
     /**
      * 事件处理：画布右键
