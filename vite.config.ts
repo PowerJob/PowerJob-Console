@@ -26,7 +26,9 @@ export default defineConfig({
       // power-workflow-next 项目根目录（用于 CSS 导入）
       'power-workflow-next-root': workflowNextRoot,
     },
-    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
+    extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
+    // 强制使用单一 React 实例，避免 hooks 问题
+    dedupe: ['react', 'react-dom', 'react-dom/client'],
   },
   server: {
     port: 8080,
