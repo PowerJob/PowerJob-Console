@@ -77,6 +77,11 @@
             @node-data-change="handleNodeDataChange"
             @nodes-change="handleNodesChange"
             @edges-change="handleEdgesChange"
+            @add-node="handleAddNode"
+            @auto-layout-applied="handleAutoLayoutApplied"
+            @connect="handleConnect"
+            @export="handleWorkflowExport"
+            @import="handleWorkflowImport"
           />
         </div>
       </div>
@@ -211,6 +216,9 @@ export default {
 
       /** 工作流引入显隐控制 */
       workflowVisible: false,
+
+      /** 添加节点后跳过下一次从 React 的同步，避免被 getWorkflowData 旧状态覆盖 */
+      _skipNextSyncFromReact: false,
     };
   },
   methods: {
@@ -274,16 +282,127 @@ export default {
       }
     },
 
-    /** 节点变化处理 */
+    /** 节点变化处理：从 React 画布同步节点/边到 Vue（拖拽、删除等） */
     handleNodesChange(changes) {
-      // React 组件内部已经管理了 nodes 状态
-      // 这里主要用于调试或额外处理
-      console.log('Nodes changed:', changes);
+      if (this._skipNextSyncFromReact) {
+        this._skipNextSyncFromReact = false;
+        return;
+      }
+      const state = this.$refs.workflowBridge?.getWorkflowData();
+      if (state && state.vueNodes && state.vueEdges) {
+        const stateIds = new Set(state.vueNodes.map((n) => n.nodeId));
+        const tempNodes = this.taskList.filter(
+          (n) => (typeof n.nodeId === 'number' && n.nodeId < 0) || String(n.nodeId).startsWith('temp-')
+        );
+        const preserved = tempNodes.filter((n) => !stateIds.has(n.nodeId));
+        const fromState = state.vueNodes.map((n) => ({
+          nodeId: n.nodeId,
+          nodeType: n.nodeType,
+          nodeName: n.nodeName,
+          jobId: n.jobId,
+          nodeParams: n.nodeParams,
+          enable: n.enable !== false,
+          skipWhenFailed: n.skipWhenFailed || false,
+        }));
+        this.taskList = [...preserved, ...fromState];
+        this.peworkflowDAG = {
+          nodes: this.taskList,
+          edges: state.vueEdges,
+        };
+      }
     },
 
     /** 连线变化处理 */
     handleEdgesChange(changes) {
-      console.log('Edges changed:', changes);
+      if (this._skipNextSyncFromReact) return;
+      const state = this.$refs.workflowBridge?.getWorkflowData();
+      if (state && state.vueNodes && state.vueEdges) {
+        const stateIds = new Set(state.vueNodes.map((n) => n.nodeId));
+        const tempNodes = this.taskList.filter(
+          (n) => (typeof n.nodeId === 'number' && n.nodeId < 0) || String(n.nodeId).startsWith('temp-')
+        );
+        const preserved = tempNodes.filter((n) => !stateIds.has(n.nodeId));
+        const fromState = state.vueNodes.map((n) => ({
+          nodeId: n.nodeId,
+          nodeType: n.nodeType,
+          nodeName: n.nodeName,
+          jobId: n.jobId,
+          nodeParams: n.nodeParams,
+          enable: n.enable !== false,
+          skipWhenFailed: n.skipWhenFailed || false,
+        }));
+        this.taskList = [...preserved, ...fromState];
+        this.peworkflowDAG = {
+          nodes: this.taskList,
+          edges: state.vueEdges,
+        };
+      }
+    },
+
+    /** 工具栏：添加节点 */
+    handleAddNode({ type, position }) {
+      this._skipNextSyncFromReact = true;
+      const typeMap = { JOB: 1, DECISION: 2, NESTED_WORKFLOW: 3 };
+      const nodeType = typeMap[type] ?? 1;
+      const tempId = -Date.now();
+      const newNode = {
+        nodeId: tempId,
+        nodeType,
+        nodeName: type === 'JOB' ? this.$t('message.newJobNode') || '新任务' : type === 'DECISION' ? this.$t('message.decision') || '判断' : this.$t('message.nestedWorkflow') || '子工作流',
+        jobId: type === 'JOB' || type === 'NESTED_WORKFLOW' ? undefined : undefined,
+        nodeParams: '',
+        enable: true,
+        skipWhenFailed: false,
+      };
+      this.taskList = [...this.taskList, newNode];
+      this.peworkflowDAG = {
+        nodes: this.taskList,
+        edges: this.peworkflowDAG.edges,
+      };
+    },
+
+    /** 工具栏：应用自动布局后的节点/边 */
+    handleAutoLayoutApplied({ vueNodes, vueEdges }) {
+      this.taskList = vueNodes.map((n) => ({
+        nodeId: n.nodeId,
+        nodeType: n.nodeType,
+        nodeName: n.nodeName,
+        jobId: n.jobId,
+        nodeParams: n.nodeParams,
+        enable: n.enable !== false,
+        skipWhenFailed: n.skipWhenFailed || false,
+      }));
+      this.peworkflowDAG = { nodes: this.taskList, edges: vueEdges };
+    },
+
+    /** 画布连线：新建连线时同步到 peworkflowDAG */
+    handleConnect(connection) {
+      const state = this.$refs.workflowBridge?.getWorkflowData();
+      if (state && state.vueEdges) {
+        this.peworkflowDAG = {
+          nodes: this.peworkflowDAG.nodes,
+          edges: state.vueEdges,
+        };
+      }
+    },
+
+    /** 工具栏：导出工作流 JSON */
+    handleWorkflowExport() {
+      const { vueNodes, vueEdges } = this.$refs.workflowBridge?.getWorkflowData() || {};
+      if (!vueNodes || !vueEdges) return;
+      const json = JSON.stringify({ nodes: vueNodes, edges: vueEdges }, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `workflow-${this.workflowInfo.wfName || 'export'}-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    },
+
+    /** 工具栏：导入工作流（打开导入任务抽屉） */
+    handleWorkflowImport() {
+      this.importDrawerVisible = true;
     },
 
     /** 根据nodeId找任务节点索引 */

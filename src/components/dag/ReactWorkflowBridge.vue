@@ -8,7 +8,7 @@
 <script>
 import { createRoot } from 'react-dom/client';
 import { createElement } from 'react';
-import { WorkflowCanvas, getWorkflowState } from '@echo009/power-workflow-next';
+import { WorkflowCanvas, getWorkflowState, layoutNodes } from '@echo009/power-workflow-next';
 
 export default {
   name: 'ReactWorkflowBridge',
@@ -99,6 +99,10 @@ export default {
         onNodeClick: this.handleNodeClick,
         onPaneClick: this.handlePaneClick,
         onValidationError: this.handleValidationError,
+        onAddNode: this.handleAddNode,
+        onAutoLayout: this.handleAutoLayout,
+        onExport: this.handleExport,
+        onImport: this.handleImport,
       };
 
       this.reactRoot.render(createElement(WorkflowCanvas, props));
@@ -311,6 +315,42 @@ export default {
      */
     handleValidationError(errors) {
       this.$emit('validation-error', errors);
+    },
+
+    /**
+     * 事件处理：工具栏 - 添加节点
+     */
+    handleAddNode(type, position) {
+      this.$emit('add-node', { type, position });
+    },
+
+    /**
+     * 事件处理：工具栏 - 自动布局
+     */
+    handleAutoLayout(direction) {
+      const state = getWorkflowState();
+      if (!state?.nodes?.length && !state?.edges?.length) {
+        this.$emit('auto-layout', { direction });
+        return;
+      }
+      const { nodes, edges } = state;
+      const layoutedNodes = layoutNodes(nodes, edges, { direction });
+      const { vueNodes, vueEdges } = this.convertToVueFormat(layoutedNodes, edges);
+      this.$emit('auto-layout-applied', { vueNodes, vueEdges });
+    },
+
+    /**
+     * 事件处理：工具栏 - 导出
+     */
+    handleExport() {
+      this.$emit('export');
+    },
+
+    /**
+     * 事件处理：工具栏 - 导入
+     */
+    handleImport() {
+      this.$emit('import');
     },
   },
   watch: {
