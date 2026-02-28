@@ -430,6 +430,7 @@ export default {
       }
       this.scheduleRuntimeRender();
       this.$emit('node-data-change', { nodeId, data });
+      this.$emit('editor-panel-save', { nodeId, data });
     },
     /**
      * 事件处理：画布右键

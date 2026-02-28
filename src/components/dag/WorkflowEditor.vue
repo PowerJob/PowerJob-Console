@@ -75,6 +75,7 @@
             @node-selected="handleNodeSelected"
             @selection-cleared="handleSelectionCleared"
             @node-data-change="handleNodeDataChange"
+            @editor-panel-save="handleEditorPanelSave"
             @nodes-change="handleNodesChange"
             @edges-change="handleEdgesChange"
             @add-node="handleAddNode"
@@ -220,6 +221,10 @@ export default {
 
       /** 添加节点后跳过下一次从 React 的同步，避免被 getWorkflowData 旧状态覆盖 */
       _skipNextSyncFromReact: false,
+
+      /** 自动持久化并发保护 */
+      _autoPersistInFlight: false,
+      _pendingAutoPersist: null,
     };
   },
   methods: {
@@ -229,6 +234,162 @@ export default {
       const t = target ?? '';
       if (sourceHandle == null && targetHandle == null) return `e${s}-${t}`;
       return `e${s}-${t}-${sourceHandle ?? 's'}-${targetHandle ?? 't'}`;
+    },
+
+    /** 是否为前端临时节点 ID */
+    isTempNodeId(nodeId) {
+      return (typeof nodeId === 'number' && nodeId < 0) || String(nodeId).startsWith('temp-');
+    },
+
+    /** 节点配置是否完整（用于临时节点入库前校验） */
+    isNodeConfigComplete(node) {
+      const nodeType = Number(node.nodeType);
+      if (nodeType === 1 || nodeType === 3) {
+        return !!node.jobId;
+      }
+      if (nodeType === 2) {
+        return !!String(node.nodeParams || '').trim();
+      }
+      return true;
+    },
+
+    /** 从 /workflow/save 响应中提取 workflowId（axios 拦截器成功后返回 response.data.data，即 Long 型 id） */
+    extractWorkflowIdFromSaveResponse(res) {
+      if (res != null && typeof res === 'number') return res;
+      return res?.id ?? res?.workflowId ?? res?.data?.id ?? res?.data?.workflowId ?? null;
+    },
+
+    /** 将生命周期字段转换为后端要求格式 */
+    buildProcessedWorkflowInfo() {
+      const processedWorkflowInfo = { ...this.workflowInfo };
+      const { lifeCycle } = processedWorkflowInfo;
+      if (lifeCycle && Array.isArray(lifeCycle) && lifeCycle.length === 2) {
+        const [start, end] = lifeCycle;
+        if (start && end && !isNaN(start) && !isNaN(end)) {
+          processedWorkflowInfo.lifeCycle = {
+            start: parseInt(start),
+            end: parseInt(end)
+          };
+        } else {
+          processedWorkflowInfo.lifeCycle = null;
+        }
+      } else {
+        processedWorkflowInfo.lifeCycle = null;
+      }
+      return processedWorkflowInfo;
+    },
+
+    /** 构建保存 DAG（过滤临时节点及其相关边，避免上传虚拟 ID） */
+    buildPersistableDagInfo(vueNodes, vueEdges) {
+      const persistedNodes = vueNodes.filter((item) => !this.isTempNodeId(item.nodeId));
+      const persistedNodeIds = new Set(persistedNodes.map((item) => String(item.nodeId)));
+      return {
+        nodes: persistedNodes.map(item => ({ nodeId: item.nodeId })),
+        edges: vueEdges
+          .filter((item) => persistedNodeIds.has(String(item.from)) && persistedNodeIds.has(String(item.to)))
+          .map(item => {
+            const property = {};
+            if (item.property) {
+              property.property = item.property;
+            }
+            return {
+              from: item.from,
+              to: item.to,
+              ...property,
+            };
+          }),
+      };
+    },
+
+    /** 临时节点保存到后端（后端 saveNode 不要求 workflowId，节点可由 saveWorkflow 时再关联） */
+    async saveTempNode(node) {
+      const payload = [
+        {
+          appId: this.workflowInfo.appId,
+          enable: node.enable !== false,
+          skipWhenFailed: node.skipWhenFailed || false,
+          nodeName: node.nodeName,
+          jobId: node.jobId,
+          nodeParams: node.nodeParams || '',
+          type: Number(node.nodeType) || 1,
+        },
+      ];
+      const res = await this.axios.post("/workflow/saveNode", payload);
+      const created = Array.isArray(res) ? res[0] : (Array.isArray(res?.data) ? res.data[0] : res);
+      if (!created || !created.id) {
+        throw new Error('SAVE_NODE_RESPONSE_INVALID');
+      }
+      this.replaceNodeId(node.nodeId, created.id);
+    },
+
+    /** 单独保存单个节点到后端（新建或更新），不检查其他节点状态 */
+    async saveSingleNode(node) {
+      const isUpdate = !this.isTempNodeId(node.nodeId);
+      const payload = [
+        {
+          appId: this.workflowInfo.appId,
+          enable: node.enable !== false,
+          skipWhenFailed: node.skipWhenFailed || false,
+          nodeName: node.nodeName,
+          jobId: node.jobId,
+          nodeParams: node.nodeParams || '',
+          type: Number(node.nodeType) || 1,
+        },
+      ];
+      if (isUpdate) {
+        payload[0].id = node.nodeId;
+      }
+      const res = await this.axios.post("/workflow/saveNode", payload);
+      const saved = Array.isArray(res) ? res[0] : (Array.isArray(res?.data) ? res.data[0] : res);
+      if (!saved || !saved.id) {
+        throw new Error('SAVE_NODE_RESPONSE_INVALID');
+      }
+      if (!isUpdate) {
+        this.replaceNodeId(node.nodeId, saved.id);
+      }
+    },
+
+    /** 将临时节点 ID 替换为真实节点 ID，并同步修正边引用 */
+    replaceNodeId(oldId, newId) {
+      this.taskList = this.taskList.map((node) => {
+        if (String(node.nodeId) !== String(oldId)) return node;
+        return {
+          ...node,
+          nodeId: newId,
+        };
+      });
+      const nextEdges = (this.peworkflowDAG.edges || []).map((edge) => ({
+        ...edge,
+        from: String(edge.from) === String(oldId) ? Number(newId) : edge.from,
+        to: String(edge.to) === String(oldId) ? Number(newId) : edge.to,
+      }));
+      this.peworkflowDAG = {
+        nodes: this.taskList,
+        edges: nextEdges,
+      };
+      if (String(this.selectedNodeId) === String(oldId)) {
+        this.selectedNodeId = String(newId);
+      }
+    },
+
+    /** 确保所有临时节点都已完成配置并持久化 */
+    async persistAllTempNodes() {
+      const tempNodes = this.taskList.filter((node) => this.isTempNodeId(node.nodeId));
+      if (tempNodes.length === 0) return true;
+
+      const unconfigured = tempNodes.filter((node) => !this.isNodeConfigComplete(node));
+      if (unconfigured.length > 0) {
+        ElMessage.warning('存在未完成配置的新节点，请先完成目标任务配置后再保存');
+        return false;
+      }
+
+      for (const node of tempNodes) {
+        if (this.isTempNodeId(node.nodeId)) {
+          await this.saveTempNode(node);
+        }
+      }
+      await this.$nextTick();
+      return true;
     },
 
     // 返回上一页
@@ -288,6 +449,33 @@ export default {
           skipWhenFailed: data.skip,
           jobId: data.jobId || data.targetWorkflowId,
         };
+      }
+    },
+
+    /** 节点编辑面板保存：仅保存当前节点，不检查其他节点状态 */
+    async handleEditorPanelSave({ nodeId }) {
+      if (this._autoPersistInFlight) {
+        this._pendingAutoPersist = { nodeId };
+        return;
+      }
+      this._autoPersistInFlight = true;
+      try {
+        const currentNode = this.taskList.find((item) => String(item.nodeId) === String(nodeId));
+        if (!currentNode) return;
+        if (this.isTempNodeId(currentNode.nodeId) && !this.isNodeConfigComplete(currentNode)) {
+          ElMessage.warning('请先完成该节点配置后再保存');
+          return;
+        }
+        await this.saveSingleNode(currentNode);
+      } catch (error) {
+        ElMessage.error('节点保存失败，请稍后重试');
+      } finally {
+        this._autoPersistInFlight = false;
+        if (this._pendingAutoPersist) {
+          const pending = this._pendingAutoPersist;
+          this._pendingAutoPersist = null;
+          await this.handleEditorPanelSave(pending);
+        }
       }
     },
 
@@ -500,52 +688,40 @@ export default {
     },
 
     /** 保存工作流 */
-    async saveWorkflow() {
-      // 从 Bridge 获取最新的 DAG 数据
-      const { vueNodes, vueEdges } = this.$refs.workflowBridge.getWorkflowData();
-
-      const dagInfo = {
-        nodes: vueNodes.map(item => ({ nodeId: item.nodeId })),
-        edges: vueEdges.map(item => {
-          const property = {};
-          if (item.property) {
-            property.property = item.property;
-          }
-          return {
-            from: item.from,
-            to: item.to,
-            ...property,
-          };
-        }),
-      };
-
-      // 处理生命周期时间范围
-      let processedWorkflowInfo = { ...this.workflowInfo };
-      const { lifeCycle } = processedWorkflowInfo;
-
-      if (lifeCycle && Array.isArray(lifeCycle) && lifeCycle.length === 2) {
-        const [start, end] = lifeCycle;
-        if (start && end && !isNaN(start) && !isNaN(end)) {
-          processedWorkflowInfo.lifeCycle = {
-            start: parseInt(start),
-            end: parseInt(end)
-          };
-        } else {
-          processedWorkflowInfo.lifeCycle = null;
+    async saveWorkflow(options = {}) {
+      const { skipTempNodeCheck = false } = options;
+      if (this.saveLoading) return;
+      this.saveLoading = true;
+      try {
+        if (!skipTempNodeCheck) {
+          const tempOk = await this.persistAllTempNodes();
+          if (!tempOk) return;
         }
-      } else {
-        processedWorkflowInfo.lifeCycle = null;
-      }
 
-      await this.axios.post("/workflow/save", {
-        ...processedWorkflowInfo,
-        dag: dagInfo,
-      });
+        // 从 Bridge 获取最新的 DAG 数据（临时节点已在 persistAllTempNodes 中落库并替换为真实 ID）
+        const { vueNodes, vueEdges } = this.$refs.workflowBridge.getWorkflowData();
+        const dagInfo = this.buildPersistableDagInfo(vueNodes, vueEdges);
+        if (!dagInfo.nodes?.length) {
+          ElMessage.warning('请至少添加并配置一个节点后再保存工作流');
+          return;
+        }
+        const savePayload = {
+          ...this.buildProcessedWorkflowInfo(),
+          dag: dagInfo,
+        };
 
-      ElMessage.success(this.$t("message.success"));
-      if (!this.workflowInfo.id) {
-        // 新建成功后需要获取返回的 ID
-        // 暂时不处理，因为后端可能返回 ID
+        const saveRes = await this.axios.post("/workflow/save", savePayload);
+        const workflowId = this.extractWorkflowIdFromSaveResponse(saveRes);
+        if (!this.workflowInfo.id && workflowId) {
+          this.workflowInfo.id = workflowId;
+        }
+
+        ElMessage.success(this.$t("message.success"));
+      } catch (error) {
+        ElMessage.error('工作流保存失败，请稍后重试');
+        throw error;
+      } finally {
+        this.saveLoading = false;
       }
     },
 
