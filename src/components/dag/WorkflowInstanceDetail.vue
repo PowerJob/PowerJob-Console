@@ -79,7 +79,7 @@
     </el-row>
 
     <!-- 工作流画布（view 模式） -->
-    <el-row>
+    <el-row class="canvas-row">
       <div class="workflow-canvas-wrapper">
         <ReactWorkflowBridge
           v-if="peworkflowDAG.nodes.length > 0"
@@ -306,6 +306,13 @@ export default {
   box-sizing: border-box;
 }
 
+.workflow-instance-detail {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
 .title {
   display: inline-block;
   font-size: 14px;
@@ -335,9 +342,20 @@ export default {
   display: inline-block;
 }
 
+.canvas-row {
+  flex: 1;
+  min-height: 400px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
 .workflow-canvas-wrapper {
   width: 100%;
-  height: 600px;
+  flex: 1;
+  min-height: 400px;
+  min-width: 0;
   display: flex;
   position: relative;
 }

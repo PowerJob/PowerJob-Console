@@ -238,6 +238,12 @@ export default {
         overflow-y: auto;
         position: relative;
         min-width: 0; /* 防止内容溢出 */
+        display: flex;
+        flex-direction: column;
+    }
+    .wrap > * {
+        flex: 1;
+        min-height: 0;
     }
     
     /* Enhanced Scrollbar */

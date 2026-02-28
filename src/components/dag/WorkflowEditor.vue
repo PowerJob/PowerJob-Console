@@ -60,7 +60,7 @@
     </el-row>
 
     <!-- 工作流画布区域 -->
-    <el-row>
+    <el-row class="canvas-row">
       <div class="power-flow">
         <div class="power-dag" id="fullInc">
           <ReactWorkflowBridge
@@ -826,17 +826,36 @@ export default {
 </script>
 
 <style scoped>
+.workflow-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
 .el-input {
   width: 80%;
 }
+.canvas-row {
+  flex: 1;
+  min-height: 400px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
 .power-dag {
   width: 100%;
-  height: 600px;
+  height: 100%;
   display: flex;
+  min-height: 0;
 }
 .power-flow {
   background: #fff;
   width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 .power-import-body {
   padding: 0px 20px;
