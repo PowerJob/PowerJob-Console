@@ -9,7 +9,7 @@
 import { createRoot } from 'react-dom/client';
 import { createElement } from 'react';
 import { WorkflowCanvas, getWorkflowState } from '@echo009/power-workflow-next';
-import '../../../power-workflow-next/dist/power-workflow-next.css';
+import '@echo009/power-workflow-next/css';
 
 export default {
   name: 'ReactWorkflowBridge',
