@@ -85,6 +85,8 @@
 <script>
 import Workflow from "power-workflow";
 import { DocumentAdd, ZoomOut, ZoomIn, Aim, FullScreen } from '@element-plus/icons-vue';
+import startSvg from "../../assets/start.svg";
+import skipSvg from "../../assets/skip.svg";
 
 const defaultSize = {
   width: (document.body.clientWidth - 254) * 0.7,
@@ -326,8 +328,8 @@ export default {
           size: [width, 70],
           leftText: item.jobId,
           titleText: item.nodeName,
-          icon1: item.enable ? require("../../assets/start.svg") : "",
-          icon2: item.skipWhenFailed ? require("../../assets/skip.svg") : "",
+          icon1: item.enable ? startSvg : "",
+          icon2: item.skipWhenFailed ? skipSvg : "",
           // taskStatus: text,
           ...statusValue,
           style: statusStyle,

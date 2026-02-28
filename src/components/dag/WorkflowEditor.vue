@@ -298,6 +298,8 @@ import TimeExpressionValidator from "../common/TimeExpressionValidator";
 import PowerWorkflow from "./PowerWorkflow";
 import WorkflowManager from "../views/WorkflowManager";
 import { ElMessage } from 'element-plus';
+import startSvg from "../../assets/start.svg";
+import skipSvg from "../../assets/skip.svg";
 
 function nodeInfoChange(icon, index) {
   return function (value) {
@@ -320,8 +322,8 @@ const nodeType = {
       size: [240, 70],
       leftText: item.jobId,
       titleText: item.nodeName,
-      icon1: item.enable ? require("../../assets/start.svg") : "",
-      icon2: item.skipWhenFailed ? require("../../assets/skip.svg") : "",
+      icon1: item.enable ? startSvg : "",
+      icon2: item.skipWhenFailed ? skipSvg : "",
     };
   },
   2: (item) => {
@@ -344,8 +346,8 @@ const nodeType = {
       size: [240, 70],
       leftText: item.jobId,
       titleText: item.nodeName,
-      icon1: item.enable ? require("../../assets/start.svg") : "",
-      icon2: item.skipWhenFailed ? require("../../assets/skip.svg") : "",
+      icon1: item.enable ? startSvg : "",
+      icon2: item.skipWhenFailed ? skipSvg : "",
     };
   },
 };
@@ -793,10 +795,10 @@ export default {
   },
   watch: {
     "nodeInfo.enable": {
-      handler: nodeInfoChange(require("../../assets/start.svg"), 3),
+      handler: nodeInfoChange(startSvg, 3),
     },
     "nodeInfo.skipWhenFailed": {
-      handler: nodeInfoChange(require("../../assets/skip.svg"), 4),
+      handler: nodeInfoChange(skipSvg, 4),
     },
   },
 };
