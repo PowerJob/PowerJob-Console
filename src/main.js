@@ -7,6 +7,8 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import './styles.scss'
 import i18n from './i18n/i18n'
 import './iconfont.css';
+// power-workflow-next React 组件样式
+import 'power-workflow-next-root/dist/power-workflow-next.css';
 
 
 // axios 负责统一拦截处理 ResultDTO，fly 负责处理不需要拦截的请求
