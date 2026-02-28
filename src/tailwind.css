@@ -1,4 +1,15 @@
-/* Tailwind CSS 入口文件 - 用于 power-workflow-next 组件 */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind CSS v4 入口文件 - 用于 power-workflow-next 组件 */
+@import "tailwindcss";
+
+/* 指定内容源 - 扫描 power-workflow-next 源码 */
+@source "../../../power-workflow-next/src";
+
+/* 自定义主题配置 */
+@theme {
+  --color-primary: #3B82F6;
+  --color-secondary: #6B7280;
+  --color-success: #52C41A;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-background: #F9FAFB;
+}
