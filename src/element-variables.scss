@@ -41,6 +41,6 @@ $--box-shadow-base: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 $--box-shadow-dark: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 12px rgba(0, 0, 0, 0.08);
 
 /* icon font path, required */
-$--font-path: '~element-plus/theme-chalk/fonts';
+$--font-path: 'element-plus/theme-chalk/fonts';
 
-@import "~element-plus/theme-chalk/src/index";
+@import "element-plus/theme-chalk/src/index";
