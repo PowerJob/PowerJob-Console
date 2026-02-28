@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 /* 指定内容源 - 扫描 power-workflow-next 源码 */
-@source "../../../power-workflow-next/src";
+@source "../../power-workflow-next/src";
 
 /* 自定义主题配置 */
 @theme {
