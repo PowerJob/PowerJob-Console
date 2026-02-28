@@ -1,0 +1,4 @@
+/* Tailwind CSS 入口文件 - 用于 power-workflow-next 组件 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

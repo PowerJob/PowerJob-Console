@@ -7,7 +7,9 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import './styles.scss'
 import i18n from './i18n/i18n'
 import './iconfont.css';
-// power-workflow-next React 组件样式
+// Tailwind CSS（用于 power-workflow-next 组件）
+import './tailwind.css';
+// power-workflow-next React 组件基础样式（ReactFlow 等）
 import 'power-workflow-next-root/dist/power-workflow-next.css';
 
 
