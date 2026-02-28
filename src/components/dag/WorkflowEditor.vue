@@ -80,6 +80,7 @@
             @add-node="handleAddNode"
             @auto-layout-applied="handleAutoLayoutApplied"
             @connect="handleConnect"
+            @pane-context-menu="handlePaneContextMenu"
             @export="handleWorkflowExport"
             @import="handleWorkflowImport"
           />
@@ -222,6 +223,14 @@ export default {
     };
   },
   methods: {
+    /** 边 ID 生成（与 ReactWorkflowBridge.toEdgeId 规则一致） */
+    toEdgeId(source, target, sourceHandle, targetHandle) {
+      const s = source ?? '';
+      const t = target ?? '';
+      if (sourceHandle == null && targetHandle == null) return `e${s}-${t}`;
+      return `e${s}-${t}-${sourceHandle ?? 's'}-${targetHandle ?? 't'}`;
+    },
+
     // 返回上一页
     back() {
       this.$router.go(-1);
@@ -288,6 +297,11 @@ export default {
         this._skipNextSyncFromReact = false;
         return;
       }
+      const transientTypes = new Set(['select', 'dimensions', 'position']);
+      const onlyTransient = Array.isArray(changes) && changes.length > 0 && changes.every((item) => transientTypes.has(item.type));
+      if (onlyTransient) {
+        return;
+      }
       const state = this.$refs.workflowBridge?.getWorkflowData();
       if (state && state.vueNodes && state.vueEdges) {
         const stateIds = new Set(state.vueNodes.map((n) => n.nodeId));
@@ -301,6 +315,8 @@ export default {
           nodeName: n.nodeName,
           jobId: n.jobId,
           nodeParams: n.nodeParams,
+          positionX: n.positionX,
+          positionY: n.positionY,
           enable: n.enable !== false,
           skipWhenFailed: n.skipWhenFailed || false,
         }));
@@ -314,6 +330,9 @@ export default {
 
     /** 连线变化处理 */
     handleEdgesChange(changes) {
+      const transientTypes = new Set(['select']);
+      const onlyTransient = Array.isArray(changes) && changes.length > 0 && changes.every((item) => transientTypes.has(item.type));
+      if (onlyTransient) return;
       if (this._skipNextSyncFromReact) return;
       const state = this.$refs.workflowBridge?.getWorkflowData();
       if (state && state.vueNodes && state.vueEdges) {
@@ -328,6 +347,8 @@ export default {
           nodeName: n.nodeName,
           jobId: n.jobId,
           nodeParams: n.nodeParams,
+          positionX: n.positionX,
+          positionY: n.positionY,
           enable: n.enable !== false,
           skipWhenFailed: n.skipWhenFailed || false,
         }));
@@ -351,6 +372,8 @@ export default {
         nodeName: type === 'JOB' ? this.$t('message.newJobNode') || '新任务' : type === 'DECISION' ? this.$t('message.decision') || '判断' : this.$t('message.nestedWorkflow') || '子工作流',
         jobId: type === 'JOB' || type === 'NESTED_WORKFLOW' ? undefined : undefined,
         nodeParams: '',
+        positionX: typeof position?.x === 'number' ? position.x : undefined,
+        positionY: typeof position?.y === 'number' ? position.y : undefined,
         enable: true,
         skipWhenFailed: false,
       };
@@ -369,19 +392,43 @@ export default {
         nodeName: n.nodeName,
         jobId: n.jobId,
         nodeParams: n.nodeParams,
+        positionX: n.positionX,
+        positionY: n.positionY,
         enable: n.enable !== false,
         skipWhenFailed: n.skipWhenFailed || false,
       }));
       this.peworkflowDAG = { nodes: this.taskList, edges: vueEdges };
     },
 
-    /** 画布连线：新建连线时同步到 peworkflowDAG */
+    /** 画布空白区域右键 */
+    handlePaneContextMenu() {
+      ElMessage.info('已触发画布右键事件，可继续接入右键菜单能力');
+    },
+
+    /** 画布连线：新建连线时同步到 peworkflowDAG（edge id 规则与 ReactWorkflowBridge.toEdgeId 一致） */
     handleConnect(connection) {
-      const state = this.$refs.workflowBridge?.getWorkflowData();
-      if (state && state.vueEdges) {
+      const edgeId = this.toEdgeId(connection.source, connection.target, connection.sourceHandle, connection.targetHandle);
+      const exists = (this.peworkflowDAG.edges || []).some((edge) => {
+        return String(edge.from) === String(connection.source) &&
+          String(edge.to) === String(connection.target) &&
+          (edge.sourceHandle || undefined) === (connection.sourceHandle || undefined) &&
+          (edge.targetHandle || undefined) === (connection.targetHandle || undefined);
+      });
+      if (!exists) {
+        const nextEdges = [
+          ...(this.peworkflowDAG.edges || []),
+          {
+            id: edgeId,
+            from: Number(connection.source),
+            to: Number(connection.target),
+            sourceHandle: connection.sourceHandle || undefined,
+            targetHandle: connection.targetHandle || undefined,
+            property: '',
+          },
+        ];
         this.peworkflowDAG = {
           nodes: this.peworkflowDAG.nodes,
-          edges: state.vueEdges,
+          edges: nextEdges,
         };
       }
     },

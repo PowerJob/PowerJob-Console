@@ -147,3 +147,7 @@ Bridge 组件内提供 `toReactFormat()` / `toBackendFormat()` 转换函数。
 | Zustand store 与 Vue 响应式不互通 | 状态同步延迟 | 通过 callback props 做单向数据流，不共享 store |
 | Tailwind 前缀改造工作量 | power-workflow-next 大量 class 需修改 | 可用脚本批量替换，或考虑用 important 选择器隔离替代前缀方案 |
 | Vite 迁移兼容性 | 旧代码中 require/process.env 不兼容 | 逐文件排查，项目规模小（28 个 Vue 文件）可控 |
+
+## 相关文档
+
+- [工作流画布桥接层问题与修复经验总结](./2026-02-28-workflow-canvas-bridge-lessons.md)：画布拖拽、连线、右键、CPU 等问题的根因与实现要点沉淀。

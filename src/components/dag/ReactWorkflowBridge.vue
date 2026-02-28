@@ -8,6 +8,7 @@
 <script>
 import { createRoot } from 'react-dom/client';
 import { createElement } from 'react';
+import { applyNodeChanges, applyEdgeChanges } from '@xyflow/react';
 import { WorkflowCanvas, getWorkflowState, layoutNodes } from '@echo009/power-workflow-next';
 
 export default {
@@ -45,13 +46,20 @@ export default {
   },
   data() {
     return {
-      reactRoot: null
+      reactRoot: null,
+      runtimeNodes: [],
+      runtimeEdges: [],
+      runtimeRenderRaf: null
     };
   },
   mounted() {
     this.initReactComponent();
   },
   beforeUnmount() {
+    if (this.runtimeRenderRaf) {
+      cancelAnimationFrame(this.runtimeRenderRaf);
+      this.runtimeRenderRaf = null;
+    }
     if (this.reactRoot) {
       this.reactRoot.unmount();
       this.reactRoot = null;
@@ -76,36 +84,72 @@ export default {
       if (!this.reactRoot) return;
 
       const { reactNodes, reactEdges } = this.convertToReactFormat(this.nodes, this.edges);
+      const positionMap = new Map((this.runtimeNodes || []).map((node) => [node.id, node.position]));
+      const mergedNodes = reactNodes.map((node) => {
+        const cachedPosition = positionMap.get(node.id);
+        return cachedPosition ? { ...node, position: cachedPosition } : node;
+      });
+      this.runtimeNodes = mergedNodes;
+      this.runtimeEdges = reactEdges;
 
       // 获取当前语言设置
       const currentLocale = this.$i18n?.locale?.value || localStorage.getItem('oms_lang') || 'cn';
       const reactLocale = currentLocale === 'cn' ? 'zh-CN' : 'en-US';
 
+      this.renderRuntimeComponent(reactLocale);
+    },
+    /**
+     * 使用 runtime 状态渲染 React 组件
+     */
+    renderRuntimeComponent(reactLocale) {
+      if (!this.reactRoot) return;
+      const currentLocale = this.$i18n?.locale?.value || localStorage.getItem('oms_lang') || 'cn';
+      const locale = reactLocale || (currentLocale === 'cn' ? 'zh-CN' : 'en-US');
       const props = {
-        nodes: reactNodes,
-        edges: reactEdges,
+        nodes: this.runtimeNodes,
+        edges: this.runtimeEdges,
         mode: this.mode,
-        defaultLocale: reactLocale,
+        defaultLocale: locale,
         showToolbar: this.showToolbar,
         showMinimap: this.showMinimap,
         jobOptions: this.jobOptions,
         workflowOptions: this.workflowOptions,
 
-        // 事件回调
         onNodesChange: this.handleNodesChange,
         onEdgesChange: this.handleEdgesChange,
         onNodeDataChange: this.handleNodeDataChange,
         onConnect: this.handleConnect,
         onNodeClick: this.handleNodeClick,
         onPaneClick: this.handlePaneClick,
+        onPaneContextMenu: this.handlePaneContextMenu,
+        onNodeDragStop: this.handleNodeDragStop,
         onValidationError: this.handleValidationError,
         onAddNode: this.handleAddNode,
         onAutoLayout: this.handleAutoLayout,
         onExport: this.handleExport,
         onImport: this.handleImport,
       };
-
       this.reactRoot.render(createElement(WorkflowCanvas, props));
+    },
+    /**
+     * 按帧节流重渲染，避免高频节点变更导致 CPU 飙升
+     */
+    scheduleRuntimeRender() {
+      if (this.runtimeRenderRaf) return;
+      this.runtimeRenderRaf = requestAnimationFrame(() => {
+        this.runtimeRenderRaf = null;
+        this.renderRuntimeComponent();
+      });
+    },
+
+    /**
+     * 统一生成边 ID：无 handle 时为 e{source}-{target}，有 handle 时带后缀便于区分多分支
+     */
+    toEdgeId(source, target, sourceHandle, targetHandle) {
+      const s = source ?? '';
+      const t = target ?? '';
+      if (sourceHandle == null && targetHandle == null) return `e${s}-${t}`;
+      return `e${s}-${t}-${sourceHandle ?? 's'}-${targetHandle ?? 't'}`;
     },
 
     /**
@@ -140,12 +184,19 @@ export default {
           instanceId: node.instanceId || undefined,
         };
 
+        const positionX = typeof node.positionX === 'number' ? node.positionX : null;
+        const positionY = typeof node.positionY === 'number' ? node.positionY : null;
+        const fallbackPosition = { x: index * 250, y: 100 };
+        const nodePosition = (positionX !== null && positionY !== null)
+          ? { x: positionX, y: positionY }
+          : fallbackPosition;
+
         // 根据节点类型添加特定数据
         if (nodeType === 'JOB') {
           return {
             id: String(node.nodeId),
             type: nodeType,
-            position: { x: index * 250, y: 100 }, // 临时位置，会被 auto-layout 覆盖
+            position: nodePosition,
             data: {
               ...baseData,
               jobId: node.jobId,
@@ -159,7 +210,7 @@ export default {
           return {
             id: String(node.nodeId),
             type: nodeType,
-            position: { x: index * 250, y: 100 },
+            position: nodePosition,
             data: {
               ...baseData,
               condition: node.nodeParams || '',
@@ -169,7 +220,7 @@ export default {
           return {
             id: String(node.nodeId),
             type: nodeType,
-            position: { x: index * 250, y: 100 },
+            position: nodePosition,
             data: {
               ...baseData,
               targetWorkflowId: node.jobId,
@@ -181,16 +232,14 @@ export default {
         }
       });
 
-      const reactEdges = vueEdges.map((edge) => {
-        return {
-          id: `e${edge.from}-${edge.to}`,
-          source: String(edge.from),
-          target: String(edge.to),
-          data: {
-            property: edge.property || '',
-          }
-        };
-      });
+      const reactEdges = vueEdges.map((edge) => ({
+        id: this.toEdgeId(edge.from, edge.to, edge.sourceHandle, edge.targetHandle),
+        source: String(edge.from),
+        target: String(edge.to),
+        sourceHandle: edge.sourceHandle || undefined,
+        targetHandle: edge.targetHandle || undefined,
+        data: { property: edge.property || '' },
+      }));
 
       return { reactNodes, reactEdges };
     },
@@ -211,6 +260,8 @@ export default {
           nodeId: parseInt(node.id),
           nodeName: node.data.label,
           nodeType: typeMap[node.data.type] || 1,
+          positionX: typeof node.position?.x === 'number' ? node.position.x : undefined,
+          positionY: typeof node.position?.y === 'number' ? node.position.y : undefined,
         };
 
         if (node.data.type === 'JOB') {
@@ -242,6 +293,8 @@ export default {
         return {
           from: parseInt(edge.source),
           to: parseInt(edge.target),
+          sourceHandle: edge.sourceHandle || undefined,
+          targetHandle: edge.targetHandle || undefined,
           property: edge.data?.property || '',
         };
       });
@@ -253,6 +306,9 @@ export default {
      * 获取当前工作流数据（供父组件调用）
      */
     getWorkflowData() {
+      if (this.runtimeNodes?.length || this.runtimeEdges?.length) {
+        return this.convertToVueFormat(this.runtimeNodes, this.runtimeEdges);
+      }
       // 从 Zustand store 获取当前状态
       const state = getWorkflowState();
       if (state && state.nodes && state.edges) {
@@ -269,9 +325,8 @@ export default {
      * 事件处理：节点变化
      */
     handleNodesChange(changes) {
-      // 更新内部状态
-      // 注意：这里需要从 React 的 changes 中提取最新的 nodes
-      // 实际上 WorkflowCanvas 内部已经管理了状态，这里只是记录
+      this.runtimeNodes = applyNodeChanges(changes || [], this.runtimeNodes || []);
+      this.scheduleRuntimeRender();
       this.$emit('nodes-change', changes);
     },
 
@@ -279,6 +334,8 @@ export default {
      * 事件处理：连线变化
      */
     handleEdgesChange(changes) {
+      this.runtimeEdges = applyEdgeChanges(changes || [], this.runtimeEdges || []);
+      this.scheduleRuntimeRender();
       this.$emit('edges-change', changes);
     },
 
@@ -293,13 +350,32 @@ export default {
      * 事件处理：新建连线
      */
     handleConnect(connection) {
+      const exists = (this.runtimeEdges || []).some(
+        (edge) =>
+          edge.source === connection.source &&
+          edge.target === connection.target &&
+          (edge.sourceHandle || undefined) === (connection.sourceHandle || undefined) &&
+          (edge.targetHandle || undefined) === (connection.targetHandle || undefined)
+      );
+      if (!exists) {
+        const newEdge = {
+          id: this.toEdgeId(connection.source, connection.target, connection.sourceHandle, connection.targetHandle),
+          source: connection.source,
+          target: connection.target,
+          sourceHandle: connection.sourceHandle || undefined,
+          targetHandle: connection.targetHandle || undefined,
+          data: { property: '' },
+        };
+        this.runtimeEdges = [...(this.runtimeEdges || []), newEdge];
+      }
+      this.scheduleRuntimeRender();
       this.$emit('connect', connection);
     },
 
     /**
      * 事件处理：节点点击
      */
-    handleNodeClick(event, node) {
+    handleNodeClick(_event, node) {
       this.$emit('node-selected', node);
     },
 
@@ -309,6 +385,21 @@ export default {
     handlePaneClick() {
       this.$emit('selection-cleared');
     },
+    /**
+     * 事件处理：画布右键
+     */
+    handlePaneContextMenu(event) {
+      if (event?.preventDefault) event.preventDefault();
+      if (event?.stopPropagation) event.stopPropagation();
+      this.$emit('pane-context-menu', {
+        clientX: event?.clientX,
+        clientY: event?.clientY,
+      });
+    },
+    /**
+     * 事件处理：节点拖拽结束（占位，兼容 React 回调签名）
+     */
+    handleNodeDragStop() {},
 
     /**
      * 事件处理：验证错误
