@@ -347,7 +347,7 @@ export default {
         target: String(edge.to),
         sourceHandle: edge.sourceHandle || undefined,
         targetHandle: edge.targetHandle || undefined,
-        data: { property: edge.property || '' },
+        data: { property: edge.property || '', enable: edge.enable },
       }));
 
       return { reactNodes, reactEdges };
@@ -405,6 +405,7 @@ export default {
           sourceHandle: edge.sourceHandle || undefined,
           targetHandle: edge.targetHandle || undefined,
           property: edge.data?.property || '',
+          enable: edge.data?.enable,
         };
       });
 
