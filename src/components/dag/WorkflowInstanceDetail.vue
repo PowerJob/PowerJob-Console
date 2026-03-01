@@ -264,6 +264,12 @@ export default {
 
     /** 节点选中处理 */
     handleNodeSelected(node) {
+      // 未生成实例的节点不打开侧边抽屉，仅提示
+      if (node.data?.type !== 'DECISION' && !node.data?.instanceId) {
+        ElMessage.warning(this.$t('message.ntfClickNoInstanceNode'));
+        return;
+      }
+
       this.selectedNode = node;
       this.nodeDetail = node.data || null;
       this.currentNodeInfo = {
@@ -274,11 +280,6 @@ export default {
 
       // 设置实例 ID
       this.currentInstanceId = node.data?.instanceId;
-
-      // 如果是任务节点但没有实例 ID，提示用户
-      if (node.data?.type !== 'DECISION' && !node.data?.instanceId) {
-        ElMessage.warning(this.$t('message.ntfClickNoInstanceNode'));
-      }
     },
 
     /** 取消选中 */
