@@ -336,18 +336,21 @@ export default {
   },
   methods: {
     fetchInstanceDetail() {
-      if (this.nodeDetail) {
-        this.instanceDetail = this.nodeDetail;
-      } else {
-        let that = this;
-        this.axios.post('/instance/detailPlus', that.queryInstanceDetailRequest).then(ret => {
-          that.instanceDetail= ret
-          if (that.instanceDetail.queriedTaskDetailInfoList !== undefined) {
-            if (that.instanceDetail.queriedTaskDetailInfoList.length !== 0) {
-              that.showQueriedTaskDetailInfoList = true
-            }
+      // 有实例 ID 时请求完整详情（工作流视图下 nodeDetail 仅含节点维度的少量字段，需用 detailPlus 拉取完整实例信息）
+      if (this.instanceId) {
+        const that = this;
+        const request = {
+          instanceId: this.instanceId,
+          customQuery: this.queryInstanceDetailRequest.customQuery
+        };
+        this.axios.post('/instance/detailPlus', request).then(ret => {
+          that.instanceDetail = ret;
+          if (that.instanceDetail.queriedTaskDetailInfoList !== undefined && that.instanceDetail.queriedTaskDetailInfoList.length !== 0) {
+            that.showQueriedTaskDetailInfoList = true;
           }
-        })
+        });
+      } else if (this.nodeDetail) {
+        this.instanceDetail = this.nodeDetail;
       }
     },
     /** 查看详情 */
