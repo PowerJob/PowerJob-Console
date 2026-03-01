@@ -199,6 +199,7 @@ export default {
         onNodeDataChange: this.handleNodeDataChange,
         onConnect: this.handleConnect,
         onNodeClick: this.handleNodeClick,
+        onNodeDoubleClick: this.handleNodeDoubleClick,
         onPaneClick: this.handlePaneClick,
         onPaneContextMenu: this.handlePaneContextMenu,
         onNodeDragStop: this.handleNodeDragStop,
@@ -483,9 +484,16 @@ export default {
     },
 
     /**
-     * 事件处理：节点点击（edit 模式打开 EditorPanel，view 模式仅通知父组件）
+     * 事件处理：节点单击（edit 模式仅通知父组件选中，不打开编辑面板）
      */
     handleNodeClick(_event, node) {
+      this.$emit('node-selected', node);
+    },
+
+    /**
+     * 事件处理：节点双击（edit 模式打开 EditorPanel）
+     */
+    handleNodeDoubleClick(_event, node) {
       if (this.mode === 'edit') {
         this.selectedNodeId = node.id;
         this.renderRuntimeComponent();
