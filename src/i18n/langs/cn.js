@@ -338,6 +338,7 @@ const cn = {
         'routeHome': '主页',
         'routeJobManage': '任务管理',
         'routeInstanceManage': '实例管理',
+        'routeInstanceDetail': '任务实例详情',
         'routeWorkflowManage': '工作流管理',
         'routeWfInstanceManage': '工作流实例管理',
         'routeTemplateGenerate': '模版生成',

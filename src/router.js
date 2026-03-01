@@ -14,6 +14,7 @@ const router = createRouter({
                 { path: "/oms/home", meta: { titleKey: 'message.routeHome' }, component: () => import('./components/views/Home') },
                 { path: "/oms/job", meta: { titleKey: 'message.routeJobManage' }, component: () => import('./components/views/JobManager') },
                 { path: "/oms/instance", name: "instanceManager", meta: { titleKey: 'message.routeInstanceManage' }, component: () => import('./components/views/InstanceManager') },
+                { path: "/oms/instanceDetail/:instanceId", name: "instanceDetail", meta: { titleKey: 'message.routeInstanceDetail' }, component: () => import('./components/views/InstanceDetailPage') },
                 { path: "/oms/workflow", meta: { titleKey: 'message.routeWorkflowManage' }, component: () => import('./components/views/WorkflowManager') },
                 { path: "/oms/wfinstance", meta: { titleKey: 'message.routeWfInstanceManage' }, component: () => import('./components/views/WFInstanceManager') },
                 { path: "/oms/template", meta: { titleKey: 'message.routeTemplateGenerate' }, component: () => import('./components/views/ContainerTemplate') },

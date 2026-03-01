@@ -146,13 +146,6 @@
       />
     </div>
 
-    <!--  任务实例详情弹出框 -->
-    <el-dialog v-model="instanceDetailVisible" v-if="instanceDetailVisible" width="80%">
-      <div class="power-instance-detail-log">
-        <InstanceDetail :instance-id="currentInstanceId" :resultAll="true" />
-      </div>
-    </el-dialog>
-
     <!-- 任务运行日志弹出框 -->
     <el-dialog v-model="instanceLogVisible" width="80%">
       <el-row>
@@ -186,13 +179,11 @@
 </template>
 
 <script>
-import InstanceDetail from "../common/InstanceDetail";
 import { ElMessage } from 'element-plus';
 import { ArrowDown, Search, Refresh } from '@element-plus/icons-vue';
 export default {
   name: "InstanceManager",
   components: {
-    InstanceDetail,
     ArrowDown,
     Search,
     Refresh
@@ -216,8 +207,6 @@ export default {
         totalItems: 0,
         data: []
       },
-      // 详细信息弹出框是否可见
-      instanceDetailVisible: false,
       // 日志查询对象
       logQueryContent: {
         instanceId: undefined,
@@ -231,7 +220,6 @@ export default {
       },
       // 日志弹出框是否可见
       instanceLogVisible: false,
-      currentInstanceId: undefined,
       // 任务实例状态选择
       instanceStatusOptions: [
         { key: "", label: this.$t("message.all") },
@@ -264,10 +252,9 @@ export default {
       this.instanceQueryContent.status = "";
       this.listInstanceInfos();
     },
-    // 点击查询详情
+    // 点击查询详情：跳转独立详情页
     onClickShowDetail(data) {
-      this.instanceDetailVisible = true;
-      this.currentInstanceId = data.instanceId;
+      this.$router.push(`/oms/instanceDetail/${data.instanceId}`);
     },
     // 点击重跑
     onClickRetryJob(data) {
@@ -418,11 +405,6 @@ export default {
   max-height: 400px;
   overflow-y: scroll;
 }
-.power-instance-detail-log {
-  max-height: 500px;
-  overflow-y: scroll;
-}
-
 /* Modern Instance Manager Styles */
 .instance-manager {
   padding: 0;

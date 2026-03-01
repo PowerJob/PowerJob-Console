@@ -311,15 +311,10 @@ export default {
       }
     },
 
-    /** 跳转到实例详情 */
+    /** 跳转到任务实例详情页 */
     toNodeDetail() {
       if (!this.nodeDetail || !this.nodeDetail.instanceId) return;
-      this.$router.push({
-        path: '/oms/wfinstance',
-      });
-      setTimeout(() => {
-        this.$router.push(`/oms/wfInstanceDetail/${this.nodeDetail.instanceId}`);
-      }, 20);
+      this.$router.push(`/oms/instanceDetail/${this.nodeDetail.instanceId}`);
     },
 
     back() {

@@ -333,6 +333,7 @@ const en = {
         'routeHome': 'Home',
         'routeJobManage': 'Job Management',
         'routeInstanceManage': 'Instance Management',
+        'routeInstanceDetail': 'Task Instance Detail',
         'routeWorkflowManage': 'Workflow Management',
         'routeWfInstanceManage': 'Workflow Instance Management',
         'routeTemplateGenerate': 'Template Generator',
