@@ -104,12 +104,21 @@ export default {
         return !hasExplicitPosition && cachedPosition ? { ...node, position: cachedPosition } : node;
       });
       const layoutDirection = this.resolveLayoutDirection(mergedNodes, reactEdges);
-      const hasAllNodePositions = (this.nodes || []).every(
-        (node) => typeof node.positionX === 'number' && typeof node.positionY === 'number'
-      );
-      const normalizedNodes = hasAllNodePositions
-        ? mergedNodes
-        : layoutNodes(mergedNodes, reactEdges, { direction: layoutDirection });
+      const hasNodeWithoutPosition = reactNodes.some((node) => {
+        const sourceNode = sourceNodeMap.get(node.id);
+        const hasExplicit =
+          typeof sourceNode?.positionX === 'number' && typeof sourceNode?.positionY === 'number';
+        const hasCached = positionMap.get(node.id);
+        return !hasExplicit && !hasCached;
+      });
+      const isEditWithExistingRuntime =
+        this.mode === 'edit' && (this.runtimeNodes?.length ?? 0) > 0;
+      const normalizedNodes =
+        isEditWithExistingRuntime
+          ? mergedNodes
+          : hasNodeWithoutPosition
+            ? layoutNodes(mergedNodes, reactEdges, { direction: layoutDirection })
+            : mergedNodes;
       const normalizedEdges = this.fillMissingEdgeHandles(normalizedNodes, reactEdges, layoutDirection);
       this.runtimeNodes = normalizedNodes;
       this.runtimeEdges = normalizedEdges;
@@ -199,8 +208,9 @@ export default {
         onExport: this.handleExport,
         onImport: this.handleImport,
       };
+      // 仅 edit 模式渲染 EditorPanel，view 模式不显示可编辑面板
       const editingNode =
-        this.selectedNodeId != null
+        this.mode === 'edit' && this.selectedNodeId != null
           ? (this.runtimeNodes || []).find((n) => n.id === this.selectedNodeId) ?? null
           : null;
       const editorPanelProps = {
@@ -211,10 +221,14 @@ export default {
         jobOptions: this.jobOptions,
         workflowOptions: this.workflowOptions,
       };
-      const content = createElement(Fragment, null, [
-        createElement(WorkflowCanvas, canvasProps),
-        createElement(EditorPanel, editorPanelProps),
-      ]);
+      const contentChildren =
+        this.mode === 'edit'
+          ? [
+              createElement(WorkflowCanvas, canvasProps),
+              createElement(EditorPanel, editorPanelProps),
+            ]
+          : [createElement(WorkflowCanvas, canvasProps)];
+      const content = createElement(Fragment, null, contentChildren);
       this.reactRoot.render(createElement(LocaleProvider, { defaultLocale: locale }, content));
     },
     /**
@@ -250,24 +264,32 @@ export default {
           3: 'NESTED_WORKFLOW'
         };
 
-        // 状态映射：1=WAITING, 2=WAITING, 3=RUNNING, 4=FAILED, 5=SUCCESS, 9=CANCELED, 10=STOPPED
-        const statusMap = {
-          1: 'WAITING',
-          2: 'WAITING',
-          3: 'RUNNING',
-          4: 'FAILED',
-          5: 'SUCCESS',
-          9: 'CANCELED',
-          10: 'STOPPED'
+        // 状态映射为 power-workflow-next NodeStatus 枚举值，供 statusVisuals 渲染颜色/文案
+        // 后端：1,2=WAITING, 3=RUNNING, 4=FAILED, 5=SUCCESS, 9=CANCELED, 10=STOPPED
+        const statusNumMap = {
+          1: 1, 2: 1, 3: 3, 4: 4, 5: 5, 9: 6, 10: 10
         };
 
         const nodeType = typeMap[node.nodeType] || 'JOB';
 
+        // 视图模式运行态：后端 PEWorkflowDAG.Node 有 startTime/finishedTime，需转为 execution 供节点展示状态与 ExecutionTooltip
+        const execution =
+          node.startTime || node.finishedTime
+            ? {
+                startTime: node.startTime || undefined,
+                endTime: node.finishedTime || undefined,
+                duration: undefined,
+                error: node.error || undefined,
+              }
+            : undefined;
+
         const baseData = {
           label: node.nodeName || '',
           type: nodeType,
-          status: node.status ? statusMap[node.status] : undefined,
-          instanceId: node.instanceId || undefined,
+          status: node.status != null ? statusNumMap[node.status] : undefined,
+          instanceId: node.instanceId != null ? String(node.instanceId) : undefined,
+          execution,
+          disableByControlNode: node.disableByControlNode === true,
         };
 
         const positionX = typeof node.positionX === 'number' ? node.positionX : null;
@@ -300,6 +322,7 @@ export default {
             data: {
               ...baseData,
               condition: node.nodeParams || '',
+              result: node.result || undefined,
             }
           };
         } else if (nodeType === 'NESTED_WORKFLOW') {
@@ -459,11 +482,13 @@ export default {
     },
 
     /**
-     * 事件处理：节点点击（打开 power-workflow-next 自带 EditorPanel）
+     * 事件处理：节点点击（edit 模式打开 EditorPanel，view 模式仅通知父组件）
      */
     handleNodeClick(_event, node) {
-      this.selectedNodeId = node.id;
-      this.renderRuntimeComponent();
+      if (this.mode === 'edit') {
+        this.selectedNodeId = node.id;
+        this.renderRuntimeComponent();
+      }
       this.$emit('node-selected', node);
     },
 
@@ -566,7 +591,17 @@ export default {
     },
     edges: {
       handler() {
-        this.renderReactComponent();
+        const { reactEdges } = this.convertToReactFormat(this.nodes, this.edges);
+        const layoutDirection = this.resolveLayoutDirection(
+          this.runtimeNodes || [],
+          reactEdges
+        );
+        this.runtimeEdges = this.fillMissingEdgeHandles(
+          this.runtimeNodes || [],
+          reactEdges,
+          layoutDirection
+        );
+        this.scheduleRuntimeRender();
       },
       deep: true
     },
