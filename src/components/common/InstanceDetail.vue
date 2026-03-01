@@ -1,333 +1,184 @@
 <template>
-  <div class="power-job-panl">
-    <el-row>
-      <div class="power-job-button">
-        <el-button type="primary" @click="fetchInstanceDetail">{{
-          $t("message.refresh")
-        }}</el-button>
-        <el-button @click="handleToDetail">{{
-          $t("message.detail")
-        }}</el-button>
-      </div>
-    </el-row>
-    <div
-      class="power-job-info"
-      :style="{ width: fixedWidth ? fixedWidth : '100%' }"
-    >
-      <el-card>
-        <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2">
-          <el-col :span="24">
-            <span class="power-job-text">{{ $t("message.instanceId") }}:</span>
-            <span class="title">{{ instanceId }}</span>
-          </el-col>
-        </el-row>
-        <el-row class="job-detail-text">
-          <el-col :span="24">
-            <span class="power-job-text" :style="{width: instanceDetail.nodeType == 2 ? '64px' : ''}">{{ $t("message.status") }}:</span>
-            <span class="title">{{
-              this.common.translateInstanceStatus(instanceDetail.status)
-            }}</span>
-          </el-col>
-        </el-row>
-        <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
-          <el-col :span="24">
-            <span class="power-job-text"
-              >{{ $t("message.runningTimes") }}:</span
-            >
-            <span class="title">{{ instanceDetail.runningTimes }}</span>
-          </el-col>
-        </el-row>
-        <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
-          <el-col :span="24">
-            <span class="power-job-text"
-              >{{ $t("message.taskTrackerAddress") }}:</span
-            >
-            <span class="title">{{ instanceDetail.taskTrackerAddress }}</span>
-          </el-col>
-        </el-row>
-        <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
-          <el-col :span="24">
-            <span class="power-job-text"
-              >{{ $t("message.expectedTriggerTime") }}:</span
-            >
-            <span class="title">{{ instanceDetail.expectedTriggerTime }}</span>
-          </el-col>
-        </el-row>
-        <el-row class="job-detail-text">
-          <el-col :span="24">
-            <span class="power-job-text" :style="{width: instanceDetail.nodeType == 2 ? '64px' : ''}">{{ $t("message.startTime") }}:</span>
-            <span class="title">{{ instanceDetail.actualTriggerTime || instanceDetail.startTime }}</span>
-          </el-col>
-        </el-row>
-        <el-row class="job-detail-text">
-          <el-col :span="24">
-            <span class="power-job-text" :style="{width: instanceDetail.nodeType == 2 ? '64px' : ''}"
-              >{{ $t("message.finishedTime") }}:</span
-            >
-            <span class="title">{{ instanceDetail.finishedTime }}</span>
-          </el-col>
-        </el-row>
-        <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
-          <el-col :span="24">
-            <span class="power-job-text">{{ $t("message.nodeParams") }}:</span>
-            <span class="title">{{ instanceDetail.jobParams ? instanceDetail.jobParams : instanceDetail.nodeParams }}</span>
-          </el-col>
-        </el-row>
-        <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
-          <el-col :span="24">
-            <span class="power-job-text"
-              >{{ $t("message.instanceParams") }}:</span
-            >
-            <span class="title">{{ instanceDetail.instanceParams }}</span>
-          </el-col>
-        </el-row>
-        <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
-          <el-col :span="24">
-            <span class="power-job-text"
-              >业务外键:</span
-            >
-            <span class="title">{{ instanceDetail.outerKey }}</span>
-          </el-col>
-        </el-row>
-        <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
-          <el-col :span="24">
-            <span class="power-job-text"
-              >业务扩展数据:</span
-            >
-            <span class="title">{{ instanceDetail.extendValue }}</span>
-          </el-col>
-        </el-row>
-        <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
-          <el-col :span="24">
-            <span class="power-job-text"
-              >运行时配置:</span
-            >
-            <span class="title">{{ instanceDetail.runtimeConfig }}</span>
-          </el-col>
-        </el-row>
-        <el-row class="job-detail-text" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
-          <el-col :span="24">
-            <span class="power-job-text"
-              >调度元信息:</span
-            >
-            <span class="title">{{ instanceDetail.meta }}</span>
-          </el-col>
-        </el-row>
-        <el-row class="job-detail-text">
-          <el-col :span="24">
-            <div
-              :class="{
-                'power-job-result': true,
-                'power-job-result-detail': resultAll,
-              }"
-            >
-              <span class="power-job-text" :style="{width: instanceDetail.nodeType == 2 ? '64px' : ''}">{{ $t("message.result") }}:</span>
-              <el-popover
-                width="400"
-                placement="right"
-                trigger="click"
-                v-if="!resultAll"
-              >
-                <div class="power-job-content-slot">
-                  {{ instanceDetail.result }}
-                </div>
-                <template #reference>
-                  <span
-                    class="power-job-content"
-                    :style="{
-                      width: fixedWidth ? `${fixedWidth - 200}px` : '400px',
-                    }"
-                    >{{ instanceDetail.result }}</span
-                  >
-                </template>
-                <!-- <i class="el-icon-chat-dot-square result" slot="reference"></i> -->
-              </el-popover>
-              <span v-if="resultAll" class="title">{{
-                instanceDetail.result
-              }}</span>
+  <div class="power-job-panel" :class="{ 'is-narrow': !!fixedWidth }">
+    <div class="power-job-info" :style="{ width: fixedWidth ? fixedWidth + 'px' : '100%' }">
+      
+      <!-- 基础信息与时间信息 -->
+      <el-card shadow="never" class="info-card">
+        <el-descriptions :column="fixedWidth ? 1 : 2" border size="small">
+          <el-descriptions-item v-if="instanceDetail.nodeType != 2" :label="$t('message.instanceId')">
+            {{ instanceId || instanceDetail.instanceId }}
+          </el-descriptions-item>
+          
+          <el-descriptions-item :label="$t('message.status')">
+            <el-tag :type="getStatusType(instanceDetail.status)" size="small" effect="light">
+              {{ common.translateInstanceStatus(instanceDetail.status) }}
+            </el-tag>
+          </el-descriptions-item>
+
+          <el-descriptions-item v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3" :label="$t('message.runningTimes')">
+            {{ instanceDetail.runningTimes }}
+          </el-descriptions-item>
+
+          <el-descriptions-item v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3" :label="$t('message.taskTrackerAddress')">
+            {{ instanceDetail.taskTrackerAddress }}
+          </el-descriptions-item>
+
+          <el-descriptions-item v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3" :label="$t('message.expectedTriggerTime')">
+            {{ instanceDetail.expectedTriggerTime }}
+          </el-descriptions-item>
+
+          <el-descriptions-item :label="$t('message.startTime')">
+            {{ instanceDetail.actualTriggerTime || instanceDetail.startTime }}
+          </el-descriptions-item>
+
+          <el-descriptions-item :label="$t('message.finishedTime')">
+            {{ instanceDetail.finishedTime }}
+          </el-descriptions-item>
+        </el-descriptions>
+        
+        <!-- 插槽区域，一般放启用/跳过状态 -->
+        <div v-if="$slots.default" class="slot-container">
+          <slot></slot>
+        </div>
+      </el-card>
+
+      <!-- 结果与详情 -->
+      <el-card shadow="never" class="info-card mt-3">
+        <template #header>
+          <span class="section-title">{{ $t('message.result') }}</span>
+        </template>
+        <div class="code-like-block">
+          {{ instanceDetail.result || '无' }}
+        </div>
+        
+        <template v-if="instanceDetail.taskDetail && instanceDetail.nodeType != 2">
+          <div class="mt-3">
+            <span class="section-title" style="font-size: 13px;">{{ $t('message.taskDetail') }}</span>
+            <div class="code-like-block mt-2">
+              {{ instanceDetail.taskDetail }}
             </div>
-          </el-col>
-        </el-row>
-        <slot></slot>
-        <el-row
-          class="job-detail-text"
-          id="taskDetail"
-          v-if="instanceDetail.taskDetail && instanceDetail.nodeType != 2"
-        >
-          <span class="power-job-text">{{ $t("message.taskDetail") }}:</span>
-          <span class="title">{{ instanceDetail.taskDetail }}</span>
-        </el-row>
+          </div>
+        </template>
+      </el-card>
+
+      <!-- 折叠面板：参数和高级信息 -->
+      <el-card shadow="never" class="info-card collapse-card mt-3" v-if="instanceDetail.nodeType != 2 && instanceDetail.nodeType != 3">
+        <el-collapse v-model="activeNames">
+          <el-collapse-item name="params">
+            <template #title>
+              <span class="collapse-title">参数配置</span>
+            </template>
+            <el-descriptions :column="1" border size="small" direction="vertical">
+              <el-descriptions-item :label="$t('message.nodeParams')">
+                <div class="code-like-block">{{ instanceDetail.jobParams ? instanceDetail.jobParams : (instanceDetail.nodeParams || '无') }}</div>
+              </el-descriptions-item>
+              <el-descriptions-item :label="$t('message.instanceParams')">
+                <div class="code-like-block">{{ instanceDetail.instanceParams || '无' }}</div>
+              </el-descriptions-item>
+              <el-descriptions-item label="运行时配置">
+                <div class="code-like-block">{{ instanceDetail.runtimeConfig || '无' }}</div>
+              </el-descriptions-item>
+            </el-descriptions>
+          </el-collapse-item>
+
+          <el-collapse-item name="advanced" v-if="hasAdvancedInfo">
+            <template #title>
+              <span class="collapse-title">高级信息</span>
+            </template>
+            <el-descriptions :column="1" border size="small">
+              <el-descriptions-item label="业务外键">
+                {{ instanceDetail.outerKey || '无' }}
+              </el-descriptions-item>
+              <el-descriptions-item label="业务扩展数据">
+                {{ instanceDetail.extendValue || '无' }}
+              </el-descriptions-item>
+              <el-descriptions-item label="调度元信息">
+                <div class="code-like-block">{{ instanceDetail.meta || '无' }}</div>
+              </el-descriptions-item>
+            </el-descriptions>
+          </el-collapse-item>
+        </el-collapse>
       </el-card>
     </div>
 
-    <el-divider
-      content-position="center"
-      v-if="instanceDetail.subInstanceDetails"
-      >{{ $t("message.secondlyJobHistory") }}</el-divider
-    >
-    <div
-      class="power-job-info"
-      v-if="instanceDetail.subInstanceDetails"
-      :style="{ width: fixedWidth ? fixedWidth : '100%' }"
-    >
-      <el-card>
-        <el-row>
-          <el-table
-            :data="instanceDetail.subInstanceDetails"
-            style="width: 100%"
-          >
-            <el-table-column
-              :show-overflow-tooltip="true"
-              prop="subInstanceId"
-              :label="$t('message.subInstanceId')"
-              width="120"
-            />
-            <el-table-column
-              :show-overflow-tooltip="true"
-              prop="startTime"
-              :label="$t('message.startTime')"
-              width="160"
-            />
-            <el-table-column
-              :show-overflow-tooltip="true"
-              prop="finishedTime"
-              :label="$t('message.finishedTime')"
-              width="160"
-            />
-            <el-table-column
-              :show-overflow-tooltip="true"
-              :label="$t('message.status')"
-              width="140"
-            >
-              <template #default="scope">{{
-                common.translateInstanceStatus(scope.row.status)
-              }}</template>
+    <!-- 子实例历史 -->
+    <template v-if="instanceDetail.subInstanceDetails && instanceDetail.subInstanceDetails.length > 0">
+      <el-divider content-position="center">{{ $t("message.secondlyJobHistory") }}</el-divider>
+      <div class="power-job-info" :style="{ width: fixedWidth ? fixedWidth + 'px' : '100%' }">
+        <el-card shadow="never" class="info-card">
+          <el-table :data="instanceDetail.subInstanceDetails" style="width: 100%" stripe>
+            <el-table-column :show-overflow-tooltip="true" prop="subInstanceId" :label="$t('message.subInstanceId')" width="120" />
+            <el-table-column :show-overflow-tooltip="true" prop="startTime" :label="$t('message.startTime')" width="160" />
+            <el-table-column :show-overflow-tooltip="true" prop="finishedTime" :label="$t('message.finishedTime')" width="160" />
+            <el-table-column :show-overflow-tooltip="true" :label="$t('message.status')" width="140">
+              <template #default="scope">
+                <el-tag :type="getStatusType(scope.row.status)" size="small" effect="light">
+                  {{ common.translateInstanceStatus(scope.row.status) }}
+                </el-tag>
+              </template>
             </el-table-column>
-            <el-table-column
-              :show-overflow-tooltip="true"
-              prop="result"
-              :label="$t('message.result')"
-            />
+            <el-table-column :show-overflow-tooltip="true" prop="result" :label="$t('message.result')" />
           </el-table>
-        </el-row>
-      </el-card>
-
-    </div>
+        </el-card>
+      </div>
+    </template>
 
     <!-- MR任务 -->
-    <el-divider
-        content-position="center"
-        v-if="showQueriedTaskDetailInfoList"
-    >{{ $t("message.queriedTaskDetailInfoList") }}</el-divider>
-
-    <div
-        class="power-job-info"
-        v-if="showQueriedTaskDetailInfoList"
-        :style="{ width: fixedWidth ? fixedWidth : '100%' }"
-    >
-
-
-      <el-row>
-        <el-col :span="20">
+    <template v-if="showQueriedTaskDetailInfoList">
+      <el-divider content-position="center">{{ $t("message.queriedTaskDetailInfoList") }}</el-divider>
+      <div class="power-job-info" :style="{ width: fixedWidth ? fixedWidth + 'px' : '100%' }">
+        <div class="mr-query-bar mb-3">
           <el-input v-model="queryInstanceDetailRequest.customQuery">
             <template #prepend>select * from task_info where</template>
             <template #append>limit 10</template>
           </el-input>
-        </el-col>
-        <el-col :span="4">
-          <el-button type="primary" @click="fetchInstanceDetail">{{$t('message.query')}}</el-button>
-        </el-col>
-      </el-row>
-      <el-card>
-        <el-row>
-          <el-table
-              :data="instanceDetail.queriedTaskDetailInfoList"
-              style="width: 100%"
-          >
-            <el-table-column
-                :show-overflow-tooltip="true"
-                prop="taskId"
-                label="taskId"
-                width="80"
-            />
-            <el-table-column
-                :show-overflow-tooltip="true"
-                prop="taskName"
-                label="taskName"
-            />
-
-            <el-table-column
-                :show-overflow-tooltip="true"
-                prop="taskContent"
-                label="taskContent"
-            />
-
-            <el-table-column
-                :show-overflow-tooltip="true"
-                prop="processorAddress"
-                label="processorAddress"
-            />
-
-            <el-table-column
-                :show-overflow-tooltip="true"
-                prop="failedCnt"
-                :label="$t('message.failedCnt')"
-                width="80"
-            />
-
-            <el-table-column
-                :show-overflow-tooltip="true"
-                prop="statusStr"
-                :label="$t('message.status')"
-                width="80"
-            />
-            <el-table-column
-                :show-overflow-tooltip="true"
-                prop="createdTimeStr"
-                :label="$t('message.createdTime')"
-
-            />
-            <el-table-column
-                :show-overflow-tooltip="true"
-                prop="lastModifiedTimeStr"
-                :label="$t('message.lastModifiedTime')"
-
-            />
-            <el-table-column
-                :show-overflow-tooltip="true"
-                prop="lastReportTimeStr"
-                :label="$t('message.lastReportTime')"
-
-            />
-            <el-table-column
-                :show-overflow-tooltip="true"
-                prop="result"
-                :label="$t('message.result')"
-            />
+          <el-button type="primary" @click="fetchInstanceDetail" class="ml-2">{{$t('message.query')}}</el-button>
+        </div>
+        
+        <el-card shadow="never" class="info-card">
+          <el-table :data="instanceDetail.queriedTaskDetailInfoList" style="width: 100%" stripe>
+            <el-table-column :show-overflow-tooltip="true" prop="taskId" label="taskId" width="80" />
+            <el-table-column :show-overflow-tooltip="true" prop="taskName" label="taskName" />
+            <el-table-column :show-overflow-tooltip="true" prop="taskContent" label="taskContent" />
+            <el-table-column :show-overflow-tooltip="true" prop="processorAddress" label="processorAddress" />
+            <el-table-column :show-overflow-tooltip="true" prop="failedCnt" :label="$t('message.failedCnt')" width="80" />
+            <el-table-column :show-overflow-tooltip="true" prop="statusStr" :label="$t('message.status')" width="80">
+              <template #default="scope">
+                <el-tag :type="getStatusType(scope.row.status)" size="small" effect="light">
+                  {{ scope.row.statusStr }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column :show-overflow-tooltip="true" prop="createdTimeStr" :label="$t('message.createdTime')" />
+            <el-table-column :show-overflow-tooltip="true" prop="lastModifiedTimeStr" :label="$t('message.lastModifiedTime')" />
+            <el-table-column :show-overflow-tooltip="true" prop="lastReportTimeStr" :label="$t('message.lastReportTime')" />
+            <el-table-column :show-overflow-tooltip="true" prop="result" :label="$t('message.result')" />
           </el-table>
-        </el-row>
-      </el-card>
-
-    </div>
-
+        </el-card>
+      </div>
+    </template>
   </div>
-
 </template>
 
 <script>
 export default {
   name: "InstanceDetail",
-  // 数据传递
   props: ["instanceId", "fixedWidth", "resultAll", "nodeDetail"],
+  computed: {
+    /** 高级信息面板是否展示：仅当业务外键、扩展数据、调度元信息至少有一项有值时才显示 */
+    hasAdvancedInfo() {
+      const d = this.instanceDetail || {};
+      const has = (v) => v != null && String(v).trim() !== '';
+      return has(d.outerKey) || has(d.extendValue) || has(d.meta);
+    },
+  },
   data() {
     return {
+      activeNames: [], // 控制折叠面板
       instanceDetail: {
         queriedTaskDetailInfoList: undefined
       },
-
-      // 是否展示 queriedTaskDetailInfoList，只单向赋值为 true ，解决改变查询条件空数据后隐藏组件的问题
       showQueriedTaskDetailInfoList: false,
-
       queryInstanceDetailRequest: {
         instanceId: this.instanceId,
         customQuery: "status in (5, 6) order by last_modified_time desc"
@@ -336,7 +187,6 @@ export default {
   },
   methods: {
     fetchInstanceDetail() {
-      // 有实例 ID 时请求完整详情（工作流视图下 nodeDetail 仅含节点维度的少量字段，需用 detailPlus 拉取完整实例信息）
       if (this.instanceId) {
         const that = this;
         const request = {
@@ -353,14 +203,27 @@ export default {
         this.instanceDetail = this.nodeDetail;
       }
     },
-    /** 查看详情 */
-    handleToDetail() {
-      this.$router.push({
-        path: '/oms/wfinstance',
-      })
-      setTimeout(() => {
-        this.$router.push(`/oms/wfInstanceDetail/${this.nodeDetail.instanceId}`)
-      }, 20)
+    // 状态颜色映射
+    getStatusType(status) {
+      // 1: 等待派发, 2: 等待Worker接收, 3: 运行中, 4: 失败, 5: 成功, 9: 取消, 10: 手动停止
+      switch (status) {
+        case 1:
+          return 'warning';
+        case 2:
+          return 'primary';
+        case 3:
+          return '';
+        case 4:
+          return 'danger';
+        case 5:
+          return 'success';
+        case 9:
+          return 'info';
+        case 10:
+          return 'warning';
+        default:
+          return 'info';
+      }
     }
   },
   mounted() {
@@ -371,72 +234,132 @@ export default {
     instanceId() {
       this.fetchInstanceDetail();
     },
+    nodeDetail() {
+      if (!this.instanceId && this.nodeDetail) {
+        this.instanceDetail = this.nodeDetail;
+      }
+    }
   },
 };
 </script>
 
 <style scoped>
-*,
-*::after,
-*::before {
+.power-job-panel {
+  width: 100%;
+}
+
+.power-job-info {
+  padding: 5px;
   box-sizing: border-box;
 }
-.title {
-  display: inline-block;
-  /* margin: 5px 0; */
+
+/* 卡片样式优化 */
+.info-card {
+  border-radius: 8px;
+  border: 1px solid #ebeef5;
+  background-color: #fff;
+  transition: .3s;
+}
+
+:deep(.info-card > .el-card__header) {
+  padding: 10px 15px;
+  background-color: #fafafa;
+  border-bottom: 1px solid #ebeef5;
+}
+
+:deep(.info-card > .el-card__body) {
+  padding: 15px;
+}
+
+.section-title {
   font-size: 14px;
   font-weight: bold;
-  flex: 1;
+  color: #303133;
 }
-.power-job-button {
-  display: flex;
-  width: 100%;
-  justify-content: flex-end;
-  padding-top: 5px;
-  padding-right: 5px;
-}
-.power-job-info {
-  padding: 5px 5px;
-}
-.power-job-text {
-  display: inline-block;
-  width: 148px;
-  text-align: right;
-  margin-right: 4px;
-  font-size: 14px;
+
+/* 预格式化文本框 */
+.code-like-block {
+  background-color: #f8f9fa;
+  border: 1px solid #e4e7ed;
+  border-radius: 4px;
+  padding: 10px;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 13px;
+  color: #606266;
+  white-space: pre-wrap;
   word-break: break-all;
-  /* flex-basis: 148px; */
+  max-height: 250px;
+  overflow-y: auto;
 }
-.result:hover {
-  transition: 0.5s;
-  color: #52aeff;
+
+/* 折叠面板样式优化 */
+.collapse-card :deep(.el-card__body) {
+  padding: 0 15px;
 }
-.power-job-result {
+
+:deep(.el-collapse) {
+  border-top: none;
+  border-bottom: none;
+}
+
+:deep(.el-collapse-item__header) {
+  font-size: 14px;
+  font-weight: bold;
+  color: #303133;
+  border-bottom: 1px solid #ebeef5;
+}
+
+:deep(.el-collapse-item__wrap) {
+  border-bottom: none;
+}
+
+:deep(.el-collapse-item:last-child .el-collapse-item__header) {
+  border-bottom: none;
+}
+:deep(.el-collapse-item:last-child.is-active .el-collapse-item__header) {
+  border-bottom: 1px solid #ebeef5;
+}
+
+.collapse-title {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* 描述列表样式优化：全屏时 label 适中宽度 */
+:deep(.el-descriptions__label) {
+  width: 96px;
+  min-width: 96px;
+  justify-content: flex-end;
+  color: #606266;
+  font-weight: 500;
+}
+
+/* 侧边栏窄屏时缩小 label 以多留内容区 */
+.power-job-panel.is-narrow :deep(.el-descriptions__label) {
+  width: 72px;
+  min-width: 72px;
+}
+
+:deep(.el-descriptions__content) {
+  color: #303133;
+}
+
+/* 插槽容器 */
+.slot-container {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed #ebeef5;
+}
+
+/* 辅助类 */
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 15px; }
+.mb-3 { margin-bottom: 15px; }
+.ml-2 { margin-left: 8px; }
+
+/* MR查询栏 */
+.mr-query-bar {
   display: flex;
   align-items: center;
-}
-.power-job-result.power-job-result-detail {
-  align-items: flex-start;
-}
-.power-job-content-slot {
-  max-height: 300px;
-  overflow-y: scroll;
-}
-.power-job-content {
-  /* width: 205px; */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: inline-block;
-  font-size: 14px;
-  /* line-height: 20px; */
-}
-</style>
-<style>
-.el-tooltip__popper.is-dark {
-  max-width: 50%;
-  word-wrap: break-word;
-  white-space: normal;
-  word-break: break-all;
 }
 </style>

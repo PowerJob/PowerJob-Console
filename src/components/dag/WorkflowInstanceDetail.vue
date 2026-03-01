@@ -97,15 +97,28 @@
         <div class="node-detail-panel" v-if="selectedNode">
           <div class="node-detail-header">
             <span class="node-detail-title">{{ nodeDetail?.nodeName || '节点详情' }}</span>
-            <el-button type="text" @click="selectedNode = null">
-              <el-icon><Close /></el-icon>
-            </el-button>
+            <div class="node-detail-actions">
+              <el-tooltip :content="$t('message.refresh')" placement="top">
+                <el-button type="text" @click="refreshNodeDetail" style="padding: 0; color: #606266;">
+                  <el-icon size="16"><Refresh /></el-icon>
+                </el-button>
+              </el-tooltip>
+              <el-tooltip :content="$t('message.detail')" placement="top" v-if="nodeDetail && nodeDetail.instanceId">
+                <el-button type="text" @click="toNodeDetail" style="padding: 0; color: #606266;">
+                  <el-icon size="16"><Document /></el-icon>
+                </el-button>
+              </el-tooltip>
+              <el-button type="text" @click="selectedNode = null" style="padding: 0; color: #606266; margin-left: 4px;">
+                <el-icon size="18"><Close /></el-icon>
+              </el-button>
+            </div>
           </div>
 
           <div class="node-detail-content">
             <!-- 任务节点详情 -->
             <template v-if="nodeDetail && nodeDetail.nodeType !== 2">
               <InstanceDetail
+                ref="instanceDetailRef"
                 :instance-id="currentInstanceId"
                 :fixedWidth="380"
                 :nodeDetail="nodeDetail"
@@ -158,7 +171,7 @@ import ReactWorkflowBridge from "./ReactWorkflowBridge.vue";
 import JsonViewer from 'vue-json-viewer';
 import JSEditor from "./JSEditor";
 import { ElMessage } from 'element-plus';
-import { Close } from '@element-plus/icons-vue';
+import { Close, Refresh, Document } from '@element-plus/icons-vue';
 
 export default {
   name: "WorkflowInstanceDetail",
@@ -168,6 +181,8 @@ export default {
     JsonViewer,
     JSEditor,
     Close,
+    Refresh,
+    Document,
   },
   data() {
     return {
@@ -289,6 +304,24 @@ export default {
       this.currentInstanceId = undefined;
     },
 
+    /** 刷新节点详情 */
+    refreshNodeDetail() {
+      if (this.$refs.instanceDetailRef) {
+        this.$refs.instanceDetailRef.fetchInstanceDetail();
+      }
+    },
+
+    /** 跳转到实例详情 */
+    toNodeDetail() {
+      if (!this.nodeDetail || !this.nodeDetail.instanceId) return;
+      this.$router.push({
+        path: '/oms/wfinstance',
+      });
+      setTimeout(() => {
+        this.$router.push(`/oms/wfInstanceDetail/${this.nodeDetail.instanceId}`);
+      }, 20);
+    },
+
     back() {
       this.$router.go(-1);
     }
@@ -374,8 +407,16 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 15px;
+  padding: 0 12px;
+  height: 40px;
+  box-sizing: border-box;
   border-bottom: 1px solid #e0e0e0;
+}
+
+.node-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .node-detail-title {
