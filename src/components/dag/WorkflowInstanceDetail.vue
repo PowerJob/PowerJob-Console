@@ -104,7 +104,7 @@
                 </el-button>
               </el-tooltip>
               <el-tooltip :content="$t('message.detail')" placement="top" v-if="nodeDetail && nodeDetail.instanceId">
-                <el-button type="text" @click="toNodeDetail" style="padding: 0; color: #606266;">
+                <el-button type="text" @click.stop="toNodeDetail" style="padding: 0; color: #606266;">
                   <el-icon size="16"><Document /></el-icon>
                 </el-button>
               </el-tooltip>
@@ -293,8 +293,9 @@ export default {
         nodeType: node.data?.type === 'DECISION' ? 2 : (node.data?.type === 'NESTED_WORKFLOW' ? 3 : 1),
       };
 
-      // 设置实例 ID
-      this.currentInstanceId = node.data?.instanceId;
+      // 嵌套工作流节点存的是 wfInstanceId，不能传给任务实例接口，只传 nodeDetail 用于展示
+      const isNestedWorkflow = node.data?.type === 'NESTED_WORKFLOW';
+      this.currentInstanceId = isNestedWorkflow ? undefined : node.data?.instanceId;
     },
 
     /** 取消选中 */
@@ -311,15 +312,34 @@ export default {
       }
     },
 
-    /** 跳转到任务实例详情页 */
+    /** 跳转详情：普通任务节点跳任务实例详情，嵌套工作流节点跳工作流实例详情 */
     toNodeDetail() {
-      if (!this.nodeDetail || !this.nodeDetail.instanceId) return;
-      this.$router.push(`/oms/instanceDetail/${this.nodeDetail.instanceId}`);
+      const detail = this.nodeDetail;
+      if (!detail || detail.instanceId == null || detail.instanceId === '') return;
+      const id = String(detail.instanceId);
+      // node.data 来自 React 节点，仅有 type 字符串，无 nodeType 数字
+      const isNestedWorkflow = detail.type === 'NESTED_WORKFLOW' || detail.nodeType === 3;
+      if (isNestedWorkflow) {
+        this.$router.push({ name: 'WorkflowInstanceDetail', params: { wfInstanceId: id } }).catch(() => {});
+      } else {
+        this.$router.push({ name: 'instanceDetail', params: { instanceId: id } }).catch(() => {});
+      }
     },
 
     back() {
       this.$router.go(-1);
     }
+  },
+  watch: {
+    // 同路由不同 params 时组件会复用，需根据 wfInstanceId 重新拉取并清空节点选中
+    wfInstanceId: {
+      handler(newId, oldId) {
+        if (oldId != null && newId !== oldId) {
+          this.handleSelectionCleared();
+          this.fetchWfInstanceInfo();
+        }
+      },
+    },
   },
   mounted() {
     console.log("Welcome to WorkflowInstanceDetail!");

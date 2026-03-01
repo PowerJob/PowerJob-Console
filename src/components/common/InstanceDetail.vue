@@ -187,6 +187,12 @@ export default {
   },
   methods: {
     fetchInstanceDetail() {
+      // 嵌套工作流节点：节点上的 ID 是 wfInstanceId，不能调任务实例接口
+      const isNestedWorkflow = this.nodeDetail?.nodeType === 3 || this.nodeDetail?.type === 'NESTED_WORKFLOW';
+      if (isNestedWorkflow && this.nodeDetail) {
+        this.instanceDetail = this.nodeDetail;
+        return;
+      }
       if (this.instanceId) {
         const that = this;
         const request = {
