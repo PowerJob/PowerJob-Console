@@ -17,7 +17,7 @@ import {
   layoutNodes,
   assignOptimalHandles,
   getOptimalHandlesForEdge,
-} from '@echo009/power-workflow-next';
+} from '@powerjob/power-workflow-next';
 
 export default {
   name: 'ReactWorkflowBridge',

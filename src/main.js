@@ -9,8 +9,8 @@ import i18n from './i18n/i18n'
 import './iconfont.css';
 // Tailwind CSS（用于 power-workflow-next 组件）
 import './tailwind.css';
-// 仅引入运行态动画样式，避免 index.css 中 @apply 依赖当前 Tailwind 主题变量
-import 'power-workflow-next-root/src/styles/animations.css';
+// power-workflow-next 组件样式（标准 npm 接入）
+import '@powerjob/power-workflow-next/style.css';
 
 
 // axios 负责统一拦截处理 ResultDTO，fly 负责处理不需要拦截的请求
