@@ -254,6 +254,51 @@ export default {
     },
 
     /**
+     * 统一转换后端节点状态到 power-workflow-next NodeStatus 枚举值
+     * 兼容 number / numeric string / enum string。
+     */
+    toWorkflowNodeStatus(rawStatus) {
+      if (rawStatus == null) return undefined;
+
+      const numericMap = {
+        1: 1,   // WAITING
+        2: 1,   // DISPATCHED -> WAITING
+        3: 3,   // RUNNING
+        4: 4,   // FAILED
+        5: 5,   // SUCCESS
+        6: 6,   // CANCELED
+        9: 6,   // CANCELED(legacy)
+        10: 10, // STOPPED
+      };
+
+      const normalizedNumber =
+        typeof rawStatus === 'number'
+          ? rawStatus
+          : (typeof rawStatus === 'string' && rawStatus.trim() !== '' && Number.isFinite(Number(rawStatus)))
+            ? Number(rawStatus)
+            : null;
+      if (normalizedNumber != null && numericMap[normalizedNumber] != null) {
+        return numericMap[normalizedNumber];
+      }
+
+      if (typeof rawStatus === 'string') {
+        const textMap = {
+          WAITING: 1,
+          RUNNING: 3,
+          FAILED: 4,
+          SUCCESS: 5,
+          SUCCEED: 5,
+          CANCELED: 6,
+          CANCELLED: 6,
+          STOPPED: 10,
+        };
+        return textMap[rawStatus.trim().toUpperCase()];
+      }
+
+      return undefined;
+    },
+
+    /**
      * 转换 Vue 格式数据到 React 格式
      */
     convertToReactFormat(vueNodes, vueEdges) {
@@ -263,12 +308,6 @@ export default {
           1: 'JOB',
           2: 'DECISION',
           3: 'NESTED_WORKFLOW'
-        };
-
-        // 状态映射为 power-workflow-next NodeStatus 枚举值，供 statusVisuals 渲染颜色/文案
-        // 后端：1,2=WAITING, 3=RUNNING, 4=FAILED, 5=SUCCESS, 9=CANCELED, 10=STOPPED
-        const statusNumMap = {
-          1: 1, 2: 1, 3: 3, 4: 4, 5: 5, 9: 6, 10: 10
         };
 
         const nodeType = typeMap[node.nodeType] || 'JOB';
@@ -287,7 +326,7 @@ export default {
         const baseData = {
           label: node.nodeName || '',
           type: nodeType,
-          status: node.status != null ? statusNumMap[node.status] : undefined,
+          status: this.toWorkflowNodeStatus(node.status),
           instanceId: node.instanceId != null ? String(node.instanceId) : undefined,
           execution,
           disableByControlNode: node.disableByControlNode === true,
