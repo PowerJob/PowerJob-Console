@@ -36,12 +36,13 @@
       <div class="card-body">
         <div class="code-block">
           <div class="code-header">
-            <span class="code-label">Node Params</span>
+            <span class="code-label"></span>
             <button class="copy-btn" @click="copyParams">
               <el-icon><CopyDocument /></el-icon>
             </button>
           </div>
-          <pre class="code-content">{{ nodeDetail?.nodeParams || '// 无判断逻辑' }}</pre>
+          <!-- condition: ReactWorkflowBridge 转换后的字段名，对应后端的 nodeParams -->
+          <pre class="code-content">{{ nodeDetail?.condition || '// 无判断逻辑' }}</pre>
         </div>
       </div>
     </div>
@@ -57,7 +58,7 @@
       <div class="card-body">
         <div class="result-display">
           <div class="result-icon">
-            <el-icon size="24"><Right /></el-icon>
+            <el-icon size="16"><Right /></el-icon>
           </div>
           <div class="result-content">
             <span class="result-label">分支路径</span>
@@ -126,8 +127,9 @@ export default {
   },
   methods: {
     copyParams() {
-      if (this.nodeDetail?.nodeParams) {
-        navigator.clipboard.writeText(this.nodeDetail.nodeParams);
+      // condition: ReactWorkflowBridge 转换后的字段名，对应后端的 nodeParams
+      if (this.nodeDetail?.condition) {
+        navigator.clipboard.writeText(this.nodeDetail.condition);
         ElMessage.success('已复制到剪贴板');
       }
     }

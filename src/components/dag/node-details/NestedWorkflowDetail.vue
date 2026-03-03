@@ -3,7 +3,7 @@
     <!-- 嵌套工作流标识 -->
     <div class="workflow-banner">
       <div class="banner-icon">
-        <el-icon size="32"><Share /></el-icon>
+        <el-icon size="24"><Share /></el-icon>
       </div>
       <div class="banner-content">
         <h3 class="banner-title">{{ nodeDetail?.label || '嵌套工作流' }}</h3>
@@ -22,10 +22,6 @@
       <div class="card-body">
         <div class="info-row">
           <span class="info-label">工作流ID</span>
-          <span class="info-value mono">{{ nodeDetail?.workflowId || '-' }}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">实例ID</span>
           <span class="info-value mono">{{ nodeDetail?.instanceId || '-' }}</span>
         </div>
         <div class="info-row">
@@ -66,7 +62,8 @@
     </div>
 
     <!-- 工作流参数 -->
-    <div class="info-card" v-if="nodeDetail?.jobParams">
+    <!-- params: ReactWorkflowBridge 转换后的字段名，对应后端的 nodeParams -->
+    <div class="info-card" v-if="nodeDetail?.params">
       <div class="card-header">
         <span class="card-title">
           <el-icon><Setting /></el-icon>
@@ -75,7 +72,7 @@
       </div>
       <div class="card-body">
         <div class="params-display">
-          <code>{{ nodeDetail.jobParams }}</code>
+          <code>{{ nodeDetail.params }}</code>
         </div>
       </div>
     </div>
@@ -187,11 +184,11 @@ export default {
 .workflow-banner {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 20px;
+  gap: 12px;
+  padding: 12px;
   background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
-  border-radius: 14px;
-  margin-bottom: 16px;
+  border-radius: 10px;
+  margin-bottom: 12px;
   color: white;
   position: relative;
   overflow: hidden;
@@ -208,14 +205,18 @@ export default {
 }
 
 .banner-icon {
-  width: 56px;
-  height: 56px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 14px;
+  border-radius: 10px;
   backdrop-filter: blur(10px);
+}
+
+.banner-icon .el-icon {
+  font-size: 22px;
 }
 
 .banner-content {
@@ -224,18 +225,18 @@ export default {
 
 .banner-title {
   margin: 0;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .banner-subtitle {
   margin: 0;
-  font-size: 12px;
+  font-size: 10px;
   opacity: 0.8;
   font-family: 'JetBrains Mono', monospace;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 /* 信息卡片 */

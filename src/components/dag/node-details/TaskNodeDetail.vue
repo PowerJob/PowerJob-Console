@@ -58,8 +58,9 @@
             <div class="extra-info">
               <div class="info-row">
                 <span class="info-label">任务参数</span>
+                <!-- params: ReactWorkflowBridge 转换后的字段名，对应后端的 nodeParams -->
                 <div class="info-value params-value">
-                  <code>{{ nodeDetail?.jobParams || '无' }}</code>
+                  <code>{{ nodeDetail?.params || '无' }}</code>
                 </div>
               </div>
             </div>
