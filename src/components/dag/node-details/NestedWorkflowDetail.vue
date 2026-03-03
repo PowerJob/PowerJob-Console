@@ -6,7 +6,7 @@
         <el-icon size="32"><Share /></el-icon>
       </div>
       <div class="banner-content">
-        <h3 class="banner-title">{{ nodeDetail?.nodeName || '嵌套工作流' }}</h3>
+        <h3 class="banner-title">{{ nodeDetail?.label || '嵌套工作流' }}</h3>
         <p class="banner-subtitle">Nested Workflow Instance</p>
       </div>
     </div>

@@ -99,13 +99,6 @@
             <!-- 面板头部 -->
             <div class="panel-header">
               <div class="header-left">
-                <div class="node-type-badge" :class="nodeTypeClass">
-                  <el-icon class="type-icon" v-if="isTaskNode"><Monitor /></el-icon>
-                  <el-icon class="type-icon" v-else-if="isDecisionNode"><Operation /></el-icon>
-                  <el-icon class="type-icon" v-else><Share /></el-icon>
-                  <span class="type-label">{{ nodeTypeLabel }}</span>
-                </div>
-                <h3 class="node-name">{{ nodeDetail?.nodeName || '节点详情' }}</h3>
               </div>
               <div class="header-actions">
                 <el-tooltip :content="$t('message.refresh')" placement="top">
@@ -515,22 +508,13 @@ export default {
   overflow: hidden;
 }
 
-.node-detail-panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #6366f1, #8b5cf6, #a855f7);
-}
-
 /* 面板头部 */
 .panel-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  padding: 16px;
+  align-items: center;
+  height: 40px;
+  padding: 0 12px;
   background: white;
   border-bottom: 1px solid #e2e8f0;
 }

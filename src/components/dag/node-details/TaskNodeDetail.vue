@@ -11,7 +11,7 @@
       <div class="card-body">
         <div class="info-row">
           <span class="info-label">节点名称</span>
-          <span class="info-value">{{ nodeDetail?.nodeName || '-' }}</span>
+          <span class="info-value">{{ nodeDetail?.label || '-' }}</span>
         </div>
         <div class="info-row">
           <span class="info-label">实例ID</span>
