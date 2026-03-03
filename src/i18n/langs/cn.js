@@ -19,6 +19,7 @@ const cn = {
         'detail': '详情',
         'download': '下载',
         'stop': '停止',
+        'confirmStop': '确定要停止该实例吗？',
         'back': '返回',
         'all': '全部',
         'more': ' 更多',

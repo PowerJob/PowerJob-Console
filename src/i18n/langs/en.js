@@ -19,6 +19,7 @@ const en = {
         'detail': 'Detail',
         'download': 'Download',
         'stop': 'Stop',
+        'confirmStop': 'Are you sure to stop this instance?',
         'back': 'Back',
         'all': 'ALL',
         'more': ' More',
