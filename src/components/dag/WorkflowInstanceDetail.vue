@@ -1,82 +1,146 @@
 <template>
   <div class="workflow-instance-detail">
     <!-- 顶部操作栏 -->
-    <el-row>
-      <div class="power-toolbtn">
-        <div>
-          <el-button type="primary" @click="back">{{ $t('message.back') }}</el-button>
+    <div class="wf-header">
+      <div class="header-left">
+        <button class="back-btn" @click="back">
+          <el-icon><ArrowLeft /></el-icon>
+          <span>{{ $t('message.back') }}</span>
+        </button>
+      </div>
+      <div class="header-actions">
+        <button class="action-btn" @click="fetchWfInstanceInfo">
+          <el-icon><Refresh /></el-icon>
+          <span>{{ $t('message.refresh') }}</span>
+        </button>
+        <button class="action-btn warning" @click="restart">
+          <el-icon><RefreshRight /></el-icon>
+          <span>{{ $t('message.reRun') }}</span>
+        </button>
+        <button class="action-btn danger" @click="stop">
+          <el-icon><VideoPause /></el-icon>
+          <span>{{ $t('message.stop') }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 工作流实例信息 - 紧凑卡片式布局 -->
+    <div class="wf-info-section">
+      <!-- 信息网格 -->
+      <div class="info-grid">
+        <!-- 第一排：ID 信息 + 状态 -->
+        <div class="info-item">
+          <span class="info-label">{{ $t('message.wfId') }}</span>
+          <span class="info-value mono">{{ wfInstanceDetail.workflowId || '-' }}</span>
         </div>
-        <div>
-          <el-button @click="fetchWfInstanceInfo">{{ $t('message.refresh') }}</el-button>
-          <el-button type="warning" @click="restart">{{ $t('message.reRun') }}</el-button>
-          <el-button type="danger" @click="stop">{{ $t('message.stop') }}</el-button>
+        <div class="info-item">
+          <span class="info-label">{{ $t('message.wfInstanceId') }}</span>
+          <span class="info-value mono">{{ wfInstanceDetail.wfInstanceId || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">{{ $t('message.status') }}</span>
+          <span class="info-value">
+            <span class="status-tag" :class="statusTagClass">
+              <span class="status-dot"></span>
+              {{ common.translateWfInstanceStatus(wfInstanceDetail.status) }}
+            </span>
+          </span>
+        </div>
+
+        <!-- 第二排：时间信息 -->
+        <div class="info-item">
+          <span class="info-label">{{ $t('message.expectedTriggerTime') }}</span>
+          <span class="info-value">{{ wfInstanceDetail.expectedTriggerTime || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">{{ $t('message.triggerTime') }}</span>
+          <span class="info-value">{{ wfInstanceDetail.actualTriggerTime || '-' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">{{ $t('message.finishedTime') }}</span>
+          <span class="info-value">{{ wfInstanceDetail.finishedTime || '-' }}</span>
+        </div>
+
+        <!-- 参数预览 -->
+        <div class="info-item full-width" v-if="wfInstanceDetail.wfInitParams">
+          <span class="info-label">{{ $t('message.wfInitParams') }}</span>
+          <div class="info-value-interactive">
+            <code class="preview-text">{{ truncateText(wfInstanceDetail.wfInitParams, 60) }}</code>
+            <button class="view-detail-btn" @click="openDetailDialog('params', $t('message.wfInitParams'), wfInstanceDetail.wfInitParams)">
+              <el-icon><View /></el-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- 上下文预览 -->
+        <div class="info-item full-width" v-if="wfInstanceDetail.wfContext">
+          <span class="info-label">{{ $t('message.wfContext') }}</span>
+          <div class="info-value-interactive">
+            <code class="preview-text">{{ truncateText(wfInstanceDetail.wfContext, 60) }}</code>
+            <button class="view-detail-btn" @click="openDetailDialog('context', $t('message.wfContext'), wfInstanceDetail.wfContext)">
+              <el-icon><View /></el-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- 结果预览 -->
+        <div class="info-item full-width" v-if="wfInstanceDetail.result">
+          <span class="info-label">{{ $t('message.result') }}</span>
+          <div class="info-value-interactive">
+            <code class="preview-text">{{ truncateText(wfInstanceDetail.result, 80) }}</code>
+            <button class="view-detail-btn" @click="openDetailDialog('result', $t('message.result'), wfInstanceDetail.result)">
+              <el-icon><View /></el-icon>
+            </button>
+          </div>
         </div>
       </div>
-    </el-row>
+    </div>
 
-    <!-- 工作流实例信息 -->
-    <el-row class="power-work-info-item">
-      <el-col :span="24">
-        {{ $t('message.status') }}：
-        <span class="title">{{ common.translateWfInstanceStatus(wfInstanceDetail.status) }}</span>
-      </el-col>
-    </el-row>
+    <!-- 详情弹窗 -->
+    <el-dialog
+      v-model="detailDialogVisible"
+      :title="detailDialogTitle"
+      width="680px"
+      class="wf-detail-dialog"
+      :close-on-click-modal="true"
+      destroy-on-close
+    >
+      <div class="detail-dialog-content">
+        <!-- 格式切换 -->
+        <div class="format-toggle" v-if="canFormatAsJson">
+          <button
+            class="toggle-btn"
+            :class="{ active: viewMode === 'raw' }"
+            @click="viewMode = 'raw'"
+          >
+            <el-icon><Document /></el-icon>
+            <span>原始</span>
+          </button>
+          <button
+            class="toggle-btn"
+            :class="{ active: viewMode === 'json' }"
+            @click="viewMode = 'json'"
+          >
+            <el-icon><List /></el-icon>
+            <span>JSON</span>
+          </button>
+          <button class="copy-btn" @click="copyToClipboard">
+            <el-icon><CopyDocument /></el-icon>
+            <span>复制</span>
+          </button>
+        </div>
 
-    <el-row class="power-work-info-item">
-      <el-col :span="8">
-        {{ $t('message.wfId') }}：
-        <span class="title">{{ wfInstanceDetail.workflowId }}</span>
-      </el-col>
-      <el-col :span="16">
-        {{ $t('message.wfInstanceId') }}：
-        <span class="title">{{ wfInstanceDetail.wfInstanceId }}</span>
-      </el-col>
-    </el-row>
-
-    <el-row class="power-work-info-item">
-      <el-col :span="8">
-        {{ $t('message.expectedTriggerTime') }}：
-        <span class="title">{{ wfInstanceDetail.expectedTriggerTime }}</span>
-      </el-col>
-      <el-col :span="8">
-        {{ $t('message.triggerTime') }}：
-        <span class="title">{{ wfInstanceDetail.actualTriggerTime }}</span>
-      </el-col>
-      <el-col :span="8">
-        {{ $t('message.finishedTime') }}：
-        <span class="title">{{ wfInstanceDetail.finishedTime }}</span>
-      </el-col>
-    </el-row>
-
-    <el-row class="power-work-info-item">
-      <el-col :span="24">
-        {{ $t('message.wfInitParams') }}：
-        <span class="title">{{ wfInstanceDetail.wfInitParams }}</span>
-      </el-col>
-    </el-row>
-
-    <el-row v-if="wfInstanceDetail.wfContext" class="power-work-info-item">
-      <div>
-        <el-col :span="24">
-          {{ $t('message.wfContext') }}：
-          <el-popover width="400" placement="top" trigger="click">
-            <div class="power-work-info-item-content">
-              <JsonViewer :value="JSON.parse(wfInstanceDetail.wfContext)" />
-            </div>
-            <template #reference>
-              <span class="power-work-info-item-context">{{ wfInstanceDetail.wfContext }}</span>
-            </template>
-          </el-popover>
-        </el-col>
+        <!-- 内容展示 -->
+        <div class="detail-content">
+          <template v-if="viewMode === 'json' && canFormatAsJson">
+            <JsonViewer :value="parsedDetailContent" />
+          </template>
+          <template v-else>
+            <pre class="raw-content"><code>{{ detailDialogContent }}</code></pre>
+          </template>
+        </div>
       </div>
-    </el-row>
-
-    <el-row class="power-work-info-item">
-      <el-col :span="24">
-        {{ $t('message.result') }}（{{ $t('message.wfTips') }}）：
-        <span class="title">{{ wfInstanceDetail.result }}</span>
-      </el-col>
-    </el-row>
+    </el-dialog>
 
     <!-- 工作流画布（view 模式） -->
     <el-row class="canvas-row">
@@ -102,7 +166,7 @@
               </div>
               <div class="header-actions">
                 <el-tooltip :content="$t('message.refresh')" placement="top">
-                  <button class="action-btn" @click="refreshNodeDetail">
+                  <button class="panel-action-btn" @click="refreshNodeDetail">
                     <el-icon size="16"><Refresh /></el-icon>
                   </button>
                 </el-tooltip>
@@ -111,11 +175,11 @@
                   placement="top"
                   v-if="showDetailButton"
                 >
-                  <button class="action-btn" @click.stop="toNodeDetail">
+                  <button class="panel-action-btn" @click.stop="toNodeDetail">
                     <el-icon size="16"><Document /></el-icon>
                   </button>
                 </el-tooltip>
-                <button class="action-btn close-btn" @click="selectedNode = null">
+                <button class="panel-action-btn close-btn" @click="selectedNode = null">
                   <el-icon size="18"><Close /></el-icon>
                 </button>
               </div>
@@ -177,7 +241,9 @@ import JSEditor from "./JSEditor";
 import { ElMessage } from 'element-plus';
 import {
   Close, Refresh, Document, CircleCheck,
-  Monitor, Share, Operation
+  Monitor, Share, Operation,
+  ArrowLeft, RefreshRight, VideoPause, View,
+  CopyDocument, List
 } from '@element-plus/icons-vue';
 
 // 子组件
@@ -199,9 +265,15 @@ export default {
     Monitor,
     Share,
     Operation,
+    ArrowLeft,
+    RefreshRight,
+    VideoPause,
+    View,
+    CopyDocument,
+    List,
     TaskNodeDetail,
     DecisionNodeDetail,
-    NestedWorkflowDetail,
+    NestedWorkflowDetail
   },
   data() {
     return {
@@ -213,12 +285,47 @@ export default {
         nodes: [],
         edges: []
       },
-      nodeDetail: null
+      nodeDetail: null,
+      // 详情弹窗
+      detailDialogVisible: false,
+      detailDialogTitle: '',
+      detailDialogContent: '',
+      detailDialogType: '',
+      viewMode: 'raw'
     };
   },
   computed: {
     wfInstanceId() {
       return this.$route.params.wfInstanceId;
+    },
+    // 状态标签样式
+    statusTagClass() {
+      const status = this.wfInstanceDetail.status;
+      if (status === 1) return 'tag-waiting';
+      if (status === 2) return 'tag-running';
+      if (status === 3) return 'tag-running';
+      if (status === 4) return 'tag-failed';
+      if (status === 5) return 'tag-success';
+      if (status === 10) return 'tag-stopped';
+      return '';
+    },
+    // 是否可以格式化为 JSON
+    canFormatAsJson() {
+      if (!this.detailDialogContent) return false;
+      try {
+        JSON.parse(this.detailDialogContent);
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    // 解析后的 JSON 内容
+    parsedDetailContent() {
+      try {
+        return JSON.parse(this.detailDialogContent);
+      } catch {
+        return this.detailDialogContent;
+      }
     },
     // 节点类型判断
     isTaskNode() {
@@ -408,6 +515,46 @@ export default {
 
     back() {
       this.$router.go(-1);
+    },
+
+    /** 截断文本 */
+    truncateText(text, maxLength) {
+      if (!text) return '-';
+      if (text.length <= maxLength) return text;
+      return text.substring(0, maxLength) + '...';
+    },
+
+    /** 打开详情弹窗 */
+    openDetailDialog(type, title, content) {
+      this.detailDialogType = type;
+      this.detailDialogTitle = title;
+      this.detailDialogContent = content;
+      this.viewMode = 'raw';
+      // 自动检测是否为 JSON
+      try {
+        JSON.parse(content);
+        this.viewMode = 'json';
+      } catch {
+        this.viewMode = 'raw';
+      }
+      this.detailDialogVisible = true;
+    },
+
+    /** 复制到剪贴板 */
+    async copyToClipboard() {
+      try {
+        await navigator.clipboard.writeText(this.detailDialogContent);
+        ElMessage.success('已复制到剪贴板');
+      } catch (err) {
+        // 降级方案
+        const textArea = document.createElement('textarea');
+        textArea.value = this.detailDialogContent;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        ElMessage.success('已复制到剪贴板');
+      }
     }
   },
   watch: {
@@ -445,38 +592,355 @@ export default {
   font-family: 'Outfit', -apple-system, sans-serif;
 }
 
-.title {
-  display: inline-block;
-  font-size: 14px;
-  font-weight: 600;
-  color: #1a1a2e;
-}
-
-.power-toolbtn {
+/* ========== 顶部操作栏 ========== */
+.wf-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 12px;
 }
 
-.power-work-info-item {
-  margin: 10px;
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #475569;
   font-size: 13px;
-  color: #4a4a68;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.power-work-info-item-content {
-  max-height: 300px;
-  overflow-y: scroll;
+.back-btn:hover {
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  color: #334155;
+  transform: translateX(-2px);
 }
 
-.power-work-info-item-context {
-  max-width: 600px;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.action-btn.warning {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.action-btn.warning:hover {
+  background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
+}
+
+.action-btn.danger {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-color: #ef4444;
+  color: #991b1b;
+}
+
+.action-btn.danger:hover {
+  background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+}
+
+/* ========== 信息区域 ========== */
+.wf-info-section {
+  padding: 0 0 12px 0;
+}
+
+/* 信息网格 */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px 16px;
+  background: white;
+  border-radius: 12px;
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* 状态标签 */
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-tag .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-tag.tag-waiting {
+  background: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%);
+  color: #854d0e;
+}
+
+.status-tag.tag-waiting .status-dot {
+  background: #eab308;
+}
+
+.status-tag.tag-running {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1e40af;
+}
+
+.status-tag.tag-running .status-dot {
+  background: #3b82f6;
+  animation: pulse-dot 1.5s infinite;
+}
+
+.status-tag.tag-success {
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  color: #166534;
+}
+
+.status-tag.tag-success .status-dot {
+  background: #22c55e;
+}
+
+.status-tag.tag-failed {
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: #991b1b;
+}
+
+.status-tag.tag-failed .status-dot {
+  background: #ef4444;
+}
+
+.status-tag.tag-stopped {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: #475569;
+}
+
+.status-tag.tag-stopped .status-dot {
+  background: #94a3b8;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-item.full-width {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding-top: 8px;
+  border-top: 1px dashed #e2e8f0;
+  margin-top: 4px;
+}
+
+.info-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.info-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.info-value-interactive {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.preview-text {
+  flex: 1;
+  font-size: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #64748b;
+  background: #f8fafc;
+  padding: 6px 10px;
+  border-radius: 6px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: inline-block;
+  border: 1px solid #e2e8f0;
 }
 
+.view-detail-btn {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-detail-btn:hover {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: #3b82f6;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* ========== 详情弹窗 ========== */
+.wf-detail-dialog :deep(.el-dialog__header) {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  margin-right: 0;
+}
+
+.wf-detail-dialog :deep(.el-dialog__title) {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.wf-detail-dialog :deep(.el-dialog__body) {
+  padding: 0;
+}
+
+.detail-dialog-content {
+  padding: 20px;
+}
+
+.format-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 4px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  width: fit-content;
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn:hover {
+  color: #334155;
+}
+
+.toggle-btn.active {
+  background: white;
+  color: #3b82f6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+}
+
+.copy-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-1px);
+}
+
+.detail-content {
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.raw-content {
+  margin: 0;
+  padding: 16px;
+  max-height: 400px;
+  overflow: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #334155;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.raw-content code {
+  background: transparent;
+}
+
+/* ========== 画布区域 ========== */
 .canvas-row {
   flex: 1;
   min-height: 400px;
@@ -572,7 +1036,7 @@ export default {
   gap: 4px;
 }
 
-.action-btn {
+.panel-action-btn {
   width: 32px;
   height: 32px;
   display: flex;
@@ -586,12 +1050,12 @@ export default {
   transition: all 0.2s ease;
 }
 
-.action-btn:hover {
+.panel-action-btn:hover {
   background: #f1f5f9;
   color: #334155;
 }
 
-.action-btn.close-btn:hover {
+.panel-action-btn.close-btn:hover {
   background: #fee2e2;
   color: #dc2626;
 }
@@ -724,6 +1188,13 @@ export default {
 }
 
 /* ========== 旧样式兼容 ========== */
+.title {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
 .power-job-text {
   display: inline-block;
   width: 148px;
