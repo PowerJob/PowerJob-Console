@@ -94,72 +94,83 @@
         />
 
         <!-- 节点详情侧边栏 -->
-        <div class="node-detail-panel" v-if="selectedNode">
-          <div class="node-detail-header">
-            <span class="node-detail-title">{{ nodeDetail?.nodeName || '节点详情' }}</span>
-            <div class="node-detail-actions">
-              <el-tooltip :content="$t('message.refresh')" placement="top">
-                <el-button type="text" @click="refreshNodeDetail" style="padding: 0; color: #606266;">
-                  <el-icon size="16"><Refresh /></el-icon>
-                </el-button>
-              </el-tooltip>
-              <el-tooltip :content="$t('message.detail')" placement="top" v-if="nodeDetail && nodeDetail.instanceId">
-                <el-button type="text" @click.stop="toNodeDetail" style="padding: 0; color: #606266;">
-                  <el-icon size="16"><Document /></el-icon>
-                </el-button>
-              </el-tooltip>
-              <el-button type="text" @click="selectedNode = null" style="padding: 0; color: #606266; margin-left: 4px;">
-                <el-icon size="18"><Close /></el-icon>
-              </el-button>
+        <transition name="slide-fade">
+          <div class="node-detail-panel" v-if="selectedNode">
+            <!-- 面板头部 -->
+            <div class="panel-header">
+              <div class="header-left">
+                <div class="node-type-badge" :class="nodeTypeClass">
+                  <el-icon class="type-icon" v-if="isTaskNode"><Monitor /></el-icon>
+                  <el-icon class="type-icon" v-else-if="isDecisionNode"><Operation /></el-icon>
+                  <el-icon class="type-icon" v-else><Share /></el-icon>
+                  <span class="type-label">{{ nodeTypeLabel }}</span>
+                </div>
+                <h3 class="node-name">{{ nodeDetail?.nodeName || '节点详情' }}</h3>
+              </div>
+              <div class="header-actions">
+                <el-tooltip :content="$t('message.refresh')" placement="top">
+                  <button class="action-btn" @click="refreshNodeDetail">
+                    <el-icon size="16"><Refresh /></el-icon>
+                  </button>
+                </el-tooltip>
+                <el-tooltip
+                  :content="$t('message.detail')"
+                  placement="top"
+                  v-if="showDetailButton"
+                >
+                  <button class="action-btn" @click.stop="toNodeDetail">
+                    <el-icon size="16"><Document /></el-icon>
+                  </button>
+                </el-tooltip>
+                <button class="action-btn close-btn" @click="selectedNode = null">
+                  <el-icon size="18"><Close /></el-icon>
+                </button>
+              </div>
+            </div>
+
+            <!-- 节点状态指示器 -->
+            <div class="status-indicator" :class="nodeStatusClass">
+              <span class="status-dot"></span>
+              <span class="status-text">{{ nodeStatusText }}</span>
+            </div>
+
+            <!-- 面板内容 - 根据节点类型切换 -->
+            <div class="panel-content">
+              <!-- 普通任务节点 -->
+              <template v-if="isTaskNode">
+                <TaskNodeDetail
+                  ref="taskDetailRef"
+                  :nodeDetail="nodeDetail"
+                  :instanceId="currentInstanceId"
+                  :currentNodeInfo="currentNodeInfo"
+                />
+              </template>
+
+              <!-- 判断节点 -->
+              <template v-else-if="isDecisionNode">
+                <DecisionNodeDetail
+                  :nodeDetail="nodeDetail"
+                />
+              </template>
+
+              <!-- 嵌套工作流节点 -->
+              <template v-else-if="isNestedWorkflowNode">
+                <NestedWorkflowDetail
+                  :nodeDetail="nodeDetail"
+                  @navigate="navigateToWorkflow"
+                />
+              </template>
+            </div>
+
+            <!-- 底部操作区 -->
+            <div class="panel-footer" v-if="canMarkSuccess">
+              <button class="mark-success-btn" @click="markedSuccess">
+                <el-icon><CircleCheck /></el-icon>
+                <span>{{ $t('message.markerSuccess') }}</span>
+              </button>
             </div>
           </div>
-
-          <div class="node-detail-content">
-            <!-- 任务节点详情 -->
-            <template v-if="nodeDetail && nodeDetail.nodeType !== 2">
-              <InstanceDetail
-                ref="instanceDetailRef"
-                :instance-id="currentInstanceId"
-                :fixedWidth="380"
-                :nodeDetail="nodeDetail"
-              >
-                <template>
-                  <el-row class="job-detail-text">
-                    <el-col :span="24">
-                      <span class="power-job-text">{{ $t('message.enable') }}:</span>
-                      <span class="title">{{ currentNodeInfo.enable ? $t('message.yes') : $t('message.no') }}</span>
-                    </el-col>
-                  </el-row>
-                  <el-row class="job-detail-text">
-                    <el-col :span="24">
-                      <span class="power-job-text">{{ $t('message.skipWhenFailed') }}:</span>
-                      <span class="title">{{ currentNodeInfo.skipWhenFailed ? $t('message.yes') : $t('message.no') }}</span>
-                    </el-col>
-                  </el-row>
-                </template>
-              </InstanceDetail>
-            </template>
-
-            <!-- 判断节点详情 -->
-            <template v-if="nodeDetail && nodeDetail.nodeType === 2">
-              <el-row class="job-detail-text">
-                <el-col :span="24">
-                  <span class="power-job-text" style="width: 64px">{{ $t('message.nodeParams') }}:</span>
-                  <div style="padding-top: 10px">
-                    <JSEditor :code="nodeDetail.nodeParams" key="nodeParams" :editorOptions="{ readOnly: true }" />
-                  </div>
-                </el-col>
-              </el-row>
-            </template>
-          </div>
-
-          <!-- 标记成功按钮（仅失败节点可点击） -->
-          <div class="node-detail-footer" v-if="canMarkSuccess">
-            <el-button type="success" @click="markedSuccess" size="small">
-              {{ $t('message.markerSuccess') }}
-            </el-button>
-          </div>
-        </div>
+        </transition>
       </div>
     </el-row>
   </div>
@@ -171,7 +182,15 @@ import ReactWorkflowBridge from "./ReactWorkflowBridge.vue";
 import JsonViewer from 'vue-json-viewer';
 import JSEditor from "./JSEditor";
 import { ElMessage } from 'element-plus';
-import { Close, Refresh, Document } from '@element-plus/icons-vue';
+import {
+  Close, Refresh, Document, CircleCheck,
+  Monitor, Share, Operation
+} from '@element-plus/icons-vue';
+
+// 子组件
+import TaskNodeDetail from './node-details/TaskNodeDetail.vue';
+import DecisionNodeDetail from './node-details/DecisionNodeDetail.vue';
+import NestedWorkflowDetail from './node-details/NestedWorkflowDetail.vue';
 
 export default {
   name: "WorkflowInstanceDetail",
@@ -183,6 +202,13 @@ export default {
     Close,
     Refresh,
     Document,
+    CircleCheck,
+    Monitor,
+    Share,
+    Operation,
+    TaskNodeDetail,
+    DecisionNodeDetail,
+    NestedWorkflowDetail,
   },
   data() {
     return {
@@ -200,6 +226,59 @@ export default {
   computed: {
     wfInstanceId() {
       return this.$route.params.wfInstanceId;
+    },
+    // 节点类型判断
+    isTaskNode() {
+      return this.nodeDetail &&
+             this.nodeDetail.type !== 'DECISION' &&
+             this.nodeDetail.type !== 'NESTED_WORKFLOW';
+    },
+    isDecisionNode() {
+      return this.nodeDetail && this.nodeDetail.type === 'DECISION';
+    },
+    isNestedWorkflowNode() {
+      return this.nodeDetail && this.nodeDetail.type === 'NESTED_WORKFLOW';
+    },
+    // 节点类型样式
+    nodeTypeClass() {
+      if (this.isDecisionNode) return 'type-decision';
+      if (this.isNestedWorkflowNode) return 'type-nested';
+      return 'type-task';
+    },
+    // 节点类型标签
+    nodeTypeLabel() {
+      if (this.isDecisionNode) return '判断节点';
+      if (this.isNestedWorkflowNode) return '嵌套工作流';
+      return '任务节点';
+    },
+    // 是否显示详情按钮
+    showDetailButton() {
+      if (!this.nodeDetail) return false;
+      return !!this.nodeDetail.instanceId;
+    },
+    // 节点状态
+    nodeStatusClass() {
+      if (!this.nodeDetail) return '';
+      const status = this.nodeDetail.status;
+      if (status === 1) return 'status-waiting';
+      if (status === 2) return 'status-running';
+      if (status === 3) return 'status-running';
+      if (status === 4) return 'status-failed';
+      if (status === 5) return 'status-success';
+      if (status === 10) return 'status-stopped';
+      return '';
+    },
+    nodeStatusText() {
+      if (!this.nodeDetail) return '';
+      const statusMap = {
+        1: '等待中',
+        2: '运行中',
+        3: '运行中',
+        4: '失败',
+        5: '成功',
+        10: '已停止'
+      };
+      return statusMap[this.nodeDetail.status] || '未知';
     },
     canMarkSuccess() {
       // 只有失败的节点才能标记成功
@@ -307,8 +386,8 @@ export default {
 
     /** 刷新节点详情 */
     refreshNodeDetail() {
-      if (this.$refs.instanceDetailRef) {
-        this.$refs.instanceDetailRef.fetchInstanceDetail();
+      if (this.$refs.taskDetailRef) {
+        this.$refs.taskDetailRef.refresh();
       }
     },
 
@@ -324,6 +403,14 @@ export default {
       } else {
         this.$router.push({ name: 'instanceDetail', params: { instanceId: id } }).catch(() => {});
       }
+    },
+
+    /** 导航到嵌套工作流 */
+    navigateToWorkflow(wfInstanceId) {
+      this.$router.push({
+        name: 'WorkflowInstanceDetail',
+        params: { wfInstanceId }
+      }).catch(() => {});
     },
 
     back() {
@@ -349,6 +436,8 @@ export default {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+
 *,
 *::after,
 *::before {
@@ -360,12 +449,14 @@ export default {
   flex-direction: column;
   height: 100%;
   min-height: 0;
+  font-family: 'Outfit', -apple-system, sans-serif;
 }
 
 .title {
   display: inline-block;
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 600;
+  color: #1a1a2e;
 }
 
 .power-toolbtn {
@@ -376,6 +467,8 @@ export default {
 
 .power-work-info-item {
   margin: 10px;
+  font-size: 13px;
+  color: #4a4a68;
 }
 
 .power-work-info-item-content {
@@ -409,48 +502,244 @@ export default {
   position: relative;
 }
 
+/* ========== 节点详情面板样式 ========== */
 .node-detail-panel {
   width: 420px;
   height: 100%;
-  border-left: 1px solid #e0e0e0;
-  background: #fff;
+  background: linear-gradient(180deg, #fafbfc 0%, #f5f7fa 100%);
+  border-left: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: hidden;
 }
 
-.node-detail-header {
+.node-detail-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6, #a855f7);
+}
+
+/* 面板头部 */
+.panel-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 0 12px;
-  height: 40px;
-  box-sizing: border-box;
-  border-bottom: 1px solid #e0e0e0;
+  align-items: flex-start;
+  padding: 16px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.node-detail-actions {
+.header-left {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 8px;
 }
 
-.node-detail-title {
-  font-size: 16px;
-  font-weight: bold;
+.node-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  width: fit-content;
 }
 
-.node-detail-content {
+.node-type-badge.type-task {
+  background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+  color: #0369a1;
+}
+
+.node-type-badge.type-decision {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+}
+
+.node-type-badge.type-nested {
+  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+  color: #5b21b6;
+}
+
+.type-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.node-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.action-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.action-btn.close-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* 状态指示器 */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.status-waiting {
+  background: #fef9c3;
+  color: #854d0e;
+}
+.status-indicator.status-waiting .status-dot {
+  background: #eab308;
+}
+
+.status-indicator.status-running {
+  background: #dbeafe;
+  color: #1e40af;
+}
+.status-indicator.status-running .status-dot {
+  background: #3b82f6;
+  animation: pulse-fast 1s infinite;
+}
+
+.status-indicator.status-success {
+  background: #dcfce7;
+  color: #166534;
+}
+.status-indicator.status-success .status-dot {
+  background: #22c55e;
+  animation: none;
+}
+
+.status-indicator.status-failed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.status-indicator.status-failed .status-dot {
+  background: #ef4444;
+  animation: none;
+}
+
+.status-indicator.status-stopped {
+  background: #f1f5f9;
+  color: #475569;
+}
+.status-indicator.status-stopped .status-dot {
+  background: #94a3b8;
+  animation: none;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.1); }
+}
+
+@keyframes pulse-fast {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* 面板内容 */
+.panel-content {
   flex: 1;
   overflow-y: auto;
-  padding: 10px;
+  padding: 16px;
 }
 
-.node-detail-footer {
-  padding: 10px 15px;
-  border-top: 1px solid #e0e0e0;
-  text-align: center;
+/* 底部操作区 */
+.panel-footer {
+  padding: 16px;
+  background: white;
+  border-top: 1px solid #e2e8f0;
 }
 
+.mark-success-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+.mark-success-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+}
+
+.mark-success-btn:active {
+  transform: translateY(0);
+}
+
+/* 过渡动画 */
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.2s ease-in;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+}
+
+/* ========== 旧样式兼容 ========== */
 .power-job-text {
   display: inline-block;
   width: 148px;
