@@ -497,7 +497,7 @@ export default {
 
 /* ========== 节点详情面板样式 ========== */
 .node-detail-panel {
-  width: 420px;
+  width: 480px;
   height: 100%;
   background: linear-gradient(180deg, #fafbfc 0%, #f5f7fa 100%);
   border-left: 1px solid #e2e8f0;

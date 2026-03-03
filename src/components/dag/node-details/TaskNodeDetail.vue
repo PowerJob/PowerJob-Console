@@ -48,10 +48,9 @@
         </button>
       </div>
       <div class="card-body">
-        <InstanceDetail
+        <InstanceDetailCompact
           ref="instanceDetailRef"
           :instance-id="instanceId"
-          :fixedWidth="380"
           :nodeDetail="nodeDetail"
         >
           <template>
@@ -65,7 +64,7 @@
               </div>
             </div>
           </template>
-        </InstanceDetail>
+        </InstanceDetailCompact>
       </div>
     </div>
 
@@ -81,13 +80,13 @@
 </template>
 
 <script>
-import InstanceDetail from "../../common/InstanceDetail";
+import InstanceDetailCompact from "../../common/InstanceDetailCompact";
 import { InfoFilled, Clock, Refresh, Warning } from '@element-plus/icons-vue';
 
 export default {
   name: 'TaskNodeDetail',
   components: {
-    InstanceDetail,
+    InstanceDetailCompact,
     InfoFilled,
     Clock,
     Refresh,
