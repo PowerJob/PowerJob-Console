@@ -41,11 +41,7 @@
               <el-icon><CopyDocument /></el-icon>
             </button>
           </div>
-          <JSEditor
-            :code="nodeDetail?.nodeParams || '// 无判断逻辑'"
-            key="nodeParams"
-            :editorOptions="{ readOnly: true }"
-          />
+          <pre class="code-content">{{ nodeDetail?.nodeParams || '// 无判断逻辑' }}</pre>
         </div>
       </div>
     </div>
@@ -84,7 +80,6 @@
 </template>
 
 <script>
-import JSEditor from "../JSEditor";
 import {
   Operation, Document, CircleCheck, Right,
   InfoFilled, CopyDocument
@@ -94,7 +89,6 @@ import { ElMessage } from 'element-plus';
 export default {
   name: 'DecisionNodeDetail',
   components: {
-    JSEditor,
     Operation,
     Document,
     CircleCheck,
@@ -260,6 +254,20 @@ export default {
   align-items: center;
   padding: 8px 12px;
   background: #1e293b;
+}
+
+.code-content {
+  margin: 0;
+  padding: 12px;
+  background: #1e293b;
+  color: #a5f3fc;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 200px;
 }
 
 .code-label {
