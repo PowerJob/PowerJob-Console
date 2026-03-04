@@ -195,7 +195,7 @@ const cn = {
 
 
         // 工作流管理
-        'wfId': '工作流 ID',
+        'wfId': '工作流ID',
         'wfName': '工作流名称',
         'newWorkflow': '新建工作流',
         'wfDescription': '工作流描述',

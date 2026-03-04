@@ -53,7 +53,7 @@
             :type="isWorkflow ? 'selection' : null"
             stripe
         >
-            <el-table-column prop="id" :label="$t('message.wfId')" width="80" sortable/>
+            <el-table-column prop="id" :label="$t('message.wfId')" width="104" sortable/>
             <el-table-column prop="wfName" :label="$t('message.wfName')" min-width="200" show-overflow-tooltip />
             <el-table-column :label="$t('message.scheduleInfo')" min-width="150" show-overflow-tooltip>
                 <template #default="scope">

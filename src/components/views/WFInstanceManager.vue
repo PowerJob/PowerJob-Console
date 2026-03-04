@@ -64,7 +64,7 @@
         :row-class-name="wfInstanceTableRowClassName"
         stripe
       >
-        <el-table-column :show-overflow-tooltip="true" prop="workflowId" :label="$t('message.wfId')" width="110" />
+        <el-table-column :show-overflow-tooltip="true" prop="workflowId" :label="$t('message.wfId')" width="200" />
         <el-table-column :show-overflow-tooltip="true" prop="workflowName" :label="$t('message.wfName')" min-width="120" />
         <el-table-column :show-overflow-tooltip="true" prop="wfInstanceId" :label="$t('message.wfInstanceId')" width="200" />
         <el-table-column prop="status" :label="$t('message.status')" width="100">
