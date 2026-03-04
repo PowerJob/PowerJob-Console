@@ -3,7 +3,7 @@
 
     <!-- Tab Section -->
     <div class="tabs-section">
-      <el-tabs type="card" v-model="instanceQueryContent.type" @tab-click="listInstanceInfos">
+      <el-tabs type="card" v-model="instanceQueryContent.type" @tab-click="onInstanceTypeTabClick">
         <el-tab-pane :label="$t('message.normalInstance')" name="NORMAL" />
         <el-tab-pane :label="$t('message.wfInstance')" name="WORKFLOW" />
       </el-tabs>
@@ -237,6 +237,13 @@ export default {
     };
   },
   methods: {
+    // Tab 切换时刷新列表（需在 nextTick 中调用，确保 v-model 已更新 type 后再请求）
+    onInstanceTypeTabClick() {
+      this.$nextTick(() => {
+        this.instanceQueryContent.index = 0; // 切换类型后从第一页开始
+        this.listInstanceInfos();
+      });
+    },
     // 查询任务实例信息
     listInstanceInfos() {
       let that = this;
