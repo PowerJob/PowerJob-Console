@@ -65,15 +65,15 @@
         stripe
       >
         <el-table-column :show-overflow-tooltip="true" prop="workflowId" :label="$t('message.wfId')" width="200" />
-        <el-table-column :show-overflow-tooltip="true" prop="workflowName" :label="$t('message.wfName')" min-width="84" />
+        <el-table-column :show-overflow-tooltip="true" prop="workflowName" :label="$t('message.wfName')" min-width="59" />
         <el-table-column :show-overflow-tooltip="true" prop="wfInstanceId" :label="$t('message.wfInstanceId')" width="200" />
         <el-table-column prop="status" :label="$t('message.status')" width="100">
           <template #default="scope">
             {{fetchWFStatus(scope.row.status)}}
           </template>
         </el-table-column>
-        <el-table-column prop="actualTriggerTime" :label="$t('message.triggerTime')" width="176" />
-        <el-table-column prop="finishedTime" :label="$t('message.finishedTime')" width="176" />
+        <el-table-column prop="actualTriggerTime" :label="$t('message.triggerTime')" width="211" />
+        <el-table-column prop="finishedTime" :label="$t('message.finishedTime')" width="211" />
 
         <el-table-column :label="$t('message.operation')" width="220" align="center" fixed="right">
           <template #default="scope">
