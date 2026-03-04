@@ -123,6 +123,7 @@
                     />
                     <el-button
                       type="primary"
+                      :disabled="!formData.timeExpression?.trim()"
                       @click="onClickValidateTimeExpression"
                     >
                       <el-icon><Check /></el-icon>
