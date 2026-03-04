@@ -113,6 +113,21 @@ export default {
         padding: var(--pj-space-sm) 0;
     }
     
+    /* 侧边栏隐藏滚动条（仍可滚轮滚动） */
+    .left-container,
+    .sidebar-aside,
+    :deep(.el-aside) {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    .left-container::-webkit-scrollbar,
+    .sidebar-aside::-webkit-scrollbar,
+    :deep(.el-aside)::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+    }
+    
     .aside {
         height: 100%;
         border-right: none !important;
