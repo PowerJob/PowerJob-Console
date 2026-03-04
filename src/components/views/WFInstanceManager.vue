@@ -1,5 +1,5 @@
 <template>
-  <div class="wf-instance-manager">
+  <div class="wf-instance-manager pj-management-page">
 
     <!-- Search Section -->
     <div class="pj-form-section" style="padding-top: 0; margin-top: 0;">
@@ -65,17 +65,17 @@
         stripe
       >
         <el-table-column :show-overflow-tooltip="true" prop="workflowId" :label="$t('message.wfId')" width="200" />
-        <el-table-column :show-overflow-tooltip="true" prop="workflowName" :label="$t('message.wfName')" min-width="120" />
+        <el-table-column :show-overflow-tooltip="true" prop="workflowName" :label="$t('message.wfName')" min-width="84" />
         <el-table-column :show-overflow-tooltip="true" prop="wfInstanceId" :label="$t('message.wfInstanceId')" width="200" />
         <el-table-column prop="status" :label="$t('message.status')" width="100">
           <template #default="scope">
             {{fetchWFStatus(scope.row.status)}}
           </template>
         </el-table-column>
-        <el-table-column prop="actualTriggerTime" :label="$t('message.triggerTime')" width="160" />
-        <el-table-column prop="finishedTime" :label="$t('message.finishedTime')" width="160" />
+        <el-table-column prop="actualTriggerTime" :label="$t('message.triggerTime')" width="176" />
+        <el-table-column prop="finishedTime" :label="$t('message.finishedTime')" width="176" />
 
-        <el-table-column :label="$t('message.operation')" width="220" fixed="right">
+        <el-table-column :label="$t('message.operation')" width="220" align="center" fixed="right">
           <template #default="scope">
             <div class="operation-buttons-group">
               <el-button
@@ -264,129 +264,13 @@ export default {
 };
 </script>
 
-<style scoped>
-/* Modern WF Instance Manager Styles */
+<style scoped lang="scss">
+@import '../../styles/management-pages.scss';
+
+/* 工作流实例页（表格/搜索/分页等已抽到 management-pages.scss） */
 .wf-instance-manager {
   padding: 0;
   background: transparent;
-}
-
-/* Compact spacing */
-:deep(.pj-form-section) {
-  margin-bottom: var(--pj-space-sm) !important;
-  padding: var(--pj-space-sm) !important;
-}
-
-/* Search Section */
-.search-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: var(--pj-space-lg);
-}
-
-.search-form {
-  flex: 1;
-  min-width: 500px;
-}
-
-.search-form :deep(.el-form--inline .el-form-item) {
-  margin-bottom: var(--pj-space-xs);
-}
-
-.action-buttons {
-  display: flex;
-  gap: var(--pj-space-sm);
-  flex-shrink: 0;
-}
-
-/* Pagination */
-.pagination-container {
-  display: flex;
-  justify-content: center;
-  padding: var(--pj-space-lg) 0;
-  background: var(--pj-bg-white);
-  border-radius: var(--pj-radius-lg);
-  margin-top: var(--pj-space-md);
-  box-shadow: var(--pj-shadow-card);
-}
-
-/* Utility Classes */
-.mr-1 {
-  margin-right: var(--pj-space-xs);
-}
-
-/* Operation Buttons Group */
-.operation-buttons-group {
-  display: flex;
-  align-items: center;
-  gap: var(--pj-space-xs, 6px);
-  flex-wrap: nowrap;
-  white-space: nowrap;
-  justify-content: center;
-}
-
-.operation-buttons-group .el-button {
-  margin: 0;
-  padding: 4px 10px;
-  border-radius: var(--pj-radius-sm, 4px);
-  font-size: 12px;
-  min-width: auto;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.operation-buttons-group .el-button + .el-button {
-  margin-left: 0;
-}
-
-.operation-buttons-group .el-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* Utility class for margin-left */
-.ml-1 {
-  margin-left: var(--pj-space-xs, 4px);
-}
-
-/* Enhanced table styling */
-:deep(.el-table) {
-  .el-table__fixed-right {
-    box-shadow: -1px 0 8px rgba(0, 0, 0, 0.1);
-  }
-}
-
-/* Dropdown menu styling */
-:deep(.el-dropdown-menu) {
-  .el-dropdown-menu__item {
-    padding: 8px 16px;
-    
-    &:hover {
-      background: var(--pj-bg-hover, #f5f5f5);
-    }
-  }
-}
-
-/* Responsive design for operation buttons */
-@media (max-width: 1200px) {
-  .operation-buttons-group {
-    justify-content: flex-start;
-    gap: 2px;
-  }
-}
-
-@media (max-width: 768px) {
-  .operation-buttons-group {
-    flex-wrap: wrap;
-    gap: 2px;
-  }
-  
-  .operation-buttons-group .el-button {
-    font-size: 11px;
-    padding: 2px 6px;
-  }
 }
 
 /* 工作流实例状态行字体颜色样式 */

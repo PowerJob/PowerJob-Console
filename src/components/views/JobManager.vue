@@ -1,5 +1,5 @@
 <template>
-    <div class="job-manager">
+    <div class="job-manager pj-management-page">
 
         <!-- Search and Action Section -->
         <div class="pj-form-section" style="padding-top: 0; margin-top: 0;">
@@ -59,15 +59,15 @@
                 <el-table-column prop="jobName" :label="$t('message.jobName')" min-width="150" show-overflow-tooltip />
                 <el-table-column :label="$t('message.scheduleInfo')" min-width="250" show-overflow-tooltip>
                     <template #default="scope">
-                        <div class="schedule-info-enhanced">
-                            <div class="schedule-type">
+                        <div class="schedule-info-enhanced" v-if="scope.row.timeExpressionType || scope.row.timeExpression">
+                            <div class="schedule-type" v-if="scope.row.timeExpressionType">
                                 <el-tag size="small">
                                     {{translateTimeExpressionType(scope.row.timeExpressionType)}}
                                 </el-tag>
                             </div>
-                            <div class="schedule-expression" :title="scope.row.timeExpression">
+                            <el-tag v-if="scope.row.timeExpression" size="small" class="schedule-expression" :title="scope.row.timeExpression">
                                 {{scope.row.timeExpression}}
-                            </div>
+                            </el-tag>
                         </div>
                     </template>
                 </el-table-column>
@@ -99,7 +99,7 @@
                         />
                     </template>
                 </el-table-column>
-                <el-table-column :label="$t('message.operation')" width="250" align="center" fixed="right">
+                <el-table-column :label="$t('message.operation')" width="325" align="center" fixed="right">
                     <template #default="scope">
                         <div class="operation-buttons-enhanced">
                             <el-button 
@@ -770,62 +770,20 @@
 </script>
 
 <style scoped lang="scss">
-/* Modern Job Manager Styles */
+@import '../../styles/management-pages.scss';
+
+/* Modern Job Manager Styles（表格/搜索/分页等已抽到 management-pages.scss） */
 .job-manager {
     padding: 0;
     background: transparent;
 }
 
-/* Compact spacing */
-:deep(.pj-form-section) {
-  margin-bottom: var(--pj-space-sm) !important;
-  padding: var(--pj-space-sm) !important;
-}
-
-/* Search Section */
-.search-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: var(--pj-space-lg);
-}
-
-.search-form {
-    flex: 1;
-    min-width: 500px;
-}
-
-.search-form :deep(.el-form--inline .el-form-item) {
-  margin-bottom: var(--pj-space-xs);
-}
-
-.action-buttons {
-    display: flex;
-    gap: var(--pj-space-sm);
-    flex-shrink: 0;
-}
-
-/* Enhanced Schedule Info Styling */
-.schedule-info-enhanced {
-    display: flex;
-    flex-direction: column;
-    gap: var(--pj-space-xs);
-    min-width: 0;
-}
-
-.schedule-info-enhanced .schedule-type {
-    flex-shrink: 0;
-}
-
-.schedule-info-enhanced .schedule-expression {
-    font-size: 12px;
-    color: var(--pj-text-secondary);
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+/* 定时信息-表达式标签内容省略（需 :deep，保留在页面内） */
+.schedule-info-enhanced .schedule-expression :deep(.el-tag__content) {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    cursor: help;
+    max-width: 320px;
 }
 
 /* Legacy support */
@@ -841,43 +799,15 @@
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 
-/* Enhanced Operation Buttons */
-.operation-buttons-enhanced {
-    display: flex;
-    align-items: center;
-    gap: var(--pj-space-sm);
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.operation-buttons-enhanced .el-button {
+/* 任务管理页专用：表格内链接按钮 */
+:deep(.el-table .el-button--link) {
+    padding: 4px 8px;
+    margin: 0 2px;
     border-radius: var(--pj-radius-sm);
-    font-weight: 500;
-    transition: all 0.3s ease;
-    margin: 0;
 }
 
-.operation-buttons-enhanced .el-button .el-icon {
-    margin-right: 4px;
-}
-
-.operation-buttons-enhanced .el-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* Dropdown menu enhancements */
-.operation-buttons-enhanced :deep(.el-dropdown-menu) {
-    .el-dropdown-menu__item {
-        display: flex;
-        align-items: center;
-        gap: var(--pj-space-sm);
-        
-        .el-icon {
-            width: 16px;
-            height: 16px;
-        }
-    }
+:deep(.el-table .el-button--link:hover) {
+    background: rgba(0, 150, 136, 0.1);
 }
 
 /* Legacy Operation Buttons */
@@ -886,113 +816,6 @@
     align-items: center;
     gap: var(--pj-space-xs);
     flex-wrap: wrap;
-}
-
-/* Pagination */
-.pagination-container {
-    display: flex;
-    justify-content: center;
-    padding: var(--pj-space-lg) 0;
-    background: var(--pj-bg-white);
-    border-radius: var(--pj-radius-lg);
-    margin-top: var(--pj-space-md);
-    box-shadow: var(--pj-shadow-card);
-}
-
-/* Utility Classes */
-.mr-1 {
-    margin-right: var(--pj-space-xs);
-}
-
-.ml-1 {
-    margin-left: var(--pj-space-xs);
-}
-
-/* Enhanced Form Styles */
-:deep(.el-form--inline .el-form-item) {
-    margin-right: var(--pj-space-lg);
-    margin-bottom: var(--pj-space-md);
-}
-
-:deep(.el-form-item__label) {
-    color: var(--pj-text-secondary);
-    font-weight: 500;
-}
-
-:deep(.el-input__wrapper) {
-    border-radius: var(--pj-radius-sm);
-    transition: all 0.3s ease;
-}
-
-:deep(.el-input__wrapper:hover) {
-    box-shadow: 0 0 8px rgba(0, 150, 136, 0.2);
-}
-
-/* Table Enhancements */
-:deep(.el-table) {
-    .el-table__header-wrapper th {
-        background: #fafbfc;
-        color: var(--pj-text-secondary);
-        font-weight: 600;
-        border-bottom: 2px solid #e4e7ed;
-    }
-    
-    .el-table__body-wrapper tr:hover {
-        background: var(--pj-bg-hover);
-    }
-    
-    .el-button--link {
-        padding: 4px 8px;
-        margin: 0 2px;
-        border-radius: var(--pj-radius-sm);
-        
-        &:hover {
-            background: rgba(0, 150, 136, 0.1);
-        }
-    }
-}
-
-/* Tag Enhancements */
-:deep(.el-tag) {
-    border-radius: var(--pj-radius-sm);
-    font-weight: 500;
-}
-
-/* Switch Styling */
-:deep(.el-switch) {
-    --el-switch-on-color: var(--pj-success);
-    --el-switch-off-color: var(--pj-error);
-}
-
-/* Dialog Enhancements */
-:deep(.el-dialog) {
-    border-radius: var(--pj-radius-lg);
-    box-shadow: var(--pj-shadow-hover);
-    
-    .el-dialog__header {
-        padding: var(--pj-space-lg);
-        background: #fafbfc;
-        border-bottom: 1px solid #e4e7ed;
-        border-radius: var(--pj-radius-lg) var(--pj-radius-lg) 0 0;
-        
-        .el-dialog__title {
-            font-weight: 600;
-            color: var(--pj-text-primary);
-        }
-    }
-    
-    .el-dialog__body {
-        padding: var(--pj-space-lg);
-        max-height: 70vh;
-        overflow-y: auto;
-    }
-    
-    .el-dialog__footer {
-        padding: var(--pj-space-lg);
-        background: #fafbfc;
-        border-top: 1px solid #e4e7ed;
-        border-radius: 0 0 var(--pj-radius-lg) var(--pj-radius-lg);
-    }
 }
 
 /* Job Form Dialog - 使用组件内样式 */
@@ -1086,49 +909,7 @@
     }
 }
 
-/* Table responsive enhancements */
-:deep(.el-table) {
-    .el-table__header-wrapper th {
-        white-space: nowrap;
-        padding: 12px 8px;
-    }
-    
-    .el-table__body-wrapper td {
-        padding: 12px 8px;
-    }
-    
-    .el-table__fixed-right {
-        box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
-    }
-}
-
-/* Tag enhancements for better readability */
-:deep(.el-tag) {
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-weight: 500;
-    border-radius: 12px;
-    padding: 4px 12px;
-    font-size: 12px;
-    line-height: 1.2;
-    transition: all 0.3s ease;
-}
-
-/* Enhanced schedule type tags */
-.schedule-info-enhanced .schedule-type .el-tag {
-    min-width: fit-content;
-    text-align: center;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.schedule-info-enhanced .schedule-type .el-tag:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-}
-
-/* Custom colors for schedule types */
+/* 任务管理页专用：标签颜色（定时类型/执行类型） */
 :deep(.el-tag.el-tag--success.el-tag--light) {
     background-color: #f0f9ff;
     border-color: #b5f5ec;
@@ -1188,52 +969,10 @@
     font-weight: 600;
 }
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-    .operation-buttons-enhanced {
-        gap: var(--pj-space-xs);
-    }
-    
-    .operation-buttons-enhanced .el-button {
-        font-size: 12px;
-        padding: 6px 12px;
-    }
-}
-
+/* 任务管理页响应式：小屏下定时表达式省略宽度 */
 @media (max-width: 1024px) {
-    .search-container {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .search-form {
-        min-width: auto;
-    }
-    
-    .action-buttons {
-        justify-content: flex-end;
-    }
-    
-    .schedule-info-enhanced .schedule-expression {
+    .schedule-info-enhanced .schedule-expression :deep(.el-tag__content) {
         max-width: 180px;
-    }
-}
-
-@media (max-width: 768px) {
-    .action-buttons {
-        flex-direction: column;
-        width: 100%;
-    }
-    
-    .operation-buttons {
-        justify-content: center;
-    }
-    
-    .pagination-container {
-        :deep(.el-pagination) {
-            flex-wrap: wrap;
-            justify-content: center;
-        }
     }
 }
 

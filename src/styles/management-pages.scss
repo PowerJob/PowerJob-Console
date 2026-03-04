@@ -1,0 +1,411 @@
+/**
+ * 任务管理 / 任务实例 / 工作流管理 / 工作流实例 页面统一样式
+ * 与 WorkflowInstanceDetail.vue 保持按钮、字体一致
+ * @author Echo009
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* 页面根容器：与工作流实例详情页一致的正文字体 */
+.pj-management-page {
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* 搜索栏操作按钮：与 WorkflowInstanceDetail 的 .action-btn / .back-btn 一致 */
+.pj-management-page .action-buttons .el-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Outfit', -apple-system, sans-serif;
+  transition: all 0.2s ease;
+}
+
+.pj-management-page .action-buttons .el-button.el-button--default {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
+
+.pj-management-page .action-buttons .el-button.el-button--default:hover {
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
+.pj-management-page .action-buttons .el-button.el-button--primary {
+  font-weight: 600;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: 1px solid #2563eb;
+  color: #fff;
+}
+
+.pj-management-page .action-buttons .el-button.el-button--primary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border-color: #1d4ed8;
+}
+
+.pj-management-page .action-buttons .el-button.el-button--success {
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+.pj-management-page .action-buttons .el-button.el-button--info {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+}
+
+.pj-management-page .action-buttons .el-button.el-button--info:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+/* 表格内操作按钮：与详情页 action-btn 风格一致 */
+.pj-management-page .operation-buttons-enhanced .el-button,
+.pj-management-page .operation-buttons-group .el-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Outfit', -apple-system, sans-serif;
+  transition: all 0.2s ease;
+  margin: 0;
+  min-width: auto;
+}
+
+.pj-management-page .operation-buttons-enhanced .el-button + .el-button,
+.pj-management-page .operation-buttons-group .el-button + .el-button {
+  margin-left: 0;
+}
+
+.pj-management-page .operation-buttons-enhanced .el-button.el-button--primary,
+.pj-management-page .operation-buttons-group .el-button.el-button--primary {
+  font-weight: 600;
+}
+
+.pj-management-page .operation-buttons-enhanced .el-button:hover,
+.pj-management-page .operation-buttons-group .el-button:hover {
+  transform: translateY(-1px);
+}
+
+/* 表单标签与表格：使用统一字体 */
+.pj-management-page .el-form-item__label {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  font-weight: 500;
+}
+
+.pj-management-page .el-table {
+  font-family: 'Outfit', -apple-system, sans-serif;
+}
+
+.pj-management-page .el-table th.el-table__cell {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.pj-management-page .el-table td.el-table__cell {
+  font-size: 13px;
+}
+
+/* 操作列：表头与内容均居中对齐 */
+.pj-management-page :deep(.el-table .el-table__fixed-right th.el-table__cell),
+.pj-management-page :deep(.el-table .el-table__fixed-right td.el-table__cell) {
+  text-align: center;
+}
+
+/* 分页、标签等保持 Outfit */
+.pj-management-page .el-pagination,
+.pj-management-page .el-tabs__item {
+  font-family: 'Outfit', -apple-system, sans-serif;
+}
+
+/* 代码/ID 类展示使用等宽字体（与 WorkflowInstanceDetail 的 .info-value .mono 一致） */
+.pj-management-page .schedule-info-enhanced .schedule-expression {
+  font-family: 'JetBrains Mono', 'Monaco', 'Menlo', monospace;
+}
+
+/* Utility */
+.pj-management-page .mr-1 {
+  margin-right: var(--pj-space-xs);
+}
+
+.pj-management-page .ml-1 {
+  margin-left: var(--pj-space-xs);
+}
+
+/* ========== 以下为表格与布局统一样式（以任务管理页为准，代码重用） ========== */
+
+/* 表单区域紧凑间距 */
+.pj-management-page .pj-form-section {
+  margin-bottom: var(--pj-space-sm) !important;
+  padding: var(--pj-space-sm) !important;
+}
+
+/* 搜索区布局 */
+.pj-management-page .search-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--pj-space-lg);
+}
+
+.pj-management-page .search-form {
+  flex: 1;
+  min-width: 500px;
+}
+
+.pj-management-page .search-form :deep(.el-form--inline .el-form-item) {
+  margin-bottom: var(--pj-space-xs);
+}
+
+.pj-management-page .action-buttons {
+  display: flex;
+  gap: var(--pj-space-sm);
+  flex-shrink: 0;
+}
+
+/* 分页容器 */
+.pj-management-page .pagination-container {
+  display: flex;
+  justify-content: center;
+  padding: var(--pj-space-lg) 0;
+  background: var(--pj-bg-white);
+  border-radius: var(--pj-radius-lg);
+  margin-top: var(--pj-space-md);
+  box-shadow: var(--pj-shadow-card);
+}
+
+/* 表格统一样式（与任务管理页一致） */
+.pj-management-page :deep(.el-table .el-table__header-wrapper th) {
+  background: #fafbfc;
+  color: var(--pj-text-secondary);
+  font-weight: 600;
+  border-bottom: 2px solid #e4e7ed;
+  white-space: nowrap;
+  padding: 12px 8px;
+}
+
+.pj-management-page :deep(.el-table .el-table__body-wrapper td) {
+  padding: 12px 8px;
+}
+
+.pj-management-page :deep(.el-table .el-table__body-wrapper tr:hover) {
+  background: var(--pj-bg-hover);
+}
+
+.pj-management-page :deep(.el-table .el-table__fixed-right) {
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 表格内操作按钮布局（与任务管理页一致） */
+.pj-management-page .operation-buttons-enhanced,
+.pj-management-page .operation-buttons-group {
+  display: flex;
+  align-items: center;
+  gap: var(--pj-space-sm);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.pj-management-page .operation-buttons-enhanced :deep(.el-button .el-icon) {
+  margin-right: 4px;
+}
+
+.pj-management-page .operation-buttons-enhanced .el-button:hover,
+.pj-management-page .operation-buttons-group .el-button:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.pj-management-page .operation-buttons-group {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+/* 下拉菜单 */
+.pj-management-page :deep(.el-dropdown-menu .el-dropdown-menu__item) {
+  display: flex;
+  align-items: center;
+  gap: var(--pj-space-sm);
+  padding: 8px 16px;
+}
+
+.pj-management-page :deep(.el-dropdown-menu .el-dropdown-menu__item:hover) {
+  background: var(--pj-bg-hover, #f5f5f5);
+}
+
+.pj-management-page :deep(.el-dropdown-menu .el-dropdown-menu__item .el-icon) {
+  width: 16px;
+  height: 16px;
+}
+
+/* 标签统一样式（与任务管理页一致） */
+.pj-management-page :deep(.el-tag) {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  border-radius: 12px;
+  padding: 4px 12px;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+/* 表单控件 */
+.pj-management-page :deep(.el-form--inline .el-form-item) {
+  margin-right: var(--pj-space-lg);
+  margin-bottom: var(--pj-space-md);
+}
+
+.pj-management-page :deep(.el-form-item__label) {
+  color: var(--pj-text-secondary);
+  font-weight: 500;
+}
+
+.pj-management-page :deep(.el-input__wrapper) {
+  border-radius: var(--pj-radius-sm);
+  transition: all 0.3s ease;
+}
+
+.pj-management-page :deep(.el-input__wrapper:hover) {
+  box-shadow: 0 0 8px rgba(0, 150, 136, 0.2);
+}
+
+/* 开关 */
+.pj-management-page :deep(.el-switch) {
+  --el-switch-on-color: var(--pj-success);
+  --el-switch-off-color: var(--pj-error);
+}
+
+/* 弹窗 */
+.pj-management-page :deep(.el-dialog) {
+  border-radius: var(--pj-radius-lg);
+  box-shadow: var(--pj-shadow-hover);
+}
+
+.pj-management-page :deep(.el-dialog .el-dialog__header) {
+  padding: var(--pj-space-lg);
+  background: #fafbfc;
+  border-bottom: 1px solid #e4e7ed;
+  border-radius: var(--pj-radius-lg) var(--pj-radius-lg) 0 0;
+}
+
+.pj-management-page :deep(.el-dialog .el-dialog__title) {
+  font-weight: 600;
+  color: var(--pj-text-primary);
+}
+
+.pj-management-page :deep(.el-dialog .el-dialog__body) {
+  padding: var(--pj-space-lg);
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.pj-management-page :deep(.el-dialog .el-dialog__footer) {
+  padding: var(--pj-space-lg);
+  background: #fafbfc;
+  border-top: 1px solid #e4e7ed;
+  border-radius: 0 0 var(--pj-radius-lg) var(--pj-radius-lg);
+}
+
+/* 定时信息列（与任务管理页一致，供任务管理/工作流管理复用） */
+.pj-management-page .schedule-info-enhanced {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--pj-space-sm);
+  width: fit-content;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.pj-management-page .schedule-info-enhanced .schedule-type {
+  flex-shrink: 0;
+}
+
+.pj-management-page .schedule-info-enhanced .schedule-type :deep(.el-tag) {
+  min-width: fit-content;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.pj-management-page .schedule-info-enhanced .schedule-expression {
+  width: fit-content;
+  max-width: 100%;
+  cursor: help;
+}
+
+/* 表达式标签内容省略号需在页面内用 :deep(.el-tag__content) 设置 */
+
+.pj-management-page .schedule-info-enhanced .schedule-type :deep(.el-tag:hover),
+.pj-management-page .schedule-info-enhanced .schedule-expression:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* 响应式 */
+@media (max-width: 1200px) {
+  .pj-management-page .operation-buttons-enhanced .el-button,
+  .pj-management-page .operation-buttons-group .el-button {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+
+  .pj-management-page .operation-buttons-enhanced,
+  .pj-management-page .operation-buttons-group {
+    gap: var(--pj-space-xs);
+  }
+
+  .pj-management-page .operation-buttons-group {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 1024px) {
+  .pj-management-page .search-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pj-management-page .search-form {
+    min-width: auto;
+  }
+
+  .pj-management-page .action-buttons {
+    justify-content: flex-end;
+  }
+
+}
+
+@media (max-width: 768px) {
+  .pj-management-page .action-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .pj-management-page .operation-buttons-group {
+    flex-wrap: wrap;
+  }
+
+  .pj-management-page .operation-buttons-group .el-button {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+
+  .pj-management-page .pagination-container :deep(.el-pagination) {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
