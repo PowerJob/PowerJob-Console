@@ -299,8 +299,11 @@ const cn = {
         'copy': '复制',
         'export': '导出',
         'condition': '判断节点',
+        'decision': '决策',
         'workflowChild': '子流程节点',
+        'nestedWorkflow': '嵌套工作流',
         'importWorkflowTitle': '工作流节点引入',
+        'newJobNode': '新建任务节点',
 
         // namespace
         'createTime': '创建时间',

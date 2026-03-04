@@ -296,8 +296,11 @@ const en = {
         'copy': 'Copy',
         'export': 'Export',
         'condition': 'Condition',
+        'decision': 'Decision',
         'workflowChild': 'Subprocesses',
+        'nestedWorkflow': 'Nested Workflow',
         'importWorkflowTitle': 'importWorkflowTitle',
+        'newJobNode': 'New Job Node',
 
         // namespace
         'createTime': 'CreateTime',
