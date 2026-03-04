@@ -73,7 +73,7 @@ axios.interceptors.response.use((response) => {
   }
 
   // 值示例 /user/query
-  const req_url = response.config.url
+  const req_url = response.config?.url ?? ''
   if (req_url.startsWith('/container')) {
     console.log("skip intercept container's request")
     return response
