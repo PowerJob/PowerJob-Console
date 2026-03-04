@@ -1,5 +1,5 @@
 <template>
-  <div class="home-dashboard">
+  <div class="home-dashboard pj-management-page">
     <!-- 核心指标 + Worker状态概览 - 双栏布局 -->
     <div class="main-content">
       <!-- 左侧：系统信息 -->
@@ -166,16 +166,16 @@
             </template>
           </el-table-column>
           <el-table-column prop="lastActiveTime" :label="$t('message.lastActiveTime')" width="150" sortable align="center" />
-          <el-table-column label="操作" width="80" align="center">
+          <el-table-column label="操作" width="100" align="center">
             <template #default="scope">
-              <el-button 
-                type="primary" 
-                size="small" 
-                @click="showWorkerDetails(scope.row)"
-                :disabled="!scope.row.workerInfo"
-              >
-                详情
-              </el-button>
+              <div class="operation-buttons-group">
+                <el-button
+                  size="small"
+                  type="primary"
+                  @click="showWorkerDetails(scope.row)"
+                  :disabled="!scope.row.workerInfo"
+                >{{$t('message.detail')}}</el-button>
+              </div>
             </template>
           </el-table-column>
         </el-table>
@@ -408,6 +408,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import '../../styles/management-pages.scss';
+
 /* 优化后的紧凑Dashboard样式 */
 .home-dashboard {
   padding: 16px;
