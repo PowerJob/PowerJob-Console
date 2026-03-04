@@ -1,63 +1,114 @@
 <template>
   <div class="workflow-editor">
     <!-- 顶部操作栏 -->
-    <el-row style="margin-left: 0px; margin-bottom: 20px; margin-right: 25px">
-      <el-col :span="1">
-        <el-button type="primary" @click="back">{{ $t("message.back") }}</el-button>
-      </el-col>
-      <el-col :span="1" :offset="22">
-        <el-button type="success" :loading="saveLoading" @click="saveWorkflow">
-          {{ $t("message.save") }}
-        </el-button>
-      </el-col>
-    </el-row>
+    <div class="wf-header">
+      <div class="header-left">
+        <button class="back-btn" @click="back">
+          <el-icon><ArrowLeft /></el-icon>
+          <span>{{ $t("message.back") }}</span>
+        </button>
+      </div>
+      <div class="header-actions">
+        <button class="action-btn save-btn" :disabled="saveLoading" @click="saveWorkflow">
+          <el-icon><DocumentCopy /></el-icon>
+          <span>{{ $t("message.save") }}</span>
+        </button>
+      </div>
+    </div>
 
-    <!-- 工作流元数据表单 -->
-    <el-row>
-      <el-form ref="form" :model="workflowInfo" label-width="100px">
-        <el-form-item :label="$t('message.wfName')">
-          <el-input v-model="workflowInfo.wfName" />
-        </el-form-item>
-        <el-form-item :label="$t('message.wfDescription')">
-          <el-input v-model="workflowInfo.wfDescription" />
-        </el-form-item>
-        <el-form-item :label="$t('message.scheduleInfo')">
-          <el-row style="width: 100%">
-            <el-col :span="6">
-              <el-select v-model="workflowInfo.timeExpressionType" :placeholder="$t('message.timeExpressionType')">
+    <!-- 工作流元数据表单 - 紧凑卡片式 -->
+    <div class="wf-info-section">
+      <div class="info-card">
+        <el-form ref="form" :model="workflowInfo" class="compact-form">
+          <!-- 第一行：工作流名称 + 描述 -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">{{ $t('message.wfName') }}</label>
+              <el-input 
+                v-model="workflowInfo.wfName" 
+                :placeholder="$t('message.wfName')"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{ $t('message.wfDescription') }}</label>
+              <el-input 
+                v-model="workflowInfo.wfDescription" 
+                :placeholder="$t('message.wfDescription')"
+                class="form-input"
+              />
+            </div>
+          </div>
+
+          <!-- 第二行：调度信息 -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">{{ $t('message.timeExpressionType') }}</label>
+              <el-select 
+                v-model="workflowInfo.timeExpressionType" 
+                :placeholder="$t('message.timeExpressionType')"
+                class="form-input"
+              >
                 <el-option v-for="item in timeExpressionTypeOptions" :key="item.key" :label="item.label" :value="item.key"></el-option>
               </el-select>
-            </el-col>
-            <el-col :span="12">
-              <el-input v-model="workflowInfo.timeExpression" :placeholder="$t('message.wfTimeExpressionPLH')" />
-            </el-col>
-            <el-col :span="4">
-              <el-button type="text" @click="onClickValidateTimeExpression">
-                {{ $t("message.validateTimeExpression") }}
-              </el-button>
-            </el-col>
-          </el-row>
-        </el-form-item>
-        <el-form-item :label="$t('message.lifeCycle')">
-          <el-date-picker
-            v-model="workflowInfo.lifeCycle"
-            type="datetimerange"
-            :start-placeholder="$t('message.startTime')"
-            :end-placeholder="$t('message.finishedTime')"
-            value-format="x"
-            format="YYYY-MM-DD HH:mm:ss"
-          />
-        </el-form-item>
-        <el-form-item :label="$t('message.maxInstanceNum')">
-          <el-input-number v-model="workflowInfo.maxWfInstanceNum" />
-        </el-form-item>
-        <el-form-item :label="$t('message.alarmConfig')">
-          <el-select v-model="workflowInfo.notifyUserIds" multiple filterable :placeholder="$t('message.alarmSelectorPLH')">
-            <el-option v-for="user in userList" :key="user.id" :label="user.username" :value="user.id"></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-    </el-row>
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{ $t('message.wfTimeExpressionPLH') }}</label>
+              <div class="input-group">
+                <el-input 
+                  v-model="workflowInfo.timeExpression" 
+                  :placeholder="$t('message.wfTimeExpressionPLH')"
+                  class="form-input"
+                />
+                <button class="validate-btn" @click="onClickValidateTimeExpression">
+                  <el-icon><Check /></el-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 第三行：生命周期 + 最大实例数 -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">{{ $t('message.lifeCycle') }}</label>
+              <el-date-picker
+                v-model="workflowInfo.lifeCycle"
+                type="datetimerange"
+                :start-placeholder="$t('message.startTime')"
+                :end-placeholder="$t('message.finishedTime')"
+                value-format="x"
+                format="YYYY-MM-DD HH:mm:ss"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{ $t('message.maxInstanceNum') }}</label>
+              <el-input-number 
+                v-model="workflowInfo.maxWfInstanceNum"
+                :min="0"
+                class="form-input compact-number"
+              />
+            </div>
+          </div>
+
+          <!-- 第四行：告警配置 -->
+          <div class="form-row full-width">
+            <div class="form-group">
+              <label class="form-label">{{ $t('message.alarmConfig') }}</label>
+              <el-select 
+                v-model="workflowInfo.notifyUserIds" 
+                multiple 
+                filterable 
+                :placeholder="$t('message.alarmSelectorPLH')"
+                class="form-input"
+              >
+                <el-option v-for="user in userList" :key="user.id" :label="user.username" :value="user.id"></el-option>
+              </el-select>
+            </div>
+          </div>
+        </el-form>
+      </div>
+    </div>
 
     <!-- 工作流画布区域 -->
     <el-row class="canvas-row">
@@ -148,6 +199,7 @@ import TimeExpressionValidator from "../common/TimeExpressionValidator";
 import ReactWorkflowBridge from "./ReactWorkflowBridge.vue";
 import WorkflowManager from "../views/WorkflowManager";
 import { ElMessage } from 'element-plus';
+import { ArrowLeft, DocumentCopy, Check } from '@element-plus/icons-vue';
 
 export default {
   name: "WorkflowEditor",
@@ -155,6 +207,9 @@ export default {
     TimeExpressionValidator,
     ReactWorkflowBridge,
     WorkflowManager,
+    ArrowLeft,
+    DocumentCopy,
+    Check,
   },
   data() {
     return {
@@ -831,15 +886,288 @@ export default {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
 .workflow-editor {
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
+  font-family: 'Outfit', -apple-system, sans-serif;
+  background: #fafbfc;
 }
-.el-input {
-  width: 80%;
+
+/* ========== 顶部操作栏 ========== */
+.wf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 12px;
 }
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Outfit', sans-serif;
+}
+
+.back-btn:hover {
+  background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  color: #334155;
+  transform: translateX(-2px);
+}
+
+.back-btn:active {
+  transform: translateX(0);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Outfit', sans-serif;
+}
+
+.action-btn:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.action-btn.save-btn {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-color: #22c55e;
+  color: white;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+}
+
+.action-btn.save-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+  transform: translateY(-1px);
+}
+
+.action-btn.save-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.action-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* ========== 信息区域 ========== */
+.wf-info-section {
+  padding: 0 16px 12px 16px;
+}
+
+.info-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.compact-form {
+  padding: 16px;
+  width: 66.666%;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.form-row.full-width {
+  grid-template-columns: 1fr;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.form-input {
+  width: 100%;
+}
+
+.form-input :deep(.el-input__wrapper) {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.form-input :deep(.el-input__wrapper:hover) {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+}
+
+.form-input :deep(.el-input__wrapper.is-focus) {
+  border-color: #3b82f6;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input :deep(.el-input__inner) {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  color: #1e293b;
+}
+
+.form-input :deep(.el-input__inner::placeholder) {
+  color: #cbd5e1;
+}
+
+.form-input :deep(.el-select__wrapper) {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.form-input :deep(.el-select__wrapper:hover) {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+}
+
+.form-input :deep(.el-select__wrapper.is-focused) {
+  border-color: #3b82f6;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input :deep(.el-date-editor__wrapper) {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.form-input :deep(.el-date-editor__wrapper:hover) {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+}
+
+.form-input :deep(.el-date-editor__wrapper.is-active) {
+  border-color: #3b82f6;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input :deep(.el-input-number__wrapper) {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.form-input :deep(.el-input-number__wrapper:hover) {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+}
+
+.form-input :deep(.el-input-number__wrapper.is-focus) {
+  border-color: #3b82f6;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input.compact-number :deep(.el-input-number__wrapper) {
+  width: 100px;
+}
+
+.input-group {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.input-group .form-input {
+  flex: 1;
+}
+
+.validate-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.validate-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.validate-btn:active {
+  transform: scale(0.98);
+}
+
+/* ========== 画布区域 ========== */
 .canvas-row {
   flex: 1;
   min-height: 400px;
@@ -848,12 +1176,14 @@ export default {
   flex-direction: column;
   min-width: 0;
 }
+
 .power-dag {
   width: 100%;
   height: 100%;
   display: flex;
   min-height: 0;
 }
+
 .power-flow {
   background: #fff;
   width: 100%;
@@ -862,9 +1192,11 @@ export default {
   display: flex;
   flex-direction: column;
 }
+
 .power-import-body {
   padding: 0px 20px;
 }
+
 .power-import-table .el-table-column--selection > .cell {
   padding-left: 15px;
 }
