@@ -6,9 +6,9 @@
     <div id="sidebar">
         <el-container class="left-container">
             <!--侧边栏容器-->
-            <el-aside width="220px" >
+            <el-aside width="220px" class="sidebar-aside">
                 <!-- 菜单 -->
-                <el-menu :router="true" :default-active="default_active_index" class="aside">
+                <el-menu :router="true" :default-active="default_active_index" class="aside" :collapse="false">
                     <!-- vue router，实现点击跳转 -->
                     <el-menu-item index="/oms/home">
                         <template #title>
@@ -72,20 +72,21 @@
 </template>
 
 <script>
-import { Monitor, DataAnalysis, DataBoard, Share, Operation } from '@element-plus/icons-vue'
+import { Monitor, DataAnalysis, DataBoard, Share, Operation, Present } from '@element-plus/icons-vue'
 
 export default {
         name: "Sidebar",
         components: {
             Monitor,
-            DataAnalysis, 
+            DataAnalysis,
             DataBoard,
             Share,
-            Operation
+            Operation,
+            Present
         },
-        data() {
-            return {
-                default_active_index: "/home"
+        computed: {
+            default_active_index() {
+                return this.$route?.path || '/oms/home'
             }
         }
     }
@@ -102,15 +103,20 @@ export default {
         min-width: var(--pj-sidebar-width);
         flex: 0 0 var(--pj-sidebar-width);
         background: var(--pj-bg-white);
-        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
-        border-right: 1px solid #e4e7ed;
+        box-shadow: 2px 0 12px rgba(0, 0, 0, 0.06);
+        border-right: 1px solid var(--pj-border-color, #e4e7ed);
         position: relative;
         z-index: 100;
+    }
+    
+    .sidebar-aside {
+        padding: var(--pj-space-sm) 0;
     }
     
     .aside {
         height: 100%;
         border-right: none !important;
+        padding: 0 var(--pj-space-sm);
     }
     
     /* 确保 el-aside 组件不会过度扩展 */
@@ -124,25 +130,32 @@ export default {
     /* Menu Styling */
     :deep(.el-menu) {
         border-right: none;
-        background: var(--pj-bg-white);
+        background: transparent;
         
         .el-menu-item {
-            height: 56px;
-            line-height: 56px;
-            margin: 0 var(--pj-space-sm);
+            height: 52px;
+            line-height: 52px;
+            margin: 2px 0;
+            padding: 0 var(--pj-space-md) !important;
             border-radius: var(--pj-radius-md);
-            transition: all 0.3s ease;
+            transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
             color: var(--pj-text-secondary);
+            position: relative;
             
             &:hover {
                 background: rgba(0, 150, 136, 0.08);
+                background: color-mix(in srgb, var(--pj-primary) 8%, transparent);
                 color: var(--pj-primary);
+                transform: translateX(2px);
             }
             
             &.is-active {
-                background: linear-gradient(135deg, rgba(0, 150, 136, 0.1), rgba(38, 166, 154, 0.08));
+                background: linear-gradient(135deg, rgba(0, 150, 136, 0.12), rgba(38, 166, 154, 0.08));
+                background: color-mix(in srgb, var(--pj-primary) 12%, var(--pj-bg-white));
                 color: var(--pj-primary);
-                font-weight: 500;
+                font-weight: 600;
+                box-shadow: 0 2px 8px rgba(0, 150, 136, 0.18);
+                box-shadow: 0 2px 8px color-mix(in srgb, var(--pj-primary) 18%, transparent);
                 
                 &::before {
                     content: '';
@@ -150,10 +163,15 @@ export default {
                     left: 0;
                     top: 50%;
                     transform: translateY(-50%);
-                    width: 3px;
-                    height: 24px;
+                    width: 4px;
+                    height: 28px;
                     background: var(--pj-primary);
-                    border-radius: 0 2px 2px 0;
+                    border-radius: 0 4px 4px 0;
+                    animation: sidebar-accent-in 0.3s ease;
+                }
+                
+                .el-icon {
+                    color: var(--pj-primary);
                 }
             }
             
@@ -161,6 +179,7 @@ export default {
                 margin-right: var(--pj-space-sm);
                 font-size: 18px;
                 width: 18px;
+                transition: color 0.25s ease;
             }
             
             span {
@@ -171,15 +190,19 @@ export default {
         
         .el-sub-menu {
             .el-sub-menu__title {
-                height: 56px;
-                line-height: 56px;
-                margin: 0 var(--pj-space-sm);
+                height: 52px;
+                line-height: 52px;
+                margin: 2px 0;
+                padding: 0 var(--pj-space-md) !important;
                 border-radius: var(--pj-radius-md);
                 color: var(--pj-text-secondary);
+                transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease;
                 
                 &:hover {
                     background: rgba(0, 150, 136, 0.08);
+                    background: color-mix(in srgb, var(--pj-primary) 8%, transparent);
                     color: var(--pj-primary);
+                    transform: translateX(2px);
                 }
                 
                 .el-icon {
@@ -194,8 +217,8 @@ export default {
                 }
                 
                 .el-submenu__icon-arrow {
-                    right: 20px;
-                    transition: transform 0.3s ease;
+                    right: var(--pj-space-md);
+                    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
                 }
             }
             
@@ -205,20 +228,33 @@ export default {
             
             .el-menu {
                 background: #fafbfc;
+                background: color-mix(in srgb, var(--pj-primary) 3%, var(--pj-bg-white));
+                border-radius: var(--pj-radius-md);
+                margin: 0 0 var(--pj-space-xs) 0;
+                padding: var(--pj-space-xs) 0;
                 
                 .el-menu-item {
-                    height: 48px;
-                    line-height: 48px;
-                    margin: 0 var(--pj-space-md);
-                    padding-left: 42px !important;
+                    height: 44px;
+                    line-height: 44px;
+                    margin: 0 var(--pj-space-sm);
+                    padding-left: 40px !important;
                     font-size: 13px;
+                    border-radius: var(--pj-radius-sm);
+                    transition: background-color 0.25s ease, color 0.25s ease;
                     
                     &:hover {
-                        background: rgba(0, 150, 136, 0.05);
+                        background: rgba(0, 150, 136, 0.06);
+                        background: color-mix(in srgb, var(--pj-primary) 8%, transparent);
+                        color: var(--pj-primary);
                     }
                     
                     &.is-active {
-                        background: rgba(0, 150, 136, 0.1);
+                        background: rgba(0, 150, 136, 0.12);
+                        background: color-mix(in srgb, var(--pj-primary) 14%, var(--pj-bg-white));
+                        color: var(--pj-primary);
+                        font-weight: 600;
+                        box-shadow: 0 1px 4px rgba(0, 150, 136, 0.15);
+                        box-shadow: 0 1px 4px color-mix(in srgb, var(--pj-primary) 15%, transparent);
                         
                         &::before {
                             display: none;
@@ -226,6 +262,17 @@ export default {
                     }
                 }
             }
+        }
+    }
+    
+    @keyframes sidebar-accent-in {
+        from {
+            opacity: 0;
+            transform: translateY(-50%) scaleY(0.6);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(-50%) scaleY(1);
         }
     }
     
@@ -317,25 +364,33 @@ export default {
         }
     }
     
-    /* Animation for menu transitions */
-    .el-menu-item,
-    .el-submenu__title {
+    /* 菜单项悬光动效（可选，与主色协调） */
+    :deep(.el-menu-item):not(.is-active):hover,
+    :deep(.el-sub-menu .el-sub-menu__title):hover {
         position: relative;
         overflow: hidden;
-        
-        &::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transition: left 0.5s;
-        }
-        
-        &:hover::after {
-            left: 100%;
-        }
+    }
+    
+    :deep(.el-menu-item):not(.is-active):hover::after,
+    :deep(.el-sub-menu .el-sub-menu__title):hover::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 60%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(0, 150, 136, 0.14),
+            transparent
+        );
+        animation: sidebar-shine 0.6s ease;
+        pointer-events: none;
+    }
+    
+    @keyframes sidebar-shine {
+        from { left: -60%; }
+        to { left: 100%; }
     }
 </style>
