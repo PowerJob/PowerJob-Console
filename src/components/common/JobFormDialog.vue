@@ -1009,7 +1009,18 @@ export default {
 </script>
 
 <style scoped lang="scss">
+/* ============================
+   Dialog 整体 & 头部
+   ============================ */
 .job-form-dialog {
+  :deep(.el-dialog) {
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow:
+      0 24px 64px rgba(0, 0, 0, 0.12),
+      0 8px 24px rgba(0, 150, 136, 0.07);
+  }
+
   :deep(.el-dialog__body) {
     padding: 0;
     max-height: 70vh;
@@ -1017,164 +1028,265 @@ export default {
   }
 
   :deep(.el-dialog__header) {
-    padding: 16px 24px;
-    border-bottom: 1px solid var(--pj-border-color);
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 0 24px 0;
+    border-bottom: 1px solid var(--pj-border-color, #e2e8f0);
+    background: linear-gradient(135deg, #f0fdf9 0%, #e6f7f5 100%);
+    position: relative;
+    overflow: hidden;
+
+    /* 顶部主题色细线 */
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(
+        90deg,
+        var(--pj-primary, #009688) 0%,
+        var(--pj-primary-light, #26a69a) 60%,
+        rgba(0, 150, 136, 0) 100%
+      );
+    }
 
     .el-dialog__title {
-      font-size: 18px;
+      display: block;
+      padding: 17px 0 14px;
+      font-size: 16px;
       font-weight: 600;
-      color: var(--pj-text-primary);
+      color: var(--pj-text-primary, #212121);
+      letter-spacing: 0.2px;
+    }
+
+    .el-dialog__headerbtn {
+      top: 14px;
+
+      .el-dialog__close {
+        color: var(--pj-text-secondary, #757575);
+        transition: color 0.2s ease, transform 0.2s ease;
+
+        &:hover {
+          color: var(--pj-primary, #009688);
+          transform: rotate(90deg);
+        }
+      }
     }
   }
 
   :deep(.el-dialog__footer) {
-    padding: 16px 24px;
-    border-top: 1px solid var(--pj-border-color);
-    background: #fafbfc;
+    padding: 14px 24px;
+    border-top: 1px solid var(--pj-border-color, #e2e8f0);
+    background: var(--pj-bg-section, #fafafa);
   }
 }
 
+/* ============================
+   表单容器
+   ============================ */
 .job-form-container {
-  padding: 20px;
+  padding: 18px 20px;
 }
 
-/* 表单区块样式 */
+/* ============================
+   表单区块卡片
+   ============================ */
 .form-section {
-  background: var(--pj-bg-white);
-  border-radius: 12px;
+  background: var(--pj-bg-white, #ffffff);
+  border-radius: 10px;
   margin-bottom: 12px;
-  border: 1px solid var(--pj-border-color);
+  border: 1px solid var(--pj-border-color, #e2e8f0);
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 3px 12px rgba(0, 150, 136, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 150, 136, 0.2);
   }
 }
 
 .form-section-required {
-  border-left: 3px solid var(--pj-primary);
+  border-left: 3px solid var(--pj-primary, #009688);
 }
 
 .section-header {
-  padding: 12px 20px;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-bottom: 1px solid var(--pj-border-color);
+  padding: 11px 20px;
+  background: linear-gradient(135deg, #f0fdf9 0%, #f5faf8 60%, #fafbfa 100%);
+  border-bottom: 1px solid rgba(0, 150, 136, 0.1);
 }
 
 .section-title {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 15px;
+  gap: 9px;
+  font-size: 14px;
   font-weight: 600;
-  color: var(--pj-text-primary);
+  color: var(--pj-text-primary, #212121);
 
   .section-icon {
-    font-size: 18px;
-    color: var(--pj-primary);
+    font-size: 16px;
+    color: var(--pj-primary, #009688);
+    opacity: 0.9;
   }
 
   .el-tag {
     margin-left: auto;
+    font-size: 11px;
+    padding: 0 6px;
+    height: 20px;
+    line-height: 18px;
+    border-radius: 4px;
   }
 }
 
 .section-content {
-  padding: 12px 16px;
+  padding: 14px 16px 10px;
 }
 
-/* 折叠面板样式 */
+/* ============================
+   折叠面板
+   ============================ */
 .optional-config-collapse {
   border: none;
   margin-bottom: 12px;
 
   :deep(.el-collapse-item__header) {
-    height: 52px;
-    line-height: 52px;
+    height: 50px;
+    line-height: 50px;
     padding: 0 20px;
-    background: var(--pj-bg-white);
-    border: 1px solid var(--pj-border-color);
-    border-radius: 12px;
+    background: var(--pj-bg-white, #ffffff);
+    border: 1px solid var(--pj-border-color, #e2e8f0);
+    border-radius: 10px;
     margin-bottom: 8px;
     font-weight: 500;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
 
     &:hover {
-      background: #f8fafc;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      background: #f0fdf9;
+      border-color: rgba(0, 150, 136, 0.25);
+      box-shadow: 0 2px 8px rgba(0, 150, 136, 0.07);
     }
 
     &.is-active {
       border-bottom-left-radius: 0;
       border-bottom-right-radius: 0;
-      border-bottom-color: transparent;
+      border-bottom-color: rgba(0, 150, 136, 0.12);
       margin-bottom: 0;
-      background: #f8fafc;
+      background: linear-gradient(135deg, #f0fdf9 0%, #e9f7f5 100%);
+      border-color: rgba(0, 150, 136, 0.25);
+      color: var(--pj-primary, #009688);
     }
   }
 
   :deep(.el-collapse-item__wrap) {
-    border: 1px solid var(--pj-border-color);
+    border: 1px solid rgba(0, 150, 136, 0.2);
     border-top: none;
-    border-radius: 0 0 12px 12px;
-    background: var(--pj-bg-white);
+    border-radius: 0 0 10px 10px;
+    background: var(--pj-bg-white, #ffffff);
   }
 
   :deep(.el-collapse-item__content) {
-    padding: 20px;
+    padding: 16px 20px 20px;
   }
 
   :deep(.el-collapse-item__arrow) {
     margin: 0 0 0 auto;
-    font-size: 14px;
-    color: var(--pj-text-secondary);
+    font-size: 13px;
+    color: var(--pj-text-secondary, #757575);
+    transition: transform 0.3s ease, color 0.25s ease;
+  }
+
+  :deep(.el-collapse-item__header.is-active .el-collapse-item__arrow) {
+    color: var(--pj-primary, #009688);
   }
 }
 
 .collapse-title {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   font-size: 14px;
-  color: var(--pj-text-primary);
+  color: inherit;
 
   .el-icon {
-    font-size: 16px;
-    color: var(--pj-primary);
-  }
-
-  .el-tag {
-    margin-left: 8px;
+    font-size: 15px;
+    color: var(--pj-primary, #009688);
   }
 }
 
-/* 表单样式 */
+/* ============================
+   Tabs 样式
+   ============================ */
+.optional-tabs {
+  :deep(.el-tabs__nav-wrap) {
+    padding: 0 4px;
+
+    &::after {
+      background-color: var(--pj-border-color, #e2e8f0);
+      height: 1px;
+    }
+  }
+
+  :deep(.el-tabs__item) {
+    font-size: 13px;
+    color: var(--pj-text-secondary, #757575);
+    padding: 0 16px;
+    height: 38px;
+    line-height: 38px;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--pj-primary, #009688);
+    }
+
+    &.is-active {
+      color: var(--pj-primary, #009688);
+      font-weight: 600;
+    }
+  }
+
+  :deep(.el-tabs__active-bar) {
+    background-color: var(--pj-primary, #009688);
+    height: 2px;
+    border-radius: 1px;
+  }
+
+  :deep(.el-tabs__content) {
+    padding-top: 12px;
+  }
+}
+
+/* ============================
+   表单通用样式
+   ============================ */
 .job-form {
   :deep(.el-form-item) {
     margin-bottom: 14px;
   }
 
   :deep(.el-form-item__label) {
-    color: var(--pj-text-secondary);
+    color: var(--pj-text-secondary, #757575);
     font-weight: 500;
     font-size: 13px;
+  }
+
+  :deep(.el-form-item.is-error .el-form-item__error) {
+    font-size: 11px;
   }
 
   :deep(.el-input__wrapper),
   :deep(.el-select__wrapper),
   :deep(.el-textarea__inner) {
-    border-radius: 8px;
-    transition: all 0.3s ease;
+    border-radius: 7px;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
 
     &:hover {
-      box-shadow: 0 0 8px rgba(37, 99, 235, 0.15);
+      box-shadow: 0 0 0 1px rgba(0, 150, 136, 0.35);
     }
 
     &.is-focus,
     &:focus {
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      box-shadow: 0 0 0 3px rgba(0, 150, 136, 0.12), 0 0 0 1px rgba(0, 150, 136, 0.5);
     }
   }
 
@@ -1182,7 +1294,7 @@ export default {
     width: 100%;
 
     .el-input__wrapper {
-      border-radius: 8px;
+      border-radius: 7px;
     }
   }
 
@@ -1192,36 +1304,46 @@ export default {
 
   :deep(.el-date-editor) {
     width: 100%;
-    border-radius: 8px;
+    border-radius: 7px;
   }
 }
 
+/* ============================
+   label 旁辅助图标
+   ============================ */
 .label-icon {
   margin-left: 4px;
-  color: var(--pj-text-tertiary);
+  color: var(--pj-text-disabled, #9e9e9e);
   cursor: help;
-  font-size: 14px;
+  font-size: 13px;
   vertical-align: middle;
-}
+  transition: color 0.2s ease;
 
-.optional-tabs {
-  :deep(.el-tabs__nav-wrap) {
-    padding: 0 20px;
-  }
-  :deep(.el-tabs__content) {
-    padding-top: 10px;
+  &:hover {
+    color: var(--pj-primary, #009688);
   }
 }
 
+/* ============================
+   任务参数行
+   ============================ */
 .edit-expression-btn {
   width: 100%;
   border-style: dashed;
+  border-color: rgba(0, 150, 136, 0.4);
+  color: var(--pj-primary, #009688);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 150, 136, 0.05);
+    border-color: var(--pj-primary, #009688);
+  }
 }
 
 .job-params-row {
   display: flex;
   width: 100%;
-  gap: 12px;
+  gap: 10px;
   align-items: flex-start;
 
   .job-params-input {
@@ -1231,29 +1353,70 @@ export default {
     :deep(.el-textarea__inner) {
       resize: vertical;
       max-height: 280px;
+      font-size: 13px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      line-height: 1.6;
     }
   }
 
   .format-params-btn {
     flex-shrink: 0;
     margin-top: 0;
+    border-radius: 7px;
   }
 }
 
-/* 底部按钮 */
+/* ============================
+   底部操作按钮
+   ============================ */
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 10px;
 
   .el-button {
-    min-width: 100px;
-    border-radius: 8px;
+    min-width: 96px;
+    border-radius: 7px;
     font-weight: 500;
+    letter-spacing: 0.2px;
+    transition: all 0.2s ease;
+  }
+
+  .el-button--primary {
+    box-shadow: 0 2px 8px rgba(0, 150, 136, 0.25);
+
+    &:hover {
+      box-shadow: 0 4px 14px rgba(0, 150, 136, 0.35);
+      transform: translateY(-1px);
+    }
   }
 }
 
-/* 响应式调整 */
+/* ============================
+   滚动条美化
+   ============================ */
+.job-form-dialog :deep(.el-dialog__body)::-webkit-scrollbar {
+  width: 5px;
+}
+
+.job-form-dialog :deep(.el-dialog__body)::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 3px;
+}
+
+.job-form-dialog :deep(.el-dialog__body)::-webkit-scrollbar-thumb {
+  background: rgba(0, 150, 136, 0.28);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: rgba(0, 150, 136, 0.5);
+  }
+}
+
+/* ============================
+   响应式调整
+   ============================ */
 @media (max-width: 768px) {
   .job-form-dialog {
     :deep(.el-dialog) {
@@ -1267,30 +1430,7 @@ export default {
   }
 
   .section-content {
-    padding: 12px;
-  }
-
-  :deep(.el-col) {
-    margin-bottom: 0;
-  }
-}
-
-/* 滚动条美化 */
-.job-form-dialog :deep(.el-dialog__body)::-webkit-scrollbar {
-  width: 6px;
-}
-
-.job-form-dialog :deep(.el-dialog__body)::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.job-form-dialog :deep(.el-dialog__body)::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-
-  &:hover {
-    background: #a8a8a8;
+    padding: 10px 12px;
   }
 }
 </style>
