@@ -55,7 +55,7 @@
                 stripe
                 @sort-change="handleSortChange"
             >
-                <el-table-column prop="id" :label="$t('message.jobId')" width="80" sortable/>
+                <el-table-column prop="id" :label="$t('message.jobId')" width="110" sortable/>
                 <el-table-column prop="jobName" :label="$t('message.jobName')" min-width="150" show-overflow-tooltip />
                 <el-table-column :label="$t('message.scheduleInfo')" min-width="250" show-overflow-tooltip>
                     <template #default="scope">
