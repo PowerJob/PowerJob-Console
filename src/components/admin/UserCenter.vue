@@ -1,5 +1,5 @@
 <template>
-<div class="pj-admin-container">
+<div class="pj-management-page">
 
   <el-row :gutter="24">
     <!-- 个人信息卡片 -->
@@ -437,20 +437,20 @@ export default {
 }
 </script>
 
-<style scoped>
-@import '../../styles/admin-theme.scss';
+<style scoped lang="scss">
+@import '../../styles/management-pages.scss';
 
 /* 组件特定样式 */
-.el-tag {
+:deep(.el-tag) {
   border-radius: var(--pj-border-radius-sm);
 }
 
-.el-alert {
+:deep(.el-alert) {
   border-radius: var(--pj-border-radius);
   margin-top: 16px;
 }
 
-.el-form-item__label {
+:deep(.el-form-item__label) {
   font-weight: 500 !important;
 }
 </style>

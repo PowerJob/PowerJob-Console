@@ -1,5 +1,5 @@
 <template>
-<div class="pj-admin-container">
+<div class="pj-management-page">
 
   <!-- 全局管理员设置卡片 -->
   <div class="pj-table-card">
@@ -198,10 +198,10 @@ export default {
 
 </script>
 
-<style scoped>
-@import '../../styles/admin-theme.scss';
+<style scoped lang="scss">
+@import '../../styles/management-pages.scss';
 
-/* 管理员列表样式 */
+/* 管理员列表样式 - 组件特定 */
 .admin-list-card {
   background: var(--pj-bg-tertiary);
   border-radius: var(--pj-border-radius);
