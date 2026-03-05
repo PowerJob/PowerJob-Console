@@ -1,3 +1,6 @@
 export * from './types'
 export { request, default as axiosInstance } from './request'
 export { jobApi } from './job'
+export { userApi } from './user'
+export { appApi } from './app'
+export { instanceApi } from './instance'
