@@ -11,7 +11,8 @@
     "type-check": "vue-tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "prepare": "husky"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
@@ -33,6 +34,8 @@
     "vuex": "^4.1.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.4.3",
+    "@commitlint/config-conventional": "^20.4.3",
     "@eslint/js": "^10.0.0",
     "@tailwindcss/postcss": "^4.2.1",
     "@types/node": "^25.3.3",
@@ -42,13 +45,18 @@
     "@vue/test-utils": "^2.4.6",
     "autoprefixer": "^10.4.27",
     "eslint": "^10.0.2",
+    "eslint-plugin-import-x": "^4.16.1",
     "eslint-plugin-vue": "^10.8.0",
     "happy-dom": "^20.8.3",
+    "husky": "^9.1.7",
     "jsdom": "^28.1.0",
+    "lint-staged": "^16.3.2",
     "postcss": "^8.5.6",
+    "prettier": "^3.8.1",
     "sass": "^1.32.0",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1",
     "vite": "^7.3.1",
     "vitest": "^4.0.18",
     "vue-tsc": "^3.2.5"
@@ -57,5 +65,14 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css,scss,html}": [
+      "prettier --write"
+    ]
+  }
 }

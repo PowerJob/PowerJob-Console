@@ -34,7 +34,12 @@ target/
 build/
 
 ### VS Code ###
-.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/*.code-snippets
 
 ### others ###
 *.jar
