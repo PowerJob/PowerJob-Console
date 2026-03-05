@@ -8,7 +8,10 @@
     "build": "vite build --mode product",
     "build_spring": "vite build --mode spring",
     "preview": "vite preview",
-    "type-check": "vue-tsc --noEmit"
+    "type-check": "vue-tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
@@ -35,14 +38,19 @@
     "@types/node": "^25.3.3",
     "@vitejs/plugin-react": "^5.1.4",
     "@vitejs/plugin-vue": "^6.0.4",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vue/test-utils": "^2.4.6",
     "autoprefixer": "^10.4.27",
     "eslint": "^10.0.2",
     "eslint-plugin-vue": "^10.8.0",
+    "happy-dom": "^20.8.3",
+    "jsdom": "^28.1.0",
     "postcss": "^8.5.6",
     "sass": "^1.32.0",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
+    "vitest": "^4.0.18",
     "vue-tsc": "^3.2.5"
   },
   "browserslist": [
