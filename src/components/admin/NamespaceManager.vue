@@ -59,14 +59,14 @@
         stripe
         table-layout="auto">
         <el-table-column prop="id" label="ID" width="80" align="center" />
-        <el-table-column prop="code" label="code" min-width="180" show-overflow-tooltip>
+        <el-table-column prop="code" label="code" min-width="120" show-overflow-tooltip>
           <template #default="scope">
             <el-tag size="small" type="info">{{ scope.row.code }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="name" :label="$t('message.name')" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" width="170" />
-        <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" width="170" />
+        <el-table-column prop="name" :label="$t('message.name')" min-width="100" show-overflow-tooltip />
+        <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" width="255" />
+        <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" width="255" />
         <el-table-column :label="$t('message.status')" width="100" align="center">
           <template #default="scope">
             <el-tag
