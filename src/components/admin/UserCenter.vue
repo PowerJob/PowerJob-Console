@@ -1,25 +1,27 @@
 <template>
-<div class="pj-management-page">
+<div class="user-center pj-management-page">
 
   <el-row :gutter="24">
     <!-- 个人信息卡片 -->
     <el-col :lg="16" :md="24">
-      <div class="pj-table-card">
-        <div class="pj-table-header">
-          <h3 class="pj-table-title">
-            <el-icon style="margin-right: 8px;"><UserFilled /></el-icon>
+      <div class="pj-form-section" style="padding-top: 0; margin-top: 0;">
+        <div class="section-header">
+          <div class="section-title">
+            <el-icon class="mr-1"><UserFilled /></el-icon>
             {{$t('message.personalInfo')}}
-          </h3>
+          </div>
         </div>
-        
-        <div style="padding: 24px;">
-          <el-form 
-            :model="userDetailInfo" 
+      </div>
+
+      <div class="pj-table" style="margin-top: var(--pj-space-sm);">
+        <div class="form-content">
+          <el-form
+            :model="userDetailInfo"
             :rules="personalInfoRules"
             ref="personalInfoRef"
-            label-width="120px" 
+            label-width="120px"
             label-position="left">
-            
+
             <el-row :gutter="24">
               <el-col :span="12">
                 <el-form-item label="用户ID">
@@ -51,14 +53,14 @@
             <el-row :gutter="24">
               <el-col :span="12">
                 <el-form-item label="昵称" prop="nick">
-                  <el-input 
+                  <el-input
                     v-model="userDetailInfo.nick"
                     :placeholder="$t('message.pleaseEnterNickname')" />
                 </el-form-item>
               </el-col>
               <el-col :span="12">
                 <el-form-item label="手机号" prop="phone">
-                  <el-input 
+                  <el-input
                     v-model="userDetailInfo.phone"
                     :placeholder="$t('message.pleaseEnterPhone')" />
                 </el-form-item>
@@ -66,23 +68,23 @@
             </el-row>
 
             <el-form-item label="邮箱" prop="email">
-              <el-input 
+              <el-input
                 v-model="userDetailInfo.email"
                 :placeholder="$t('message.pleaseEnterEmail')" />
             </el-form-item>
 
             <el-form-item label="Webhook URL">
-              <el-input 
+              <el-input
                 v-model="userDetailInfo.webHook"
                 :placeholder="$t('message.pleaseEnterWebhook')" />
             </el-form-item>
 
             <el-form-item label="全局角色">
               <div v-if="userDetailInfo.globalRoles && userDetailInfo.globalRoles.length > 0">
-                <el-tag 
-                  v-for="role in userDetailInfo.globalRoles" 
+                <el-tag
+                  v-for="role in userDetailInfo.globalRoles"
                   :key="role"
-                  type="success" 
+                  type="success"
                   style="margin-right: 8px;">
                   {{ role }}
                 </el-tag>
@@ -91,17 +93,17 @@
             </el-form-item>
 
             <el-form-item style="margin-top: 32px;">
-              <div style="display: flex; gap: 12px;">
-                <el-button 
-                  type="primary" 
+              <div class="action-buttons">
+                <el-button
+                  type="primary"
                   @click="onClickSaveNewUserInfo"
                   :loading="saving"
                   :icon="Check">
                   {{$t('message.save')}}
                 </el-button>
-                <el-button 
-                  type="danger" 
-                  v-if="userDetailInfo.accountType=='PWJB'" 
+                <el-button
+                  type="danger"
+                  v-if="userDetailInfo.accountType=='PWJB'"
                   @click="onClickChangePassword"
                   :icon="Key">
                   {{$t('message.changePassword')}}
@@ -112,33 +114,35 @@
         </div>
       </div>
     </el-col>
-    
+
     <!-- 应用管理员申请卡片 -->
     <el-col :lg="8" :md="24">
-      <div class="pj-table-card">
-        <div class="pj-table-header">
-          <h3 class="pj-table-title">
-            <el-icon style="margin-right: 8px;"><UserFilled /></el-icon>
+      <div class="pj-form-section" style="padding-top: 0; margin-top: 0;">
+        <div class="section-header">
+          <div class="section-title">
+            <el-icon class="mr-1"><UserFilled /></el-icon>
             {{$t('message.appAdmin')}}
-          </h3>
+          </div>
         </div>
-        
-        <div style="padding: 24px;">
-          <el-form 
-            :model="appAssertRequest" 
+      </div>
+
+      <div class="pj-table" style="margin-top: var(--pj-space-sm);">
+        <div class="form-content">
+          <el-form
+            :model="appAssertRequest"
             :rules="adminRules"
             ref="adminFormRef"
-            label-width="80px" 
+            label-width="80px"
             label-position="left">
-            
+
             <el-form-item label="应用名" prop="appName">
-              <el-input 
+              <el-input
                 v-model="appAssertRequest.appName"
                 :placeholder="$t('message.pleaseEnterAppName')" />
             </el-form-item>
 
             <el-form-item label="应用密码" prop="password">
-              <el-input 
+              <el-input
                 v-model="appAssertRequest.password"
                 type="password"
                 :placeholder="$t('message.pleaseEnterAppPassword')"
@@ -146,8 +150,8 @@
             </el-form-item>
 
             <el-form-item style="margin-top: 24px;">
-              <el-button 
-                type="primary" 
+              <el-button
+                type="primary"
                 @click="onClickAuthThenBecomeAdmin"
                 :loading="applying"
                 :icon="Shield"
@@ -155,7 +159,7 @@
                 {{$t('message.authThenBecomeAdmin')}}
               </el-button>
             </el-form-item>
-            
+
             <el-alert
               type="info"
               :closable="false"
@@ -172,16 +176,14 @@
     </el-col>
   </el-row>
 
-
-
   <!-- 修改密码对话框 -->
-  <el-dialog 
-    :title="$t('message.changePassword')" 
-    v-model="changePasswordFormVisible" 
+  <el-dialog
+    :title="$t('message.changePassword')"
+    v-model="changePasswordFormVisible"
     width="450px"
     :close-on-click-modal="false">
-    <el-form 
-      :model="changePasswordRequest" 
+    <el-form
+      :model="changePasswordRequest"
       :rules="passwordRules"
       ref="passwordFormRef"
       label-width="100px">
@@ -191,7 +193,7 @@
       </el-form-item>
 
       <el-form-item :label="$t('message.oldPassword')" prop="oldPassword">
-        <el-input 
+        <el-input
           v-model="changePasswordRequest.oldPassword"
           type="password"
           placeholder="请输入旧密码"
@@ -199,15 +201,15 @@
       </el-form-item>
 
       <el-form-item :label="$t('message.newPassword')" prop="newPassword">
-        <el-input 
+        <el-input
           v-model="changePasswordRequest.newPassword"
           type="password"
           placeholder="请输入新密码"
           show-password />
       </el-form-item>
-      
+
       <el-form-item :label="$t('message.newPassword2')" prop="newPassword2">
-        <el-input 
+        <el-input
           v-model="changePasswordRequest.newPassword2"
           type="password"
           placeholder="请再次输入新密码"
@@ -215,12 +217,12 @@
       </el-form-item>
 
       <el-form-item style="margin-top: 32px;">
-        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+        <div class="action-buttons" style="justify-content: flex-end;">
           <el-button @click="changePasswordFormVisible = false" :icon="Close">
             {{$t('message.cancel')}}
           </el-button>
-          <el-button 
-            type="primary" 
+          <el-button
+            type="primary"
             @click="submitChangePasswordRequest"
             :loading="changingPassword"
             :icon="Check">
@@ -235,14 +237,14 @@
 
 <script>
 import { ElMessage } from "element-plus";
-import { 
-  UserFilled
+import {
+  UserFilled, Check, Key, Shield, Close
 } from '@element-plus/icons-vue';
 
 export default {
   name: 'UserCenter',
   components: {
-    UserFilled
+    UserFilled, Check, Key, Shield, Close
   },
   data() {
     return {
@@ -260,12 +262,8 @@ export default {
         originUsername: undefined,
         extra: undefined,
         globalRoles: [],
-        role2NamespaceList: {
-
-        },
-        role2AppList: {
-
-        }
+        role2NamespaceList: {},
+        role2AppList: {}
       },
       // 修改密码
       changePasswordRequest: {
@@ -281,12 +279,12 @@ export default {
         appName: undefined,
         password: undefined
       },
-      
+
       // 加载状态
       saving: false,
       applying: false,
       changingPassword: false,
-      
+
       // 表单验证规则
       personalInfoRules: {
         nick: [
@@ -361,11 +359,11 @@ export default {
           this.changingPassword = true;
           this.axios.post('/pwjbUser/changePassword', this.changePasswordRequest).then(() => {
             ElMessage.success(this.$t('message.passwordModifySuccess'));
-            
+
             window.localStorage.removeItem('PowerJwt');
             window.localStorage.removeItem('Power_appId');
             this.$router.push("/");
-            
+
           }).catch(err => {
             ElMessage.error(this.$t('message.passwordModifyFailed') + err);
             this.changingPassword = false;
@@ -395,7 +393,7 @@ export default {
         }
       });
     },
-    
+
     // 验证确认密码
     validatePassword2(rule, value, callback) {
       if (value === '') {
@@ -406,7 +404,7 @@ export default {
         callback();
       }
     },
-    
+
     // 获取账号类型文本
     getAccountTypeText(accountType) {
       const typeMap = {
@@ -418,7 +416,7 @@ export default {
       };
       return typeMap[accountType] || accountType;
     },
-    
+
     // 获取账号类型样式
     getAccountTypeStyle(accountType) {
       const styleMap = {
@@ -440,16 +438,60 @@ export default {
 <style scoped lang="scss">
 @import '../../styles/management-pages.scss';
 
-/* 组件特定样式 */
+/* User Center 页面样式 - 与 JobManager 保持一致 */
+.user-center {
+  padding: 0;
+  background: transparent;
+}
+
+/* 图标间距 */
+.mr-1 {
+  margin-right: 4px;
+}
+
+/* 标题样式 */
+.section-header {
+  margin-bottom: var(--pj-space-sm);
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--pj-text-primary);
+  display: flex;
+  align-items: center;
+}
+
+/* 表单内容区 */
+.form-content {
+  background: var(--pj-bg-white);
+  border-radius: var(--pj-radius-lg);
+  padding: var(--pj-space-lg);
+  box-shadow: var(--pj-shadow-card);
+}
+
+/* 操作按钮组 */
+.action-buttons {
+  display: flex;
+  gap: var(--pj-space-sm);
+}
+
+/* 标签样式 */
 :deep(.el-tag) {
-  border-radius: var(--pj-border-radius-sm);
+  font-family: 'Outfit', -apple-system, sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  border-radius: 12px;
+  padding: 4px 12px;
 }
 
+/* 提示框样式 */
 :deep(.el-alert) {
-  border-radius: var(--pj-border-radius);
-  margin-top: 16px;
+  border-radius: var(--pj-radius-lg);
+  margin-top: var(--pj-space-md);
 }
 
+/* 表单标签 */
 :deep(.el-form-item__label) {
   font-weight: 500 !important;
 }

@@ -1,58 +1,63 @@
 <template>
-  <div class="pj-management-page">
+  <div class="namespace-manager pj-management-page">
 
-    <!-- 搜索条件卡片 -->
-    <div class="pj-search-card">
-      <el-form :inline="true" :model="queryNamespaceRequest" class="el-form--inline">
-        <el-form-item label="namespace">
-          <el-input 
-            v-model="queryNamespaceRequest.codeLike" 
-            placeholder="namespace"
-            style="width: 160px;"
-            clearable />
-        </el-form-item>
-        
-        <el-form-item label="空间名称">
-          <el-input 
-            v-model="queryNamespaceRequest.nameLike" 
-            :placeholder="$t('message.name')"
-            style="width: 180px;"
-            clearable />
-        </el-form-item>
-        
-        <el-form-item label="标签">
-          <el-input 
-            v-model="queryNamespaceRequest.tagLike" 
-            placeholder="请输入标签"
-            style="width: 160px;"
-            clearable />
-        </el-form-item>
+    <!-- Search and Action Section -->
+    <div class="pj-form-section" style="padding-top: 0; margin-top: 0;">
+      <div class="search-container">
+        <div class="search-form">
+          <el-form :inline="true" :model="queryNamespaceRequest" class="el-form--inline">
+            <el-form-item label="namespace">
+              <el-input
+                v-model="queryNamespaceRequest.codeLike"
+                placeholder="namespace"
+                style="width: 160px;"
+                clearable />
+            </el-form-item>
 
-        <el-form-item>
-          <div class="pj-search-actions">
-            <el-button type="primary" @click="listNamespaces" :icon="Search">
-              {{$t('message.query')}}
-            </el-button>
-            <el-button @click="onClickReset" :icon="Refresh">
-              {{$t('message.reset')}}
-            </el-button>
-          </div>
-        </el-form-item>
-      </el-form>
-    </div>
+            <el-form-item label="空间名称">
+              <el-input
+                v-model="queryNamespaceRequest.nameLike"
+                :placeholder="$t('message.name')"
+                style="width: 180px;"
+                clearable />
+            </el-form-item>
 
-    <!-- 数据表格卡片 -->
-    <div class="pj-table-card">
-      <div class="pj-table-header">
-        <h3 class="pj-table-title">命名空间列表</h3>
-        <div class="pj-table-actions">
-          <el-button type="primary" @click="onClickNewNamespace" :icon="Plus">
+            <el-form-item label="标签">
+              <el-input
+                v-model="queryNamespaceRequest.tagLike"
+                placeholder="请输入标签"
+                style="width: 160px;"
+                clearable />
+            </el-form-item>
+          </el-form>
+        </div>
+
+        <div class="action-buttons">
+          <el-button @click="onClickReset">{{$t('message.reset')}}</el-button>
+          <el-button type="primary" @click="listNamespaces">
+            <el-icon class="mr-1"><Search /></el-icon>
+            {{$t('message.query')}}
+          </el-button>
+          <el-button type="info" @click="listNamespaces">
+            <el-icon class="mr-1"><Refresh /></el-icon>
+            {{$t('message.refresh')}}
+          </el-button>
+          <el-button type="primary" @click="onClickNewNamespace">
+            <el-icon class="mr-1"><Plus /></el-icon>
             {{$t('message.add')}}
           </el-button>
         </div>
       </div>
-      
-      <el-table :data="namespaceResult.data" style="width: 100%" v-loading="loading" table-layout="auto">
+    </div>
+
+    <!-- Table Section -->
+    <div class="pj-table" style="margin-top: var(--pj-space-sm);">
+      <el-table
+        :data="namespaceResult.data"
+        style="width: 100%"
+        v-loading="loading"
+        stripe
+        table-layout="auto">
         <el-table-column prop="id" label="ID" width="80" align="center" />
         <el-table-column prop="code" label="code" min-width="180" show-overflow-tooltip>
           <template #default="scope">
@@ -64,7 +69,7 @@
         <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" width="170" />
         <el-table-column :label="$t('message.status')" width="100" align="center">
           <template #default="scope">
-            <el-tag 
+            <el-tag
               :type="scope.row.statusStr === 'ENABLE' ? 'success' : 'danger'"
               size="small">
               {{ scope.row.statusStr }}
@@ -74,17 +79,19 @@
         <el-table-column prop="creatorShowName" :label="$t('message.creator')" min-width="120" show-overflow-tooltip />
         <el-table-column prop="modifierShowName" :label="$t('message.modifier')" min-width="120" show-overflow-tooltip />
 
-        <el-table-column :label="$t('message.operation')" width="140" fixed="right">
+        <el-table-column :label="$t('message.operation')" width="200" align="center" fixed="right">
           <template #default="scope">
-            <div class="pj-action-group">
-              <el-button size="small" type="text" @click="onClickModify(scope.row)" :icon="Edit">
+            <div class="operation-buttons-enhanced">
+              <el-button size="small" type="primary" @click="onClickModify(scope.row)">
+                <el-icon><Edit /></el-icon>
                 {{$t('message.edit')}}
               </el-button>
-              <el-popconfirm 
+              <el-popconfirm
                 title="确认删除此命名空间？"
                 @confirm="onClickDeleteNamespace(scope.row)">
                 <template #reference>
-                  <el-button size="small" type="text" :icon="Delete" style="color: var(--pj-danger);">
+                  <el-button size="small" type="danger">
+                    <el-icon><Delete /></el-icon>
                     {{$t('message.delete')}}
                   </el-button>
                 </template>
@@ -93,34 +100,36 @@
           </template>
         </el-table-column>
       </el-table>
-
-      <!-- 分页 -->
-      <div class="pj-table-footer" v-if="namespaceResult.data && namespaceResult.data.length > 0">
-        <el-pagination
-            layout="total, prev, pager, next, jumper"
-            :total="this.namespaceResult.totalItems"
-            :page-size="this.namespaceResult.pageSize"
-            @current-change="onClickChangePage"
-            :hide-on-single-page="false"/>
-      </div>
-      
-      <!-- 空状态 -->
-      <div v-if="!loading && (!namespaceResult.data || namespaceResult.data.length === 0)" class="pj-empty-state">
-        <el-icon class="pj-empty-icon"><FolderRemove /></el-icon>
-        <div class="pj-empty-text">暂无命名空间数据</div>
-      </div>
     </div>
 
+    <!-- Pagination Section -->
+    <div class="pagination-container" v-if="namespaceResult.data && namespaceResult.data.length > 0">
+      <el-pagination
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="namespaceResult.totalItems"
+        :page-size="namespaceResult.pageSize"
+        :page-sizes="[10, 20, 50, 100]"
+        @current-change="onClickChangePage"
+        @size-change="handleSizeChange"
+        :hide-on-single-page="false"
+        background
+      />
+    </div>
+
+    <!-- Empty State -->
+    <div v-if="!loading && (!namespaceResult.data || namespaceResult.data.length === 0)" class="pagination-container" style="color: var(--pj-text-tertiary);">
+      暂无命名空间数据
+    </div>
 
     <!-- 命名空间编辑对话框 -->
-    <el-dialog 
-      :title="modifiedNamespaceForm.id ? '编辑命名空间' : '新建命名空间'" 
-      v-model="modifiedNamespaceFormVisible" 
+    <el-dialog
+      :title="modifiedNamespaceForm.id ? '编辑命名空间' : '新建命名空间'"
+      v-model="modifiedNamespaceFormVisible"
       width="800px"
       :close-on-click-modal="false"
       destroy-on-close>
-      <el-form 
-        :model="modifiedNamespaceForm" 
+      <el-form
+        :model="modifiedNamespaceForm"
         :rules="formRules"
         ref="namespaceFormRef"
         label-width="120px">
@@ -128,16 +137,16 @@
         <el-row :gutter="24">
           <el-col :span="12">
             <el-form-item label="namespace" prop="code">
-              <el-input 
+              <el-input
                 v-model="modifiedNamespaceForm.code"
                 placeholder="code"
                 :disabled="modifiedNamespaceForm.id != null" />
             </el-form-item>
           </el-col>
-          
+
           <el-col :span="12">
             <el-form-item :label="$t('message.name')" prop="name">
-              <el-input 
+              <el-input
                 v-model="modifiedNamespaceForm.name"
                 placeholder="name" />
             </el-form-item>
@@ -145,14 +154,14 @@
         </el-row>
 
         <el-form-item label="访问令牌" v-if="modifiedNamespaceForm.id != null">
-          <el-input 
-            :disabled="true" 
+          <el-input
+            :disabled="true"
             v-model="modifiedNamespaceForm.token"
             placeholder="保存后自动生成">
             <template #append>
-              <el-button 
-                @click="copyToken" 
-                :icon="DocumentCopy" 
+              <el-button
+                @click="copyToken"
+                :icon="DocumentCopy"
                 v-if="modifiedNamespaceForm.token">
                 复制
               </el-button>
@@ -161,13 +170,13 @@
         </el-form-item>
 
         <el-form-item :label="$t('message.tag')">
-          <el-input 
+          <el-input
             v-model="modifiedNamespaceForm.tags"
             placeholder="请输入标签，多个标签用逗号分隔" />
         </el-form-item>
-        
+
         <el-form-item :label="$t('message.extra')">
-          <el-input 
+          <el-input
             v-model="modifiedNamespaceForm.extra"
             type="textarea"
             :rows="3"
@@ -177,10 +186,10 @@
         <el-divider content-position="left">
           <span style="font-weight: 600; color: var(--pj-text-secondary);">{{$t('message.permissionManage')}}</span>
         </el-divider>
-        
+
         <el-form-item>
-          <user-role 
-            :user-rule-form="user_rule_form" 
+          <user-role
+            :user-rule-form="user_rule_form"
             @update:userRuleForm="handleUserRoleUpdate"
             style="width: 100%;" />
         </el-form-item>
@@ -190,8 +199,8 @@
             <el-button @click="modifiedNamespaceFormVisible = false" :icon="Close">
               {{$t('message.cancel')}}
             </el-button>
-            <el-button 
-              type="primary" 
+            <el-button
+              type="primary"
               @click="onClickSaveNamespace"
               :loading="saving"
               :icon="Check">
@@ -207,15 +216,15 @@
 <script>
 import UserRole from "../common/UserRole.vue";
 import { ElMessage } from 'element-plus';
-import { 
-  FolderRemove
+import {
+  Search, Refresh, Plus, Edit, Delete, Close, Check, DocumentCopy
 } from '@element-plus/icons-vue';
 
 export default {
   name: "NamespaceManager",
   components: {
     UserRole,
-    FolderRemove
+    Search, Refresh, Plus, Edit, Delete, Close, Check, DocumentCopy
   },
   data() {
     return {
@@ -225,8 +234,8 @@ export default {
         codeLike: undefined,
         nameLike: undefined,
         tagLike: undefined,
-        index:0,
-        pageSize:10
+        index: 0,
+        pageSize: 10
       },
 
       // 创建or修改表单
@@ -252,7 +261,7 @@ export default {
       modifiedNamespaceFormVisible: false,
       loading: false,
       saving: false,
-      
+
       // 表单验证规则
       formRules: {
         code: [
@@ -291,6 +300,13 @@ export default {
     onClickChangePage(index) {
       // 后端从0开始，前端从1开始
       this.queryNamespaceRequest.index = index - 1;
+      this.listNamespaces();
+    },
+
+    // 每页条数变更
+    handleSizeChange(newSize) {
+      this.queryNamespaceRequest.pageSize = newSize;
+      this.queryNamespaceRequest.index = 0;
       this.listNamespaces();
     },
 
@@ -366,7 +382,7 @@ export default {
         ElMessage.error(this.$t('message.deleteFailed') + ': ' + e);
       });
     },
-    
+
     // 复制Token
     copyToken() {
       if (this.modifiedNamespaceForm.token) {
@@ -377,7 +393,7 @@ export default {
         });
       }
     },
-    
+
     // 处理用户权限更新
     handleUserRoleUpdate(newUserRoleData) {
       this.user_rule_form = { ...newUserRoleData };
@@ -389,37 +405,33 @@ export default {
 }
 </script>
 
-
 <style scoped lang="scss">
 @import '../../styles/management-pages.scss';
 
-/* 组件特定样式 */
-.pj-management-page {
-    :deep(.el-tag) {
-        border-radius: var(--pj-border-radius-sm);
-    }
+/* Namespace Manager 页面样式 - 与 JobManager 保持一致 */
+.namespace-manager {
+  padding: 0;
+  background: transparent;
+}
 
-    :deep(.el-table) {
-        --el-table-border-color: var(--pj-border-color);
-        --el-table-text-color: var(--pj-text-primary);
-        --el-table-header-text-color: var(--pj-text-primary);
-        --el-table-header-bg-color: var(--pj-bg-secondary);
-    }
+/* 图标间距 */
+.mr-1 {
+  margin-right: 4px;
+}
 
-    :deep(.el-table .cell) {
-        white-space: nowrap;
-    }
+/* 表格内标签样式 */
+:deep(.el-tag) {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  border-radius: 12px;
+  padding: 4px 12px;
+}
 
-    .pj-action-group {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        flex-wrap: nowrap;
-
-        .el-button {
-            margin: 0;
-            padding: 4px 8px;
-        }
-    }
+/* 信息标签颜色 */
+:deep(.el-tag.el-tag--info.el-tag--light) {
+  background-color: #f0f5ff;
+  border-color: #adc6ff;
+  color: #2f54eb;
 }
 </style>
