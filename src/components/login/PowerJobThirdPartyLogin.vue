@@ -121,118 +121,121 @@
     <el-dialog
       :title="$t('message.userRegister')"
       v-model="userRegisterFormVisible"
-      width="420px"
-      class="modern-dialog"
+      width="480px"
+      class="modern-dialog register-dialog"
       :append-to-body="true"
+      :show-close="true"
     >
-      <div class="dialog-content">
+      <div class="register-content">
+
         <el-form :model="userRegisterForm" label-position="top" class="register-form">
-          <div class="form-row">
-            <div class="form-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-              </svg>
-            </div>
+          <!-- 第一行：用户名 + 昵称 -->
+          <div class="form-grid">
             <el-form-item label="用户名" class="form-item">
-              <el-input v-model="userRegisterForm.username" placeholder="唯一标识，请使用英文" class="dialog-input"></el-input>
+              <el-input v-model="userRegisterForm.username" placeholder="唯一标识" class="dialog-input">
+                <template #prefix>
+                  <svg class="input-prefix-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </template>
+              </el-input>
             </el-form-item>
-          </div>
-
-          <div class="form-row">
-            <div class="form-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
-              </svg>
-            </div>
             <el-form-item :label="$t('message.nick')" class="form-item">
-              <el-input v-model="userRegisterForm.nick" placeholder="昵称" class="dialog-input"></el-input>
+              <el-input v-model="userRegisterForm.nick" placeholder="昵称" class="dialog-input">
+                <template #prefix>
+                  <svg class="input-prefix-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2a5 5 0 0 0-5 5c0 2 1.5 3.5 3 4.5V20h4v-8.5c1.5-1 3-2.5 3-4.5a5 5 0 0 0-5-5z"/>
+                    <circle cx="12" cy="7" r="2"/>
+                  </svg>
+                </template>
+              </el-input>
             </el-form-item>
           </div>
 
-          <div class="form-row">
-            <div class="form-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
-            </div>
+          <!-- 第二行：手机号 + 邮箱 -->
+          <div class="form-grid">
             <el-form-item :label="$t('message.phone')" class="form-item">
-              <el-input v-model="userRegisterForm.phone" placeholder="手机号" class="dialog-input"></el-input>
+              <el-input v-model="userRegisterForm.phone" placeholder="手机号" class="dialog-input">
+                <template #prefix>
+                  <svg class="input-prefix-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                </template>
+              </el-input>
             </el-form-item>
-          </div>
-
-          <div class="form-row">
-            <div class="form-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                <polyline points="22,6 12,13 2,6"/>
-              </svg>
-            </div>
             <el-form-item :label="$t('message.email')" class="form-item">
-              <el-input v-model="userRegisterForm.email" placeholder="邮箱" class="dialog-input"></el-input>
+              <el-input v-model="userRegisterForm.email" placeholder="邮箱" class="dialog-input">
+                <template #prefix>
+                  <svg class="input-prefix-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                  </svg>
+                </template>
+              </el-input>
             </el-form-item>
           </div>
 
-          <div class="form-row">
-            <div class="form-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-              </svg>
-            </div>
-            <el-form-item :label="$t('message.webhook')" class="form-item">
-              <el-input v-model="userRegisterForm.webHook" placeholder="Webhook 地址（可选）" class="dialog-input"></el-input>
-            </el-form-item>
-          </div>
-
-          <div class="form-row">
-            <div class="form-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-              </svg>
-            </div>
+          <!-- 密码 -->
+          <div class="form-grid single-row">
             <el-form-item :label="$t('message.newPassword')" class="form-item">
-              <el-input type="password" v-model="userRegisterForm.password" show-password placeholder="请输入密码" class="dialog-input"></el-input>
+              <el-input type="password" v-model="userRegisterForm.password" show-password placeholder="请输入密码" class="dialog-input">
+                <template #prefix>
+                  <svg class="input-prefix-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </template>
+              </el-input>
             </el-form-item>
-          </div>
-
-          <div class="form-row">
-            <div class="form-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                <polyline points="9 12 11 14 15 10"/>
-              </svg>
-            </div>
             <el-form-item :label="$t('message.newPassword2')" class="form-item">
-              <el-input type="password" v-model="userRegisterForm.password2" show-password placeholder="请再次输入密码" class="dialog-input"></el-input>
+              <el-input type="password" v-model="userRegisterForm.password2" show-password placeholder="请再次输入密码" class="dialog-input">
+                <template #prefix>
+                  <svg class="input-prefix-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <polyline points="9 12 11 14 15 10"/>
+                  </svg>
+                </template>
+              </el-input>
             </el-form-item>
           </div>
 
-          <el-form-item class="dialog-actions">
-            <div class="dialog-button-group">
-              <button type="button" class="action-btn confirm-btn" @click="registerUser">
-                <span class="btn-bg"></span>
-                <span class="btn-content">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="20 6 9 17 4 12"/>
+          <!-- Webhook（可选） -->
+          <div class="form-grid single-row">
+            <el-form-item :label="$t('message.webhook')" class="form-item full-width">
+              <el-input v-model="userRegisterForm.webHook" placeholder="Webhook 地址（可选）" class="dialog-input">
+                <template #prefix>
+                  <svg class="input-prefix-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
                   </svg>
-                  <span>确认注册</span>
-                </span>
-              </button>
-              <button type="button" class="action-btn cancel-btn" @click="userRegisterFormVisible = false">
-                <span class="btn-bg"></span>
-                <span class="btn-content">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
-                  </svg>
-                  <span>取消</span>
-                </span>
-              </button>
-            </div>
-          </el-form-item>
+                </template>
+              </el-input>
+            </el-form-item>
+          </div>
+
+          <!-- 按钮组 -->
+          <div class="form-actions">
+            <button type="button" class="action-btn cancel-btn" @click="userRegisterFormVisible = false">
+              <span class="btn-bg"></span>
+              <span class="btn-content">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                <span>取消</span>
+              </span>
+            </button>
+            <button type="button" class="action-btn confirm-btn" @click="registerUser">
+              <span class="btn-bg"></span>
+              <span class="btn-content">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <span>立即注册</span>
+              </span>
+            </button>
+          </div>
         </el-form>
       </div>
     </el-dialog>
@@ -712,7 +715,7 @@ export default {
   color: #94a3b8;
 }
 
-/* 注册对话框样式 */
+/* 注册对话框样式 - 紧凑型 */
 :deep(.el-overlay) {
   background-color: rgba(15, 23, 42, 0.6) !important;
   backdrop-filter: blur(4px);
@@ -726,91 +729,90 @@ export default {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
 }
 
-:deep(.el-dialog__header) {
-  padding: 28px 28px 20px !important;
-  border-bottom: 1px solid #e2e8f0 !important;
+.register-dialog :deep(.el-dialog__header) {
+  padding: 20px 24px 12px !important;
+  border-bottom: none !important;
   background: transparent !important;
+  position: relative;
 }
 
-:deep(.el-dialog__title) {
+.register-dialog :deep(.el-dialog__title) {
   color: #1e293b !important;
-  font-size: 20px !important;
-  font-weight: 500 !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  display: block;
+  text-align: center;
 }
 
-:deep(.el-dialog__headerbtn) {
-  top: 24px !important;
-  right: 24px !important;
+.register-dialog :deep(.el-dialog__headerbtn) {
+  top: 16px !important;
+  right: 16px !important;
 }
 
-:deep(.el-dialog__close) {
+.register-dialog :deep(.el-dialog__close) {
   color: #94a3b8 !important;
   font-size: 18px !important;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
-:deep(.el-dialog__close:hover) {
+.register-dialog :deep(.el-dialog__close:hover) {
   color: #3b82f6 !important;
+  transform: rotate(90deg);
 }
 
-:deep(.el-dialog__body) {
-  padding: 16px 24px 24px !important;
+.register-dialog :deep(.el-dialog__body) {
+  padding: 0 24px 24px !important;
   background: transparent !important;
 }
 
-/* 注册表单样式 */
-
-/* 表单行样式 */
-.form-row {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 6px;
+/* 注册内容容器 */
+.register-content {
+  padding: 8px 8px 0;
+  position: relative;
 }
 
-.form-icon {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #eff6ff, #dbeafe);
-  border-radius: 8px;
-  margin-right: 10px;
-  margin-top: 20px;
-  flex-shrink: 0;
+.register-form {
+  margin-top: 8px;
 }
 
-.form-icon svg {
-  width: 16px;
-  height: 16px;
-  color: #3b82f6;
-}
-
-.form-row .form-item {
-  flex: 1;
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
   margin-bottom: 0;
 }
 
-.form-row .form-item :deep(.el-form-item__label) {
-  margin-bottom: 2px;
-  font-size: 12px;
+.form-grid.single-row {
+  grid-template-columns: 1fr 1fr;
 }
 
+.form-grid .form-item {
+  margin-bottom: 0;
+}
+
+.form-grid .form-item.full-width {
+  grid-column: 1 / -1;
+}
+
+/* 表单标签 */
 .register-form :deep(.el-form-item__label) {
   color: #475569 !important;
   font-weight: 500 !important;
-  font-size: 14px !important;
+  font-size: 12px !important;
+  padding: 0 0 4px 0 !important;
+  line-height: 1 !important;
 }
 
 .register-form :deep(.el-form-item) {
-  margin-bottom: 18px;
+  margin-bottom: 12px !important;
 }
 
+/* 输入框样式 */
 :deep(.dialog-input .el-input__wrapper) {
   background: white !important;
   border: 1.5px solid #e2e8f0 !important;
   border-radius: 10px !important;
-  padding: 12px 14px !important;
+  padding: 8px 10px !important;
   box-shadow: none !important;
   transition: all 0.3s ease !important;
 }
@@ -826,24 +828,42 @@ export default {
 
 :deep(.dialog-input .el-input__inner) {
   color: #1e293b !important;
-  font-size: 14px !important;
+  font-size: 13px !important;
 }
 
-.dialog-actions {
-  margin-top: 28px;
-  margin-bottom: 0 !important;
+:deep(.dialog-input .el-input__inner::placeholder) {
+  color: #94a3b8 !important;
+  font-size: 12px !important;
 }
 
-.dialog-button-group {
+/* 输入框前缀图标 */
+.input-prefix-icon {
+  width: 16px;
+  height: 16px;
+  color: #94a3b8;
+  transition: color 0.3s ease;
+}
+
+:deep(.dialog-input .el-input__wrapper:focus-within .input-prefix-icon) {
+  color: #3b82f6;
+}
+
+:deep(.dialog-input .el-input__wrapper:hover .input-prefix-icon) {
+  color: #64748b;
+}
+
+/* 按钮区域 */
+.form-actions {
   display: flex;
-  gap: 16px;
-  justify-content: center;
-  width: 100%;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
 }
 
-.dialog-button-group .action-btn {
+.form-actions .action-btn {
   flex: 1;
-  padding: 14px 20px;
+  padding: 12px 16px;
 }
 
 .confirm-btn .btn-bg {
@@ -851,7 +871,7 @@ export default {
 }
 
 .cancel-btn .btn-bg {
-  background: linear-gradient(135deg, #64748b, #475569);
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
 }
 
 .confirm-btn .btn-content span,
@@ -864,12 +884,12 @@ export default {
   color: #64748b;
 }
 
-.dialog-button-group .action-btn:hover .btn-bg {
+.form-actions .action-btn:hover .btn-bg {
   opacity: 1;
 }
 
-.dialog-button-group .action-btn:hover .btn-content span,
-.dialog-button-group .action-btn:hover .btn-content svg {
+.form-actions .action-btn:hover .btn-content span,
+.form-actions .action-btn:hover .btn-content svg {
   color: white;
 }
 
@@ -966,6 +986,29 @@ export default {
   :deep(.el-dialog) {
     width: 90% !important;
     margin: 0 auto !important;
+  }
+
+  /* 注册对话框响应式 */
+  .register-dialog :deep(.el-dialog) {
+    width: 92% !important;
+    max-width: 400px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-grid.single-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+
+  .form-actions .action-btn {
+    width: 100%;
   }
 }
 </style>
