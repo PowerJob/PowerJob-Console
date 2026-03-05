@@ -154,7 +154,7 @@
                 type="primary"
                 @click="onClickAuthThenBecomeAdmin"
                 :loading="applying"
-                :icon="Shield"
+                :icon="Lock"
                 style="width: 100%;">
                 {{$t('message.authThenBecomeAdmin')}}
               </el-button>
@@ -238,13 +238,13 @@
 <script>
 import { ElMessage } from "element-plus";
 import {
-  UserFilled, Check, Key, Shield, Close
+  UserFilled, Check, Key, Lock, Close
 } from '@element-plus/icons-vue';
 
 export default {
   name: 'UserCenter',
   components: {
-    UserFilled, Check, Key, Shield, Close
+    UserFilled, Check, Key, Lock, Close
   },
   data() {
     return {

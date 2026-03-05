@@ -52,14 +52,14 @@
               type="primary"
               @click="saveGlobalAdmins"
               :loading="saving"
-              :disabled="!hasChanges"
-              :icon="Check">
+              :disabled="!hasChanges">
+              <el-icon class="mr-1"><Check /></el-icon>
               {{$t('message.save')}}
             </el-button>
             <el-button
               @click="resetChanges"
-              :disabled="!hasChanges"
-              :icon="Refresh">
+              :disabled="!hasChanges">
+              <el-icon class="mr-1"><Refresh /></el-icon>
               重置
             </el-button>
           </div>
