@@ -1,62 +1,63 @@
 <template>
-  <div class="pj-management-page">
+  <div class="user-manager pj-management-page">
 
-    <!-- 搜索条件卡片 -->
-    <div class="pj-search-card">
-      <el-form :inline="true" :model="queryUserRequest" class="el-form--inline">
-        <el-form-item label="用户ID">
-          <el-input 
-            v-model="queryUserRequest.userIdEq" 
-            placeholder="请输入用户ID"
-            style="width: 140px;"
-            clearable />
-        </el-form-item>
-        
-        <el-form-item label="用户昵称">
-          <el-input 
-            v-model="queryUserRequest.nickLike" 
-            :placeholder="$t('message.fuzzyQuery')"
-            style="width: 180px;"
-            clearable />
-        </el-form-item>
-        
-        <el-form-item label="手机号">
-          <el-input 
-            v-model="queryUserRequest.phoneLike" 
-            :placeholder="$t('message.fuzzyQuery')"
-            style="width: 160px;"
-            clearable />
-        </el-form-item>
+    <!-- Search and Action Section -->
+    <div class="pj-form-section" style="padding-top: 0; margin-top: 0;">
+      <div class="search-container">
+        <div class="search-form">
+          <el-form :inline="true" :model="queryUserRequest" class="el-form--inline">
+            <el-form-item label="用户ID">
+              <el-input
+                v-model="queryUserRequest.userIdEq"
+                placeholder="请输入用户ID"
+                style="width: 140px;"
+                clearable />
+            </el-form-item>
 
-        <el-form-item>
-          <div class="pj-search-actions">
-            <el-button type="primary" @click="listUser" :icon="Search">
-              {{$t('message.query')}}
-            </el-button>
-            <el-button @click="onClickReset" :icon="Refresh">
-              {{$t('message.reset')}}
-            </el-button>
-          </div>
-        </el-form-item>
-      </el-form>
-    </div>
+            <el-form-item label="用户昵称">
+              <el-input
+                v-model="queryUserRequest.nickLike"
+                :placeholder="$t('message.fuzzyQuery')"
+                style="width: 180px;"
+                clearable />
+            </el-form-item>
 
-    <!-- 数据表格卡片 -->
-    <div class="pj-table-card">
-      <div class="pj-table-header">
-        <h3 class="pj-table-title">用户列表</h3>
-        <div class="pj-table-actions">
-          <el-tooltip content="刷新数据" placement="top">
-            <el-button @click="listUser" :icon="Refresh" circle></el-button>
-          </el-tooltip>
+            <el-form-item label="手机号">
+              <el-input
+                v-model="queryUserRequest.phoneLike"
+                :placeholder="$t('message.fuzzyQuery')"
+                style="width: 160px;"
+                clearable />
+            </el-form-item>
+          </el-form>
+        </div>
+
+        <div class="action-buttons">
+          <el-button @click="onClickReset">{{$t('message.reset')}}</el-button>
+          <el-button type="primary" @click="listUser">
+            <el-icon class="mr-1"><Search /></el-icon>
+            {{$t('message.query')}}
+          </el-button>
+          <el-button type="info" @click="listUser">
+            <el-icon class="mr-1"><Refresh /></el-icon>
+            {{$t('message.refresh')}}
+          </el-button>
         </div>
       </div>
-      
-      <el-table :data="userListResult" style="width: 100%" v-loading="loading">
+    </div>
+
+    <!-- Table Section -->
+    <div class="pj-table" style="margin-top: var(--pj-space-sm);">
+      <el-table
+        :data="userListResult"
+        style="width: 100%"
+        v-loading="loading"
+        stripe
+        table-layout="auto">
         <el-table-column prop="id" label="ID" width="80" align="center" />
         <el-table-column label="账号类型" width="120">
           <template #default="scope">
-            <el-tag 
+            <el-tag
               :type="getAccountTypeStyle(scope.row.accountType).type"
               size="small">
               {{ getAccountTypeText(scope.row.accountType) }}
@@ -70,39 +71,38 @@
 
         <el-table-column :label="$t('message.status')" width="100" align="center">
           <template #default="scope">
-            <el-tooltip 
-              :content="scope.row.enable ? '点击禁用用户' : '点击启用用户'" 
+            <el-tooltip
+              :content="scope.row.enable ? '点击禁用用户' : '点击启用用户'"
               placement="top">
-              <el-switch 
-                v-model="scope.row.enable" 
-                active-color="var(--pj-success)" 
-                inactive-color="var(--pj-danger)" 
+              <el-switch
+                v-model="scope.row.enable"
+                :active-color="'var(--pj-success)'"
+                :inactive-color="'var(--pj-error)'"
                 @change="changeUserStatus(scope.row)"
                 :loading="scope.row._switching" />
             </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
-      
-      <!-- 空状态 -->
-      <div v-if="!loading && (!userListResult || userListResult.length === 0)" class="pj-empty-state">
-        <el-icon class="pj-empty-icon"><User /></el-icon>
-        <div class="pj-empty-text">暂无用户数据</div>
-      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-if="!loading && (!userListResult || userListResult.length === 0)" class="pagination-container" style="color: var(--pj-text-tertiary);">
+      暂无用户数据
     </div>
   </div>
 </template>
 
 <script>
 import { ElMessage } from "element-plus";
-import { 
-  User 
+import {
+  User, Search, Refresh
 } from '@element-plus/icons-vue';
 
 export default {
   name: "UserManager",
   components: {
-    User
+    User, Search, Refresh
   },
   data() {
     return {
@@ -142,11 +142,11 @@ export default {
       const that = this;
       // 设置当前用户为切换状态
       data._switching = true;
-      
+
       console.log('user status: ' + data.enable)
       const action = data.enable ? 'enable' : 'disable';
       const url = `/user/${action}?uid=${data.id}`;
-      
+
       that.axios.post(url).then(() => {
         ElMessage.success(data.enable ? '用户已启用' : '用户已禁用');
         data._switching = false;
@@ -157,7 +157,7 @@ export default {
         ElMessage.error(this.$t('message.operationFailed') + error);
       });
     },
-    
+
     // 获取账号类型文本
     getAccountTypeText(accountType) {
       const typeMap = {
@@ -169,7 +169,7 @@ export default {
       };
       return typeMap[accountType] || accountType;
     },
-    
+
     // 获取账号类型样式
     getAccountTypeStyle(accountType) {
       const styleMap = {
@@ -192,15 +192,29 @@ export default {
 <style scoped lang="scss">
 @import '../../styles/management-pages.scss';
 
-/* 组件特定样式 */
-.pj-management-page {
-    :deep(.el-tag) {
-        border-radius: var(--pj-border-radius-sm);
-    }
+/* User Manager 页面样式 - 与 JobManager 保持一致 */
+.user-manager {
+  padding: 0;
+  background: transparent;
+}
 
-    :deep(.el-switch) {
-        --el-switch-on-color: var(--pj-success);
-        --el-switch-off-color: var(--pj-error);
-    }
+/* 图标间距 */
+.mr-1 {
+  margin-right: 4px;
+}
+
+/* 表格内标签样式 */
+:deep(.el-tag) {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  border-radius: 12px;
+  padding: 4px 12px;
+}
+
+/* 开关样式 */
+:deep(.el-switch) {
+  --el-switch-on-color: var(--pj-success);
+  --el-switch-off-color: var(--pj-error);
 }
 </style>
