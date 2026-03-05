@@ -15,16 +15,16 @@ export const jobApi = {
 
   /** 删除任务 */
   delete(jobId: number): Promise<void> {
-    return request.get(`/job/delete?jobId=${jobId}`)
+    return request.get('/job/delete', { jobId })
   },
 
   /** 立即运行 */
   run(jobId: number, appId: string, params?: string): Promise<void> {
-    let url = `/job/run?jobId=${jobId}&appId=${appId}`
-    if (params) {
-      url += `&instanceParams=${encodeURIComponent(params)}`
-    }
-    return request.get(url)
+    return request.get('/job/run', {
+      jobId,
+      appId,
+      instanceParams: params
+    })
   },
 
   /** 高级运行 */
@@ -34,11 +34,16 @@ export const jobApi = {
 
   /** 复制任务 */
   copy(jobId: number): Promise<JobForm> {
-    return request.post(`/job/copy?jobId=${jobId}`)
+    return request.post('/job/copy', { jobId })
   },
 
   /** 禁用任务 */
   disable(jobId: number): Promise<void> {
-    return request.get(`/job/disable?jobId=${jobId}`)
+    return request.get('/job/disable', { jobId })
   },
+
+  /** 启用任务 */
+  enable(jobId: number): Promise<void> {
+    return request.get('/job/enable', { jobId })
+  }
 }

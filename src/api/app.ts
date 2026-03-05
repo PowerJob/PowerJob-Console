@@ -9,7 +9,7 @@ export const appApi = {
 
   /** 获取应用信息 */
   info(appId: number): Promise<AppInfo> {
-    return request.get(`/app/info?appId=${appId}`)
+    return request.get('/app/info', { appId })
   },
 
   /** 保存应用 */
@@ -19,6 +19,11 @@ export const appApi = {
 
   /** 验证应用密码 */
   assert(appName: string, password: string): Promise<string> {
-    return request.post('/app/assert?appName=' + appName + '&password=' + password)
+    return request.post('/app/assert', { appName, password })
   },
+
+  /** 删除应用 */
+  delete(appId: number): Promise<void> {
+    return request.get('/app/delete', { appId })
+  }
 }
