@@ -101,7 +101,7 @@
     to { left: 100%; }
 }
 
-/* Menu 深度样式 Mixin */
+/* Menu 深度样式 Mixin - 用于 :deep(.el-menu) 内部 */
 @mixin sidebar-menu-deep {
     border-right: none;
     background: transparent;
@@ -231,10 +231,10 @@
     }
 }
 
-/* 悬光动效 Mixin */
+/* 悬光动效 Mixin - 用于根选择器下 */
 @mixin sidebar-shine-effect {
-    .el-menu-item:not(.is-active):hover,
-    .el-sub-menu .el-sub-menu__title:hover {
+    :deep(.el-menu-item:not(.is-active):hover),
+    :deep(.el-sub-menu .el-sub-menu__title:hover) {
         position: relative;
         overflow: hidden;
 
@@ -257,7 +257,7 @@
     }
 }
 
-/* 响应式样式 Mixin */
+/* 响应式样式 Mixin - 用于根选择器下 */
 @mixin sidebar-responsive {
     @media (max-width: 1024px) {
         .sidebar-left-container {
@@ -267,7 +267,7 @@
             flex: 0 0 180px;
         }
 
-        .el-aside {
+        :deep(.el-aside) {
             width: 180px !important;
             max-width: 180px !important;
             min-width: 180px !important;
@@ -291,7 +291,7 @@
             overflow-y: auto;
         }
 
-        .el-menu {
+        :deep(.el-menu) {
             display: flex;
             overflow-x: auto;
 
