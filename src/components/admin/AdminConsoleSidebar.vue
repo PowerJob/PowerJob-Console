@@ -3,12 +3,12 @@
 * 该组件内部包括了侧边栏和主显示区域（以router-view的形式声明，在router.js中通过component: () => import('./components/Home')的方式导入）
 -->
 <template>
-  <div id="admin_sidebar">
-    <el-container class="left-container">
+  <div id="admin_sidebar" class="sidebar-container">
+    <el-container class="left-container sidebar-left-container">
       <!--侧边栏容器-->
       <el-aside width="100%" >
         <!-- 菜单 -->
-        <el-menu :router="true" :default-active="default_active_index" class="aside">
+        <el-menu :router="true" :default-active="default_active_index" class="aside sidebar-menu">
 
           <!-- vue router，实现点击跳转 -->
           <el-menu-item index="/admin/app">
@@ -56,7 +56,7 @@
     </el-container>
 
     <!-- 功能区 -->
-    <div class="wrap">
+    <div class="wrap sidebar-wrap">
       <router-view/>
     </div>
   </div>
@@ -74,59 +74,52 @@ export default {
     Setting,
     User
   },
-  data() {
-    return {
-      default_active_index: "/admin/app"
+  computed: {
+    default_active_index() {
+      return this.$route?.path || '/admin/app'
     }
   }
 }
 </script>
-<style scoped>
+<style scoped lang="scss">
+@import '../../styles/shared/sidebar.scss';
 
-/* 菜单左对齐 */
-.el-menu {
-  text-align: left;
+#admin_sidebar {
+  @extend .sidebar-container;
 }
-#admin_sidebar{
-  display: flex;
+
+.left-container {
+  @extend .sidebar-left-container;
 }
-.aside{
-  height: 100vh;
+
+.sidebar-aside {
+  @extend .sidebar-aside;
 }
-.left-container{
-  flex-basis:210px;
-  flex-grow: 0;
-  flex-shrink: 0;
+
+.aside {
+  @extend .sidebar-menu;
 }
-/* view */
+
 .wrap {
-  box-sizing: border-box;
-  padding: 20px;
-  position: absolute;
-  left: 210px;
-  right: 0;
-  top: 80px;
-  bottom: 0;
-  background: #ffffff;
-  width: calc(100% - 200px);
-  overflow-y: scroll;
+  @extend .sidebar-wrap;
+}
 
+/* 应用 Menu 深度样式 */
+:deep(.el-menu) {
+  @include sidebar-menu-deep;
 }
-.wrap::-webkit-scrollbar {
-  /*滚动条整体样式*/
-  width: 4px; /*高宽分别对应横竖滚动条的尺寸*/
-  height: 4px;
-}
-.wrap::-webkit-scrollbar-thumb {
-  /*滚动条里面小方块*/
-  border-radius: 5px;
-  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  background: rgba(0, 0, 0, 0.2);
-}
-.wrap::-webkit-scrollbar-track {
-  /*滚动条里面轨道*/
-  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
-  border-radius: 0;
-  background: rgba(0, 0, 0, 0.1);
+
+/* 应用悬光动效 */
+@include sidebar-shine-effect;
+
+/* 应用响应式样式 */
+@include sidebar-responsive;
+
+/* el-aside 宽度确保 */
+:deep(.el-aside) {
+  width: var(--pj-sidebar-width) !important;
+  max-width: var(--pj-sidebar-width) !important;
+  min-width: var(--pj-sidebar-width) !important;
+  flex: 0 0 var(--pj-sidebar-width) !important;
 }
 </style>
