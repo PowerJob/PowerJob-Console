@@ -28,12 +28,14 @@ PowerJob Console 是 [PowerJob](https://github.com/PowerJob/PowerJob) 的官方 
 
 | 类别     | 技术 |
 |----------|------|
-| 框架     | Vue 3、Vue Router、Vuex |
+| 语言     | TypeScript |
+| 框架     | Vue 3、Vue Router、Pinia |
 | UI       | Element Plus、Tailwind CSS |
 | 构建     | Vite 7 |
 | 工作流编辑 | React + @powerjob/power-workflow-next、@xyflow/react |
 | 编辑器   | Monaco Editor |
 | 国际化   | Vue I18n |
+| 测试     | Vitest |
 
 ---
 
@@ -85,13 +87,38 @@ npm run build_spring
 npm run preview
 ```
 
+### 类型检查
+
+```bash
+npm run type-check
+```
+
+### 运行测试
+
+```bash
+# 交互式监视模式
+npm run test
+
+# 单次运行所有测试
+npm run test:run
+
+# 生成覆盖率报告
+npm run test:coverage
+```
+
 ---
 
-## 项目结构（简要）
+## 项目结构
 
 ```
 PowerJob-Console/
 ├── src/
+│   ├── api/            # API 服务层（axios 封装、接口定义）
+│   ├── composables/    # 组合式函数（useTable、useFormDialog 等）
+│   ├── constants/      # 常量定义（状态枚举、选项配置）
+│   ├── stores/         # Pinia 状态管理
+│   ├── types/          # TypeScript 类型定义
+│   ├── utils/          # 工具函数（日期、格式化、存储）
 │   ├── components/     # 页面与通用组件
 │   │   ├── views/      # 业务视图（任务、工作流、实例等）
 │   │   ├── dag/        # 工作流 DAG 编辑与实例详情
@@ -99,13 +126,17 @@ PowerJob-Console/
 │   │   ├── bar/        # 侧边栏、导航栏
 │   │   └── common/     # 公共组件
 │   ├── i18n/           # 国际化（中/英）
-│   ├── router.js       # 路由
-│   ├── store.js        # Vuex 状态
-│   └── main.js         # 入口
+│   ├── router.js       # 路由配置
+│   └── main.ts         # 应用入口
+├── tests/              # 单元测试
+├── docs/               # 项目文档
+│   └── plans/          # 设计与实施计划
 ├── .env.dev            # 开发环境变量
 ├── .env.product        # 生产环境变量
 ├── .env.spring         # 内嵌 Spring Boot 环境变量
-└── vite.config.ts     # Vite 配置
+├── vite.config.ts      # Vite 配置
+├── vitest.config.ts    # Vitest 测试配置
+└── tsconfig.json       # TypeScript 配置
 ```
 
 ---
