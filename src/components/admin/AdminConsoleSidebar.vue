@@ -122,4 +122,16 @@ export default {
   min-width: var(--pj-sidebar-width) !important;
   flex: 0 0 var(--pj-sidebar-width) !important;
 }
+
+/* 隐藏侧边栏滚动条 */
+:deep(.el-aside),
+:deep(.el-menu) {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}
 </style>
