@@ -97,15 +97,15 @@
                 <el-button
                   type="primary"
                   @click="onClickSaveNewUserInfo"
-                  :loading="saving"
-                  :icon="Check">
+                  :loading="saving">
+                  <el-icon class="mr-1"><Check /></el-icon>
                   {{$t('message.save')}}
                 </el-button>
                 <el-button
                   type="danger"
                   v-if="userDetailInfo.accountType=='PWJB'"
-                  @click="onClickChangePassword"
-                  :icon="Key">
+                  @click="onClickChangePassword">
+                  <el-icon class="mr-1"><Key /></el-icon>
                   {{$t('message.changePassword')}}
                 </el-button>
               </div>
@@ -154,8 +154,8 @@
                 type="primary"
                 @click="onClickAuthThenBecomeAdmin"
                 :loading="applying"
-                :icon="Lock"
                 style="width: 100%;">
+                <el-icon class="mr-1"><Lock /></el-icon>
                 {{$t('message.authThenBecomeAdmin')}}
               </el-button>
             </el-form-item>
@@ -218,14 +218,15 @@
 
       <el-form-item style="margin-top: 32px;">
         <div class="action-buttons" style="justify-content: flex-end;">
-          <el-button @click="changePasswordFormVisible = false" :icon="Close">
+          <el-button @click="changePasswordFormVisible = false">
+            <el-icon class="mr-1"><Close /></el-icon>
             {{$t('message.cancel')}}
           </el-button>
           <el-button
             type="primary"
             @click="submitChangePasswordRequest"
-            :loading="changingPassword"
-            :icon="Check">
+            :loading="changingPassword">
+            <el-icon class="mr-1"><Check /></el-icon>
             {{$t('message.confirm')}}
           </el-button>
         </div>
