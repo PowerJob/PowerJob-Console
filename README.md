@@ -141,6 +141,37 @@ PowerJob-Console/
 
 ---
 
+## 样式架构
+
+项目使用统一的 CSS 变量系统，确保全局视觉一致性。
+
+### 设计系统
+
+| 变量 | 值 | 说明 |
+|------|-----|------|
+| `--pj-primary` | #009688 | 主色调（青绿色） |
+| `--pj-sidebar-width` | 220px | 侧边栏宽度 |
+| `--pj-navbar-height` | 80px | 顶部导航高度 |
+
+### 样式文件
+
+| 文件 | 用途 |
+|------|------|
+| `src/styles.scss` | 全局 CSS 变量定义 |
+| `src/styles/shared/sidebar.scss` | 共享侧边栏样式 |
+| `src/styles/management-pages.scss` | 管理页面统一样式 |
+
+### 使用规范
+
+所有管理页面应：
+- 使用 `pj-management-page` 作为根容器类名
+- 引入 `management-pages.scss` 样式文件
+- 优先使用 CSS 变量而非硬编码值
+
+> ⚠️ `admin-theme.scss` 已废弃，请勿在新组件中使用
+
+---
+
 ## 文档与资源
 
 - **PowerJob 官方文档**：[https://www.yuque.com/powerjob/guidence](https://www.yuque.com/powerjob/guidence)
