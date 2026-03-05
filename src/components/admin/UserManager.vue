@@ -1,5 +1,5 @@
 <template>
-  <div class="pj-admin-container">
+  <div class="pj-management-page">
 
     <!-- 搜索条件卡片 -->
     <div class="pj-search-card">
@@ -189,16 +189,18 @@ export default {
 }
 </script>
 
-<style scoped>
-@import '../../styles/admin-theme.scss';
+<style scoped lang="scss">
+@import '../../styles/management-pages.scss';
 
 /* 组件特定样式 */
-.el-tag {
-  border-radius: var(--pj-border-radius-sm);
-}
+.pj-management-page {
+    :deep(.el-tag) {
+        border-radius: var(--pj-border-radius-sm);
+    }
 
-.el-switch {
-  --el-switch-on-color: var(--pj-success);
-  --el-switch-off-color: var(--pj-danger);
+    :deep(.el-switch) {
+        --el-switch-on-color: var(--pj-success);
+        --el-switch-off-color: var(--pj-error);
+    }
 }
 </style>
