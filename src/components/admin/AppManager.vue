@@ -241,15 +241,20 @@
 <script>
 import UserRole from "../common/UserRole.vue";
 import { ElMessage } from 'element-plus';
-import { 
+import {
   DocumentRemove
 } from '@element-plus/icons-vue';
+import { useAppStore } from '@/stores';
 
 export default {
   name: "AppManager",
   components: {
     UserRole,
     DocumentRemove
+  },
+  setup() {
+    const appStore = useAppStore();
+    return { appStore };
   },
   data() {
     return {
@@ -410,12 +415,12 @@ export default {
 
     // 进入任务管理界面
     onClickEnter(data) {
-      let appInfo = {
+      const appInfo = {
         id: data.id,
         appName: data.appName
       };
-      // 将 appId 存储到 VueStore
-      this.$store.commit("initAppInfo", appInfo);
+      // 将 appId 存储到 Pinia Store
+      this.appStore.setAppInfo(appInfo);
 
       // 同步存储一份到 localStorage（后续主要使用 localStorage，鉴权全部在服务端，本地无脑存即可）
       window.localStorage.setItem('Power_appId', appInfo.id)
