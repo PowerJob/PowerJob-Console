@@ -1,0 +1,102 @@
+/**
+ * 共享侧边栏样式
+ * 从 Sidebar.vue 提取，供 Sidebar.vue 和 AdminConsoleSidebar.vue 复用
+ */
+
+/* 侧边栏容器基础样式 */
+.sidebar-container {
+    display: flex;
+    height: calc(100vh - var(--pj-navbar-height));
+}
+
+/* 左侧容器 */
+.sidebar-left-container {
+    width: var(--pj-sidebar-width) !important;
+    max-width: var(--pj-sidebar-width);
+    min-width: var(--pj-sidebar-width);
+    flex: 0 0 var(--pj-sidebar-width);
+    background: var(--pj-bg-white);
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.06);
+    border-right: 1px solid var(--pj-border-color, #e4e7ed);
+    position: relative;
+    z-index: 100;
+}
+
+/* 侧边栏 aside */
+.sidebar-aside {
+    padding: var(--pj-space-sm) 0;
+}
+
+/* 隐藏滚动条 */
+.sidebar-left-container,
+.sidebar-aside {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
+    }
+}
+
+/* 菜单容器 */
+.sidebar-menu {
+    height: 100%;
+    border-right: none !important;
+    padding: 0 var(--pj-space-sm);
+}
+
+/* 主内容区 */
+.sidebar-wrap {
+    flex: 1;
+    width: calc(100% - var(--pj-sidebar-width));
+    background: var(--pj-bg-base);
+    padding: var(--pj-container-padding);
+    overflow-y: auto;
+    position: relative;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+
+    > * {
+        flex: 1;
+        min-height: 0;
+    }
+
+    /* 滚动条样式 */
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 3px;
+        transition: background 0.3s ease;
+
+        &:hover {
+            background: #a8a8a8;
+        }
+    }
+}
+
+/* 动画关键帧 */
+@keyframes sidebar-accent-in {
+    from {
+        opacity: 0;
+        transform: translateY(-50%) scaleY(0.6);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-50%) scaleY(1);
+    }
+}
+
+@keyframes sidebar-shine {
+    from { left: -60%; }
+    to { left: 100%; }
+}
