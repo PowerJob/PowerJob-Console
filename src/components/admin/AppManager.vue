@@ -1,80 +1,86 @@
 <template>
-  <div class="pj-management-page">
-    
-    <!-- 搜索条件卡片 -->
-    <div class="pj-search-card">
-      <el-form :inline="true" :model="queryAppRequest" class="el-form--inline">
-        <el-form-item label="应用ID">
-          <el-input 
-            v-model="queryAppRequest.appId" 
-            :placeholder="$t('message.pleaseEnterAppId')"
-            style="width: 140px;"
-            clearable />
-        </el-form-item>
-        
-        <el-form-item label="应用名称">
-          <el-input 
-            v-model="queryAppRequest.appNameLike" 
-            :placeholder="$t('message.fuzzyQuery')"
-            style="width: 180px;"
-            clearable />
-        </el-form-item>
-        
-        <el-form-item label="标签">
-          <el-input 
-            v-model="queryAppRequest.tagLike" 
-            :placeholder="$t('message.fuzzyQuery')"
-            style="width: 160px;"
-            clearable />
-        </el-form-item>
+  <div class="app-manager pj-management-page">
 
-        <el-form-item label="命名空间">
-          <el-select 
-            v-model="queryAppRequest.namespaceId" 
-            :placeholder="$t('message.pleaseSelectNamespace')"
-            style="width: 180px;"
-            clearable>
-            <el-option
-                v-for="item in namespaceList"
-                :key="item.id"
-                :label="item.showName"
-                :value="item.id">
-            </el-option>
-          </el-select>
-        </el-form-item>
+    <!-- Search and Action Section -->
+    <div class="pj-form-section" style="padding-top: 0; margin-top: 0;">
+      <div class="search-container">
+        <div class="search-form">
+          <el-form :inline="true" :model="queryAppRequest" class="el-form--inline">
+            <el-form-item label="应用ID">
+              <el-input
+                v-model="queryAppRequest.appId"
+                :placeholder="$t('message.pleaseEnterAppId')"
+                style="width: 140px;"
+                clearable />
+            </el-form-item>
 
-        <el-form-item :label="$t('message.showMyRelated')">
-          <el-switch 
-            v-model="queryAppRequest.showMyRelated" 
-            @change="listApps"
-            active-color="#2563eb" />
-        </el-form-item>
+            <el-form-item label="应用名称">
+              <el-input
+                v-model="queryAppRequest.appNameLike"
+                :placeholder="$t('message.fuzzyQuery')"
+                style="width: 180px;"
+                clearable />
+            </el-form-item>
 
-        <el-form-item>
-          <div class="pj-search-actions">
-            <el-button type="primary" @click="listApps" :icon="Search">
-              {{$t('message.query')}}
-            </el-button>
-            <el-button @click="onClickReset" :icon="Refresh">
-              {{$t('message.reset')}}
-            </el-button>
-          </div>
-        </el-form-item>
-      </el-form>
-    </div>
+            <el-form-item label="标签">
+              <el-input
+                v-model="queryAppRequest.tagLike"
+                :placeholder="$t('message.fuzzyQuery')"
+                style="width: 160px;"
+                clearable />
+            </el-form-item>
 
-    <!-- 数据表格卡片 -->
-    <div class="pj-table-card">
-      <div class="pj-table-header">
-        <h3 class="pj-table-title">应用列表</h3>
-        <div class="pj-table-actions">
-          <el-button type="primary" @click="onClickNewApps" :icon="Plus">
+            <el-form-item label="命名空间">
+              <el-select
+                v-model="queryAppRequest.namespaceId"
+                :placeholder="$t('message.pleaseSelectNamespace')"
+                style="width: 180px;"
+                clearable>
+                <el-option
+                  v-for="item in namespaceList"
+                  :key="item.id"
+                  :label="item.showName"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+
+            <el-form-item :label="$t('message.showMyRelated')">
+              <el-switch
+                v-model="queryAppRequest.showMyRelated"
+                @change="listApps"
+                :active-color="'var(--pj-success)'"
+                :inactive-color="'var(--pj-error)'" />
+            </el-form-item>
+          </el-form>
+        </div>
+
+        <div class="action-buttons">
+          <el-button @click="onClickReset">{{$t('message.reset')}}</el-button>
+          <el-button type="primary" @click="listApps">
+            <el-icon class="mr-1"><Search /></el-icon>
+            {{$t('message.query')}}
+          </el-button>
+          <el-button type="info" @click="listApps">
+            <el-icon class="mr-1"><Refresh /></el-icon>
+            {{$t('message.refresh')}}
+          </el-button>
+          <el-button type="primary" @click="onClickNewApps">
+            <el-icon class="mr-1"><Plus /></el-icon>
             {{$t('message.add')}}
           </el-button>
         </div>
       </div>
-      
-      <el-table :data="appResult.data" style="width: 100%" v-loading="loading" table-layout="auto">
+    </div>
+
+    <!-- Table Section -->
+    <div class="pj-table" style="margin-top: var(--pj-space-sm);">
+      <el-table
+        :data="appResult.data"
+        style="width: 100%"
+        v-loading="loading"
+        stripe
+        table-layout="auto">
         <el-table-column prop="id" label="ID" width="80" align="center" />
         <el-table-column prop="appName" label="应用代码" min-width="180" show-overflow-tooltip>
           <template #default="scope">
@@ -85,7 +91,7 @@
         <el-table-column prop="namespaceName" label="命名空间" min-width="140" show-overflow-tooltip>
           <template #default="scope">
             <el-tag size="small" v-if="scope.row.namespaceName">{{ scope.row.namespaceName }}</el-tag>
-            <span v-else class="pj-text-tertiary">未分配</span>
+            <span v-else class="text-placeholder">未分配</span>
           </template>
         </el-table-column>
         <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" width="170" />
@@ -93,35 +99,40 @@
         <el-table-column prop="creatorShowName" :label="$t('message.creator')" min-width="120" show-overflow-tooltip />
         <el-table-column prop="modifierShowName" :label="$t('message.modifier')" min-width="120" show-overflow-tooltip />
 
-        <el-table-column :label="$t('message.operation')" width="140" fixed="right">
+        <el-table-column :label="$t('message.operation')" width="180" align="center" fixed="right">
           <template #default="scope">
-            <div class="pj-action-group">
-              <el-button size="small" type="text" @click="onClickModify(scope.row)" :icon="Edit">
+            <div class="operation-buttons-enhanced">
+              <el-button size="small" type="primary" @click="onClickModify(scope.row)">
+                <el-icon><Edit /></el-icon>
                 {{$t('message.edit')}}
               </el-button>
-              <el-button size="small" type="text" @click="onClickEnter(scope.row)" :icon="Right">
+              <el-button size="small" type="success" @click="onClickEnter(scope.row)">
+                <el-icon><Right /></el-icon>
                 {{$t('message.enter')}}
               </el-button>
             </div>
           </template>
         </el-table-column>
       </el-table>
+    </div>
 
-      <!-- 分页 -->
-      <div class="pj-table-footer" v-if="appResult.data && appResult.data.length > 0">
-        <el-pagination
-            layout="total, prev, pager, next, jumper"
-            :total="this.appResult.totalItems"
-            :page-size="this.appResult.pageSize"
-            @current-change="onClickChangePage"
-            :hide-on-single-page="false"/>
-      </div>
-      
-      <!-- 空状态 -->
-      <div v-if="!loading && (!appResult.data || appResult.data.length === 0)" class="pj-empty-state">
-        <el-icon class="pj-empty-icon"><DocumentRemove /></el-icon>
-        <div class="pj-empty-text">暂无应用数据</div>
-      </div>
+    <!-- Pagination Section -->
+    <div class="pagination-container" v-if="appResult.data && appResult.data.length > 0">
+      <el-pagination
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="appResult.totalItems"
+        :page-size="appResult.pageSize"
+        :page-sizes="[10, 20, 50, 100]"
+        @current-change="onClickChangePage"
+        @size-change="handleSizeChange"
+        :hide-on-single-page="false"
+        background
+      />
+    </div>
+
+    <!-- Empty State -->
+    <div v-if="!loading && (!appResult.data || appResult.data.length === 0)" class="pagination-container" style="color: var(--pj-text-tertiary);">
+      暂无应用数据
     </div>
 
     <!-- 应用编辑对话框 -->
@@ -242,7 +253,7 @@
 import UserRole from "../common/UserRole.vue";
 import { ElMessage } from 'element-plus';
 import {
-  DocumentRemove
+  Search, Refresh, Plus, Edit, Right, Close, Check, Delete
 } from '@element-plus/icons-vue';
 import { useAppStore } from '@/stores';
 
@@ -250,7 +261,7 @@ export default {
   name: "AppManager",
   components: {
     UserRole,
-    DocumentRemove
+    Search, Refresh, Plus, Edit, Right, Close, Check, Delete
   },
   setup() {
     const appStore = useAppStore();
@@ -265,8 +276,8 @@ export default {
         appNameLike: undefined,
         tagLike: undefined,
         showMyRelated: true,
-        index:0,
-        pageSize:10
+        index: 0,
+        pageSize: 10
       },
 
       // 创建or修改表单
@@ -341,6 +352,13 @@ export default {
     onClickChangePage(index) {
       // 后端从0开始，前端从1开始
       this.queryAppRequest.index = index - 1;
+      this.listApps();
+    },
+
+    // 每页条数变更
+    handleSizeChange(newSize) {
+      this.queryAppRequest.pageSize = newSize;
+      this.queryAppRequest.index = 0;
       this.listApps();
     },
 
@@ -465,38 +483,36 @@ export default {
 <style scoped lang="scss">
 @import '../../styles/management-pages.scss';
 
-/* 组件特定样式 - 仅保留 management-pages.scss 未覆盖的 */
-.pj-management-page {
-    /* 表格容器样式 */
-    .pj-table-card {
-        :deep(.el-table) {
-            --el-table-border-color: var(--pj-border-color);
-            --el-table-text-color: var(--pj-text-primary);
-            --el-table-header-text-color: var(--pj-text-primary);
-            --el-table-header-bg-color: var(--pj-bg-secondary);
-        }
+/* App Manager 页面样式 - 与 JobManager 保持一致 */
+.app-manager {
+  padding: 0;
+  background: transparent;
+}
 
-        :deep(.el-table .cell) {
-            white-space: nowrap;
-        }
-    }
+/* 文本占位符 */
+.text-placeholder {
+  color: var(--pj-text-disabled);
+  font-style: italic;
+}
 
-    /* 操作按钮组 */
-    .pj-action-group {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        flex-wrap: nowrap;
+/* 图标间距 */
+.mr-1 {
+  margin-right: 4px;
+}
 
-        .el-button {
-            margin: 0;
-            padding: 4px 8px;
-        }
-    }
+/* 表格内标签样式 */
+:deep(.el-tag) {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  border-radius: 12px;
+  padding: 4px 12px;
+}
 
-    /* 标签样式 */
-    :deep(.el-tag) {
-        border-radius: var(--pj-border-radius-sm);
-    }
+/* 信息标签颜色 */
+:deep(.el-tag.el-tag--info.el-tag--light) {
+  background-color: #f0f5ff;
+  border-color: #adc6ff;
+  color: #2f54eb;
 }
 </style>
