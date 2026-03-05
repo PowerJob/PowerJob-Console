@@ -1,7 +1,8 @@
 # PowerJob Console 工程化优化设计
 
 > 创建日期: 2026-03-05
-> 状态: 待实施
+> 完成日期: 2026-03-06
+> 状态: ✅ 已完成
 
 ## 概述
 
@@ -43,6 +44,7 @@
 #### 1. Prettier 配置
 
 创建 `.prettierrc`:
+
 ```json
 {
   "semi": false,
@@ -57,6 +59,7 @@
 #### 2. ESLint 增强
 
 更新 `.eslintrc.cjs`:
+
 - 添加 `@typescript-eslint` 规则
 - 添加 Vue 3 推荐规则
 - 添加 import 排序规则 (`eslint-plugin-import`)
@@ -65,6 +68,7 @@
 #### 3. Commitlint 配置
 
 创建 `commitlint.config.cjs`:
+
 - 使用 conventional commits 规范
 - 类型: feat/fix/refactor/style/docs/test/chore
 - 支持中文提交信息
@@ -72,6 +76,7 @@
 #### 4. Husky Git Hooks
 
 配置 `.husky/`:
+
 - `pre-commit`: 运行 lint-staged (格式化 + lint 检查)
 - `commit-msg`: 运行 commitlint 校验
 
@@ -159,7 +164,7 @@ enum ErrorCode {
 // 错误码映射
 const ErrorMessages: Record<ErrorCode, string> = {
   [ErrorCode.UNAUTHORIZED]: '登录已过期，请重新登录',
-  [ErrorCode.FORBIDDEN]: '没有权限执行此操作',
+  [ErrorCode.FORBIDDEN]: '没有权限执行此操作'
   // ...
 }
 ```
@@ -175,14 +180,14 @@ const ErrorMessages: Record<ErrorCode, string> = {
 // 添加请求重试机制 (可选)
 
 request.interceptors.response.use(
-  (response) => {
+  response => {
     const { data } = response
     if (data.code === ErrorCode.UNAUTHORIZED) {
       // 统一处理登录过期
     }
     return data
   },
-  (error) => {
+  error => {
     // 统一错误提示
     const message = ErrorMessages[error.code] || error.message
     ElMessage.warning(message)
@@ -246,6 +251,7 @@ src/components/base/
 ```
 
 **BasePagination.vue**:
+
 ```vue
 <template>
   <div class="pagination-container">
@@ -261,42 +267,39 @@ src/components/base/
 </template>
 
 <script setup lang="ts">
-interface Props {
-  total: number
-  page?: number
-  size?: number
-}
+  interface Props {
+    total: number
+    page?: number
+    size?: number
+  }
 
-const props = withDefaults(defineProps<Props>(), {
-  page: 1,
-  size: 10
-})
+  const props = withDefaults(defineProps<Props>(), {
+    page: 1,
+    size: 10
+  })
 
-const emit = defineEmits<{
-  'update:page': [value: number]
-  'update:size': [value: number]
-  change: [page: number, size: number]
-}>()
+  const emit = defineEmits<{
+    'update:page': [value: number]
+    'update:size': [value: number]
+    change: [page: number, size: number]
+  }>()
 
-// 转换: 前端页码从1开始，后端从0开始
-const currentPage = computed({
-  get: () => props.page + 1,
-  set: (val) => emit('update:page', val - 1)
-})
+  // 转换: 前端页码从1开始，后端从0开始
+  const currentPage = computed({
+    get: () => props.page + 1,
+    set: val => emit('update:page', val - 1)
+  })
 </script>
 ```
 
 **SearchSection.vue**:
+
 ```vue
 <template>
   <div class="pj-form-section">
     <div class="search-container">
       <el-form :inline="true" :model="modelValue">
-        <el-form-item
-          v-for="field in fields"
-          :key="field.prop"
-          :label="field.label"
-        >
+        <el-form-item v-for="field in fields" :key="field.prop" :label="field.label">
           <component
             :is="field.component || 'el-input'"
             v-model="modelValue[field.prop]"
@@ -327,23 +330,23 @@ const currentPage = computed({
 </template>
 
 <script setup lang="ts">
-interface SearchField {
-  prop: string
-  label: string
-  placeholder?: string
-  component?: string
-  options?: { label: string; value: any }[]
-  style?: string
-  props?: Record<string, any>
-}
+  interface SearchField {
+    prop: string
+    label: string
+    placeholder?: string
+    component?: string
+    options?: { label: string; value: any }[]
+    style?: string
+    props?: Record<string, any>
+  }
 
-interface Props {
-  fields: SearchField[]
-}
+  interface Props {
+    fields: SearchField[]
+  }
 
-defineProps<Props>()
-const modelValue = defineModel<Record<string, any>>({ required: true })
-const emit = defineEmits<{ search: []; reset: [] }>()
+  defineProps<Props>()
+  const modelValue = defineModel<Record<string, any>>({ required: true })
+  const emit = defineEmits<{ search: []; reset: [] }>()
 </script>
 ```
 
@@ -352,6 +355,7 @@ const emit = defineEmits<{ search: []; reset: [] }>()
 完善 `src/composables/` 目录:
 
 **useTable.ts** - 增强版:
+
 ```typescript
 export interface UseTableOptions<T, Q = Record<string, any>> {
   /** 数据获取函数 */
@@ -367,12 +371,7 @@ export interface UseTableOptions<T, Q = Record<string, any>> {
 }
 
 export function useTable<T, Q = Record<string, any>>(options: UseTableOptions<T, Q>) {
-  const {
-    fetchFn,
-    defaultPageSize = 10,
-    autoLoad = true,
-    defaultQuery = {}
-  } = options
+  const { fetchFn, defaultPageSize = 10, autoLoad = true, defaultQuery = {} } = options
 
   // 状态
   const loading = ref(false)
@@ -460,6 +459,7 @@ export function useTable<T, Q = Record<string, any>>(options: UseTableOptions<T,
 ```
 
 **useSearch.ts** - 新增:
+
 ```typescript
 export interface UseSearchOptions<T> {
   /** 默认值 */
@@ -554,32 +554,32 @@ export function useSearch<T extends Record<string, any>>(options: UseSearchOptio
 </template>
 
 <script setup lang="ts" generic="T extends Record<string, any>, Q extends Record<string, any>">
-import type { SearchField } from '@/components/base/SearchSection.vue'
-import type { TableColumn } from '@/components/base/BaseTable.vue'
+  import type { SearchField } from '@/components/base/SearchSection.vue'
+  import type { TableColumn } from '@/components/base/BaseTable.vue'
 
-interface Props {
-  searchFields?: SearchField[]
-  columns: TableColumn[]
-  fetchFn: (params: Q) => Promise<PageResult<T>>
-  rowClassName?: (data: { row: T }) => string
-}
+  interface Props {
+    searchFields?: SearchField[]
+    columns: TableColumn[]
+    fetchFn: (params: Q) => Promise<PageResult<T>>
+    rowClassName?: (data: { row: T }) => string
+  }
 
-const props = defineProps<Props>()
+  const props = defineProps<Props>()
 
-const {
-  loading,
-  data: tableData,
-  total,
-  index,
-  pageSize,
-  queryParams,
-  onPageChange,
-  onSizeChange,
-  reset,
-  refresh
-} = useTable<T, Q>({
-  fetchFn: props.fetchFn
-})
+  const {
+    loading,
+    data: tableData,
+    total,
+    index,
+    pageSize,
+    queryParams,
+    onPageChange,
+    onSizeChange,
+    reset,
+    refresh
+  } = useTable<T, Q>({
+    fetchFn: props.fetchFn
+  })
 </script>
 ```
 
@@ -589,18 +589,9 @@ const {
 
 ```vue
 <template>
-  <ManagementTemplate
-    :search-fields="searchFields"
-    :columns="columns"
-    :fetch-fn="appApi.list"
-  >
+  <ManagementTemplate :search-fields="searchFields" :columns="columns" :fetch-fn="appApi.list">
     <template #actions="{ row }">
-      <OperationButtons
-        :row="row"
-        :actions="rowActions"
-        @edit="openEdit"
-        @delete="handleDelete"
-      />
+      <OperationButtons :row="row" :actions="rowActions" @edit="openEdit" @delete="handleDelete" />
     </template>
 
     <template #dialog>
@@ -615,60 +606,58 @@ const {
 </template>
 
 <script setup lang="ts">
-import { useTable } from '@/composables/useTable'
-import { useFormDialog } from '@/composables/useFormDialog'
-import { appApi } from '@/api/app'
+  import { useTable } from '@/composables/useTable'
+  import { useFormDialog } from '@/composables/useFormDialog'
+  import { appApi } from '@/api/app'
 
-// 表格配置
-const columns = [
-  { prop: 'appName', label: '应用名称' },
-  { prop: 'title', label: '应用描述' },
-  { prop: 'tags', label: '标签' }
-]
+  // 表格配置
+  const columns = [
+    { prop: 'appName', label: '应用名称' },
+    { prop: 'title', label: '应用描述' },
+    { prop: 'tags', label: '标签' }
+  ]
 
-// 搜索配置
-const searchFields = [
-  { prop: 'appName', label: '应用名称', placeholder: '请输入应用名称' }
-]
+  // 搜索配置
+  const searchFields = [{ prop: 'appName', label: '应用名称', placeholder: '请输入应用名称' }]
 
-// 使用组合式函数
-const { data: tableData, loading, refresh } = useTable({ fetchFn: appApi.list })
-const { visible: dialogVisible, open: openDialog, close } = useFormDialog()
+  // 使用组合式函数
+  const { data: tableData, loading, refresh } = useTable({ fetchFn: appApi.list })
+  const { visible: dialogVisible, open: openDialog, close } = useFormDialog()
 
-// 当前编辑的应用
-const currentApp = ref<App | null>(null)
-const saving = ref(false)
+  // 当前编辑的应用
+  const currentApp = ref<App | null>(null)
+  const saving = ref(false)
 
-// 操作按钮配置
-const rowActions = [
-  { label: '编辑', event: 'edit', type: 'primary' },
-  { label: '删除', event: 'delete', type: 'danger' }
-]
+  // 操作按钮配置
+  const rowActions = [
+    { label: '编辑', event: 'edit', type: 'primary' },
+    { label: '删除', event: 'delete', type: 'danger' }
+  ]
 
-// 打开编辑弹窗
-const openEdit = (row: App) => {
-  currentApp.value = { ...row }
-  openDialog()
-}
-
-// 保存
-const handleSave = async (data: App) => {
-  saving.value = true
-  try {
-    await appApi.save(data)
-    close()
-    refresh()
-  } finally {
-    saving.value = false
+  // 打开编辑弹窗
+  const openEdit = (row: App) => {
+    currentApp.value = { ...row }
+    openDialog()
   }
-}
 
-// 删除
-const handleDelete = async (row: App) => {
-  await ElMessageBox.confirm('确定删除该应用?')
-  await appApi.delete(row.id)
-  refresh()
-}
+  // 保存
+  const handleSave = async (data: App) => {
+    saving.value = true
+    try {
+      await appApi.save(data)
+      close()
+      refresh()
+    } finally {
+      saving.value = false
+    }
+  }
+
+  // 删除
+  const handleDelete = async (row: App) => {
+    await ElMessageBox.confirm('确定删除该应用?')
+    await appApi.delete(row.id)
+    refresh()
+  }
 </script>
 ```
 
@@ -710,12 +699,15 @@ const handleDelete = async (row: App) => {
 }
 
 // 状态行样式
-@each $status, $color in (
-  'waiting-dispatch': var(--pj-status-waiting),
-  'running': var(--pj-status-running),
-  'success': var(--pj-status-success),
-  'failed': var(--pj-status-failed)
-) {
+@each $status,
+  $color
+    in (
+      'waiting-dispatch': var(--pj-status-waiting),
+      'running': var(--pj-status-running),
+      'success': var(--pj-status-success),
+      'failed': var(--pj-status-failed)
+    )
+{
   :deep(.el-table .#{$status}-row) {
     color: $color !important;
     font-weight: 500;
@@ -728,8 +720,13 @@ const handleDelete = async (row: App) => {
 }
 
 @keyframes pulse-text {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 ```
 
@@ -771,6 +768,7 @@ src/types/
 ```
 
 **工具类型** (`src/types/utils.ts`):
+
 ```typescript
 // 深度只读
 export type DeepReadonly<T> = {
@@ -792,11 +790,11 @@ export type ApiParams<T> = {
 export type ExtractParams<T> = T extends (...args: infer P) => any ? P : never
 
 // 提取 Promise 返回类型
-export type AsyncReturnType<T extends (...args: any) => Promise<any>> =
-  Awaited<ReturnType<T>>
+export type AsyncReturnType<T extends (...args: any) => Promise<any>> = Awaited<ReturnType<T>>
 ```
 
 **业务模型** (`src/types/models/job.ts`):
+
 ```typescript
 export interface Job {
   id: number
@@ -858,6 +856,7 @@ src/__tests__/
 ```
 
 **测试示例** (`src/__tests__/composables/useTable.test.ts`):
+
 ```typescript
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useTable } from '@/composables/useTable'
@@ -919,6 +918,7 @@ describe('useTable', () => {
 #### 3. 性能优化
 
 **组件懒加载** (`src/router.js`):
+
 ```javascript
 const routes = [
   {
@@ -934,29 +934,22 @@ const routes = [
 ```
 
 **表格虚拟滚动** (大数据量场景):
+
 ```vue
-<el-table
-  :data="tableData"
-  :row-key="rowKey"
-  :height="500"
-  :row-height="50"
-  use-virtual
->
+<el-table :data="tableData" :row-key="rowKey" :height="500" :row-height="50" use-virtual>
   <!-- columns -->
 </el-table>
 ```
 
 **请求缓存** (`src/utils/cache.ts`):
+
 ```typescript
 interface CacheOptions {
   key: string
   ttl?: number // 缓存时间 (ms)
 }
 
-export function withCache<T>(
-  fetchFn: () => Promise<T>,
-  options: CacheOptions
-): Promise<T> {
+export function withCache<T>(fetchFn: () => Promise<T>, options: CacheOptions): Promise<T> {
   const cache = sessionStorage.getItem(options.key)
 
   if (cache) {
@@ -968,11 +961,14 @@ export function withCache<T>(
     }
   }
 
-  return fetchFn().then((data) => {
-    sessionStorage.setItem(options.key, JSON.stringify({
-      data,
-      timestamp: Date.now()
-    }))
+  return fetchFn().then(data => {
+    sessionStorage.setItem(
+      options.key,
+      JSON.stringify({
+        data,
+        timestamp: Date.now()
+      })
+    )
     return data
   })
 }
@@ -981,6 +977,7 @@ export function withCache<T>(
 #### 4. 开发体验提升
 
 **VS Code 配置** (`.vscode/extensions.json`):
+
 ```json
 {
   "recommendations": [
@@ -994,6 +991,7 @@ export function withCache<T>(
 ```
 
 **代码片段** (`.vscode/vue.code-snippets`):
+
 ```json
 {
   "Vue 3 Composition API Component": {
@@ -1030,12 +1028,12 @@ export function withCache<T>(
 
 ## 总体时间规划
 
-| 阶段 | 内容 | 预计工期 | 累计 |
-|------|------|----------|------|
-| 第一阶段 | 规范化建设 | 1-2 天 | 1-2 天 |
-| 第二阶段 | API 层统一 | 2-3 天 | 3-5 天 |
-| 第三阶段 | 组件化重构 | 3-5 天 | 6-10 天 |
-| 第四阶段 | 深度优化 | 2-3 天 | 8-13 天 |
+| 阶段     | 内容       | 预计工期 | 累计    |
+| -------- | ---------- | -------- | ------- |
+| 第一阶段 | 规范化建设 | 1-2 天   | 1-2 天  |
+| 第二阶段 | API 层统一 | 2-3 天   | 3-5 天  |
+| 第三阶段 | 组件化重构 | 3-5 天   | 6-10 天 |
+| 第四阶段 | 深度优化   | 2-3 天   | 8-13 天 |
 
 ## 预期效果
 
@@ -1048,11 +1046,11 @@ export function withCache<T>(
 
 ## 风险与对策
 
-| 风险 | 对策 |
-|------|------|
-| 重构引入 bug | 每阶段完成后进行回归测试 |
-| 时间超出预期 | 可随时暂停，各阶段相对独立 |
-| 团队不熟悉新组件 | 编写详细文档和示例 |
+| 风险             | 对策                       |
+| ---------------- | -------------------------- |
+| 重构引入 bug     | 每阶段完成后进行回归测试   |
+| 时间超出预期     | 可随时暂停，各阶段相对独立 |
+| 团队不熟悉新组件 | 编写详细文档和示例         |
 
 ---
 
