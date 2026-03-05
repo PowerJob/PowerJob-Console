@@ -82,19 +82,18 @@
         stripe
         table-layout="auto">
         <el-table-column prop="id" label="ID" width="80" align="center" />
-        <el-table-column prop="appName" label="应用代码" min-width="180" show-overflow-tooltip>
+        <el-table-column prop="appName" label="应用代码" min-width="90" show-overflow-tooltip>
           <template #default="scope">
             <el-tag size="small" type="info">{{ scope.row.appName }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="title" :label="$t('message.name')" min-width="150" show-overflow-tooltip />
         <el-table-column prop="namespaceName" label="命名空间" min-width="140" show-overflow-tooltip>
           <template #default="scope">
             <el-tag size="small" v-if="scope.row.namespaceName">{{ scope.row.namespaceName }}</el-tag>
             <span v-else class="text-placeholder">未分配</span>
           </template>
         </el-table-column>
-        <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" width="170" />
+        <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" width="255" />
         <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" width="170" />
         <el-table-column prop="creatorShowName" :label="$t('message.creator')" min-width="120" show-overflow-tooltip />
         <el-table-column prop="modifierShowName" :label="$t('message.modifier')" min-width="120" show-overflow-tooltip />
