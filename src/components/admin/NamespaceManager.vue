@@ -1,5 +1,5 @@
 <template>
-  <div class="pj-admin-container">
+  <div class="pj-management-page">
 
     <!-- 搜索条件卡片 -->
     <div class="pj-search-card">
@@ -390,36 +390,36 @@ export default {
 </script>
 
 
-<style scoped>
-@import '../../styles/admin-theme.scss';
+<style scoped lang="scss">
+@import '../../styles/management-pages.scss';
 
 /* 组件特定样式 */
-.el-tag {
-  border-radius: var(--pj-border-radius-sm);
-}
+.pj-management-page {
+    :deep(.el-tag) {
+        border-radius: var(--pj-border-radius-sm);
+    }
 
-/* 表格优化 */
-.el-table {
-  --el-table-border-color: var(--pj-border-color);
-  --el-table-text-color: var(--pj-text-primary);
-  --el-table-header-text-color: var(--pj-text-primary);
-  --el-table-header-bg-color: var(--pj-bg-secondary);
-}
+    :deep(.el-table) {
+        --el-table-border-color: var(--pj-border-color);
+        --el-table-text-color: var(--pj-text-primary);
+        --el-table-header-text-color: var(--pj-text-primary);
+        --el-table-header-bg-color: var(--pj-bg-secondary);
+    }
 
-.el-table .cell {
-  white-space: nowrap;
-}
+    :deep(.el-table .cell) {
+        white-space: nowrap;
+    }
 
-/* 确保按钮组紧凑显示 */
-.pj-action-group {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: nowrap;
-}
+    .pj-action-group {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: nowrap;
 
-.pj-action-group .el-button {
-  margin: 0;
-  padding: 4px 8px;
+        .el-button {
+            margin: 0;
+            padding: 4px 8px;
+        }
+    }
 }
 </style>
