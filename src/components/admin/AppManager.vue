@@ -98,7 +98,7 @@
           <el-input v-model="modifiedAppForm.title"/>
         </el-form-item>
         <el-form-item :label="$t('message.password')">
-          <el-input v-model="modifiedAppForm.password"/>
+          <el-input v-model="modifiedAppForm.password" type="password" show-password/>
         </el-form-item>
         <el-form-item :label="$t('message.tag')">
           <el-input v-model="modifiedAppForm.tags"/>
@@ -221,7 +221,6 @@ export default {
       let that = this;
       this.modifiedAppForm['componentUserRoleInfo'] = this.user_rule_form;
 
-      console.log("modifiedAppForm: " + JSON.stringify(this.modifiedAppForm))
       this.axios.post("/appInfo/save", this.modifiedAppForm, {
         'headers': {
           'Content-Type': 'application/json',
@@ -235,17 +234,18 @@ export default {
     },
 
     onClickDeleteApp() {
-      let that = this;
-      this.axios.post('/appInfo/delete?appId=' + that.modifiedAppForm.id, {}, {
-        'headers': {
-          'Content-Type': 'application/json',
-          'AppId': that.modifiedAppForm.id
-        }
-      }).then(() => {
-        that.$message.success(that.$t('message.success'));
+      const appId = this.modifiedAppForm.id;
+      this.$confirm(this.$t('message.deleteConfirmation', {name: this.modifiedAppForm.appName}), this.$t('message.delete'), {
+        confirmButtonText: this.$t('message.confirm'),
+        cancelButtonText: this.$t('message.cancel'),
+        type: 'warning'
+      }).then(() => this.axios.post('/appInfo/delete?appId=' + appId, {}, {
+        headers: {'Content-Type': 'application/json', 'AppId': appId}
+      })).then(() => {
+        this.$message.success(this.$t('message.success'));
         this.listApps();
         this.modifiedAppFormVisible = false;
-      })
+      }).catch(() => {});
     },
 
     // 点击 编辑按钮

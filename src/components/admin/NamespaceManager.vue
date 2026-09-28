@@ -184,7 +184,6 @@ export default {
       let that = this;
       this.modifiedNamespaceForm['componentUserRoleInfo'] = this.user_rule_form;
 
-      console.log("modifiedNamespaceForm: " + JSON.stringify(this.modifiedNamespaceForm))
       this.axios.post("/namespace/save", this.modifiedNamespaceForm, {
         'headers': {
           'Content-Type': 'application/json',
@@ -207,16 +206,18 @@ export default {
     // 点击 删除命名空间
     onClickDeleteNamespace(data) {
       const url = '/namespace/delete?id=' + data.id
-      console.log('delete url:' + url)
-      this.axios.delete(url, {
+      this.$confirm(this.$t('message.deleteConfirmation', {name: data.name}), this.$t('message.delete'), {
+        confirmButtonText: this.$t('message.confirm'),
+        cancelButtonText: this.$t('message.cancel'),
+        type: 'warning'
+      }).then(() => this.axios.delete(url, {
         'headers': {
           'Content-Type': 'application/json',
           'NamespaceId': data.id
         }
-      }).then(ret => {
-        console.log('delete ret: ' + ret)
+      })).then(() => {
         this.listNamespaces();
-      })
+      }).catch(() => {})
     }
   },
   mounted() {
