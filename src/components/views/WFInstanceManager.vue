@@ -146,7 +146,7 @@ export default {
     onClickShowDetail(data) {
       this.$router.push({
         name: 'WorkflowInstanceDetail',
-        params: {
+        query: {
           wfInstanceId: data.wfInstanceId
         }
       })
@@ -163,7 +163,7 @@ export default {
       this.axios.get(url).then(() => {
         that.$message.success(this.$t('message.success'));
         // 重新加载列表
-        that.listInstanceInfos();
+        that.listWfInstances();
       });
     },
     // 换页

@@ -1,6 +1,8 @@
 import zhLocale from 'element-ui/lib/locale/lang/zh-CN'
 const cn = {
     message: {
+        'missingWfInstanceId': '缺少工作流实例 ID，已返回实例列表。',
+        'deleteConfirmation': '确定删除“{name}”？',
 
         // common
         'save': '保存',

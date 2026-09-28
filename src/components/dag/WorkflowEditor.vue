@@ -550,7 +550,11 @@ export default {
           appId: this.workflowInfo.appId,
         },
       });
-      this.workflowInfo = { ...this.workflowInfo, ...res };
+      this.workflowInfo = {
+        ...this.workflowInfo,
+        ...res,
+        lifeCycle: res.lifeCycle ? [res.lifeCycle.start, res.lifeCycle.end] : null,
+      };
       if (res.peworkflowDAG) {
         this.taskList = res.peworkflowDAG.nodes;
         this.peworkflowDAG = res.peworkflowDAG;
@@ -584,20 +588,19 @@ export default {
         }),
       };
       const { lifeCycle } = this.workflowInfo;
-      if (lifeCycle && Array.isArray(lifeCycle)) {
-        const start = lifeCycle[0];
-        const end = lifeCycle[1];
-        this.workflowInfo.lifeCycle = {
-          start,
-          end,
-        };
-      }
       const res = await this.axios.post("/workflow/save", {
         ...this.workflowInfo,
+        lifeCycle: lifeCycle ? { start: lifeCycle[0], end: lifeCycle[1] } : null,
         dag: dagInfo,
       });
       this.$message.success(this.$t("message.success"));
-      if (!this.workflowInfo.id) this.workflowInfo.id = res;
+      if (!this.workflowInfo.id) {
+        this.workflowInfo.id = res;
+        this.$router.replace({
+          name: "workflowEditor",
+          query: { ...this.$route.query, workflowId: res },
+        });
+      }
     },
     /** 导入任务节点数据 */
     async importTask(taskList) {
@@ -745,17 +748,17 @@ export default {
     let that = this;
     that.axios.get("/user/list").then((res) => (that.userList = res));
 
-    // 读取传递数据，如果是修改，需要先将数据绘制上去
-    let modify = this.$route.params.modify;
-    if (modify) {
-      this.workflowInfo = this.$route.params.workflowInfo;
-      if (this.workflowInfo.lifeCycle) {
-        const { start, end } = this.workflowInfo.lifeCycle;
-        this.workflowInfo.lifeCycle = [start, end]
-      } else {
-        this.workflowInfo.lifeCycle = null;
+    // Persist the ID in the URL so a reload can restore the complete workflow from the API.
+    const legacyInfo = this.$route.params.workflowInfo;
+    const workflowId = this.$route.query.workflowId || this.$route.params.workflowId || (legacyInfo && legacyInfo.id);
+    if (workflowId) {
+      this.workflowInfo.id = workflowId;
+      if (!this.$route.query.workflowId) {
+        this.$router.replace({
+          name: "workflowEditor",
+          query: { ...this.$route.query, workflowId },
+        });
       }
-      this.workflowInfo.appId = window.localStorage.getItem("Power_appId");
       this.getWorkflowInfo(true);
     }
   },

@@ -5,7 +5,7 @@
         <el-button type="primary" @click="fetchInstanceDetail">{{
           $t("message.refresh")
         }}</el-button>
-        <el-button @click="handleToDetail">{{
+        <el-button v-if="nodeDetail && nodeDetail.nodeType === 3 && nodeDetail.instanceId" @click="handleToDetail">{{
           $t("message.detail")
         }}</el-button>
       </div>
@@ -319,13 +319,14 @@ export default {
     },
     /** 查看详情 */
     handleToDetail() {
+      if (!this.nodeDetail || this.nodeDetail.nodeType !== 3 || !this.nodeDetail.instanceId) return;
       this.$router.push({
         path: '/oms/wfinstance',
       })
       setTimeout(() => {
         this.$router.push({
           name: 'WorkflowInstanceDetail',
-          params: {
+          query: {
             wfInstanceId: this.nodeDetail.instanceId
           }
         })

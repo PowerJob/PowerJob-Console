@@ -146,21 +146,21 @@
             },
             // 开关工作流
             switchWorkflow(data) {
-                let that = this;
+                const previousEnable = !data.enable;
                 let path = data.enable ? "enable" : "disable";
                 let url = "/workflow/" + path + "?appId=" + window.localStorage.getItem("Power_appId") + "&workflowId=" + data.id;
-                this.axios.get(url, res => {
-                    console.log(res);
-                    that.listWorkflow();
+                this.axios.get(url).then(() => {
+                    this.listWorkflow();
+                }, () => {
+                    data.enable = previousEnable;
                 });
             },
             // 编辑工作流
             onClickModifyWorkflow(data) {
                 this.$router.push({
                     name: 'workflowEditor',
-                    params: {
-                        modify: true,
-                        workflowInfo: data
+                    query: {
+                        workflowId: data.id
                     }
                 })
             },
@@ -219,12 +219,8 @@
                 this.axios.post(`/workflow/copy?workflowId=${data.id}&appId=${this.workflowQueryContent.appId}`).then(res => {
                     this.$router.push({
                         name: 'workflowEditor',
-                        params: {
-                            modify: true,
-                            workflowInfo: {
-                                ...data,
-                                id: res
-                            }
+                        query: {
+                            workflowId: res
                         }
                     });
                     this.copyLoading = false;

@@ -169,17 +169,30 @@
                 nodeDetail: null
             }
         },
+        computed: {
+            wfInstanceId() {
+                return this.$route.query.wfInstanceId || this.$route.params.wfInstanceId;
+            }
+        },
         methods: {
             /** 获取数据 */
             async fetchWfInstanceInfo() {
+                if (!this.wfInstanceId) {
+                    this.$message.warning(this.$t('message.missingWfInstanceId'));
+                    this.$router.replace('/oms/wfinstance');
+                    return;
+                }
                 // 从 router 获取 wfInstanceId
                 this.peworkflowDAG = {
                     nodes: [],
                     edges: []
                 }
-                const wfInstanceId = this.$route.params.wfInstanceId;
-                let url = "/wfInstance/info?appId=" + window.localStorage.getItem("Power_appId") + "&wfInstanceId=" + wfInstanceId;
-                let res = await this.axios.get(url)
+                this.selectNode = null;
+                this.currentInstanceId = undefined;
+                this.nodeDetail = null;
+                let res = await this.axios.get('/wfInstance/info', {
+                    params: { appId: window.localStorage.getItem("Power_appId"), wfInstanceId: this.wfInstanceId }
+                });
                 this.wfInstanceDetail = res;
                 this.peworkflowDAG = res.peworkflowDAG;
                 // this.initDag()
@@ -192,7 +205,7 @@
                 
                 const data = {
                     appId: window.localStorage.getItem("Power_appId"),
-                    wfInstanceId: this.$route.params.wfInstanceId,
+                    wfInstanceId: this.wfInstanceId,
                     nodeId: this.selectNode.get('model').id
                 };
 
@@ -208,7 +221,7 @@
             async restart() {
                 const data = {
                     appId: window.localStorage.getItem("Power_appId"),
-                    wfInstanceId: this.$route.params.wfInstanceId,
+                    wfInstanceId: this.wfInstanceId,
                 };
                 await this.axios.get('/wfInstance/retry', {
                     params: data
@@ -219,7 +232,7 @@
             // 点击停止实例
             async stop() {
               let that = this;
-              let url = "/wfInstance/stop?wfInstanceId=" + this.$route.params.wfInstanceId +
+              let url = "/wfInstance/stop?wfInstanceId=" + this.wfInstanceId +
                   "&appId=" + window.localStorage.getItem("Power_appId");
               await this.axios.get(url).then(() => {
                 that.$message.success(this.$t('message.success'));
@@ -284,8 +297,18 @@
             }
         },
         mounted() {
-            console.log("Welcome to WorkflowInstanceDetail!");
+            if (this.wfInstanceId && !this.$route.query.wfInstanceId) {
+                this.$router.replace({
+                    name: 'WorkflowInstanceDetail',
+                    query: { ...this.$route.query, wfInstanceId: this.wfInstanceId }
+                });
+            }
             this.fetchWfInstanceInfo();
+        },
+        watch: {
+            wfInstanceId() {
+                this.fetchWfInstanceInfo();
+            }
         }
     }
 </script>

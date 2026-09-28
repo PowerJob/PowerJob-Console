@@ -2,6 +2,8 @@ import enLocale from 'element-ui/lib/locale/lang/en'
 
 const en = {
     message: {
+        'missingWfInstanceId': 'Missing workflow instance ID. Returned to the instance list.',
+        'deleteConfirmation': 'Delete "{name}"?',
 
         'save': 'Save',
         'cancel': 'Cancel',
