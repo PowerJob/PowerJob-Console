@@ -304,13 +304,45 @@ export default {
       this.queryLog();
     },
     // 下载日志
-    onclickDownloadLog() {
-      let url =
-        "/instance/downloadLogUrl?instanceId=" +
-        this.logQueryContent.instanceId +
-        "&appId=" +
-        window.localStorage.getItem("Power_appId");
-      this.axios.get(url).then(res => window.open(res));
+    async onclickDownloadLog() {
+      const instanceId = this.logQueryContent.instanceId;
+      try {
+        const response = await this.axios.get("/instance/downloadLog4Console", {
+          params: { instanceId },
+          responseType: "blob",
+          timeout: 75000
+        });
+        const contentType = response.headers["content-type"] || response.data.type || "";
+        if (contentType.includes("json")) {
+          const error = JSON.parse(await response.data.text());
+          throw new Error(error.message || "Log download failed");
+        }
+        if (!contentType.includes("application/octet-stream")) {
+          throw new Error("Unexpected log download response");
+        }
+        const url = window.URL.createObjectURL(response.data);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "powerjob-instance-" + instanceId + ".log";
+        document.body.appendChild(link);
+        try {
+          link.click();
+        } finally {
+          link.remove();
+          window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+        }
+      } catch (error) {
+        let message = error.message || "Log download failed";
+        if (error.response && error.response.data instanceof window.Blob) {
+          try {
+            const detail = JSON.parse(await error.response.data.text());
+            message = detail.message || detail.error || message;
+          } catch (ignored) {
+            // Preserve the HTTP/network error when the body is not JSON.
+          }
+        }
+        this.$message.error(message);
+      }
     },
     // 获取状态
     fetchStatus(s) {

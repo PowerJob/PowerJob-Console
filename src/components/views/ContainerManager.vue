@@ -131,8 +131,7 @@
                    data.sourceInfo = this.sourceInfo;
                    data.sourceType = 'FatJar'
                }
-               this.axios.post("container/save",data).then(res=>{
-                 console.log('container save result:' + JSON.stringify(res))
+               this.axios.post("container/save",data).then(()=>{
 
                  Message.success("SUCCESS");
                  // 恢复默认表单
@@ -151,8 +150,7 @@
             },
             deleteItem(item,index){
                 let appId = window.localStorage.getItem("Power_appId");
-                this.axios.get("/container/delete?containerId="+ item.id+'&appId='+appId).then(res => {
-                    console.log(res);
+                this.axios.get("/container/delete?containerId="+ item.id+'&appId='+appId).then(() => {
                     this.containerList.splice(index,1);
                     this.$message.info(this.$t('message.success'));
                 });
@@ -178,7 +176,7 @@
                     this.arrangeTitle = this.$t('message.deploy');
                     this.arrangeVisible = true;
                         console.log("Connection open ...");
-                        ws.send("Hello WebSockets!");
+                        ws.send(JSON.stringify({jwtToken: window.localStorage.getItem("PowerJwt")}));
                     };
 
                 ws.onmessage = (evt)=> {
@@ -191,7 +189,10 @@
             },
             // 关闭部署页面时 关闭ws避免dialog内的信息有上台机器信息
             closeArrange(){
-                ws.close();
+                if (ws) {
+                    ws.close();
+                    ws = null;
+                }
                 this.logs = [];
             },
             closeEdit(){
@@ -226,7 +227,6 @@
           listContainers() {
             let appId = window.localStorage.getItem("Power_appId");
             this.axios.get("/container/list?appId=" + appId).then(res => {
-              console.log(res);
               if(res.data.success){
                 this.containerList = res.data.data;
               }

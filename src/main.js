@@ -54,6 +54,11 @@ axios.interceptors.request.use((request) => {
 // 请求返回拦截，封装公共处理逻辑
 axios.interceptors.response.use((response) => {
 
+  // Binary callers inspect the response headers and any JSON error themselves.
+  if (response.config.responseType === 'blob') {
+    return response;
+  }
+
   // -100 为未登录约定状态码，前端全局拦截跳转登录页面
   if (response.data.code === '-100') {
     Message.warning("USER_NEED_LOGIN")
@@ -74,6 +79,9 @@ axios.interceptors.response.use((response) => {
   Message.warning("ERROR：" + response.data.message);
   return Promise.reject(response.data.msg);
 }, (error) => {
+  if (error.config && error.config.responseType === 'blob') {
+    return Promise.reject(error);
+  }
   Message.error(error.toString());
   return Promise.reject(error);
 });

@@ -79,9 +79,7 @@ export default {
       for (var pair of urlSearchParams.entries()) {
         callbackLoginUrl = callbackLoginUrl + '&' + pair[0] + '=' + pair[1];
       }
-      console.log('final url:' + callbackLoginUrl)
       this.axios.get(callbackLoginUrl).then(ret => {
-        console.log('login success, user: ' + ret)
 
         const jwtToken = ret.jwtToken
         window.localStorage.setItem('PowerJwt', jwtToken);
