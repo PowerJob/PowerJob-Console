@@ -119,4 +119,5 @@ async function run() {
   editor.definition.watch.code.call(editor.instance, ''); assert.strictEqual(value, '');
   console.log('PASS: instance route/race, filter/page/race, cancel state, DAILY parse/save, editor props, copied lifecycle boundaries, decision/job/nested icon guards');
 }
-run().catch(error => { console.error(error); process.exitCode = 1; });
+run().then(() => require('./job-save-lifecycle-regressions'))
+  .catch(error => { console.error(error); process.exitCode = 1; });
