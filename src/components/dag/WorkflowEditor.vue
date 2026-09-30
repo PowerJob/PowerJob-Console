@@ -299,9 +299,10 @@ import WorkflowManager from "../views/WorkflowManager";
 
 function nodeInfoChange(icon, index) {
   return function (value) {
-    if (!this.selectNode) return;
+    if (!this.selectNode || Number(this.nodeInfo.type) === 2) return;
     const group = this.selectNode.getContainer();
     const current = group.getChildByIndex(index);
+    if (!current) return;
     if (value) {
       current.attr({ img: icon });
     } else {

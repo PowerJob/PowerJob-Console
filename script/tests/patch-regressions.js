@@ -9,7 +9,7 @@ function component(file, props = {}) {
   const source = fs.readFileSync(path.join(sourceRoot, 'src/components', file), 'utf8');
   let script = source.match(/<script>([\s\S]*?)<\/script>/)[1];
   const context = { window: { localStorage: { getItem: () => '1' } }, console,
-    result: undefined };
+    result: undefined, require: file => file };
   script = script.replace(/import\s+(\w+)\s+from[^;]+;/g, (_, name) => {
     context[name] = {}; return '';
   }).replace('export default', 'result =');
@@ -63,6 +63,38 @@ async function run() {
     assert.strictEqual(instance.runParameter, null); assert.strictEqual(instance.temporaryRowData, null);
   }
 
+  const copied = component('views/JobManager.vue');
+  const copyCalls = deferredRequests(copied.instance);
+  for (const [lifeCycle, expected] of [[undefined, null], [null, null], [{ start: null, end: null }, null], [{ start: 1700000000000, end: null }, null], [{ start: 1700000000000, end: 1700003600000 }, [1700000000000, 1700003600000]]]) {
+    copied.instance.onClickCopyJob({ id: 173 });
+    const response = { id: 238, jobName: 'copied job', lifeCycle, alarmConfig: { alertThreshold: 2 } };
+    copyCalls[copyCalls.length - 1].resolve(response); await Promise.resolve();
+    assert.strictEqual(JSON.stringify(copied.instance.modifiedJobForm.lifeCycle), JSON.stringify(expected));
+    assert.strictEqual(copied.instance.modifiedJobForm.id, 238);
+    assert.strictEqual(copied.instance.modifiedJobForm.alarmConfig.alertThreshold, 2);
+    assert.strictEqual(copied.instance.modifiedJobFormVisible, true);
+  }
+
+  const workflowEditor = component('dag/WorkflowEditor.vue');
+  for (const type of [2, '2']) {
+    workflowEditor.instance.nodeInfo.type = type;
+    workflowEditor.instance.selectNode = { getContainer() { throw new Error('decision nodes have no enable/skip icon shapes'); } };
+    workflowEditor.definition.watch['nodeInfo.enable'].handler.call(workflowEditor.instance, undefined);
+    workflowEditor.definition.watch['nodeInfo.skipWhenFailed'].handler.call(workflowEditor.instance, undefined);
+  }
+  for (const type of [1, 3]) {
+    const attrs = [];
+    workflowEditor.instance.nodeInfo.type = type;
+    workflowEditor.instance.selectNode = { getContainer: () => ({ getChildByIndex: index => ({ attr: value => attrs.push({ index, value }) }) }) };
+    workflowEditor.definition.watch['nodeInfo.enable'].handler.call(workflowEditor.instance, true);
+    workflowEditor.definition.watch['nodeInfo.skipWhenFailed'].handler.call(workflowEditor.instance, false);
+    assert.strictEqual(attrs.length, 2);
+    assert.strictEqual(attrs[0].index, 3); assert.ok(attrs[0].value.img.endsWith('start.svg'));
+    assert.strictEqual(attrs[1].index, 4); assert.strictEqual(attrs[1].value.img, '');
+  }
+  workflowEditor.instance.selectNode = { getContainer: () => ({ getChildByIndex: () => undefined }) };
+  workflowEditor.definition.watch['nodeInfo.enable'].handler.call(workflowEditor.instance, true);
+
   const daily = component('common/DailyTimeIntervalForm.vue');
   for (const input of [undefined, null, '', '0 0 8 * * ?']) {
     daily.instance.loadExpression(input); assert.strictEqual(daily.instance.parseError, false);
@@ -85,6 +117,6 @@ async function run() {
   assert.strictEqual(value, 'new code');
   editor.definition.watch.code.call(editor.instance, 'new code'); assert.strictEqual(writes, 1);
   editor.definition.watch.code.call(editor.instance, ''); assert.strictEqual(value, '');
-  console.log('PASS: instance route/race, filter/page/race, cancel state, DAILY parse/save, editor props');
+  console.log('PASS: instance route/race, filter/page/race, cancel state, DAILY parse/save, editor props, copied lifecycle boundaries, decision/job/nested icon guards');
 }
 run().catch(error => { console.error(error); process.exitCode = 1; });

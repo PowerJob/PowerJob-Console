@@ -618,6 +618,10 @@
               let url = "/job/copy?jobId=" + data.id;
               let that = this;
               this.axios.post(url).then(res => {
+                const lifeCycle = res.lifeCycle;
+                res.lifeCycle = lifeCycle && lifeCycle.start && lifeCycle.end
+                  ? [lifeCycle.start, lifeCycle.end]
+                  : null;
                 that.modifiedJobForm = res
                 that.modifiedJobFormVisible = true;
               });
