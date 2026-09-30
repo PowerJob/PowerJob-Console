@@ -1,34 +1,21 @@
 <template>
-  <div id="app">
-    <router-view/>
-  </div>
+  <el-config-provider :locale="elementLocale"><router-view :key="store.sessionRevision"/></el-config-provider>
 </template>
-
-<script>
-
-  export default {
-    name: 'app'
-  }
+<script setup>
+import { computed, onMounted, onUnmounted, watchEffect } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import { useAppStore } from './store.js'
+import { installStorageSync } from './services/storage-sync.js'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
+import en from 'element-plus/es/locale/lang/en'
+const { locale } = useI18n()
+const store = useAppStore()
+store.restoreApplication()
+const router = useRouter()
+let uninstall
+onMounted(() => { uninstall = installStorageSync({ store, router }) })
+onUnmounted(() => { uninstall?.() })
+const elementLocale = computed(() => locale.value === 'en' ? en : zhCn)
+watchEffect(() => { document.documentElement.lang = locale.value === 'en' ? 'en' : 'zh-CN' })
 </script>
-
-<style>
-  #app {
-    width: 100%;
-    height: 100%;
-  }
-  html,
-  body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow: hidden; 
-    font-family: Helvetica, ‘Hiragino Sans GB’, ‘Microsoft Yahei’, ‘微软雅黑’,
-    Arial, sans-serif;
-    background: #f0f3f4;
-  }
-  a {
-    color: #303133;
-    text-decoration: none;
-  }
-</style>

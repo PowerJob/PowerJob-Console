@@ -1,25 +1,4 @@
-<template>
-  <div id="console">
-    <!-- 顶部导航条 -->
-    <navbar/>
-    <!-- 左侧导航条 -->
-    <AdminConsoleSidebar/>
-  </div>
-</template>
-
-<script>
-import Navbar from "../bar/Navbar.vue";
-import AdminConsoleSidebar from "./AdminConsoleSidebar.vue";
-
-export default {
-  name: "AdminConsole",
-  components: {Navbar, AdminConsoleSidebar}
-}
+<template><AppShell admin/></template>
+<script setup>
+import AppShell from '../common/AppShell.vue'
 </script>
-
-<style scoped>
-#console {
-  width: 100%;
-  height: 100%;
-}
-</style>

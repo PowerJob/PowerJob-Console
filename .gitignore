@@ -41,3 +41,9 @@ build/
 *.log
 */.DS_Store
 .DS_Store
+# Generated acceptance and release artifacts
+/test-results/
+/playwright-report/
+/release/
+/.env.local
+/.env.*.local

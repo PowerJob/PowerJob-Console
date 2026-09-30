@@ -1,232 +1,159 @@
 <template>
-  <div id="namespace_manager">
-
-    <!--第一行，条件搜索栏（row布局：gutter代表栅格间隔，span代表占用格数）-->
-    <el-row :gutter="20">
-
-      <!-- 左侧搜索栏，占地面积 16/24 -->
-      <el-col :span="16">
-        <el-form :inline="true" :model="queryNamespaceRequest" class="el-form--inline">
-          <el-form-item label="code">
-            <el-input v-model="queryNamespaceRequest.codeLike" placeholder="code"/>
-          </el-form-item>
-          <el-form-item :label="$t('message.name')">
-            <el-input v-model="queryNamespaceRequest.nameLike" :placeholder="$t('message.name')"/>
-          </el-form-item>
-          <el-form-item label="tag">
-            <el-input v-model="queryNamespaceRequest.tagLike" placeholder="tag"/>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="listNamespaces">{{$t('message.query')}}</el-button>
-            <el-button type="cancel" @click="onClickReset">{{$t('message.reset')}}</el-button>
-          </el-form-item>
-        </el-form>
-      </el-col>
-
-      <!-- 右侧新增任务按钮，占地面积 4/24 -->
-      <el-col :span="4">
-        <div style="float:right;padding-right:10px">
-          <el-button type="primary" @click="onClickNewNamespace">{{$t('message.add')}}</el-button>
-        </div>
-      </el-col>
-    </el-row>
-
-    <!--第二行，任务数据表格-->
-    <el-row>
-      <el-table :data="namespaceResult.data" style="width: 100%">
-        <el-table-column prop="id" label="ID" width="80"/>
-        <el-table-column prop="code" label="code"/>
-        <el-table-column prop="name" :label="$t('message.name')" />
-        <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" />
-        <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" />
-        <el-table-column prop="statusStr" :label="$t('message.status')" />
-        <el-table-column prop="creatorShowName" :label="$t('message.creator')" />
-        <el-table-column prop="modifierShowName" :label="$t('message.modifier')" />
-
-        <el-table-column :label="$t('message.operation')" width="150">
-          <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
-            <el-button size="mini" type="text" @click="onClickDeleteNamespace(scope.row)">{{$t('message.delete')}}</el-button>
+  <section class="admin-page">
+    <header class="page-heading">
+      <div><h1>{{ $t('message.tabNamespace') }}</h1><p>{{ $t('message.namespacesDescription') }}</p></div>
+      <el-button type="primary" @click="onClickNewNamespace">{{ $t('message.add') }}</el-button>
+    </header>
+    <div class="filter-panel">
+      <el-form :inline="true" :model="queryNamespaceRequest" @submit.prevent="searchNamespaces">
+        <el-form-item label="Code"><el-input v-model="queryNamespaceRequest.codeLike" clearable placeholder="Code" @keyup.enter="searchNamespaces" /></el-form-item>
+        <el-form-item :label="$t('message.name')"><el-input v-model="queryNamespaceRequest.nameLike" clearable :placeholder="$t('message.name')" @keyup.enter="searchNamespaces" /></el-form-item>
+        <el-form-item :label="$t('message.tag')"><el-input v-model="queryNamespaceRequest.tagLike" clearable :placeholder="$t('message.tag')" @keyup.enter="searchNamespaces" /></el-form-item>
+        <el-form-item>
+          <el-button type="primary" native-type="submit" :loading="loading">{{ $t('message.query') }}</el-button>
+          <el-button @click="onClickReset">{{ $t('message.reset') }}</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <div class="data-panel">
+      <el-table v-loading="loading" :data="namespaceResult.data" row-key="id" style="width: 100%">
+        <el-table-column prop="id" label="ID" min-width="90" />
+        <el-table-column prop="code" label="Code" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="name" :label="$t('message.name')" min-width="160" show-overflow-tooltip />
+        <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" min-width="180" />
+        <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" min-width="180" />
+        <el-table-column prop="statusStr" :label="$t('message.status')" min-width="100" />
+        <el-table-column prop="creatorShowName" :label="$t('message.creator')" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="modifierShowName" :label="$t('message.modifier')" min-width="120" show-overflow-tooltip />
+        <el-table-column :label="$t('message.operation')" width="150" fixed="right">
+          <template #default="{ row }">
+            <el-button size="small" link type="primary" @click="onClickModify(row)">{{ $t('message.edit') }}</el-button>
+            <el-button size="small" link type="danger" :disabled="deletingId === row.id" @click="onClickDeleteNamespace(row)">{{ $t('message.delete') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
-    </el-row>
-
-    <!-- 第三行，分页插件 -->
-    <el-row>
-      <el-pagination
-          layout="prev, pager, next"
-          :total="this.namespaceResult.totalItems"
-          :page-size="this.namespaceResult.pageSize"
-          @current-change="onClickChangePage"
-          :hide-on-single-page="true"/>
-    </el-row>
-
-
-    <el-dialog :close-on-click-modal="false" :visible.sync="modifiedNamespaceFormVisible" width="80%">
-      <el-form :model="modifiedNamespaceForm" label-width="120px">
-        <el-form-item label="code">
-          <el-input v-model="modifiedNamespaceForm.code"/>
-        </el-form-item>
-        <el-form-item :label="$t('message.name')">
-          <el-input v-model="modifiedNamespaceForm.name"/>
-        </el-form-item>
-        <el-form-item label="Token" >
-          <el-input :disabled="true" v-model="modifiedNamespaceForm.token"/>
-        </el-form-item>
-        <el-form-item :label="$t('message.tag')">
-          <el-input v-model="modifiedNamespaceForm.tags"/>
-        </el-form-item>
-        <el-form-item :label="$t('message.extra')">
-          <el-input v-model="modifiedNamespaceForm.extra"/>
-        </el-form-item>
-
-        <el-form-item :label="$t('message.permissionManage')">
-          <user-role :user-rule-form="user_rule_form"/>
-        </el-form-item>
-
-        <el-form-item>
-          <el-button type="primary" @click="onClickSaveNamespace">{{$t('message.save')}}</el-button>
-          <el-button @click="modifiedNamespaceFormVisible = false">{{$t('message.cancel')}}</el-button>
-        </el-form-item>
+      <div class="pagination">
+        <el-pagination layout="total, prev, pager, next" :total="namespaceResult.totalItems" :page-size="queryNamespaceRequest.pageSize"
+                       :current-page="queryNamespaceRequest.index + 1" @current-change="onClickChangePage" :hide-on-single-page="true" />
+      </div>
+    </div>
+    <el-dialog :title="$t(modifiedNamespaceForm.id == null ? 'message.add' : 'message.edit')"
+               v-model="modifiedNamespaceFormVisible" :close-on-click-modal="false" :close-on-press-escape="!saving"
+               :show-close="!saving" width="min(760px, calc(100vw - 32px))">
+      <el-form ref="namespaceForm" :model="modifiedNamespaceForm" :rules="formRules" :disabled="saving" label-position="top">
+        <div class="form-grid">
+          <el-form-item label="Code" prop="code"><el-input v-model="modifiedNamespaceForm.code" :disabled="modifiedNamespaceForm.id != null" /></el-form-item>
+          <el-form-item :label="$t('message.name')"><el-input v-model="modifiedNamespaceForm.name" /></el-form-item>
+          <el-form-item label="Token"><el-input disabled v-model="modifiedNamespaceForm.token" show-password /></el-form-item>
+          <el-form-item :label="$t('message.tag')"><el-input v-model="modifiedNamespaceForm.tags" /></el-form-item>
+        </div>
+        <el-form-item :label="$t('message.extra')"><el-input v-model="modifiedNamespaceForm.extra" /></el-form-item>
+        <el-form-item :label="$t('message.permissionManage')"><user-role v-model:user-rule-form="user_rule_form" /></el-form-item>
       </el-form>
+      <template #footer>
+        <el-button :disabled="saving" @click="modifiedNamespaceFormVisible = false">{{ $t('message.cancel') }}</el-button>
+        <el-button type="primary" :loading="saving" @click="onClickSaveNamespace">{{ $t('message.save') }}</el-button>
+      </template>
     </el-dialog>
-  </div>
+  </section>
 </template>
 
 <script>
-import UserRole from "../common/UserRole.vue";
-
+import UserRole from '../common/UserRole.vue'
+const emptyRoles = () => ({ observer: [], qa: [], developer: [], admin: [] })
+const emptyForm = () => ({ id: undefined, code: '', name: '', tags: '', token: '', status: undefined, extra: '' })
+const emptyQuery = () => ({ codeLike: undefined, nameLike: undefined, tagLike: undefined, index: 0, pageSize: 10 })
+const cloneRoles = (roles) => Object.fromEntries(Object.keys(emptyRoles()).map(role => [role, Array.isArray(roles?.[role]) ? [...roles[role]] : []]))
 export default {
-  name: "NamespaceManager",
-  components: {UserRole},
+  name: 'NamespaceManager',
+  components: { UserRole },
   data() {
     return {
-
-      // 查询命名空间
-      queryNamespaceRequest: {
-        codeLike: undefined,
-        nameLike: undefined,
-        tagLike: undefined,
-        index:0,
-        pageSize:10
-      },
-
-      // 创建or修改表单
-      modifiedNamespaceForm: {
-        id: undefined,
-        code: undefined,
-        name: undefined,
-        tags: undefined,
-        status: undefined,
-        extra: undefined
-      },
-
-      user_rule_form: {
-        observer: [],
-        qa: [],
-        developer: [],
-        admin: [],
-      },
-
-      namespaceResult: [],
-
-      // 显示变量
-      modifiedNamespaceFormVisible: false
+      queryNamespaceRequest: emptyQuery(), modifiedNamespaceForm: emptyForm(), user_rule_form: emptyRoles(),
+      namespaceResult: { data: [], totalItems: 0, pageSize: 10 }, modifiedNamespaceFormVisible: false,
+      loading: false, saving: false, deletingId: null, requestGeneration: 0
     }
+  },
+  computed: {
+    formRules() { return { code: [{ required: true, message: this.$t('message.requiredField'), trigger: 'blur' }] } }
   },
   methods: {
-    // 点击重置按钮
-    onClickReset() {
-      this.queryNamespaceRequest.codeLike = undefined;
-      this.queryNamespaceRequest.nameLike = undefined;
-      this.queryNamespaceRequest.tagLike = undefined;
-      this.queryNamespaceRequest.index = 0;
-      this.listNamespaces();
+    showError(error) { this.$message.error(error?.message || String(error)) },
+    onClickReset() { this.queryNamespaceRequest = emptyQuery(); return this.listNamespaces() },
+    searchNamespaces() { this.queryNamespaceRequest.index = 0; return this.listNamespaces() },
+    async listNamespaces() {
+      const generation = ++this.requestGeneration
+      this.loading = true
+      try {
+        const result = await this.axios.post('/namespace/list', { ...this.queryNamespaceRequest })
+        if (generation === this.requestGeneration) this.namespaceResult = { data: [], totalItems: 0, pageSize: 10, ...result }
+      } catch (error) { if (generation === this.requestGeneration) this.showError(error) }
+      finally { if (generation === this.requestGeneration) this.loading = false }
     },
-
-    // 查询 namespace
-    listNamespaces() {
-      const that = this;
-      this.axios.post("/namespace/list", this.queryNamespaceRequest).then((res) => {
-        that.namespaceResult = res;
-      });
-    },
-
-    // 点击 换页
-    onClickChangePage(index) {
-      // 后端从0开始，前端从1开始
-      this.queryNamespaceRequest.index = index - 1;
-      this.listNamespaces();
-    },
-
-    // 新增 namespace
+    onClickChangePage(index) { this.queryNamespaceRequest.index = index - 1; return this.listNamespaces() },
     onClickNewNamespace() {
-      // 清空之前填写的脏数据
-      this.modifiedNamespaceForm = {
-        id: undefined,
-        code: undefined,
-        name: undefined,
-        tags: undefined,
-        status: undefined,
-        extra: undefined
-      }
-      this.user_rule_form.observer = []
-      this.user_rule_form.qa = []
-      this.user_rule_form.developer = []
-      this.user_rule_form.admin = []
-
-      this.modifiedNamespaceFormVisible = true;
+      this.modifiedNamespaceForm = emptyForm()
+      this.user_rule_form = emptyRoles()
+      this.modifiedNamespaceFormVisible = true
+      this.$nextTick(() => this.$refs.namespaceForm?.clearValidate())
     },
-
-    // 保存
-    onClickSaveNamespace() {
-      let that = this;
-      this.modifiedNamespaceForm['componentUserRoleInfo'] = this.user_rule_form;
-
-      this.axios.post("/namespace/save", this.modifiedNamespaceForm, {
-        'headers': {
-          'Content-Type': 'application/json',
-          'NamespaceId': that.modifiedNamespaceForm.id
+    async onClickSaveNamespace() {
+      if (this.saving) return
+      this.saving = true
+      try {
+        if (!this.modifiedNamespaceForm.code) {
+          this.$message.warning(this.$t('message.requiredField'))
+          await this.$refs.namespaceForm?.validate().catch(() => false)
+          return
         }
-      }).then(() => {
-        that.$message.success(that.$t('message.success'));
-        this.listNamespaces();
-      })
-      this.modifiedNamespaceFormVisible = false;
+        if (this.$refs.namespaceForm && !await this.$refs.namespaceForm.validate().catch(() => false)) return
+        const payload = { ...this.modifiedNamespaceForm, componentUserRoleInfo: cloneRoles(this.user_rule_form) }
+        await this.axios.post('/namespace/save', payload, { headers: { 'Content-Type': 'application/json', NamespaceId: payload.id } })
+        this.$message.success(this.$t('message.success'))
+        this.modifiedNamespaceFormVisible = false
+        await this.listNamespaces()
+      } catch (error) { this.showError(error) }
+      finally { this.saving = false }
     },
-
-    // 点击 编辑按钮
     onClickModify(data) {
-      this.modifiedNamespaceForm = JSON.parse(JSON.stringify(data));
-      this.user_rule_form = JSON.parse(JSON.stringify(data.componentUserRoleInfo));
-      this.modifiedNamespaceFormVisible = true;
+      this.modifiedNamespaceForm = { ...emptyForm(), ...data }
+      this.user_rule_form = cloneRoles(data.componentUserRoleInfo)
+      this.modifiedNamespaceFormVisible = true
+      this.$nextTick(() => this.$refs.namespaceForm?.clearValidate())
     },
-
-    // 点击 删除命名空间
-    onClickDeleteNamespace(data) {
-      const url = '/namespace/delete?id=' + data.id
-      this.$confirm(this.$t('message.deleteConfirmation', {name: data.name}), this.$t('message.delete'), {
-        confirmButtonText: this.$t('message.confirm'),
-        cancelButtonText: this.$t('message.cancel'),
-        type: 'warning'
-      }).then(() => this.axios.delete(url, {
-        'headers': {
-          'Content-Type': 'application/json',
-          'NamespaceId': data.id
-        }
-      })).then(() => {
-        this.listNamespaces();
-      }).catch(() => {})
+    async onClickDeleteNamespace(data) {
+      if (this.deletingId !== null) return
+      try {
+        await this.$confirm(this.$t('message.deleteConfirmation', { name: data.name }), this.$t('message.delete'), {
+          confirmButtonText: this.$t('message.confirm'), cancelButtonText: this.$t('message.cancel'), type: 'warning'
+        })
+      } catch { return }
+      this.deletingId = data.id
+      try {
+        await this.axios.delete('/namespace/delete?id=' + encodeURIComponent(data.id), {
+          headers: { 'Content-Type': 'application/json', NamespaceId: data.id }
+        })
+        this.$message.success(this.$t('message.success'))
+        await this.listNamespaces()
+      } catch (error) { this.showError(error) }
+      finally { this.deletingId = null }
     }
   },
-  mounted() {
-    this.listNamespaces()
-  }
+  mounted() { this.listNamespaces() }
 }
 </script>
 
-
 <style scoped>
-
+.admin-page { width: 100%; }
+.page-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 22px; }
+.page-heading h1 { font-size: 25px; font-weight: 650; letter-spacing: -.6px; color: var(--pj-text); margin: 0 0 8px; }
+.page-heading p { color: var(--pj-muted); font-size: 13px; margin: 0; line-height: 1.6; }
+.filter-panel, .data-panel { background: var(--pj-surface); border: 1px solid var(--pj-border); border-radius: 13px; }
+.filter-panel { padding: 20px 20px 2px; margin-bottom: 18px; }
+.filter-panel :deep(.el-form-item) { margin-right: 16px; margin-bottom: 18px; }
+.filter-panel :deep(.el-input) { width: 190px; }
+.data-panel { overflow: hidden; }
+.pagination { display: flex; justify-content: flex-end; padding: 14px 18px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; }
+@media (max-width: 650px) { .page-heading { align-items: flex-start; } .page-heading h1 { font-size: 22px; } .form-grid { grid-template-columns: 1fr; } .filter-panel :deep(.el-form-item), .filter-panel :deep(.el-form-item__content) { width: 100%; margin-right: 0; } .filter-panel :deep(.el-input) { width: 100%; } .pagination { padding: 12px 8px; } }
 </style>

@@ -1,886 +1,147 @@
 <template>
-  <div>
-    <el-row style="margin-left: 0px; margin-bottom: 20px; margin-right: 25px">
-      <el-col :span="1">
-        <el-button type="primary" @click="back">{{
-          $t("message.back")
-        }}</el-button>
-      </el-col>
-      <el-col :span="1" :offset="22">
-        <el-button
-          type="success"
-          :loading="saveLoading"
-          @click="saveWorkflow"
-          >{{ $t("message.save") }}</el-button
-        >
-      </el-col>
-    </el-row>
-
-    <el-row>
-      <el-form ref="form" :model="workflowInfo" label-width="100px">
-        <el-form-item :label="$t('message.wfName')">
-          <el-input v-model="workflowInfo.wfName" />
-        </el-form-item>
-        <el-form-item :label="$t('message.wfDescription')">
-          <el-input v-model="workflowInfo.wfDescription" />
-        </el-form-item>
-
-        <el-form-item :label="$t('message.scheduleInfo')">
-          <el-row>
-            <el-col :span="6">
-              <el-select
-                v-model="workflowInfo.timeExpressionType"
-                :placeholder="$t('message.timeExpressionType')"
-              >
-                <el-option
-                  v-for="item in timeExpressionTypeOptions"
-                  :key="item.key"
-                  :label="item.label"
-                  :value="item.key"
-                ></el-option>
-              </el-select>
-            </el-col>
-            <el-col :span="12">
-              <el-input
-                v-model="workflowInfo.timeExpression"
-                :placeholder="$t('message.wfTimeExpressionPLH')"
-              />
-            </el-col>
-            <el-col :span="4">
-              <el-button type="text" @click="onClickValidateTimeExpression">{{
-                $t("message.validateTimeExpression")
-              }}</el-button>
-            </el-col>
-          </el-row>
-        </el-form-item>
-        <el-form-item :label="$t('message.lifeCycle')">
-          <el-date-picker
-            v-model="workflowInfo.lifeCycle"
-            type="datetimerange"
-            :start-placeholder="$t('message.startTime')"
-            :end-placeholder="$t('message.finishedTime')"
-            value-format="timestamp"
-          >
-          </el-date-picker>
-        </el-form-item>
-
-        <el-form-item :label="$t('message.maxInstanceNum')">
-          <el-input-number v-model="workflowInfo.maxWfInstanceNum" />
-        </el-form-item>
-
-        <el-form-item :label="$t('message.alarmConfig')">
-          <el-select
-            v-model="workflowInfo.notifyUserIds"
-            multiple
-            filterable
-            :placeholder="$t('message.alarmSelectorPLH')"
-          >
-            <el-option
-              v-for="user in userList"
-              :key="user.id"
-              :label="user.username"
-              :value="user.id"
-            ></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-    </el-row>
-
-    <el-row>
-      <!-- v-if="workflowInfo.id" -->
-      <div class="power-flow">
-        <div class="power-dag" id="fullInc">
-          <PowerWorkflow
-            @onSelectedNode="handleSelectedNode"
-            @getDag="getDag"
-            :onClickImportSpecialNode="onClickImportSpecialNode"
-            :onClickImportNode="onClickImportNode"
-            :selectNode="selectNode"
-            :nodes="peworkflowDAG.nodes"
-            :edges="peworkflowDAG.edges"
-            :defaultWidthInc="234"
-            fullInc="fullInc"
-          >
-            <div class="job-panl" v-if="selectNode !== null">
-              <el-form ref="form" :model="nodeInfo">
-                <el-form-item
-                  :label="$t('message.jobName')"
-                  v-if="nodeInfo.type != '2'"
-                >
-                  <el-select
-                    v-model="nodeInfo.jobId"
-                    filterable
-                    remote
-                    reserve-keyword
-                    placeholder="请输入关键词"
-                    :remote-method="remoteTaskData"
-                    :loading="taskLoading"
-                    :style="{ width: 'calc(100% - 90px)' }"
-                    @focus="handleWaitFocus"
-                    @change="handleWaitTaskChange"
-                  >
-                    <el-option
-                      v-for="item in waitTaskList"
-                      :key="item.id"
-                      :label="item.jobName || item.wfName"
-                      :value="item.id"
-                    ></el-option>
-                  </el-select>
-                </el-form-item>
-                <el-form-item :label="$t('message.nodeName')">
-                  <el-input
-                    v-model="nodeInfo.nodeName"
-                    @input="handleNodeName"
-                    :style="{ width: 'calc(100% - 90px)' }"
-                  />
-                </el-form-item>
-                <el-form-item
-                  :label="$t('message.nodeParams')"
-                  v-if="nodeInfo.type != '2'"
-                >
-                  <el-input
-                    v-model="nodeInfo.nodeParams"
-                    :style="{ width: 'calc(100% - 90px)' }"
-                  />
-                </el-form-item>
-                <el-form-item
-                  :label="$t('message.enable')"
-                  v-if="nodeInfo.type != '2'"
-                >
-                  <el-switch v-model="nodeInfo.enable"></el-switch>
-                  <img
-                    class="job-panl-icon"
-                    v-if="nodeInfo.enable"
-                    src="../../assets/start.svg"
-                    height="18"
-                    width="18"
-                    alt
-                  />
-                </el-form-item>
-                <el-form-item
-                  :label="$t('message.skipWhenFailed')"
-                  v-if="nodeInfo.type != '2'"
-                >
-                  <el-switch v-model="nodeInfo.skipWhenFailed"></el-switch>
-                  <img
-                    class="job-panl-icon"
-                    v-if="nodeInfo.skipWhenFailed"
-                    src="../../assets/skip.svg"
-                    height="18"
-                    width="18"
-                    alt
-                  />
-                </el-form-item>
-              </el-form>
-              <!-- <MonacoEditor
-                    :code="nodeInfo.nodeParams"
-                    key="nodeParams"
-                    theme="vs"
-                    :height="100"
-                    :editorOptions="options"
-                    @mounted="onMounted"
-                    @codeChange="onCodeChange"
-                  >
-                  </MonacoEditor> -->
-              <div v-if="nodeInfo.type == '2'" class="judge-message-params">
-                <p>{{ $t("message.nodeParams") }}</p>
-                <JSEditor
-                  :code="nodeInfo.nodeParams"
-                  key="nodeParams"
-                  @onCodeChange="onCodeChange"
-                ></JSEditor>
-              </div>
-
-              <div class="job-panl-btn">
-                <el-button type="success" @click="handleNodeSave">{{
-                  $t("message.save")
-                }}</el-button>
-              </div>
-            </div>
-          </PowerWorkflow>
-          <el-drawer
-            :title="$t('message.importJobTitle')"
-            :visible.sync="importDrawerVisible"
-            direction="rtl"
-            size="60%"
-          >
-            <div class="power-import-body">
-              <el-row>
-                <el-form
-                  :inline="true"
-                  :model="jobQueryContent"
-                  class="el-form--inline"
-                >
-                  <el-form-item :label="$t('message.jobId')">
-                    <el-input
-                      v-model="jobQueryContent.jobId"
-                      :placeholder="$t('message.jobId')"
-                    />
-                  </el-form-item>
-                  <el-form-item :label="$t('message.keyword')">
-                    <el-input
-                      v-model="jobQueryContent.keyword"
-                      :placeholder="$t('message.keyword')"
-                    />
-                  </el-form-item>
-                  <el-form-item>
-                    <el-button type="primary" @click="listJobInfos">{{
-                      $t("message.query")
-                    }}</el-button>
-                    <el-button type="cancel" @click="onClickReset">{{
-                      $t("message.reset")
-                    }}</el-button>
-                    <el-button type="cancel" @click="onBulkImport">{{
-                      $t("message.bulkImport")
-                    }}</el-button>
-                  </el-form-item>
-                </el-form>
-              </el-row>
-              <el-table
-                class="power-import-table"
-                :data="jobInfoPageResult.data"
-                @selection-change="handleSelectionChange"
-              >
-                <el-table-column type="selection" width="55" />
-                <el-table-column property="id" :label="$t('message.jobId')" />
-                <el-table-column
-                  property="jobName"
-                  :label="$t('message.jobName')"
-                />
-                <el-table-column :label="$t('message.operation')">
-                  <template slot-scope="scope">
-                    <el-button size="medium" @click="importTask([scope.row])">{{
-                      $t("message.import")
-                    }}</el-button>
-                  </template>
-                </el-table-column>
-              </el-table>
-              <el-row>
-                <el-pagination
-                  layout="prev, pager, next"
-                  :total="this.jobInfoPageResult.totalItems"
-                  :page-size="this.jobInfoPageResult.pageSize"
-                  @current-change="onClickChangePage"
-                />
-              </el-row>
-            </div>
-          </el-drawer>
+  <div class="workflow-editor">
+    <div class="editor-heading"><div><h2>{{ workflowInfo.wfName || $t('message.workflow') }}</h2><p>{{ $t('message.wfDescription') }}</p></div><div><el-button @click="back">{{ $t('message.back') }}</el-button><el-button type="primary" :loading="saveLoading" @click="saveWorkflow">{{ $t('message.save') }}</el-button></div></div>
+    <el-card class="workflow-settings" shadow="never">
+      <el-form :model="workflowInfo" label-position="top">
+        <div class="settings-grid">
+          <el-form-item :label="$t('message.wfName')" required><el-input v-model="workflowInfo.wfName" maxlength="255" /></el-form-item>
+          <el-form-item :label="$t('message.wfDescription')"><el-input v-model="workflowInfo.wfDescription" /></el-form-item>
+          <el-form-item :label="$t('message.scheduleInfo')"><div class="schedule-fields"><el-select v-model="workflowInfo.timeExpressionType" style="width:120px"><el-option label="API" value="API" /><el-option label="CRON" value="CRON" /></el-select><el-input v-model="workflowInfo.timeExpression" :placeholder="$t('message.wfTimeExpressionPLH')" /><el-button @click="timeExpressionValidatorVisible = true">{{ $t('message.validateTimeExpression') }}</el-button></div></el-form-item>
+          <el-form-item :label="$t('message.lifeCycle')"><LifeCycleFields v-model="workflowInfo.lifeCycle" /></el-form-item>
+          <el-form-item :label="$t('message.maxInstanceNum')"><el-input-number v-model="workflowInfo.maxWfInstanceNum" :min="1" /></el-form-item>
+          <el-form-item :label="$t('message.alarmConfig')"><el-select v-model="workflowInfo.notifyUserIds" multiple filterable :placeholder="$t('message.alarmSelectorPLH')" style="width:100%"><el-option v-for="user in userList" :key="user.id" :label="user.username" :value="user.id" /></el-select></el-form-item>
         </div>
+      </el-form>
+    </el-card>
+    <PowerWorkflow ref="dag" :nodes="peworkflowDAG.nodes" :edges="peworkflowDAG.edges" :on-click-import-node="onClickImportNode" :on-click-import-special-node="onClickImportSpecialNode" @get-dag="getDag" @on-selected-node="handleSelectedNode" @on-clear-select-node="handleClearSelectNode" @dag-change="onDagChange">
+      <div v-if="nodeInfo" class="node-panel">
+        <h3>{{ $t('message.nodeName') }}</h3>
+        <el-form :model="nodeInfo" label-position="top">
+          <el-form-item v-if="nodeInfo.type !== 2" :label="nodeInfo.type === 3 ? $t('message.workflow') : $t('message.jobName')"><el-select v-model="nodeInfo.jobId" filterable remote reserve-keyword :placeholder="$t('message.keyword')" :remote-method="remoteTaskData" :loading="taskLoading" style="width:100%" @focus="remoteTaskData('')" @change="handleWaitTaskChange"><el-option v-for="item in waitTaskList" :key="item.id" :label="item.jobName || item.wfName" :value="item.id" /></el-select></el-form-item>
+          <el-form-item :label="$t('message.nodeName')"><el-input v-model="nodeInfo.nodeName" @input="updatePreview" /></el-form-item>
+          <el-form-item :label="$t('message.nodeParams')"><JSEditor v-if="nodeInfo.type === 2" :code="nodeInfo.nodeParams || ''" @on-code-change="onCodeChange" /><el-input v-else v-model="nodeInfo.nodeParams" type="textarea" :rows="4" @input="updatePreview" /></el-form-item>
+          <el-form-item v-if="nodeInfo.type !== 2" :label="$t('message.enable')"><el-switch v-model="nodeInfo.enable" @change="updatePreview" /></el-form-item>
+          <el-form-item v-if="nodeInfo.type !== 2" :label="$t('message.skipWhenFailed')"><el-switch v-model="nodeInfo.skipWhenFailed" @change="updatePreview" /></el-form-item>
+        </el-form>
+        <el-button type="primary" :loading="nodeSaveLoading" @click="handleNodeSave">{{ $t('message.save') }}</el-button>
       </div>
-    </el-row>
-    <el-dialog
-      :visible.sync="timeExpressionValidatorVisible"
-      v-if="timeExpressionValidatorVisible"
-    >
-      <TimeExpressionValidator
-        :time-expression="workflowInfo.timeExpression"
-        :time-expression-type="workflowInfo.timeExpressionType"
-      />
-    </el-dialog>
-    <el-drawer
-      :title="$t('message.importWorkflowTitle')"
-      :visible.sync="workflowVisible"
-      direction="rtl"
-      size="60%"
-    >
-      <WorkflowManager
-        :isWorkflow="true"
-        @onImportNode="onImportChildWorkflowNode"
-      ></WorkflowManager>
+    </PowerWorkflow>
+    <el-drawer v-model="importDrawerVisible" :title="$t('message.importJobTitle')" size="min(760px, 95vw)">
+      <el-form :inline="true" :model="jobQueryContent" @submit.prevent="queryJobs"><el-form-item :label="$t('message.jobId')"><el-input v-model="jobQueryContent.jobId" /></el-form-item><el-form-item :label="$t('message.keyword')"><el-input v-model="jobQueryContent.keyword" /></el-form-item><el-form-item><el-button type="primary" :loading="jobsLoading" @click="queryJobs">{{ $t('message.query') }}</el-button><el-button @click="resetJobs">{{ $t('message.reset') }}</el-button><el-button @click="onBulkImport">{{ $t('message.bulkImport') }}</el-button></el-form-item></el-form>
+      <el-table ref="jobImportTable" v-loading="jobsLoading" :data="jobInfoPageResult.data" :row-key="row => String(row.id)" @selection-change="multipleSelection = $event"><el-table-column type="selection" :reserve-selection="true" width="50" /><el-table-column prop="id" :label="$t('message.jobId')" /><el-table-column prop="jobName" :label="$t('message.jobName')" /><el-table-column :label="$t('message.operation')" width="110"><template #default="{ row }"><el-button size="small" :loading="importLoading" @click="importTask([row])">{{ $t('message.import') }}</el-button></template></el-table-column></el-table>
+      <el-pagination :current-page="jobQueryContent.index + 1" layout="total, prev, pager, next" :total="jobInfoPageResult.totalItems" :page-size="jobQueryContent.pageSize" @current-change="onClickChangePage" />
     </el-drawer>
+    <el-dialog v-model="timeExpressionValidatorVisible" destroy-on-close><TimeExpressionValidator v-if="timeExpressionValidatorVisible" :time-expression="workflowInfo.timeExpression" :time-expression-type="workflowInfo.timeExpressionType" /></el-dialog>
+    <el-drawer v-model="workflowVisible" :title="$t('message.importWorkflowTitle')" size="min(960px, 95vw)" destroy-on-close><WorkflowManager v-if="workflowVisible" :is-workflow="true" @on-import-node="onImportChildWorkflowNode" /></el-drawer>
   </div>
 </template>
-
 <script>
-import JSEditor from "./JSEditor.vue";
-import TimeExpressionValidator from "../common/TimeExpressionValidator";
-import PowerWorkflow from "./PowerWorkflow";
-import WorkflowManager from "../views/WorkflowManager";
-
-function nodeInfoChange(icon, index) {
-  return function (value) {
-    if (!this.selectNode) return;
-    const group = this.selectNode.getContainer();
-    const current = group.getChildByIndex(index);
-    if (value) {
-      current.attr({ img: icon });
-    } else {
-      current.attr({ img: "" });
-    }
-  };
-}
-
-/** 节点类型映射 */
-const nodeType = {
-  1: (item) => {
-    return {
-      type: "flow-node",
-      size: [240, 70],
-      leftText: item.jobId,
-      titleText: item.nodeName,
-      icon1: item.enable ? require("../../assets/start.svg") : "",
-      icon2: item.skipWhenFailed ? require("../../assets/skip.svg") : "",
-    };
-  },
-  2: (item) => {
-    return {
-      type: "max-diamond-node",
-      text: !item.nodeName ? "判断" : item.nodeName,
-      style: {
-        sideLength: 80,
-        textStyle: {
-          // fill: "#FFFFFF",
-        },
-        // fill: "#FE9201",
-        // stroke: "#D45547",
-      },
-    };
-  },
-  3: (item) => {
-    return {
-      type: "flow-child-node",
-      size: [240, 70],
-      leftText: item.jobId,
-      titleText: item.nodeName,
-      icon1: item.enable ? require("../../assets/start.svg") : "",
-      icon2: item.skipWhenFailed ? require("../../assets/skip.svg") : "",
-    };
-  },
-};
-
+import { markRaw, defineAsyncComponent } from 'vue';
+import TimeExpressionValidator from '../common/TimeExpressionValidator.vue';
+import PowerWorkflow from './PowerWorkflow.vue';
+import WorkflowManager from '../views/WorkflowManager.vue';
+import LifeCycleFields from '../common/LifeCycleFields.vue';
+import { lifeCycleForSave } from '../../services/jobs.js';
+import { serializeDag, validateDag } from './workflow-model.js';
+const emptyWorkflowInfo = () => ({ id:'', appId:window.localStorage.getItem('Power_appId'), enable:true, maxWfInstanceNum:1, notifyUserIds:[], timeExpression:'', timeExpressionType:'API', wfDescription:'', wfName:'', lifeCycle:null });
 export default {
-  name: "WorkflowEditor",
-  components: {
-    TimeExpressionValidator,
-    PowerWorkflow,
-    JSEditor,
-    WorkflowManager,
-  },
-  data() {
-    return {
-      workflowInfo: {
-        id: "",
-        appId: window.localStorage.getItem("Power_appId"),
-        enable: true,
-        maxWfInstanceNum: 1,
-        notifyUserIds: [],
-        timeExpression: undefined,
-        timeExpressionType: undefined,
-        wfDescription: undefined,
-        wfName: undefined,
-        lifeCycle: null,
-      },
-      nodeInfo: {
-        id: null,
-        jobId: null,
-        nodeName: "",
-        nodeParams: "",
-        enable: true,
-        skipWhenFailed: true,
-      },
-      timeExpressionTypeOptions: [
-        { key: "API", label: "API" },
-        { key: "CRON", label: "CRON" },
-      ],
-      userList: [],
-
-      // 导入任务相关
-      importDrawerVisible: false,
-      jobQueryContent: {
-        appId: window.localStorage.getItem("Power_appId"),
-        index: 0,
-        pageSize: 8,
-        jobId: undefined,
-        keyword: undefined,
-      },
-      jobInfoPageResult: {
-        pageSize: 20,
-        totalItems: 0,
-        data: [],
-      },
-
-      // 事件（1：新增起点，2：新增终点，3：删除节点；4：删除边）
-      event: undefined,
-      from: undefined,
-
-      // 时间表达式校验窗口
-      timeExpressionValidatorVisible: false,
-      /** DAG信息 */
-      peworkflowDAG: {
-        nodes: [],
-        edges: [],
-      },
-      /** 保存按钮loading */
-      saveLoading: false,
-      /** 流程图实例 */
-      powerFlow: null,
-      /** 选中的数据 */
-      multipleSelection: [],
-      /** 当前的节点信息 */
-      taskList: [],
-      /** 当前选中的节点 */
-      selectNode: null,
-      /** 重置节点方法 */
-      resetNodes: null,
-      /** 待选任务列表 */
-      waitTaskList: [],
-      /** 任务搜索loading */
-      taskLoading: false,
-      /** 任务节流 */
-      taskTimeout: null,
-      /** 工作流引入显隐控制 */
-      workflowVisible: false,
-    };
-  },
+  name: 'WorkflowEditor', components: { JSEditor: defineAsyncComponent(() => import('./JSEditor.vue')), TimeExpressionValidator, PowerWorkflow, WorkflowManager, LifeCycleFields },
+  data() { return {
+    workflowInfo: emptyWorkflowInfo(),
+    peworkflowDAG: { nodes: [], edges: [] }, nodeInfo: null, powerFlow: null, selectedId: null, pendingNodes: {}, userList: [],
+    saveLoading: false, nodeSaveLoading: false, importLoading: false, jobsLoading: false, importDrawerVisible: false, workflowVisible: false, timeExpressionValidatorVisible: false,
+    jobQueryContent: { appId: window.localStorage.getItem('Power_appId'), index: 0, pageSize: 8, jobId: undefined, keyword: undefined }, jobInfoPageResult: { data: [], totalItems: 0 }, multipleSelection: [], waitTaskList: [], taskLoading: false, taskTimeout: null, searchSequence: 0, fetchSequence: 0, jobQuerySequence:0,
+  }; },
+  mounted() { this.axios.get('/user/list').then(users => { this.userList = users || []; }).catch(() => {}); this.restoreWorkflow().catch(() => this.$router.replace('/oms/workflow')); },
+  beforeUnmount() { clearTimeout(this.taskTimeout); this.searchSequence++; this.fetchSequence++; this.jobQuerySequence++; },
+  watch: { '$route.query.workflowId'(value) { if (String(value || '') !== String(this.workflowInfo.id)) this.restoreWorkflow().catch(() => this.$router.replace('/oms/workflow')); } },
   methods: {
-    // 返回上一页
-    back: function () {
-      this.$router.go(-1);
+    back() { this.$router.push('/oms/workflow'); },
+    getDag(flow) { this.powerFlow = markRaw(flow); },
+    async restoreWorkflow() {
+      const legacy = this.$route.params.workflowInfo; const id = this.$route.query.workflowId || this.$route.params.workflowId || legacy?.id;
+      if (id) { this.workflowInfo.id = String(id); await this.getWorkflowInfo(); }
+      else { this.fetchSequence++; this.workflowInfo = emptyWorkflowInfo(); this.peworkflowDAG = { nodes:[],edges:[] }; this.pendingNodes = {}; this.handleClearSelectNode(); }
     },
-    /* ******** 导入任务相关，所有函数与 JobManager 重复，需要前端大佬重构！ ******** */
-    // 点击重置按钮
-    onClickReset() {
-      this.jobQueryContent.keyword = undefined;
-      this.jobQueryContent.jobId = undefined;
-      this.listJobInfos();
+    async getWorkflowInfo() {
+      const generation = ++this.fetchSequence;
+      try {
+        const res = await this.axios.get('/workflow/fetch', { params: { workflowId: this.workflowInfo.id, appId: this.workflowInfo.appId } });
+        if (generation !== this.fetchSequence) return;
+        this.workflowInfo = { ...this.workflowInfo, ...res, id: String(res.id), lifeCycle: res.lifeCycle ? { ...res.lifeCycle } : null, notifyUserIds: res.notifyUserIds || [] };
+        this.peworkflowDAG = res.peworkflowDAG || { nodes: [], edges: [] }; this.pendingNodes = {}; this.handleClearSelectNode();
+        await this.$nextTick(); this.powerFlow?.graph.layout();
+      } catch (error) { if (generation === this.fetchSequence) throw error; }
     },
-    // 列出符合当前搜索条件的任务
-    listJobInfos() {
-      const that = this;
-      this.axios.post("/job/list", this.jobQueryContent).then((res) => {
-        that.jobInfoPageResult = res;
-      });
-    },
-    // 点击 换页
-    onClickChangePage(index) {
-      // 后端从0开始，前端从1开始
-      this.jobQueryContent.index = index - 1;
-      this.listJobInfos();
-    },
-    onClickImportNode() {
-      this.listJobInfos();
-      this.importDrawerVisible = true;
-    },
-    /** 引入其他类型节点, 判断，工作流 */
-    onClickImportSpecialNode(data) {
-      const { type } = data;
-      console.log(type);
-      if (type === 3) {
-        this.workflowVisible = true;
-      } else {
-        this.importTask([
-          {
-            appId: this.workflowInfo.appId,
-            jobParams: "true",
-            type: type,
-            workflowId: this.workflowInfo.id,
-            jobName: "",
-          },
-        ]);
-      }
-    },
-    /** 引入嵌套工作流节点 */
-    onImportChildWorkflowNode(data) {
-      this.importTask([
-        {
-          appId: this.workflowInfo.appId,
-          nodeName: data.wfName,
-          enable: data.enable,
-          id: data.id,
-          nodeParams: "",
-          type: 3,
-          workflowId: this.workflowInfo.id,
-          jobName: data.wfName,
-        },
-      ]);
-    },
-    onClickValidateTimeExpression() {
-      this.timeExpressionValidatorVisible = true;
-    },
-    /** 选中节点 */
     handleSelectedNode(item) {
-      this.selectNode = item;
-
-      // 从节点列表找到节点
-      let index = this.getNodeIndexById(item.get("model").nodeId);
-
-      let node = this.taskList[index];
-      // if (node.type === "condition") return false;
-      this.remoteTaskData(null, node.jobId);
-      console.log(node);
-      this.nodeInfo = {
-        type: node.nodeType,
-        jobId: node.jobId,
-        nodeName: node.nodeName
-          ? node.nodeName
-          : node.nodeType == 2
-          ? "判断"
-          : node.nodeName,
-        nodeParams: node.nodeParams,
-        enable: node.enable,
-        skipWhenFailed: node.skipWhenFailed,
-        id: item.get("model").nodeId || item.get("model").id,
-      };
+      const node = item.get('model'); this.selectedId = node.id;
+      this.nodeInfo = { id: node.id, type: Number(node.nodeType), jobId: node.jobId, nodeName: node.nodeName || (Number(node.nodeType) === 2 ? this.$t('message.condition') : ''), nodeParams: node.nodeParams || '', enable: node.enable !== false, skipWhenFailed: !!node.skipWhenFailed, ...this.pendingNodes[node.id] };
+      this.waitTaskList = node.jobId ? [{ id: node.jobId, jobName: node.nodeName }] : [];
+      if (this.nodeInfo.type !== 2) this.remoteTaskData('', node.jobId);
     },
-    /** 多选节点 */
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
+    handleClearSelectNode() { this.selectedId = null; this.nodeInfo = null; clearTimeout(this.taskTimeout); this.searchSequence++; },
+    updatePreview() { if (!this.nodeInfo) return; this.pendingNodes[this.nodeInfo.id] = { ...this.nodeInfo }; this.powerFlow.graph.updateItem(this.nodeInfo.id, { ...this.nodeInfo, nodeType: this.nodeInfo.type }); },
+    onCodeChange(code) { this.nodeInfo.nodeParams = code; this.updatePreview(); },
+    onDagChange(dag) { const present = new Set(dag.nodes.map(node => node.id)); Object.keys(this.pendingNodes).forEach(id => { if (!present.has(id)) delete this.pendingNodes[id]; }); },
+    async handleNodeSave() {
+      if (!this.nodeInfo || this.nodeSaveLoading) return; this.nodeSaveLoading = true;
+      const generation = this.fetchSequence, edited = { ...this.nodeInfo, appId:this.workflowInfo.appId };
+      try { const [node] = await this.axios.post('/workflow/saveNode', [edited]); if (generation !== this.fetchSequence) return; this.powerFlow.graph.updateItem(edited.id, { ...node, id: String(node.id), nodeId: String(node.id), nodeType: Number(node.type) }); delete this.pendingNodes[edited.id]; this.$message.success(this.$t('message.success')); } catch { /* The HTTP client already presents the business error; retain the draft. */ } finally { this.nodeSaveLoading = false; }
     },
-    /** 修改节点名称 */
-    handleNodeName(value) {
-      const nodeItem = this.powerFlow.graph.get("selectedItem");
-      const group = nodeItem.getContainer();
-      const current = group.getChildByIndex(2);
-      current.attr("text", value);
-    },
-    /** 获取工作流程图实例 */
-    getDag(powerFlow, { resetNodes }) {
-      this.powerFlow = powerFlow;
-      this.resetNodes = resetNodes;
-    },
-    /** 根据nodeId找任务节点索引 */
-    getNodeIndexById(nodeId) {
-      return this.taskList.findIndex((item) => item.nodeId == nodeId);
-    },
-    /** 获取工作流信息 */
-    async getWorkflowInfo(fit) {
-      const res = await this.axios.get("/workflow/fetch", {
-        params: {
-          workflowId: this.workflowInfo.id,
-          appId: this.workflowInfo.appId,
-        },
-      });
-      this.workflowInfo = {
-        ...this.workflowInfo,
-        ...res,
-        lifeCycle: res.lifeCycle ? [res.lifeCycle.start, res.lifeCycle.end] : null,
-      };
-      if (res.peworkflowDAG) {
-        this.taskList = res.peworkflowDAG.nodes;
-        this.peworkflowDAG = res.peworkflowDAG;
-        this.$nextTick(() => {
-          this.resetNodes();
-          if (fit) {
-            // this.powerFlow.graph.fitView(20);
-            // 改为layout适配会对节点少的时候友好一点
-            this.powerFlow.graph.layout();
-          }
-        });
-      }
-    },
-    /** 保存工作流全局信息 */
     async saveWorkflow() {
-      // 改为不需要dag信息
-      const flowData = this.powerFlow.graph.save();
-      console.log(flowData);
-      let dagInfo = {
-        nodes: flowData.nodes.map((item) => ({ nodeId: item.id })),
-        edges: flowData.edges.map((item) => {
-          const property = {};
-          if (item.label) {
-            property.property = item.label === "Y" ? "true" : "false";
-          }
-          return {
-            from: item.source,
-            to: item.target,
-            ...property,
-          };
-        }),
-      };
-      const { lifeCycle } = this.workflowInfo;
-      const res = await this.axios.post("/workflow/save", {
-        ...this.workflowInfo,
-        lifeCycle: lifeCycle ? { start: lifeCycle[0], end: lifeCycle[1] } : null,
-        dag: dagInfo,
-      });
-      this.$message.success(this.$t("message.success"));
-      if (!this.workflowInfo.id) {
-        this.workflowInfo.id = res;
-        this.$router.replace({
-          name: "workflowEditor",
-          query: { ...this.$route.query, workflowId: res },
-        });
-      }
+      if (this.saveLoading) return;
+      if (!this.workflowInfo.wfName?.trim()) { this.$message.warning(this.$t('message.workflowNameRequired')); return; }
+      const flow = this.powerFlow?.graph.save() || { nodes: [], edges: [] }, validation = validateDag(flow);
+      if (!validation.valid) { this.$message.warning(this.$t(`message.${validation.reason}`)); return; }
+      let lifeCycle;
+      try { lifeCycle = this.workflowInfo.lifeCycle == null ? { start:null, end:null } : lifeCycleForSave(this.workflowInfo.lifeCycle); }
+      catch { this.$message.warning(this.$t('message.lifeCycleInvalid')); return; }
+      const generation = this.fetchSequence;
+      const payload = { ...JSON.parse(JSON.stringify(this.workflowInfo)), id:this.workflowInfo.id || undefined, lifeCycle, dag:serializeDag(flow) };
+      this.saveLoading = true;
+      try {
+        const pending = Object.values(this.pendingNodes);
+        if (pending.length) { await this.axios.post('/workflow/saveNode', pending.map(node => ({ ...node, appId: payload.appId }))); if (generation !== this.fetchSequence) return; this.pendingNodes = {}; }
+        // The existing Server skips a null lifeCycle; explicit null bounds clear an old range.
+        const res = await this.axios.post('/workflow/save', payload);
+        if (generation !== this.fetchSequence) return;
+        this.workflowInfo.id = String(res);
+        await this.$router.replace({ name: 'workflowEditor', query: { ...this.$route.query, workflowId: String(res) } });
+        this.$message.success(this.$t('message.success'));
+      } catch { /* Keep the current graph and draft available for retry. */ } finally { this.saveLoading = false; }
     },
-    /** 导入任务节点数据 */
-    async importTask(taskList) {
-      if (taskList.length === 0) {
-        return;
-      }
-
-      let type = "";
-
-      let data = taskList.map((item) => {
-        type = item.type ? Number(item.type) : 1;
-        return {
-          appId: item.appId,
-          enable: item.enable,
-          skipWhenFailed: item.skipWhenFailed,
-          nodeName: item.jobName,
-          jobId: item.id,
-          nodeParams: item.jobParams,
-          workflowId: this.workflowInfo.id,
-          // type: "JOB"
-          type: type,
-        };
-      });
-      let res = await this.axios.post("/workflow/saveNode", data);
-      console.log(res);
-      // 先移动视口一个节点点的位置
-      // 获取缩放比例
-      const zoom = this.powerFlow.graph.getZoom();
-      this.powerFlow.graph.translate(260 * zoom, 0);
-      const viewPointEnd = this.powerFlow.graph.getPointByCanvas(0, 0);
-      res.forEach((item, index) => {
-        const nodeText = nodeType[type](item);
-        this.powerFlow.graph.add("node", {
-          ...item,
-
-          id: `${item.id}`,
-          nodeId: `${item.id}`,
-          nodeType: `${item.type}`,
-          // type: nodeType[item.type],
-          size: [240, 70],
-          x: viewPointEnd.x + 20,
-          y: viewPointEnd.y + 70 * index + 20 + index * 10,
-          ...nodeText,
-          // leftText: item.jobId,
-          // titleText: item.nodeName,
-          // icon1: item.enable ? require("../../assets/start.svg") : "",
-          // icon2: item.skipWhenFailed ? require("../../assets/skip.svg") : "",
-        });
-      });
-      this.taskList = [
-        ...this.taskList,
-        ...res.map((item) => ({
-          ...item,
-          nodeType: item.type,
-          nodeParams: item.nodeParams,
-          nodeId: item.id,
-        })),
-      ];
+    async listJobInfos() { const sequence = ++this.jobQuerySequence; this.jobsLoading = true; try { const result = await this.axios.post('/job/list', { ...this.jobQueryContent }); if (sequence === this.jobQuerySequence) this.jobInfoPageResult = result; } catch { /* Keep the loaded page available while the error is displayed. */ } finally { if (sequence === this.jobQuerySequence) this.jobsLoading = false; } },
+    queryJobs() { this.jobQueryContent.index = 0; this.$refs.jobImportTable?.clearSelection(); this.multipleSelection = []; this.listJobInfos(); }, resetJobs() { this.jobQueryContent.keyword = undefined; this.jobQueryContent.jobId = undefined; this.queryJobs(); },
+    onClickChangePage(index) { this.jobQueryContent.index = index - 1; this.listJobInfos(); },
+    onClickImportNode() { this.importDrawerVisible = true; this.listJobInfos(); this.$nextTick(() => this.$refs.jobImportTable?.clearSelection()); this.multipleSelection = []; },
+    onClickImportSpecialNode({ type }) { if (type === 3) this.workflowVisible = true; else this.importTask([{ type: 2, jobName: this.$t('message.condition'), jobParams: 'true', enable: true }]); },
+    async onImportChildWorkflowNode(data) { await this.importTask([{ ...data, jobName: data.wfName, type: 3, jobParams: '' }]); this.workflowVisible = false; },
+    async importTask(tasks) {
+      if (!tasks.length || this.importLoading) return; this.importLoading = true;
+      const generation = this.fetchSequence;
+      try {
+        const nodes = await this.axios.post('/workflow/saveNode', tasks.map(item => ({ appId: this.workflowInfo.appId, type: Number(item.type || 1), jobId: item.id, nodeName: item.jobName || item.wfName || '', nodeParams: item.jobParams || '', enable: item.enable !== false, skipWhenFailed: !!item.skipWhenFailed })));
+        if (generation !== this.fetchSequence) return;
+        const point = this.powerFlow.graph.getPointByCanvas(140, 100);
+        nodes.forEach((node, index) => this.powerFlow.graph.add('node', { ...node, id: String(node.id), nodeId: String(node.id), nodeType: Number(node.type), x: point.x + index * 35, y: point.y + index * 110 }));
+        this.$refs.dag.autoLayout(); this.importDrawerVisible = false; this.multipleSelection = [];
+      } catch { /* Failed imports leave the drawer and selection available for retry. */ } finally { this.importLoading = false; }
     },
-    /** 保存单个节点 */
-    async handleNodeSave(value = {}) {
-      let data = [
-        {
-          ...this.nodeInfo,
-          appId: this.workflowInfo.appId,
-          workflowId: this.workflowInfo.id,
-          ...value,
-        },
-      ];
-      await this.axios.post("/workflow/saveNode", data);
-
-      let index = this.getNodeIndexById(this.nodeInfo.id);
-
-      this.taskList[index] = {
-        ...this.taskList[index],
-        nodeName: this.nodeInfo.nodeName,
-        nodeParams: this.nodeInfo.nodeParams,
-        enable: this.nodeInfo.enable,
-        skipWhenFailed: this.nodeInfo.skipWhenFailed,
-      };
-
-      this.$message.success(this.$t("message.success"));
-    },
-    /** 批量导入工作流 */
-    async onBulkImport() {
-      if (this.multipleSelection.length === 0) {
-        this.$message.warning(this.$t("message.noSelect"));
-        return;
-      }
-      await this.importTask(this.multipleSelection);
-    },
-    /** 远程加载任务列表数据 */
-    async remoteTaskData(value, jobId) {
-      clearTimeout(this.taskTimeout);
-      this.taskTimeout = setTimeout(() => {
+    onBulkImport() { if (!this.multipleSelection.length) this.$message.warning(this.$t('message.noSelect')); else this.importTask(this.multipleSelection); },
+    remoteTaskData(keyword, jobId) {
+      clearTimeout(this.taskTimeout); const generation = ++this.searchSequence, type = this.nodeInfo?.type;
+      if (type === 2 || !type) return;
+      this.taskTimeout = setTimeout(async () => {
         this.taskLoading = true;
-        console.log(this.nodeInfo);
-        let url = "/job/list";
-        if (this.nodeInfo.type === 3) {
-          url = "/workflow/list";
-        }
-        this.axios
-          .post(url, {
-            ...this.jobQueryContent,
-            index: 0,
-            keyword: value,
-            jobId: jobId,
-          })
-          .then((res) => {
-            this.waitTaskList = res.data;
-            this.taskLoading = false;
-          });
-      }, 100);
+        try { const result = await this.axios.post(type === 3 ? '/workflow/list' : '/job/list', { ...this.jobQueryContent, index: 0, keyword, jobId: type === 3 ? undefined : jobId, workflowId: type === 3 ? jobId : undefined }); if (generation === this.searchSequence) this.waitTaskList = result.data || []; } catch { /* A remote search failure must not reject the debounce timer. */ } finally { if (generation === this.searchSequence) this.taskLoading = false; }
+      }, 180);
     },
-    /** 选中任务时 */
-    handleWaitTaskChange(value) {
-      // 找到节点信息
-      let current = this.waitTaskList.find((item) => item.id === value);
-
-      let currentShape = this.selectNode.getContainer().getChildByIndex(1);
-
-      currentShape.attr({ text: current.id });
-      let index = this.getNodeIndexById(this.selectNode.get("model").nodeId);
-      this.powerFlow.graph.updateItem(this.selectNode, {
-        leftText: current.id,
-        jobId: current.id,
-      });
-      this.taskList[index] = {
-        ...this.taskList[index],
-        jobId: current.id,
-      };
-      this.nodeInfo.jobId = value;
-    },
-    /** 节点外点击时单独处理 */
-    handleWaitFocus() {
-      this.powerFlow.graph.set("noKeyDown", true);
-    },
-    /** 判断节点参数改变 */
-    onCodeChange(code) {
-      this.nodeInfo.nodeParams = code;
-    },
-  },
-  mounted() {
-    // 加载用户信息
-    let that = this;
-    that.axios.get("/user/list").then((res) => (that.userList = res));
-
-    // Persist the ID in the URL so a reload can restore the complete workflow from the API.
-    const legacyInfo = this.$route.params.workflowInfo;
-    const workflowId = this.$route.query.workflowId || this.$route.params.workflowId || (legacyInfo && legacyInfo.id);
-    if (workflowId) {
-      this.workflowInfo.id = workflowId;
-      if (!this.$route.query.workflowId) {
-        this.$router.replace({
-          name: "workflowEditor",
-          query: { ...this.$route.query, workflowId },
-        });
-      }
-      this.getWorkflowInfo(true);
-    }
-  },
-  watch: {
-    "nodeInfo.enable": {
-      handler: nodeInfoChange(require("../../assets/start.svg"), 3),
-    },
-    "nodeInfo.skipWhenFailed": {
-      handler: nodeInfoChange(require("../../assets/skip.svg"), 4),
-    },
+    handleWaitTaskChange() { this.updatePreview(); },
   },
 };
 </script>
-
 <style scoped>
-.el-input {
-  width: 80%;
-}
-.job-panl-icon {
-  vertical-align: middle;
-}
-.title {
-  display: inline-block;
-  margin: 5px 0;
-  font-size: 16px;
-  font-weight: bold;
-}
-.power-dag {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-}
-.job-panl {
-  /* border: 1px solid red; */
-  flex: 1;
-  position: relative;
-  border-radius: 10px;
-  box-shadow: 0 10px 10px 1px #c0c0c0;
-  border-top-right-radius: 0px;
-  box-sizing: border-box;
-  margin: 0 10px;
-  padding: 10px;
-  height: 100%;
-}
-.job-panl-btn {
-  /* position: absolute;
-        bottom: 0; */
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
-  /* margin-right: 12px; */
-  box-sizing: border-box;
-  padding: 12px;
-  border-top: 1px solid #f0f0f0;
-}
-.job-tools {
-  width: calc(100% - 10px);
-  box-sizing: border-box;
-  border: 1px solid #d0d0d0;
-  /* box-shadow: 0 0 10px 1px #c0c0c0; */
-  border-radius: 10px;
-  margin-right: 10px;
-  border-bottom-left-radius: 0px;
-  border-bottom-right-radius: 0px;
-  display: flex;
-  padding: 8px 10px;
-}
-.job-tools > div {
-  box-sizing: border-box;
-  height: 30px;
-  width: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-.job-tools div:hover {
-  border: 1px solid #f0f0f0;
-}
-.job-tools > div + div {
-  margin-left: 24px;
-}
-.job-tools i {
-  font-size: 20px;
-  /* color: #aaaaaa; */
-}
-.power-import-body {
-  padding: 0px 20px;
-}
-/* .el-drawer__body {
-  padding: 0 20px;
-} */
-</style>
-<!-- can't use scope, or dag will be the black block, maybe this is the bug of d3.js -->
-<style>
-svg {
-  font-size: 16px;
-  border: 1px solid red;
-}
-
-.power-flow {
-  background: #fff;
-}
-
-.node rect {
-  stroke: #999;
-  fill: #fff;
-  stroke-width: 1.5px;
-}
-
-.edgePath path {
-  stroke: #333;
-  stroke-width: 1px;
-}
-.power-import-table .el-table-column--selection > .cell {
-  padding-left: 15px;
-}
-.judge-message-params {
-  font-size: 14px;
-  color: #606266;
-}
-.judge-message-params p {
-  margin-bottom: 4px;
-}
+.editor-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; }.editor-heading h2 { margin:0; font-size:24px; }.editor-heading p { margin:7px 0 0; color:var(--el-text-color-secondary); font-size:13px; }
+.workflow-settings { margin-bottom:20px; border-radius:16px; }.settings-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 24px; }.schedule-fields { width:100%; display:flex; gap:8px; }.schedule-fields :deep(.el-input) { flex:1; }.node-panel h3 { font-size:16px; margin:0 0 20px; }.node-panel :deep(.code-edit) { width:100%; }.workflow-editor :deep(.el-pagination) { margin-top:20px; }
+@media(max-width:1050px) { .settings-grid { grid-template-columns:1fr; } .schedule-fields { flex-wrap:wrap; } }
 </style>

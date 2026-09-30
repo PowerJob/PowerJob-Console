@@ -1,19 +1,27 @@
-import Vue from "vue"
-import Vuex from "vuex"
+import { defineStore } from 'pinia'
 
-Vue.use(Vuex);
-
-const store = new Vuex.Store({
-    state: {
-        // 包含两个属性：id和appName
-        appInfo: {}
+export const useAppStore = defineStore('application', {
+  state: () => ({ appInfo: {}, sessionRevision: 0 }),
+  actions: {
+    restoreApplication() {
+      const id = localStorage.getItem('Power_appId')
+      const name = localStorage.getItem('Power_appName') || ''
+      this.appInfo = id ? { id, title: name, appName: name } : {}
     },
-    // 推荐使用 mutations 改变 store中的值，调用方法：this.$store.commit('initAppInfo', xxx)
-    mutations: {
-        initAppInfo(state, appInfo) {
-            state.appInfo = appInfo;
-        }
-    }
-});
-
-export default store;
+    resetSessionView() {
+      // Another tab owns the newly persisted session and application values.
+      this.appInfo = {}
+      this.sessionRevision++
+    },
+    selectApplication(appInfo) {
+      this.appInfo = { ...appInfo }
+      localStorage.setItem('Power_appId', String(appInfo.id))
+      localStorage.setItem('Power_appName', appInfo.title || appInfo.appName || '')
+    },
+    clearApplication() {
+      this.appInfo = {}
+      localStorage.removeItem('Power_appId')
+      localStorage.removeItem('Power_appName')
+    },
+  },
+})
