@@ -1,4 +1,3 @@
-import enLocale from 'element-ui/lib/locale/lang/en'
 
 const en = {
     message: {
@@ -23,7 +22,7 @@ const en = {
         'stop': 'Stop',
         'back': 'Back',
         'all': 'ALL',
-        'more': '| More',
+        'more': 'More',
         'add': 'Add',
         'extra': 'Extra',
         'tag': 'Tag',
@@ -268,7 +267,6 @@ const en = {
         'appAdmin': 'App Admin',
         'authThenBecomeAdmin': 'Auth then become admin',
     },
-    ...enLocale
 };
 
 export default en

@@ -1,79 +1,31 @@
 <template>
-    <div>
-        <el-input
-            type="textarea"
-            placeholder="请输入内容"
-            v-model="jsonContent"
-            :autosize="{ minRows: 8, maxRows: 256}"
-            :disabled="mode==='EXPORT'"
-        >
-        </el-input>
-
-        <el-button type="info" @click="onClickCancelButton">{{$t('message.cancel')}}</el-button>
-        <el-button type="primary" @click="onClickConfirmButton">{{$t('message.confirm')}}</el-button>
-    </div>
+  <div>
+    <el-input type="textarea" v-model="jsonContent" :autosize="{ minRows: 12, maxRows: 28 }" :readonly="mode === 'EXPORT'"/>
+    <el-alert v-if="error" :title="error" type="error" :closable="false" style="margin-top:12px"/>
+    <div class="export-actions"><el-button @click="$emit('finished', 'cancel')">{{ $t('message.cancel') }}</el-button><el-button type="primary" :loading="loading" @click="onClickConfirmButton">{{ $t('message.confirm') }}</el-button></div>
+  </div>
 </template>
-
 <script>
+import { parseResponse } from '../../services/http.js'
 export default {
-    name: "Exporter",
-    // 数据传递
-    props: [
-        "type", // 类型，JOB 代表任务的导入导出，WORKFLOW 代表工作流的导入导出
-        "mode", // EXPORT or INPUT
-        "targetId" // export 模式有效，目标ID
-    ],
-    data() {
-        return {
-            jsonContent: undefined,
-        }
-    }
-    ,
-    methods: {
-
-        notifyParent() {
-            this.$emit("finished", 'ok');
-        },
-
-        fetchExportInfo(type, targetId) {
-            let api = '/job/export?jobId=' + targetId;
-            if (type === 'WORKFLOW') {
-                api = '/workflow/export?workflowId=' + targetId;
-            }
-            let that = this;
-            that.axios.get(api).then(res => {
-                console.log('[Exporter] query export result: ' + JSON.stringify(res))
-                that.jsonContent = JSON.stringify(res);
-            });
-        },
-        input() {
-            console.log('[Exporter] try to input by content: ' + this.jsonContent)
-            if (this.jsonContent === undefined || this.jsonContent.length === 0) {
-                return;
-            }
-            this.axios.post("/job/save", JSON.parse(this.jsonContent)).then()
-        },
-
-        onClickCancelButton() {
-            this.notifyParent();
-        },
-
-        onClickConfirmButton() {
-            if (this.mode === 'INPUT') {
-                this.input();
-            }
-            this.notifyParent();
-        }
-    }
-    ,mounted() {
-        console.log("[Exporter] mounted Exporter with params, type=%s, mode=%s, targetId=%s", this.type, this.mode, this.targetId);
-        if (this.mode === 'EXPORT') {
-            this.fetchExportInfo(this.type, this.targetId);
-        }
-    }
+  name: 'Exporter', props: ['type','mode','targetId'], emits: ['finished'],
+  data() { return { jsonContent: '', loading: false, error: '' } },
+  methods: {
+    async fetchExportInfo() {
+      this.loading = true
+      try { const workflow = this.type === 'WORKFLOW'; const result = await this.axios.get(workflow ? '/workflow/export' : '/job/export', { params: { [workflow ? 'workflowId' : 'jobId']: this.targetId } }); this.jsonContent = JSON.stringify(result, null, 2) } catch (error) { this.error = error.message } finally { this.loading = false }
+    },
+    async onClickConfirmButton() {
+      if (this.loading) return
+      if (this.mode !== 'INPUT') { this.$emit('finished', 'ok'); return }
+      this.error = ''
+      let payload
+      try { payload = parseResponse(this.jsonContent); if (!payload || typeof payload !== 'object' || Array.isArray(payload)) throw new Error('invalid') } catch { this.error = this.$t('message.invalidJson'); return }
+      this.loading = true
+      try { await this.axios.post(this.type === 'WORKFLOW' ? '/workflow/save' : '/job/save', { ...payload, appId: localStorage.getItem('Power_appId') }); this.$emit('finished','ok') } catch (error) { this.error = error.message } finally { this.loading = false }
+    },
+  },
+  mounted() { if (this.mode === 'EXPORT') this.fetchExportInfo() },
 }
 </script>
-
-<style scoped>
-
-</style>
+<style scoped>.export-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}</style>

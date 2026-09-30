@@ -1,102 +1,45 @@
 <template>
-    <div id="navbar">
-        <div id="logo_content">
-            <a href="http://www.powerjob.tech/" target="_blank">
-                <img src="../../assets/powerjob-console-logo.png"  alt="logo"/>
-            </a>
-        </div>
-
-        <div id="right_content">
-
-            <el-dropdown @command="this.common.switchLanguage">
-                <span class="el-dropdown-link">
-                    <p style="color:#ffffff">Language<i class="el-icon-arrow-down el-icon--right"/></p>
-                </span>
-                <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item command="en">English</el-dropdown-item>
-                    <el-dropdown-item command="cn">简体中文</el-dropdown-item>
-                </el-dropdown-menu>
-            </el-dropdown>
-
-            <el-dropdown @command="handleSettings">
-                <span class="el-dropdown-link">
-                    <p style="color:#ffffff">Settings<i class="el-icon-arrow-down el-icon--right"/></p>
-                </span>
-                <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item command="back2Home">{{$t('message.back2Home')}}</el-dropdown-item>
-                    <el-dropdown-item command="logout">{{$t('message.logout')}}</el-dropdown-item>
-                </el-dropdown-menu>
-            </el-dropdown>
-        </div>
+  <header class="workspace-header">
+    <div class="header-context">
+      <button class="nav-toggle" :aria-label="$t('message.navigation')" @click="$emit('toggle-nav')"><PjIcon name="menu"/></button>
+      <span class="breadcrumb-root">{{ $t($route.path.startsWith('/admin') ? 'message.workspaceAdmin' : 'message.workspace') }}</span>
+      <span class="breadcrumb-divider">/</span><strong>{{ pageTitle }}</strong>
+      <el-tag v-if="appName && !$route.path.startsWith('/admin')" class="application-tag" effect="plain">{{ appName }}</el-tag>
     </div>
+    <div class="header-actions">
+      <el-dropdown @command="common.switchLanguage">
+        <button class="header-button">{{ $i18n.locale === 'en' ? 'English' : '简体中文' }} <PjIcon name="arrow"/></button>
+        <template #dropdown><el-dropdown-menu><el-dropdown-item command="cn">简体中文</el-dropdown-item><el-dropdown-item command="en">English</el-dropdown-item></el-dropdown-menu></template>
+      </el-dropdown>
+      <el-dropdown @command="handleSettings">
+        <button class="header-button account-button"><span class="avatar"><PjIcon name="user"/></span><span>{{ $t('message.account') }}</span><PjIcon name="arrow"/></button>
+        <template #dropdown><el-dropdown-menu><el-dropdown-item command="back2Home">{{ $t('message.back2Home') }}</el-dropdown-item><el-dropdown-item command="profile">{{ $t('message.tabPersonal') }}</el-dropdown-item><el-dropdown-item command="logout" divided>{{ $t('message.logout') }}</el-dropdown-item></el-dropdown-menu></template>
+      </el-dropdown>
+    </div>
+  </header>
 </template>
-
 <script>
-    export default {
-        name: "Navbar",
-        data() {
-            return {
-            }
-        },
-        methods: {
-
-          // 返回主页
-          onClickBack2Home() {
-            window.localStorage.removeItem('Power_appId')
-            this.$router.push("/");
-          },
-
-          // 退出登录
-          onClickLogout() {
-            window.localStorage.removeItem('Power_appId');
-            window.localStorage.removeItem('PowerJwt')
-            this.$router.push("/");
-          },
-            // 处理系统设置的指令时间
-            handleSettings: function (cmd) {
-                switch (cmd) {
-                    case "logout": this.onClickLogout(); break;
-                    case "back2Home": this.onClickBack2Home(); break;
-                }
-            }
-        }
-    }
+import PjIcon from '../common/PjIcon.vue'
+import { useAppStore } from '../../store.js'
+export default {
+  name: 'Navbar',
+  components: { PjIcon },
+  emits: ['toggle-nav'],
+  computed: {
+    appName() { return useAppStore().appInfo.title || useAppStore().appInfo.appName || localStorage.getItem('Power_appName') },
+    pageTitle() {
+      const titles = { '/oms/home': 'tabHome', '/oms/job': 'tabJobManage', '/oms/instance': 'tabJobInstance', '/oms/workflow': 'tabWorkflowManage', '/oms/wfinstance': 'tabWfInstance', '/oms/template': 'tabTemplate', '/oms/containermanage': 'tabContainerManager', '/oms/workflowEditor': 'workflow', '/oms/wfInstanceDetail': 'wfInstanceDetail', '/admin/app': 'tabAppManage', '/admin/namespace': 'tabNamespace', '/admin/user': 'tabUserManager', '/admin/personal': 'tabPersonal', '/admin/settings': 'tabSettings' }
+      return this.$t('message.' + (titles[this.$route.path] || 'workspace'))
+    },
+  },
+  methods: {
+    onClickBack2Home() { useAppStore().clearApplication(); this.$router.push('/admin/app') },
+    onClickLogout() { useAppStore().clearApplication(); localStorage.removeItem('PowerJwt'); this.$router.push('/loginHomepage') },
+    handleSettings(command) {
+      if (command === 'logout') this.onClickLogout()
+      else if (command === 'back2Home') this.onClickBack2Home()
+      else if (command === 'profile') this.$router.push('/admin/personal')
+    },
+  },
+}
 </script>
-
-<style scoped>
-    #navbar {
-        width: 100%;
-        height: 80px;
-        display: flex;
-        background-color: #000;
-        /* 子容器沿主轴均匀分布，位于首末两端的子容器与父容器相切 */
-        justify-content: space-between;
-        border-bottom:2px solid #dddfe6;
-    }
-
-    #logo_content {
-        padding-right: 10px;
-        box-sizing: border-box;
-        width: 220px;
-        height: 100%;
-        background-color: #000000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    #right_content {
-        display: flex;
-        align-items: center;
-        margin: 20px;
-    }
-
-    img {
-        width: 100%;
-        margin-left:8px;
-    }
-
-    .el-dropdown {
-        margin-right: 50px;
-    }
-</style>

@@ -1,11 +1,11 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import Console from "./components/Console";
 import AdminConsole from "./components/admin/AdminConsole.vue";
 
-Vue.use(VueRouter);
 
-const router = new VueRouter({
+
+const router = createRouter({
+    history: createWebHashHistory(),
     routes: [
         { path: "/", redirect: '/loginHomepage' },
         { path: "/loginHomepage", component: () => import('./components/login/LoginHomepage.vue') },
@@ -39,10 +39,19 @@ const router = new VueRouter({
             ]
         },
 
+        // Unknown bookmarks recover through the existing sign-in/session flow.
+        { path: "/:pathMatch(.*)*", redirect: "/loginHomepage" },
+
         // 调试用
         { path: "/sidebar", component: () => import('./components/bar/Sidebar') },
         { path: "/navbar", component: () => import('./components/bar/Navbar') },
     ]
+});
+
+router.beforeEach(to => {
+    if (/^\/(?:oms|admin)(?:\/|$)/.test(to.path) && !localStorage.getItem('PowerJwt')) {
+        return '/loginHomepage';
+    }
 });
 
 // 默认导出，供 main.js 引入，作为项目的路由器

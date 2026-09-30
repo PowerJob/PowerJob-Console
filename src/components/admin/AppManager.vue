@@ -1,304 +1,198 @@
 <template>
-  <div id="app_manager">
-    <!--第一行，条件搜索栏（row布局：gutter代表栅格间隔，span代表占用格数）-->
-    <el-row :gutter="20">
-
-      <!-- 左侧搜索栏，占地面积 16/24 -->
-      <el-col :span="16">
-        <el-form :inline="true" :model="queryAppRequest" class="el-form--inline">
-          <el-form-item label="ID">
-            <el-input v-model="queryAppRequest.appId" placeholder="ID"/>
-          </el-form-item>
-          <el-form-item label="appName">
-            <el-input v-model="queryAppRequest.appNameLike" :placeholder="$t('message.fuzzyQuery')"/>
-          </el-form-item>
-          <el-form-item label="tag">
-            <el-input v-model="queryAppRequest.tagLike" :placeholder="$t('message.fuzzyQuery')"/>
-          </el-form-item>
-
-          <el-form-item label="namespace">
-            <el-select v-model="queryAppRequest.namespaceId" placeholder="namespace">
-              <el-option
-                  v-for="item in namespaceList"
-                  :key="item.id"
-                  :label="item.showName"
-                  :value="item.id">
-              </el-option>
-            </el-select>
-          </el-form-item>
-
-          <el-form-item :label="$t('message.showMyRelated')">
-            <el-switch v-model="queryAppRequest.showMyRelated" @change="listApps"></el-switch>
-          </el-form-item>
-
-          <el-form-item>
-            <el-button type="primary" @click="listApps">{{$t('message.query')}}</el-button>
-            <el-button type="cancel" @click="onClickReset">{{$t('message.reset')}}</el-button>
-          </el-form-item>
-        </el-form>
-      </el-col>
-
-      <!-- 右侧新增任务按钮，占地面积 4/24 -->
-      <el-col :span="4">
-        <div style="float:right;padding-right:10px">
-          <el-button type="primary" @click="onClickNewApps">{{$t('message.add')}}</el-button>
-        </div>
-      </el-col>
-    </el-row>
-
-    <!--第二行，任务数据表格-->
-    <el-row>
-      <el-table :data="appResult.data" style="width: 100%">
-        <el-table-column prop="id" label="ID" width="80"/>
-        <el-table-column prop="appName" label="code" width="150"/>
-        <el-table-column prop="title" :label="$t('message.name')" />
-        <el-table-column prop="namespaceName" label="namespace" />
-        <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" />
-        <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" />
-        <el-table-column prop="creatorShowName" :label="$t('message.creator')" />
-        <el-table-column prop="modifierShowName" :label="$t('message.modifier')" />
-
-        <el-table-column :label="$t('message.operation')" width="150">
-          <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="onClickModify(scope.row)">{{$t('message.edit')}}</el-button>
-            <el-button size="mini" type="text" @click="onClickEnter(scope.row)">{{$t('message.enter')}}</el-button>
+  <section class="admin-page">
+    <header class="page-heading">
+      <div><h1>{{ $t('message.tabAppManage') }}</h1><p>{{ $t('message.applicationsDescription') }}</p></div>
+      <el-button type="primary" @click="onClickNewApps">{{ $t('message.add') }}</el-button>
+    </header>
+    <div class="filter-panel">
+      <el-form :inline="true" :model="queryAppRequest" @submit.prevent="searchApps">
+        <el-form-item label="ID"><el-input v-model="queryAppRequest.appId" clearable placeholder="ID" @keyup.enter="searchApps" /></el-form-item>
+        <el-form-item label="appName"><el-input v-model="queryAppRequest.appNameLike" clearable :placeholder="$t('message.fuzzyQuery')" @keyup.enter="searchApps" /></el-form-item>
+        <el-form-item :label="$t('message.tag')"><el-input v-model="queryAppRequest.tagLike" clearable :placeholder="$t('message.fuzzyQuery')" @keyup.enter="searchApps" /></el-form-item>
+        <el-form-item label="Namespace">
+          <el-select v-model="queryAppRequest.namespaceId" clearable filterable placeholder="Namespace">
+            <el-option v-for="item in namespaceList" :key="item.id" :label="item.showName" :value="item.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item :label="$t('message.showMyRelated')"><el-switch v-model="queryAppRequest.showMyRelated" @change="searchApps" /></el-form-item>
+        <el-form-item class="filter-actions">
+          <el-button type="primary" native-type="submit" :loading="loading">{{ $t('message.query') }}</el-button>
+          <el-button @click="onClickReset">{{ $t('message.reset') }}</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <div class="data-panel">
+      <el-table v-loading="loading" :data="appResult.data" row-key="id" style="width: 100%">
+        <el-table-column prop="id" label="ID" min-width="90" />
+        <el-table-column prop="appName" label="appName" min-width="160" show-overflow-tooltip />
+        <el-table-column prop="title" :label="$t('message.name')" min-width="160" show-overflow-tooltip />
+        <el-table-column prop="namespaceName" label="Namespace" min-width="140" show-overflow-tooltip />
+        <el-table-column prop="gmtCreateStr" :label="$t('message.createTime')" min-width="180" />
+        <el-table-column prop="gmtModifiedStr" :label="$t('message.modifyTime')" min-width="180" />
+        <el-table-column prop="creatorShowName" :label="$t('message.creator')" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="modifierShowName" :label="$t('message.modifier')" min-width="120" show-overflow-tooltip />
+        <el-table-column :label="$t('message.operation')" width="135" fixed="right">
+          <template #default="{ row }">
+            <el-button size="small" link type="primary" @click="onClickModify(row)">{{ $t('message.edit') }}</el-button>
+            <el-button size="small" link type="primary" @click="onClickEnter(row)">{{ $t('message.enter') }}</el-button>
           </template>
         </el-table-column>
       </el-table>
-    </el-row>
+      <div class="pagination">
+        <el-pagination layout="total, prev, pager, next" :total="appResult.totalItems" :page-size="queryAppRequest.pageSize"
+                       :current-page="queryAppRequest.index + 1" @current-change="onClickChangePage" :hide-on-single-page="true" />
+      </div>
+    </div>
 
-    <!-- 第三行，分页插件 -->
-    <el-row>
-      <el-pagination
-          layout="prev, pager, next"
-          :total="this.appResult.totalItems"
-          :page-size="this.appResult.pageSize"
-          @current-change="onClickChangePage"
-          :hide-on-single-page="true"/>
-    </el-row>
-
-    <el-dialog :close-on-click-modal="false" :visible.sync="modifiedAppFormVisible" width="80%">
-      <el-form :model="modifiedAppForm" label-width="120px">
-
-        <el-form-item label="namespace">
-          <el-select v-model="modifiedAppForm.namespaceId" placeholder="namespace">
-            <el-option
-                v-for="item in namespaceList"
-                :key="item.id"
-                :label="item.showName"
-                :value="item.id">
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="appName">
-          <el-input v-model="modifiedAppForm.appName"/>
-        </el-form-item>
-        <el-form-item :label="$t('message.name')">
-          <el-input v-model="modifiedAppForm.title"/>
-        </el-form-item>
-        <el-form-item :label="$t('message.password')">
-          <el-input v-model="modifiedAppForm.password" type="password" show-password/>
-        </el-form-item>
-        <el-form-item :label="$t('message.tag')">
-          <el-input v-model="modifiedAppForm.tags"/>
-        </el-form-item>
-        <el-form-item :label="$t('message.extra')">
-          <el-input v-model="modifiedAppForm.extra"/>
-        </el-form-item>
-
-        <el-form-item :label="$t('message.permissionManage')">
-          <user-role :user-rule-form="user_rule_form"/>
-        </el-form-item>
-
-        <el-form-item>
-          <el-button v-if="modifiedAppForm.id!=null" type="danger" @click="onClickDeleteApp">{{$t('message.delete')}}</el-button>
-          <el-button type="primary" @click="onClickSaveApp">{{$t('message.save')}}</el-button>
-          <el-button @click="modifiedAppFormVisible = false">{{$t('message.cancel')}}</el-button>
-        </el-form-item>
+    <el-dialog :title="$t(modifiedAppForm.id == null ? 'message.add' : 'message.edit')"
+               v-model="modifiedAppFormVisible" :close-on-click-modal="false" :close-on-press-escape="!saving && !deleting"
+               :show-close="!saving && !deleting" width="min(800px, calc(100vw - 32px))">
+      <el-form ref="appForm" :model="modifiedAppForm" :rules="formRules" :disabled="saving || deleting" label-position="top">
+        <div class="form-grid">
+          <el-form-item label="Namespace" prop="namespaceId">
+            <el-select v-model="modifiedAppForm.namespaceId" filterable placeholder="Namespace">
+              <el-option v-for="item in namespaceList" :key="item.id" :label="item.showName" :value="item.id" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="appName" prop="appName"><el-input v-model="modifiedAppForm.appName" /></el-form-item>
+          <el-form-item :label="$t('message.name')"><el-input v-model="modifiedAppForm.title" /></el-form-item>
+          <el-form-item :label="$t('message.password')" prop="password"><el-input v-model="modifiedAppForm.password" show-password autocomplete="new-password" /></el-form-item>
+          <el-form-item :label="$t('message.tag')"><el-input v-model="modifiedAppForm.tags" /></el-form-item>
+          <el-form-item :label="$t('message.extra')"><el-input v-model="modifiedAppForm.extra" /></el-form-item>
+        </div>
+        <el-form-item :label="$t('message.permissionManage')"><user-role v-model:user-rule-form="user_rule_form" /></el-form-item>
       </el-form>
+      <template #footer>
+        <div class="dialog-actions">
+          <el-button v-if="modifiedAppForm.id != null" type="danger" plain :loading="deleting" :disabled="saving" @click="onClickDeleteApp">{{ $t('message.delete') }}</el-button>
+          <span class="action-spacer"></span>
+          <el-button :disabled="saving || deleting" @click="modifiedAppFormVisible = false">{{ $t('message.cancel') }}</el-button>
+          <el-button type="primary" :loading="saving" :disabled="deleting" @click="onClickSaveApp">{{ $t('message.save') }}</el-button>
+        </div>
+      </template>
     </el-dialog>
-  </div>
+  </section>
 </template>
 
 <script>
-// import UserRole from "../common/UserRole.vue";
-
-import UserRole from "../common/UserRole.vue";
-
+import UserRole from '../common/UserRole.vue'
+import { useAppStore } from '../../store.js'
+const emptyRoles = () => ({ observer: [], qa: [], developer: [], admin: [] })
+const emptyForm = () => ({ id: undefined, appName: '', namespaceId: undefined, password: '', title: '', tags: '', extra: '' })
+const emptyQuery = () => ({ appId: undefined, namespaceId: undefined, appNameLike: undefined, tagLike: undefined, showMyRelated: true, index: 0, pageSize: 10 })
+const cloneRoles = (roles) => Object.fromEntries(Object.keys(emptyRoles()).map(role => [role, Array.isArray(roles?.[role]) ? [...roles[role]] : []]))
 export default {
-  name: "AppManager",
-  components: {UserRole},
-  // components: {UserRole},
+  name: 'AppManager',
+  components: { UserRole },
   data() {
     return {
-      // 查询 APP 请求
-      queryAppRequest: {
-        appId: undefined,
-        namespaceId: undefined,
-        appNameLike: undefined,
-        tagLike: undefined,
-        showMyRelated: true,
-        index:0,
-        pageSize:10
-      },
-
-      // 创建or修改表单
-      modifiedAppForm: {
-        id: undefined,
-        appName: undefined,
-        namespaceId: undefined,
-        password: undefined,
-        title: undefined,
-        tags: undefined,
-        extra: undefined
-      },
-
-      user_rule_form: {
-        observer: [],
-        qa: [],
-        developer: [],
-        admin: [],
-      },
-
-      appResult: [],
-
-      // 显示变量
-      modifiedAppFormVisible: false,
-
-      // namespace，用于驱动下拉列表
-      namespaceList: []
+      queryAppRequest: emptyQuery(), modifiedAppForm: emptyForm(), user_rule_form: emptyRoles(),
+      appResult: { data: [], totalItems: 0, pageSize: 10 }, modifiedAppFormVisible: false,
+      namespaceList: [], loading: false, saving: false, deleting: false, requestGeneration: 0
+    }
+  },
+  computed: {
+    formRules() {
+      const required = { required: true, message: this.$t('message.requiredField'), trigger: 'blur' }
+      return { namespaceId: [required], appName: [required], password: [required] }
     }
   },
   methods: {
-    // 点击重置按钮
-    onClickReset() {
-      this.queryAppRequest.appId = undefined;
-      this.queryAppRequest.namespaceId = undefined;
-      this.queryAppRequest.appNameLike = undefined;
-      this.queryAppRequest.tagLike = undefined;
-      this.queryAppRequest.showMyRelated = true;
-      this.queryAppRequest.index = 0;
-      this.listApps();
-    },
-
-    // 查询 app
-    listApps() {
-      const that = this;
-      this.axios.post("/appInfo/list", this.queryAppRequest).then((res) => {
-        that.appResult = res;
-      });
-    },
-
-    // 点击 换页
-    onClickChangePage(index) {
-      // 后端从0开始，前端从1开始
-      this.queryAppRequest.index = index - 1;
-      this.listApps();
-    },
-
-    // 点击新增按钮
-    onClickNewApps() {
-      // 清空之前填写的脏数据
-      this.modifiedAppForm = {
-        id: undefined,
-        appName: undefined,
-        password: undefined,
-        title: undefined,
-        tags: undefined,
-        extra: undefined
-      }
-
-      this.user_rule_form.observer = []
-      this.user_rule_form.qa = []
-      this.user_rule_form.developer = []
-      this.user_rule_form.admin = []
-
-      this.modifiedAppFormVisible = true;
-    },
-
-    onClickSaveApp() {
-      let that = this;
-      this.modifiedAppForm['componentUserRoleInfo'] = this.user_rule_form;
-
-      this.axios.post("/appInfo/save", this.modifiedAppForm, {
-        'headers': {
-          'Content-Type': 'application/json',
-          'AppId': that.modifiedAppForm.id
+    showError(error) { this.$message.error(error?.message || String(error)) },
+    onClickReset() { this.queryAppRequest = emptyQuery(); return this.listApps() },
+    searchApps() { this.queryAppRequest.index = 0; return this.listApps() },
+    async listApps() {
+      const generation = ++this.requestGeneration
+      this.loading = true
+      try {
+        const result = await this.axios.post('/appInfo/list', { ...this.queryAppRequest })
+        if (generation === this.requestGeneration) {
+          this.appResult = { data: [], totalItems: 0, pageSize: 10, ...result }
         }
-      }).then(() => {
-        that.$message.success(that.$t('message.success'));
-        this.listApps();
-      }, e => that.$message.error(e))
-      this.modifiedAppFormVisible = false;
+      } catch (error) { if (generation === this.requestGeneration) this.showError(error) }
+      finally { if (generation === this.requestGeneration) this.loading = false }
     },
-
-    onClickDeleteApp() {
-      const appId = this.modifiedAppForm.id;
-      this.$confirm(this.$t('message.deleteConfirmation', {name: this.modifiedAppForm.appName}), this.$t('message.delete'), {
-        confirmButtonText: this.$t('message.confirm'),
-        cancelButtonText: this.$t('message.cancel'),
-        type: 'warning'
-      }).then(() => this.axios.post('/appInfo/delete?appId=' + appId, {}, {
-        headers: {'Content-Type': 'application/json', 'AppId': appId}
-      })).then(() => {
-        this.$message.success(this.$t('message.success'));
-        this.listApps();
-        this.modifiedAppFormVisible = false;
-      }).catch(() => {});
+    onClickChangePage(index) { this.queryAppRequest.index = index - 1; return this.listApps() },
+    onClickNewApps() {
+      this.modifiedAppForm = emptyForm()
+      this.user_rule_form = emptyRoles()
+      this.modifiedAppFormVisible = true
+      this.$nextTick(() => this.$refs.appForm?.clearValidate())
     },
-
-    // 点击 编辑按钮
+    async onClickSaveApp() {
+      if (this.saving) return
+      this.saving = true
+      try {
+        if (!this.modifiedAppForm.appName || !this.modifiedAppForm.password || this.modifiedAppForm.namespaceId == null || this.modifiedAppForm.namespaceId === '') {
+          this.$message.warning(this.$t('message.requiredField'))
+          await this.$refs.appForm?.validate().catch(() => false)
+          return
+        }
+        if (this.$refs.appForm && !await this.$refs.appForm.validate().catch(() => false)) return
+        const payload = { ...this.modifiedAppForm, componentUserRoleInfo: cloneRoles(this.user_rule_form) }
+        await this.axios.post('/appInfo/save', payload, { headers: { 'Content-Type': 'application/json', AppId: payload.id } })
+        this.$message.success(this.$t('message.success'))
+        this.modifiedAppFormVisible = false
+        await this.listApps()
+      } catch (error) { this.showError(error) }
+      finally { this.saving = false }
+    },
+    async onClickDeleteApp() {
+      if (this.deleting || this.saving) return
+      const app = { ...this.modifiedAppForm }
+      try {
+        await this.$confirm(this.$t('message.deleteConfirmation', { name: app.appName }), this.$t('message.delete'), {
+          confirmButtonText: this.$t('message.confirm'), cancelButtonText: this.$t('message.cancel'), type: 'warning'
+        })
+      } catch { return }
+      this.deleting = true
+      try {
+        await this.axios.post('/appInfo/delete?appId=' + encodeURIComponent(app.id), {}, {
+          headers: { 'Content-Type': 'application/json', AppId: app.id }
+        })
+        if (window.localStorage.getItem('Power_appId') === String(app.id)) useAppStore().clearApplication()
+        this.$message.success(this.$t('message.success'))
+        this.modifiedAppFormVisible = false
+        await this.listApps()
+      } catch (error) { this.showError(error) }
+      finally { this.deleting = false }
+    },
     onClickModify(data) {
-      this.modifiedAppForm = JSON.parse(JSON.stringify(data));
-      this.user_rule_form = JSON.parse(JSON.stringify(data.componentUserRoleInfo));
-      this.modifiedAppFormVisible = true;
+      this.modifiedAppForm = { ...emptyForm(), ...data }
+      this.user_rule_form = cloneRoles(data.componentUserRoleInfo)
+      this.modifiedAppFormVisible = true
+      this.$nextTick(() => this.$refs.appForm?.clearValidate())
     },
-
-    // 进入任务管理界面
     onClickEnter(data) {
-      let appInfo = {
-        id: data.id,
-        appName: data.appName
-      };
-      // 将 appId 存储到 VueStore
-      this.$store.commit("initAppInfo", appInfo);
-
-      // 同步存储一份到 localStorage（后续主要使用 localStorage，鉴权全部在服务端，本地无脑存即可）
-      window.localStorage.setItem('Power_appId', appInfo.id)
-
-      // 跳转到 APP 主界面
-      this.$router.push("/oms/home")
+      useAppStore().selectApplication({ id: data.id, appName: data.appName })
+      return this.$router.push('/oms/home')
     },
-
-    // 自动登录 APP，缩短绝大部分用户的操作路径
-    autoEnterApp() {
-      const appId = window.localStorage.getItem('Power_appId')
-      if (appId == undefined || appId == null || appId == '') {
-        return
-      }
-      console.log('Detect the existence of appId and enter automatically: ' + appId)
-      this.$router.push("/oms/home")
-    },
-
-    listNamespaces() {
-      const that = this;
-      this.axios.post("/namespace/listAll", this.queryAppRequest).then((res) => {
-        that.namespaceList = res;
-      });
+    async listNamespaces() {
+      try {
+        const result = await this.axios.post('/namespace/listAll', { ...this.queryAppRequest })
+        this.namespaceList = Array.isArray(result) ? result : []
+      } catch (error) { this.showError(error) }
     }
   },
-
-  mounted() {
-
-    this.autoEnterApp()
-
-    this.listApps()
-    this.listNamespaces()
-  }
+  mounted() { this.listApps(); this.listNamespaces() }
 }
 </script>
 
 <style scoped>
-
+.admin-page { width: 100%; }
+.page-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 22px; }
+.page-heading h1 { font-size: 25px; font-weight: 650; letter-spacing: -.6px; color: var(--pj-text); margin: 0 0 8px; }
+.page-heading p { color: var(--pj-muted); font-size: 13px; margin: 0; line-height: 1.6; }
+.filter-panel, .data-panel { background: var(--pj-surface); border: 1px solid var(--pj-border); border-radius: 13px; }
+.filter-panel { padding: 20px 20px 2px; margin-bottom: 18px; }
+.filter-panel :deep(.el-form-item) { margin-right: 16px; margin-bottom: 18px; }
+.filter-panel :deep(.el-input), .filter-panel :deep(.el-select) { width: 170px; }
+.data-panel { overflow: hidden; }
+.pagination { display: flex; justify-content: flex-end; padding: 14px 18px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; }
+.form-grid .el-select { width: 100%; }
+.dialog-actions { display: flex; align-items: center; gap: 8px; }
+.dialog-actions .el-button { margin: 0; }
+.action-spacer { flex: 1; }
+@media (max-width: 650px) { .page-heading { align-items: flex-start; } .page-heading h1 { font-size: 22px; } .form-grid { grid-template-columns: 1fr; } .filter-panel :deep(.el-form-item), .filter-panel :deep(.el-form-item__content) { width: 100%; margin-right: 0; } .filter-panel :deep(.el-input), .filter-panel :deep(.el-select) { width: 100%; } .pagination { padding: 12px 8px; } }
 </style>

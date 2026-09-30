@@ -1,200 +1,188 @@
 <template>
-<div>
-
-  <el-collapse v-model="activeNames" @change="handleCollapseChange">
-    <el-collapse-item :title="$t('message.personalInfo')" name="personalInfo">
-      <el-row>
-        <el-form :model="userDetailInfo" label-width="118px" style="width: 500px;">
-          <el-form-item label="ID">
-            <el-input disabled v-model="userDetailInfo.id"/>
-          </el-form-item>
-          <el-form-item label="username">
-            <el-input disabled v-model="userDetailInfo.username"/>
-          </el-form-item>
-
-          <el-form-item label="accountType">
-            <el-input disabled v-model="userDetailInfo.accountType"/>
-          </el-form-item>
-
-          <el-form-item label="originUsername">
-            <el-input disabled v-model="userDetailInfo.originUsername"/>
-          </el-form-item>
-
-          <el-form-item label="nick">
-            <el-input v-model="userDetailInfo.nick"/>
-          </el-form-item>
-
-          <el-form-item label="phone">
-            <el-input v-model="userDetailInfo.phone"/>
-          </el-form-item>
-
-          <el-form-item label="email">
-            <el-input v-model="userDetailInfo.email"/>
-          </el-form-item>
-
-          <el-form-item label="webHook">
-            <el-input v-model="userDetailInfo.webHook"/>
-          </el-form-item>
-
-          <el-form-item label="globalRoles">
-            <el-input disabled v-model="userDetailInfo.globalRoles"/>
-          </el-form-item>
-
-          <el-form-item>
-            <el-button type="primary" @click="onClickSaveNewUserInfo">{{$t('message.save')}}</el-button>
-            <el-button type="danger" v-if="userDetailInfo.accountType=='PWJB'" @click="onClickChangePassword">{{$t('message.changePassword')}}</el-button>
-          </el-form-item>
-
+  <section class="profile-page">
+    <header class="page-heading"><h1>{{ $t('message.tabPersonal') }}</h1><p>{{ $t('message.profileDescription') }}</p></header>
+    <div class="profile-grid">
+      <section class="profile-card" v-loading="loading">
+        <div class="profile-summary">
+          <span class="avatar">{{ avatarLetter }}</span>
+          <div><h2>{{ userDetailInfo.nick || userDetailInfo.username || $t('message.personalInfo') }}</h2>
+            <span class="account-label">{{ userDetailInfo.accountType || 'PowerJob' }} · ID {{ userDetailInfo.id ?? '—' }}</span>
+          </div>
+        </div>
+        <el-form ref="profileForm" :model="userDetailInfo" :disabled="saving || loading" label-position="top">
+          <div class="form-grid">
+            <el-form-item :label="$t('message.username')"><el-input disabled v-model="userDetailInfo.username" /></el-form-item>
+            <el-form-item :label="$t('message.originUsername')"><el-input disabled v-model="userDetailInfo.originUsername" /></el-form-item>
+            <el-form-item :label="$t('message.accountType')"><el-input disabled v-model="userDetailInfo.accountType" /></el-form-item>
+            <el-form-item :label="$t('message.globalRoles')"><el-input disabled :model-value="globalRolesText" /></el-form-item>
+            <el-form-item :label="$t('message.nick')"><el-input v-model="userDetailInfo.nick" /></el-form-item>
+            <el-form-item :label="$t('message.phone')"><el-input v-model="userDetailInfo.phone" autocomplete="tel" /></el-form-item>
+          </div>
+          <el-form-item :label="$t('message.email')"><el-input v-model="userDetailInfo.email" autocomplete="email" /></el-form-item>
+          <el-form-item :label="$t('message.webhook')"><el-input v-model="userDetailInfo.webHook" /></el-form-item>
+          <div class="profile-actions">
+            <el-button v-if="userDetailInfo.accountType === 'PWJB'" :disabled="loading || !userLoaded" @click="onClickChangePassword">{{ $t('message.changePassword') }}</el-button>
+            <el-button type="primary" :loading="saving" :disabled="loading || !userLoaded" @click="onClickSaveNewUserInfo">{{ $t('message.save') }}</el-button>
+          </div>
+          <el-button v-if="!loading && !userLoaded" @click="fetchUserDetail">{{ $t('message.retry') }}</el-button>
         </el-form>
-      </el-row>
-    </el-collapse-item>
+      </section>
+      <section class="profile-card app-admin-card">
+        <div class="card-heading"><span class="card-icon" aria-hidden="true">◇</span><h2>{{ $t('message.appAdmin') }}</h2></div>
+        <el-form ref="appAdminForm" :model="appAssertRequest" label-position="top" @submit.prevent="onClickAuthThenBecomeAdmin">
+          <el-form-item label="appName" prop="appName" :rules="requiredRule"><el-input v-model="appAssertRequest.appName" /></el-form-item>
+          <el-form-item :label="$t('message.password')" prop="password" :rules="requiredRule">
+            <el-input v-model="appAssertRequest.password" show-password autocomplete="off" />
+          </el-form-item>
+          <el-button type="primary" native-type="submit" :loading="granting">{{ $t('message.authThenBecomeAdmin') }}</el-button>
+        </el-form>
+      </section>
+    </div>
 
-    <el-collapse-item :title="$t('message.appAdmin')" name="appAdmin">
-      <el-form :model="appAssertRequest" label-width="118px" style="width: 500px;">
-        <el-form-item label="appName">
-          <el-input v-model="appAssertRequest.appName"/>
+    <el-dialog :title="$t('message.changePassword')" v-model="changePasswordFormVisible" width="min(540px, calc(100vw - 32px))"
+               :close-on-click-modal="false" :close-on-press-escape="!changingPassword" :show-close="!changingPassword">
+      <el-form ref="passwordForm" :model="changePasswordRequest" label-position="top">
+        <el-form-item :label="$t('message.username')"><el-input disabled v-model="changePasswordRequest.username" autocomplete="username" /></el-form-item>
+        <el-form-item :label="$t('message.oldPassword')" prop="oldPassword" :rules="requiredRule">
+          <el-input v-model="changePasswordRequest.oldPassword" show-password autocomplete="current-password" />
         </el-form-item>
-
-        <el-form-item label="password">
-          <el-input v-model="appAssertRequest.password"/>
+        <el-form-item :label="$t('message.newPassword')" prop="newPassword" :rules="requiredRule">
+          <el-input v-model="changePasswordRequest.newPassword" show-password autocomplete="new-password" />
         </el-form-item>
-
-        <el-form-item>
-          <el-button type="primary" @click="onClickAuthThenBecomeAdmin">{{$t('message.authThenBecomeAdmin')}}</el-button>
+        <el-form-item :label="$t('message.newPassword2')" prop="newPassword2" :rules="requiredRule">
+          <el-input v-model="changePasswordRequest.newPassword2" show-password autocomplete="new-password" />
         </el-form-item>
       </el-form>
-    </el-collapse-item>
-  </el-collapse>
-
-
-
-  <el-dialog :title="$t('message.changePassword')" :visible.sync="changePasswordFormVisible" width="35%" >
-    <el-form :model="changePasswordRequest" style="margin:0 5px">
-
-      <el-form-item label="username">
-        <el-input disabled v-model="changePasswordRequest.username"/>
-      </el-form-item>
-
-      <el-form-item :label="$t('message.oldPassword')">
-        <el-input v-model="changePasswordRequest.oldPassword"/>
-      </el-form-item>
-
-      <el-form-item :label="$t('message.newPassword')">
-        <el-input v-model="changePasswordRequest.newPassword"/>
-      </el-form-item>
-      <el-form-item :label="$t('message.newPassword2')">
-        <el-input v-model="changePasswordRequest.newPassword2"/>
-      </el-form-item>
-
-      <el-form-item>
-        <el-button type="primary" @click="submitChangePasswordRequest">{{$t('message.confirm')}}</el-button>
-        <el-button @click="changePasswordFormVisible = false">{{$t('message.cancel')}}</el-button>
-      </el-form-item>
-    </el-form>
-  </el-dialog>
-</div>
+      <template #footer>
+        <el-button :disabled="changingPassword" @click="changePasswordFormVisible = false">{{ $t('message.cancel') }}</el-button>
+        <el-button type="primary" :loading="changingPassword" @click="submitChangePasswordRequest">{{ $t('message.confirm') }}</el-button>
+      </template>
+    </el-dialog>
+  </section>
 </template>
 
 <script>
-import {Message} from "element-ui";
-
+import { useAppStore } from '../../store.js'
+const emptyUser = () => ({
+  id: undefined, username: '', nick: '', accountType: '', phone: '', email: '', webHook: '',
+  originUsername: '', extra: undefined, globalRoles: [], role2NamespaceList: {}, role2AppList: {}
+})
+const emptyPassword = (username = '') => ({ username, oldPassword: '', newPassword: '', newPassword2: '' })
 export default {
   name: 'UserCenter',
   data() {
     return {
-
-      // 激活的菜单列表
-      activeNames: [''],
-
-      // 用户详细信息
-      userDetailInfo: {
-        id: undefined,
-        username: undefined,
-        nick: undefined,
-        accountType: undefined,
-        password: undefined,
-        phone: undefined,
-        email: undefined,
-        webHook: undefined,
-        originUsername: undefined,
-        extra: undefined,
-        globalRoles: [],
-        role2NamespaceList: {
-
-        },
-        role2AppList: {
-
-        }
-      },
-      // 修改密码
-      changePasswordRequest: {
-        username: undefined,
-        oldPassword: undefined,
-        newPassword: undefined,
-        newPassword2: undefined
-      },
-      changePasswordFormVisible: false,
-
-      // 使用 APP 账户密码成为管理员
-      appAssertRequest: {
-        appName: undefined,
-        password: undefined
-      }
+      userDetailInfo: emptyUser(), loading: false, userLoaded: false, saving: false, granting: false, changingPassword: false,
+      changePasswordRequest: emptyPassword(), changePasswordFormVisible: false,
+      appAssertRequest: { appName: '', password: '' }
     }
   },
-
+  computed: {
+    requiredRule() { return { required: true, message: this.$t('message.requiredField'), trigger: 'blur' } },
+    globalRolesText() {
+      const roles = this.userDetailInfo.globalRoles
+      return Array.isArray(roles) ? roles.join(', ') : String(roles || '')
+    },
+    avatarLetter() { return Array.from(this.userDetailInfo.nick || this.userDetailInfo.username || 'P')[0].toUpperCase() }
+  },
   methods: {
-
-    //
-    handleCollapseChange(val) {
-      console.log(val);
+    showError(error) { this.$message.error(error?.message || String(error)) },
+    async fetchUserDetail() {
+      this.loading = true
+      try {
+        const result = await this.axios.get('/user/detail')
+        if (!result || typeof result !== 'object') throw new Error(this.$t('message.failed'))
+        this.userDetailInfo = { ...emptyUser(), ...result }
+        this.userLoaded = true
+        return this.userDetailInfo
+      } catch (error) { this.showError(error); return null }
+      finally { this.loading = false }
     },
-
-    fetchUserDetail() {
-      const that = this;
-      this.axios.get('/user/detail').then(ret => that.userDetailInfo = ret)
+    async onClickSaveNewUserInfo() {
+      if (this.saving || !this.userLoaded) return
+      this.saving = true
+      const draft = { ...this.userDetailInfo }
+      try {
+        await this.axios.post('/user/modify', draft)
+        const saved = await this.fetchUserDetail()
+        if (!saved) { this.userDetailInfo = draft; return }
+        if (['nick', 'phone', 'email', 'webHook'].some(key => String(saved[key] ?? '') !== String(draft[key] ?? ''))) {
+          this.userDetailInfo = draft
+          throw new Error(this.$t('message.profileUpdateMismatch'))
+        }
+        this.$message.success(this.$t('message.success'))
+      } catch (error) { this.showError(error) }
+      finally { this.saving = false }
     },
-
-    onClickSaveNewUserInfo() {
-      const that = this;
-      this.axios.post('/user/modify', that.userDetailInfo).then(() => {
-        Message.success("SUCCESS");
-        that.fetchUserDetail();
-      })
-    },
-
-    // 修改密码
     onClickChangePassword() {
-      this.changePasswordRequest.username = this.userDetailInfo.originUsername
+      this.changePasswordRequest = emptyPassword(this.userDetailInfo.originUsername)
       this.changePasswordFormVisible = true
+      this.$nextTick(() => this.$refs.passwordForm?.clearValidate())
     },
-
-    submitChangePasswordRequest() {
-      this.axios.post('/pwjbUser/changePassword', this.changePasswordRequest).then(() => {
-        Message.success('SUCCESS')
-
-        window.localStorage.removeItem('PowerJwt');
-        window.localStorage.removeItem('Power_appId');
-        this.$router.push("/");
-
-      }, err => {
-        Message.error(err)
-      })
-      this.changePasswordFormVisible = true
+    async submitChangePasswordRequest() {
+      if (this.changingPassword) return
+      this.changingPassword = true
+      try {
+        const request = this.changePasswordRequest
+        if (!request.username || !request.oldPassword || !request.newPassword || !request.newPassword2) {
+          this.$message.warning(this.$t('message.requiredField'))
+          await this.$refs.passwordForm?.validate().catch(() => false)
+          return
+        }
+        if (this.$refs.passwordForm && !await this.$refs.passwordForm.validate().catch(() => false)) return
+        if (this.changePasswordRequest.newPassword !== this.changePasswordRequest.newPassword2) {
+          this.$message.warning(this.$t('message.passwordMismatch'))
+          return
+        }
+        await this.axios.post('/pwjbUser/changePassword', { ...this.changePasswordRequest })
+        this.$message.success(this.$t('message.success'))
+        this.changePasswordFormVisible = false
+        this.changePasswordRequest = emptyPassword()
+        window.localStorage.removeItem('PowerJwt')
+        useAppStore().clearApplication()
+        await this.$router.push('/')
+      } catch (error) { this.showError(error) }
+      finally { this.changingPassword = false }
     },
-
-    onClickAuthThenBecomeAdmin() {
-      this.axios.post('/appInfo/becomeAdmin', this.appAssertRequest).then(() => {
-        Message.success('SUCCESS')
-      })
+    async onClickAuthThenBecomeAdmin() {
+      if (this.granting) return
+      this.granting = true
+      try {
+        if (!this.appAssertRequest.appName || !this.appAssertRequest.password) {
+          this.$message.warning(this.$t('message.requiredField'))
+          await this.$refs.appAdminForm?.validate().catch(() => false)
+          return
+        }
+        if (this.$refs.appAdminForm && !await this.$refs.appAdminForm.validate().catch(() => false)) return
+        await this.axios.post('/appInfo/becomeAdmin', { ...this.appAssertRequest })
+        this.appAssertRequest.password = ''
+        this.$message.success(this.$t('message.success'))
+        await this.fetchUserDetail()
+      } catch (error) { this.showError(error) }
+      finally { this.granting = false }
     }
   },
-  mounted() {
-    this.fetchUserDetail()
-  }
+  mounted() { this.fetchUserDetail() }
 }
 </script>
 
 <style scoped>
-
+.page-heading { margin-bottom: 22px; }
+.page-heading h1 { font-size: 25px; font-weight: 650; letter-spacing: -.6px; color: var(--pj-text); margin: 0 0 8px; }
+.page-heading p { color: var(--pj-muted); font-size: 13px; margin: 0; line-height: 1.6; }
+.profile-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr); gap: 22px; align-items: start; }
+.profile-card { background: var(--pj-surface); border: 1px solid var(--pj-border); border-radius: 14px; padding: 26px; }
+.profile-summary { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; padding-bottom: 24px; border-bottom: 1px solid var(--pj-border); }
+.avatar { flex-shrink: 0; display: grid; place-items: center; width: 51px; height: 51px; border-radius: 15px; background: #e7f1e9; color: var(--pj-primary); font-size: 25px; font-weight: 650; }
+.profile-summary h2 { color: var(--pj-text); font-weight: 600; font-size: 19px; margin: 0 0 6px; overflow-wrap: anywhere; }
+.account-label { color: var(--pj-muted); font-size: 12px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 18px; }
+.profile-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; padding-top: 10px; }
+.profile-actions .el-button { margin: 0; }
+.card-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+.card-heading h2 { color: var(--pj-text); font-size: 16px; margin: 0; font-weight: 600; }
+.card-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: var(--pj-primary); background: #edf5ef; font-size: 23px; }
+.app-admin-card :deep(.el-button) { width: 100%; }
+@media (max-width: 950px) { .profile-grid { grid-template-columns: 1fr; } }
+@media (max-width: 540px) { .profile-card { padding: 20px; } .form-grid { grid-template-columns: 1fr; } .page-heading h1 { font-size: 22px; } }
 </style>

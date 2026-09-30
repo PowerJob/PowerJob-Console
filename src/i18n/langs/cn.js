@@ -1,4 +1,3 @@
-import zhLocale from 'element-ui/lib/locale/lang/zh-CN'
 const cn = {
     message: {
         'missingWfInstanceId': '缺少工作流实例 ID，已返回实例列表。',
@@ -23,7 +22,7 @@ const cn = {
         'stop': '停止',
         'back': '返回',
         'all': '全部',
-        'more': '| 更多',
+        'more': '更多',
         'add': '新增',
         'extra': '额外信息',
         'tag': '标签',
@@ -273,7 +272,6 @@ const cn = {
         'appAdmin': '应用管理员',
         'authThenBecomeAdmin': '验证并成为管理员',
     },
-    ...zhLocale
 };
 
 export default cn

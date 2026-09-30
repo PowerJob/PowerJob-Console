@@ -1,5 +1,6 @@
 <template>
   <div id="instance_manager">
+    <div class="page-heading"><h1>{{$t('message.tabJobInstance')}}</h1><p>{{$t('message.instancesDescription')}}</p></div>
     <!-- 第一行，搜索区 -->
     <el-row>
       <el-col :span="22">
@@ -34,8 +35,8 @@
           </el-form-item>
 
           <el-form-item>
-            <el-button type="primary" @click="listInstanceInfos">{{$t('message.query')}}</el-button>
-            <el-button type="cancel" @click="onClickRest">{{$t('message.reset')}}</el-button>
+            <el-button type="primary" @click="searchInstances">{{$t('message.query')}}</el-button>
+            <el-button type="default" @click="onClickRest">{{$t('message.reset')}}</el-button>
           </el-form-item>
         </el-form>
       </el-col>
@@ -47,7 +48,7 @@
     </el-row>
 
     <!-- 第二行，切换器 -->
-    <el-tabs type="card" v-model="instanceQueryContent.type" @tab-click="listInstanceInfos">
+    <el-tabs type="card" v-model="instanceQueryContent.type" @tab-change="changeInstanceTab">
       <el-tab-pane :label="$t('message.normalInstance')" name="NORMAL" />
       <el-tab-pane :label="$t('message.wfInstance')" name="WORKFLOW" />
     </el-tabs>
@@ -70,30 +71,30 @@
         />
         <el-table-column :show-overflow-tooltip="true" prop="instanceId" :label="$t('message.instanceId')" />
         <el-table-column prop="status" :label="$t('message.status')" width="160">
-          <template slot-scope="scope">{{fetchStatus(scope.row.status)}}</template>
+          <template #default="scope">{{fetchStatus(scope.row.status)}}</template>
         </el-table-column>
         <el-table-column  prop="actualTriggerTime" :label="$t('message.triggerTime')" width="150"/>
         <el-table-column  prop="finishedTime" :label="$t('message.finishedTime')" width="150"/>
 
         <el-table-column :label="$t('message.operation')" width="285">
-          <template slot-scope="scope">
+          <template #default="scope">
             <el-button
-              size="mini"
+              size="small"
               type="primary"
               @click="onClickShowDetail(scope.row)"
             >{{$t('message.detail')}}</el-button>
             <el-button
-              size="mini"
+              size="small"
               type="success"
               @click="onClickShowLog(scope.row)"
             >{{$t('message.log')}}</el-button>
             <el-button
-              size="mini"
+              size="small"
               type="warning"
               @click="onClickRetryJob(scope.row)"
             >{{$t('message.reRun')}}</el-button>
             <el-button
-              size="mini"
+              size="small"
               type="danger"
               @click="onClickStop(scope.row)"
             >{{$t('message.stop')}}</el-button>
@@ -106,37 +107,37 @@
     <el-row>
       <el-col :span="24">
         <el-pagination
-          :total="this.instancePageResult.totalItems"
-          :page-size="this.instancePageResult.pageSize"
+          :total="instancePageResult.totalItems"
+          :page-size="instancePageResult.pageSize"
           @current-change="onClickChangeInstancePage"
-          layout="prev, pager, next"
+          layout="prev, pager, next" :current-page="instanceQueryContent.index + 1"
         />
       </el-col>
     </el-row>
 
     <!--  任务实例详情弹出框 -->
-    <el-dialog :visible.sync="instanceDetailVisible" v-if="instanceDetailVisible" width="80%">
+    <el-dialog v-model="instanceDetailVisible" v-if="instanceDetailVisible" width="80%">
       <div class="power-instance-detail-log">
         <InstanceDetail :instance-id="currentInstanceId" :resultAll="true" />
       </div>
     </el-dialog>
 
     <!-- 任务运行日志弹出框 -->
-    <el-dialog :visible.sync="instanceLogVisible" width="80%">
+    <el-dialog v-model="instanceLogVisible" width="80%">
       <el-row>
           <el-col :span="24" class="power-instance-log-download" style="margin-bottom:20px">
             <el-button
               type="primary"
-              size="mini"
+              size="small"
               @click="onclickDownloadLog()"
-              icon="el-icon-download"
+
             >{{$t('message.download')}}</el-button>
           </el-col>
         </el-row>
       <div class="power-instance-log-dialog">
         <el-row>
           <el-col :span="24">
-            <h4 style="white-space: pre-line;">{{this.paginableInstanceLog.data}}</h4>
+            <pre class="log-output">{{this.paginableInstanceLog.data}}</pre>
           </el-col>
         </el-row>
       </div>
@@ -154,7 +155,8 @@
 </template>
 
 <script>
-import InstanceDetail from "../common/InstanceDetail";
+import { downloadInstanceLog } from '../dag/instance-log.js';
+import InstanceDetail from "../common/InstanceDetail.vue";
 export default {
   name: "InstanceManager",
   components: {
@@ -162,6 +164,7 @@ export default {
   },
   data() {
     return {
+      listGeneration: 0, listLoading: false,
       // 实例查询对象
       instanceQueryContent: {
         appId: window.localStorage.getItem("Power_appId"),
@@ -212,15 +215,16 @@ export default {
     };
   },
   methods: {
+    searchInstances() { this.instanceQueryContent.index = 0; return this.listInstanceInfos(); },
+    changeInstanceTab() { this.instanceQueryContent.index = 0; this.listInstanceInfos(); },
     // 查询任务实例信息
-    listInstanceInfos() {
-      let that = this;
-      that.axios.post("/instance/list", that.instanceQueryContent).then(res => {
-        that.instancePageResult = res;
-      });
+    async listInstanceInfos() {
+      const generation = ++this.listGeneration; this.listLoading = true;
+      try { const response = await this.axios.post('/instance/list', { ...this.instanceQueryContent }); if (generation === this.listGeneration) this.instancePageResult = response; } catch { /* Keep the last loaded page for retry. */ } finally { if (generation === this.listGeneration) this.listLoading = false; }
     },
     // 点击重置按钮
     onClickRest() {
+      this.instanceQueryContent.index = 0;
       this.instanceQueryContent.jobId = undefined;
       this.instanceQueryContent.instanceId = undefined;
       this.instanceQueryContent.wfInstanceId = undefined;
@@ -243,10 +247,11 @@ export default {
       this.axios.get(url).then(() => {
         that.$message.success(this.$t("message.success"));
         that.listInstanceInfos();
-      });
+      }).catch(() => {});
     },
     // 点击停止实例
-    onClickStop(data) {
+    async onClickStop(data) {
+      try { await this.$confirm(this.$t('message.stopConfirmation', { id: data.instanceId }), this.$t('message.confirmTitle'), { type: 'warning' }); } catch { return; }
       let that = this;
       let url = "/instance/stop?instanceId=" +
           data.instanceId +
@@ -256,7 +261,7 @@ export default {
         that.$message.success(this.$t("message.success"));
         // 重新加载列表
         that.listInstanceInfos();
-      });
+      }).catch(() => {});
     },
     // 换页
     onClickChangeInstancePage(index) {
@@ -290,7 +295,7 @@ export default {
       this.axios.get(url).then(res => {
         that.paginableInstanceLog = res;
         that.instanceLogVisible = true;
-      });
+      }).catch(() => {});
     },
     // 查看在线日志
     onClickShowLog(data) {
@@ -305,63 +310,35 @@ export default {
     },
     // 下载日志
     async onclickDownloadLog() {
-      const instanceId = this.logQueryContent.instanceId;
-      try {
-        const response = await this.axios.get("/instance/downloadLog4Console", {
-          params: { instanceId },
-          responseType: "blob",
-          timeout: 75000
-        });
-        const contentType = response.headers["content-type"] || response.data.type || "";
-        if (contentType.includes("json")) {
-          const error = JSON.parse(await response.data.text());
-          throw new Error(error.message || "Log download failed");
-        }
-        if (!contentType.includes("application/octet-stream")) {
-          throw new Error("Unexpected log download response");
-        }
-        const url = window.URL.createObjectURL(response.data);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "powerjob-instance-" + instanceId + ".log";
-        document.body.appendChild(link);
-        try {
-          link.click();
-        } finally {
-          link.remove();
-          window.setTimeout(() => window.URL.revokeObjectURL(url), 1000);
-        }
-      } catch (error) {
-        let message = error.message || "Log download failed";
-        if (error.response && error.response.data instanceof window.Blob) {
-          try {
-            const detail = JSON.parse(await error.response.data.text());
-            message = detail.message || detail.error || message;
-          } catch (ignored) {
-            // Preserve the HTTP/network error when the body is not JSON.
-          }
-        }
-        this.$message.error(message);
-      }
+      try { await downloadInstanceLog(this.axios, this.logQueryContent.instanceId); } catch (error) { this.$message.error(error.message); }
     },
     // 获取状态
     fetchStatus(s) {
       return this.common.translateInstanceStatus(s);
     }
   },
+  watch: {
+    '$route.query.jobId'(jobId) {
+      this.instanceQueryContent.jobId = jobId;
+      this.instanceQueryContent.index = 0;
+      this.listInstanceInfos();
+    }
+  },
   mounted() {
     // 读取传递的参数
-    let jobId = this.$route.params.jobId;
+    let jobId = this.$route.query.jobId;
     if (jobId !== undefined) {
       this.instanceQueryContent.jobId = jobId;
     }
 
     this.listInstanceInfos();
-  }
+  },
+  beforeUnmount() { this.listGeneration++ },
 };
 </script>
 
 <style scoped>
+.log-output { white-space: pre-wrap; background: #18263b; color: #e4eeea; padding: 20px; border-radius: 8px; font: 12px/1.8 monospace; }
 .title {
   display: inline-block;
   margin: 5px 0;

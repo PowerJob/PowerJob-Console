@@ -1,5 +1,6 @@
 <template>
   <div id="wf_instance_manager">
+    <div class="page-heading"><h1>{{$t('message.tabWfInstance')}}</h1><p>{{$t('message.wfInstancesDescription')}}</p></div>
     <!-- 第一行，搜索区 -->
     <el-row>
       <el-col :span="20">
@@ -34,8 +35,8 @@
           </el-form-item>
 
           <el-form-item>
-            <el-button type="primary" @click="listWfInstances">{{$t('message.query')}}</el-button>
-            <el-button type="cancel" @click="onClickRest">{{$t('message.reset')}}</el-button>
+            <el-button type="primary" @click="searchWfInstances">{{$t('message.query')}}</el-button>
+            <el-button type="default" @click="onClickRest">{{$t('message.reset')}}</el-button>
           </el-form-item>
         </el-form>
       </el-col>
@@ -60,7 +61,7 @@
         <el-table-column :show-overflow-tooltip="true" prop="workflowName" :label="$t('message.wfName')" />
         <el-table-column :show-overflow-tooltip="true" prop="wfInstanceId" :label="$t('message.wfInstanceId')" />
         <el-table-column :show-overflow-tooltip="true" prop="status" :label="$t('message.status')" width="160">
-          <template slot-scope="scope">
+          <template #default="scope">
             {{fetchWFStatus(scope.row.status)}}
           </template>
         </el-table-column>
@@ -68,14 +69,14 @@
         <el-table-column :show-overflow-tooltip="true" prop="finishedTime" :label="$t('message.finishedTime')" />
 
         <el-table-column :show-overflow-tooltip="true" :label="$t('message.operation')" width="225">
-          <template slot-scope="scope">
-            <el-button type="primary" size="mini" @click="onClickShowDetail(scope.row)"
+          <template #default="scope">
+            <el-button type="primary" size="small" @click="onClickShowDetail(scope.row)"
               >{{$t('message.detail')}}</el-button
             >
-            <el-button type="danger" size="mini" @click="onClickStop(scope.row)"
+            <el-button type="danger" size="small" @click="onClickStop(scope.row)"
               >{{$t('message.stop')}}</el-button
             >
-            <el-button type="warning" size="mini" @click="restart(scope.row)"
+            <el-button type="warning" size="small" @click="restart(scope.row)"
               >{{$t('message.reRun')}}</el-button
             >
           </template>
@@ -87,10 +88,10 @@
     <el-row>
       <el-col :span="24">
         <el-pagination
-          :total="this.wfInstancePageResult.totalItems"
-          :page-size="this.wfInstancePageResult.pageSize"
+          :total="wfInstancePageResult.totalItems"
+          :page-size="wfInstancePageResult.pageSize"
           @current-change="onClickChangeInstancePage"
-          layout="prev, pager, next"
+          layout="prev, pager, next" :current-page="wfInstanceQueryContent.index + 1"
         />
       </el-col>
     </el-row>
@@ -102,6 +103,7 @@ export default {
   name: "WFInstanceManager",
   data() {
     return {
+      listGeneration: 0, listLoading: false,
       // 查询条件
       wfInstanceQueryContent: {
         appId: window.localStorage.getItem("Power_appId"),
@@ -129,14 +131,14 @@ export default {
     };
   },
   methods: {
-    listWfInstances() {
-      let that = this;
-      this.axios
-        .post("/wfInstance/list", this.wfInstanceQueryContent)
-        .then((res) => (that.wfInstancePageResult = res));
+    searchWfInstances() { this.wfInstanceQueryContent.index = 0; return this.listWfInstances(); },
+    async listWfInstances() {
+      const generation = ++this.listGeneration; this.listLoading = true;
+      try { const response = await this.axios.post('/wfInstance/list', { ...this.wfInstanceQueryContent }); if (generation === this.listGeneration) this.wfInstancePageResult = response; } catch { /* Keep the last loaded page for retry. */ } finally { if (generation === this.listGeneration) this.listLoading = false; }
     },
     // 重置搜索条件
     onClickRest() {
+      this.wfInstanceQueryContent.index = 0;
       this.wfInstanceQueryContent.wfInstanceId = undefined;
       this.wfInstanceQueryContent.workflowId = undefined;
       this.wfInstanceQueryContent.status = "";
@@ -153,7 +155,8 @@ export default {
     },
 
     // 停止工作流
-    onClickStop(data) {
+    async onClickStop(data) {
+      try { await this.$confirm(this.$t('message.stopConfirmation', { id: data.wfInstanceId }), this.$t('message.confirmTitle'), { type: 'warning' }); } catch { return; }
       let that = this;
       let url =
         "/wfInstance/stop?wfInstanceId=" +
@@ -164,7 +167,7 @@ export default {
         that.$message.success(this.$t('message.success'));
         // 重新加载列表
         that.listWfInstances();
-      });
+      }).catch(() => {});
     },
     // 换页
     onClickChangeInstancePage(index) {
@@ -203,31 +206,8 @@ export default {
   mounted() {
     this.listWfInstances();
   },
+  beforeUnmount() { this.listGeneration++ },
 };
 </script>
 
-<style>
-
-  svg{
-    font-size: 10px;
-    border: 1px solid red;
-  }
-
-  text {
-    font-weight: 300;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 14px;
-  }
-
-  .node rect {
-    stroke: #999;
-    fill: #fff;
-    stroke-width: 1.5px;
-  }
-
-  .edgePath path {
-    stroke: #333;
-    stroke-width: 1px;
-  }
-
-</style>
+<style scoped></style>

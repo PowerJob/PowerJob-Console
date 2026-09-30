@@ -1,93 +1,51 @@
 <template>
-  <div>
-    <el-form>
-      <el-form-item :label="$t('message.observer')">
-        <el-select multiple v-model="userRuleForm.observer" placeholder="observer" style="width: 80%">
-          <el-option
-              v-for="item in user_list"
-              :key="item.id"
-              :label="item.showName"
-              :value="item.id">
-          </el-option>
-        </el-select>
-      </el-form-item>
-
-      <el-form-item :label="$t('message.qa')">
-        <el-select multiple v-model="userRuleForm.qa" placeholder="observer" style="width: 80%">
-          <el-option
-              v-for="item in user_list"
-              :key="item.id"
-              :label="item.showName"
-              :value="item.id">
-          </el-option>
-        </el-select>
-      </el-form-item>
-
-      <el-form-item :label="$t('message.developer')">
-        <el-select multiple v-model="userRuleForm.developer" placeholder="observer" style="width: 80%">
-          <el-option
-              v-for="item in user_list"
-              :key="item.id"
-              :label="item.showName"
-              :value="item.id">
-          </el-option>
-        </el-select>
-      </el-form-item>
-
-      <el-form-item :label="$t('message.admin')">
-        <el-select multiple v-model="userRuleForm.admin" placeholder="observer" style="width: 80%">
-          <el-option
-              v-for="item in user_list"
-              :key="item.id"
-              :label="item.showName"
-              :value="item.id">
-          </el-option>
-        </el-select>
-      </el-form-item>
-    </el-form>
+  <div class="role-fields" v-loading="loading">
+    <div v-for="role in roles" :key="role" class="role-field">
+      <label :for="'role-' + role + '-' + uid">{{ $t('message.' + role) }}</label>
+      <el-select :id="'role-' + role + '-' + uid" :model-value="userRuleForm[role] || []"
+                 multiple filterable clearable collapse-tags collapse-tags-tooltip
+                 :placeholder="$t('message.' + role)" @update:model-value="updateRole(role, $event)">
+        <el-option v-for="user in user_list" :key="user.id" :label="user.showName" :value="user.id" />
+      </el-select>
+    </div>
   </div>
 </template>
 
 <script>
+let roleEditorId = 0
 export default {
   name: 'UserRole',
   props: {
-    userRuleForm: {
-      type: Object,
-      default: () => {
-        return {
-          observer: [],
-          qa: [],
-          developer: [],
-          admin: [],
-        }
+    userRuleForm: { type: Object, default: () => ({ observer: [], qa: [], developer: [], admin: [] }) }
+  },
+  emits: ['update:userRuleForm'],
+  data() {
+    return { user_list: [], loading: false, roles: ['observer', 'qa', 'developer', 'admin'], uid: ++roleEditorId }
+  },
+  methods: {
+    updateRole(role, value) {
+      this.$emit('update:userRuleForm', { ...this.userRuleForm, [role]: value })
+    },
+    async listUser() {
+      this.loading = true
+      try {
+        const result = await this.axios.get('/user/list')
+        this.user_list = Array.isArray(result) ? result : []
+      } catch (error) {
+        this.$message.error(error?.message || String(error))
+      } finally {
+        this.loading = false
       }
     }
   },
-
-  data() {
-    return {
-      // 用户列表
-      user_list: []
-    }
-  },
-
-  methods: {
-    listUser() {
-      // 加载用户信息
-      let that = this;
-      that.axios.get("/user/list").then(res => {
-        that.user_list = res
-      });
-    }
-  },
-  mounted() {
-    this.listUser()
-  }
+  mounted() { this.listUser() }
 }
 </script>
 
-
 <style scoped>
-
+.role-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 20px; width: 100%; }
+.role-field { display: flex; flex-direction: column; gap: 7px; }
+.role-field label { color: var(--pj-muted); font-size: 12px; }
+.role-field .el-select { width: 100%; }
+@media (max-width: 600px) { .role-fields { grid-template-columns: 1fr; } }
 </style>
