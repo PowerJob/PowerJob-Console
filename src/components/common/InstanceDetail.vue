@@ -339,6 +339,7 @@ export default {
   },
   watch: {
     instanceId() {
+      this.queryInstanceDetailRequest.instanceId = this.instanceId;
       this.fetchInstanceDetail();
     },
   },
