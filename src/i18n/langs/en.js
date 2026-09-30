@@ -138,6 +138,7 @@ const en = {
         'fixDelay': 'Fixed delay (ms)',
         'workflow': 'Workflow',
         'dailyTimeInterval': 'DailyTimeInterval',
+        'invalidDailyExpression': 'Invalid daily interval expression. Reset the form to enter a new rule.',
         'validateTimeExpression': 'Validate',
         'javaContainer': 'External',
         'runHistory': 'History',

@@ -294,6 +294,7 @@ export default {
 
       // 是否展示 queriedTaskDetailInfoList，只单向赋值为 true ，解决改变查询条件空数据后隐藏组件的问题
       showQueriedTaskDetailInfoList: false,
+      detailRequestSequence: 0,
 
       queryInstanceDetailRequest: {
         instanceId: this.instanceId,
@@ -303,11 +304,14 @@ export default {
   },
   methods: {
     fetchInstanceDetail() {
+      const sequence = ++this.detailRequestSequence;
       if (this.nodeDetail) {
         this.instanceDetail = this.nodeDetail;
       } else {
         let that = this;
-        this.axios.post('/instance/detailPlus', that.queryInstanceDetailRequest).then(ret => {
+        const request = Object.assign({}, this.queryInstanceDetailRequest, { instanceId: this.instanceId });
+        return this.axios.post('/instance/detailPlus', request).then(ret => {
+          if (sequence !== this.detailRequestSequence) return;
           that.instanceDetail= ret
           if (that.instanceDetail.queriedTaskDetailInfoList !== undefined) {
             if (that.instanceDetail.queriedTaskDetailInfoList.length !== 0) {
@@ -333,12 +337,19 @@ export default {
       }, 20)
     }
   },
+  beforeDestroy() {
+    ++this.detailRequestSequence;
+  },
   mounted() {
     console.log("using InstanceId: " + this.instanceId);
     this.fetchInstanceDetail();
   },
   watch: {
-    instanceId() {
+    nodeDetail() { this.fetchInstanceDetail(); },
+    instanceId(value) {
+      this.queryInstanceDetailRequest.instanceId = value;
+      this.instanceDetail = { queriedTaskDetailInfoList: undefined };
+      this.showQueriedTaskDetailInfoList = false;
       this.fetchInstanceDetail();
     },
   },
