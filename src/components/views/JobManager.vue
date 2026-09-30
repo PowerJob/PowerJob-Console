@@ -485,11 +485,12 @@
             },
             // 保存变更，包括新增和修改
             async saveJob() {
-                const { lifeCycle, alarmConfig } = this.modifiedJobForm;
+                const payload = Object.assign({}, this.modifiedJobForm);
+                const { lifeCycle, alarmConfig } = payload;
                 if (lifeCycle && Array.isArray(lifeCycle)) {
                     const start = lifeCycle[0];
                     const end = lifeCycle[1];
-                    this.modifiedJobForm.lifeCycle = {
+                    payload.lifeCycle = {
                         start,
                         end
                     }
@@ -503,8 +504,8 @@
                 if (!alarmConfig.silenceWindowLen) {
                     alarmConfig.silenceWindowLen = 0;
                 }
-                this.modifiedJobForm.alarmConfig = alarmConfig;
-                await this.axios.post("/job/save", this.modifiedJobForm);
+                payload.alarmConfig = alarmConfig;
+                await this.axios.post("/job/save", payload);
                 this.modifiedJobFormVisible = false;
                 this.$message.success(this.$t('message.success'));
                 this.listJobInfos();
