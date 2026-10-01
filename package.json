@@ -1,6 +1,6 @@
 {
   "name": "powerjob-console",
-  "version": "5.1.6-fev2.rc.2",
+  "version": "5.1.6-fev3.rc.1",
   "private": true,
   "type": "module",
   "engines": {
@@ -9,36 +9,34 @@
   "scripts": {
     "dev": "vite",
     "serve": "vite",
-    "build": "vite build",
-    "build_spring": "vite build --mode spring",
-    "preview": "vite preview --host 127.0.0.1",
-    "lint": "eslint .",
+    "typecheck": "vue-tsc --noEmit",
+    "lint": "eslint src tests --no-warn-ignored",
     "test": "vitest run",
-    "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "build": "vue-tsc --noEmit && vite build",
+    "build_spring": "npm run build",
     "check": "npm run lint && npm test && npm run build",
     "package": "npm run build && node script/package-release.mjs"
   },
   "dependencies": {
-    "axios": "1.20.0",
-    "element-plus": "2.14.6",
-    "json-bigint": "1.0.0",
-    "monaco-editor": "0.57.0",
-    "pinia": "4.0.3",
     "vue": "3.5.43",
-    "vue-i18n": "11.4.12",
-    "vue-router": "5.3.1"
+    "vue-router": "5.3.1",
+    "json-bigint": "1.0.0",
+    "monaco-editor": "0.57.0"
   },
   "devDependencies": {
-    "@playwright/test": "1.63.0",
+    "typescript": "5.9.3",
+    "vue-tsc": "3.3.11",
+    "@types/json-bigint": "1.0.4",
     "@vitejs/plugin-vue": "6.0.9",
     "@vue/test-utils": "2.5.1",
+    "@playwright/test": "1.63.0",
     "eslint": "10.11.0",
     "eslint-plugin-vue": "10.11.1",
     "happy-dom": "20.14.5",
-    "sass": "1.105.1",
     "vite": "8.3.1",
-    "vitest": "5.0.2"
+    "vitest": "5.0.2",
+    "typescript-eslint": "8.57.1"
   },
-  "consoleRelease": "5.1.6_fev2-rc.2"
+  "consoleRelease": "5.1.6_fev3-rc.1"
 }

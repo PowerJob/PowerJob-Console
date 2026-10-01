@@ -32,7 +32,7 @@ for (const [dependency, metadata] of Object.entries(lock.packages).sort(([a], [b
   for (const filename of files) notices += `\n${filename}\n${await readFile(path.join(directory, filename), 'utf8')}\n`
   if (!files.length) notices += '\nThe published package declares the license above and supplies no separate license text.\n'
 }
-notices += `\n\n${'='.repeat(72)}\nIBM Plex Sans — @ibm/plex-sans@1.1.0 — SIL Open Font License 1.1\nLocally served, unmodified WOFF2 fonts from https://github.com/IBM/plex.\n\n${await readFile(path.join(root, 'public/fonts/IBM-Plex-OFL.txt'), 'utf8')}\n`
+notices += `\n\n${'='.repeat(72)}\nManrope — @fontsource-variable/manrope@5.3.0 — SIL Open Font License 1.1\nLocally served, unmodified WOFF2 fonts from https://github.com/sharanda/manrope.\n\n${await readFile(path.join(root, 'public/fonts/Manrope-OFL.txt'), 'utf8')}\n`
 await writeFile(path.join(staging, 'THIRD_PARTY_NOTICES.txt'), notices)
 const script = `import pathlib, sys, zipfile
 source=pathlib.Path(sys.argv[1])

@@ -1,69 +1,44 @@
-# PowerJob Console 5.1.6_fev2-rc.2
+# PowerJob Console
 
-An independent Vue 3 console for PowerJob. This release introduces a light scheduling workspace with collapsible navigation, integrated list filters, clearer Worker status and consistent forms. IBM Plex Sans fonts are served locally, including in offline deployments. Jobs and workflows include a CRON quick setup for common intervals and calendar schedules. Existing Server APIs and hash routes are preserved.
+PowerJob Console `5.1.6_fev3-rc.1` is a standalone administration UI for PowerJob Server 5.1.6. This edition is rebuilt in Vue 3 and TypeScript with native controls, a compact workspace, a workflow canvas, and shared scheduling tools.
 
-The release prefix follows the validated PowerJob Server version: **5.1.6**. `fev2` denotes the second frontend generation, implemented with **Vue 3**. The public release/tag is `5.1.6_fev2-rc.2`; package metadata uses the equivalent valid SemVer `5.1.6-fev2.rc.2`.
+The Server version is the release prefix. `fev3` identifies this frontend generation. Installing this Console does not upgrade Server, Worker, or Client, or replace the Console bundled in the Server JAR.
 
-This is a prerelease. Real third-party OAuth login, provider callbacks and provider-account settings/password visibility have not yet been accepted against a configured provider; their automated request/encoding contract tests do not replace that acceptance.
+## Use the standalone distribution
 
-PowerJob Server 5.1.6 has a known container deployment limitation when `server.servlet.context-path` is nonempty: the JAR download URL sent to Workers omits that path. Console preserves the configured context path for uploads and WebSockets, but cannot correct the Server-generated download URL. Use the default Server context path for EXTERNAL container deployment with this Server version. Deployment progress means the Server has dispatched requests; check the Worker list for each deployment result.
+Download the versioned ZIP and SHA-256 file from [Console releases](https://github.com/PowerJob/PowerJob-Console/releases). Verify the checksum, extract the archive, and serve its `dist/` directory through your web server. Keep the previous distribution and its API configuration for rollback.
 
-Console has its own version and release artifacts. Installing it does not require changing PowerJob Server, Worker or Java SDK versions. The validated Server/browser combinations are listed in the release notes; other combinations need separate verification.
+The default API base is the directory hosting the Console. Proxy the existing Server HTTP endpoints and `/container/deploy/` WebSocket connections through that directory, or edit `dist/config.js` before serving:
 
-## CRON quick setup
+```js
+window.POWERJOB_CONFIG = {
+  apiBaseUrl: 'https://powerjob.example.invalid/server'
+};
+```
 
-Choose CRON in a job or workflow schedule, then select **Quick setup** beside the expression. Configure minutes, hours, daily, weekdays, weekly or monthly schedules, review the generated expression, and select **Apply expression**. Cancel or Escape leaves your expression unchanged. Advanced expressions remain manually editable. Use the existing validation action to check the next trigger times in the Server timezone; months without a selected day are skipped.
+For a Console deployed at `/console/` with an API proxy at `/api/`, use `apiBaseUrl: '/api'`. Static resources and fonts support a subdirectory. Hash routes preserve job history, workflow definitions, and workflow instance links. A cross-origin API needs the existing Server/proxy CORS configuration. An HTTPS page needs an HTTPS API and secure WebSocket endpoint.
+
+Reverse-proxy requests retain the existing `PowerJwt`, `AppId`, and `NamespaceId` headers. No new authentication protocol or session affinity is introduced. Rollback consists of restoring the previous static distribution and its `config.js`; there is no database migration.
 
 ## Development
 
-Use Node.js 24 and install the exact dependency versions from the lockfile:
+Use Node.js 24 and the checked-in lockfile:
 
 ```sh
 npm ci
 npm run dev
+npm run check
+npm run package
 ```
 
-The development server listens on `127.0.0.1:5173` and proxies `/api` to `http://127.0.0.1:7700`, including container deployment WebSockets. Set `POWERJOB_DEV_SERVER` to change that target. The application uses Vue 3, Vue Router, Pinia, Element Plus, Vite and Monaco; it does not load the Vue 2 compatibility runtime.
+The development server listens on `127.0.0.1:5197`. Its `/api` proxy targets `http://127.0.0.1:23700`; change the target in `vite.config.js` for your local Server. `VITE_API_BASE_URL` sets a build-time fallback; the external `config.js` takes priority. `npm run package` produces a versioned ZIP and SHA-256 file containing the static site, this README, and license notices.
 
-```sh
-npm run lint
-npm test
-npm run build
-npm run preview
-```
+`src/core` contains routing, requests, and session state; `src/shared` contains native dialog/form/paging controls; `src/features` contains administration, authentication, jobs, instances, workflows, containers, and scheduling. Unit tests are in `tests/unit`; real browser regression tests are in `tests/e2e`. Browser tests require a separately configured isolated Server/Worker environment and private credentials, which are never included in this repository or the release.
 
-`npm run serve` remains an alias for development. `npm run build_spring` creates the same portable static distribution; it never copies files into PowerJob Server.
+## Prerelease scope
 
-## Independent static deployment
+The backend API and persisted DTO contract remain compatible with Server 5.1.6. The UI includes application/namespace permissions, account management, all existing job schedules and execution modes, workflow nodes and execution controls, online/archived logs, Git/FatJar containers, and Java 8/11 templates. CRON quick setup supports six common Quartz rules; complex expressions remain editable.
 
-Download and extract the Console release archive, then serve its `dist` directory with a static web server. Hash routes support refreshing and sharing job/workflow links without a server-side route rewrite. The build uses relative asset paths and supports hosting under a directory such as `/console/`.
+This is a prerelease. Real third-party OAuth sign-in still requires configured provider accounts and callback infrastructure for final acceptance. Server 5.1.6's Worker JAR download limitation with a nonempty Server context path remains a backend limitation; Console static-subdirectory hosting is a separate capability. Consult the release notes for the actual tested scope.
 
-Configure the API destination in `dist/config.js` **before loading the page**:
-
-```js
-window.POWERJOB_CONFIG = { apiBaseUrl: 'https://powerjob.example.invalid/powerjob' }
-```
-
-The URL includes any Server context path and port. Container WebSockets use the same destination, with `https` mapped to `wss`. An empty URL uses the current origin and directory; `VITE_API_BASE_URL` is an optional build-time fallback. When Console and Server have different origins, configure the existing Server/reverse proxy's CORS and WebSocket forwarding for that deployment. Never put credentials in `config.js`.
-
-The Console retains the `PowerJwt`, `Power_appId`, `oms_lang` and legacy `lang` browser preferences. Application, namespace and user permissions are enforced by the Server. IDs larger than JavaScript's safe integer range are kept as strings.
-
-## Testing
-
-Unit and component tests verify request/DTO compatibility, form validation, lifecycle cleanup, workflow topology, Monaco and regression scenarios. They do not replace real browser acceptance against a Server and Workers.
-
-The Playwright suite requires a dedicated test environment and an external credentials file. Its credential schema includes `isolated_test_environment: true`, `admin_username`, `admin_password`, `app_id`, `app_name` and `server_urls`; use synthetic test accounts and never commit the file.
-
-```sh
-POWERJOB_E2E_CREDENTIALS=/absolute/path/to/isolated-test-credentials.json npm run test:e2e
-```
-
-An installed Chrome can be selected with `POWERJOB_E2E_CHROME`; otherwise install Playwright Chromium with `npx playwright install chromium`. Authenticated traces are disabled and screenshots mask sensitive inputs. Test objects use a unique run identifier and cleanup must complete before reusing the environment.
-
-## Release and rollback
-
-Run `npm run check` and the real browser acceptance suite, then `npm run package` (Python 3 is used only to create the ZIP archive) to create a versioned static archive and SHA-256 checksums in `release/`. The archive includes the compiled application, this guide, the project license and third-party notices. Do not ship test credentials, authenticated traces or local runtime evidence.
-
-Keep the previous Console distribution and API configuration. To roll back, point the static web server at that previous distribution. Console performs no database migration. Verify login, existing jobs, workflow details and logs after switching versions.
-
-[PowerJob documentation](https://www.yuque.com/powerjob/guidence)
+Manrope is served locally under the SIL Open Font License. Its complete license and runtime dependency notices are included in the distribution.

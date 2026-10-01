@@ -1,0 +1,22 @@
+<script setup lang="ts">
+import { locale, setLocale, t } from '../../core/ui'
+</script>
+
+<template>
+  <main class="auth-frame"><section class="auth-product" aria-label="PowerJob"><a class="auth-brand" href="#/loginHomepage"><span class="auth-mark" aria-hidden="true">P</span><span>PowerJob</span></a><div class="product-heading"><h2>{{ t('从任务编排，\n到分布式执行。', 'Orchestrate jobs.\nExecute across workers.') }}</h2><p>{{ t('在一个工作台管理任务、工作流与执行记录。', 'Manage jobs, workflows and execution records in one workspace.') }}</p></div><svg class="auth-diagram" viewBox="0 0 460 260" fill="none" aria-hidden="true"><path d="M87 129H165M226 129H305M196 99V56H305M196 159V204H305" stroke="#59749c" stroke-width="2"/><path d="M158 124L165 129L158 134M298 124L305 129L298 134M298 51L305 56L298 61M298 199L305 204L298 209" stroke="#91a7ca" stroke-width="2"/><rect x="27" y="100" width="60" height="60" rx="12" fill="#2a3a58" stroke="#59749c"/><rect x="165" y="99" width="61" height="60" rx="12" fill="#4169e1"/><rect x="305" y="28" width="110" height="55" rx="10" fill="#2a3a58" stroke="#59749c"/><rect x="305" y="102" width="110" height="55" rx="10" fill="#2a3a58" stroke="#59749c"/><rect x="305" y="177" width="110" height="55" rx="10" fill="#2a3a58" stroke="#59749c"/><path d="M45 119H69M45 128H63M45 137H69" stroke="#c1cde4" stroke-width="2" stroke-linecap="round"/><path d="M182 119H210M182 129H210M182 139H200" stroke="white" stroke-width="2" stroke-linecap="round"/><circle cx="324" cy="55" r="4" fill="#98b2ef"/><circle cx="324" cy="130" r="4" fill="#98b2ef"/><circle cx="324" cy="204" r="4" fill="#98b2ef"/><path d="M340 55H397M340 130H397M340 204H397" stroke="#8ba2c9" stroke-width="2"/><text x="32" y="185" fill="#a8b8d4" font-size="11">JOB</text><text x="166" y="184" fill="#a8b8d4" font-size="11">WORKFLOW</text><text x="310" y="254" fill="#a8b8d4" font-size="11">WORKERS</text></svg></section><section class="auth-content"><div class="auth-language"><label>{{ t('语言', 'Language') }}<select :value="locale" @change="setLocale(($event.target as HTMLSelectElement).value === 'en' ? 'en' : 'zh')"><option value="zh">简体中文</option><option value="en">English</option></select></label></div><div class="auth-card"><slot/></div></section></main>
+</template>
+
+<style scoped>
+.auth-frame { min-height: 100dvh; display: grid; grid-template-columns: minmax(380px,.9fr) minmax(0,1.1fr); background: white; }
+.auth-product { background: var(--ink); color: #fff; padding: 42px 11%; display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+.auth-brand { display: flex; align-items: center; gap: 11px; color: white; font-size: 19px; font-weight: 750; margin-bottom: 70px; text-decoration: none; }
+.auth-mark { display: grid; place-items: center; height: 39px; width: 39px; border-radius: 11px; background: var(--blue); color: white; font-size: 24px; font-weight: 800; }
+.product-heading h2 { font-size: clamp(28px,2.8vw,44px); line-height: 1.3; white-space: pre-line; margin-top: 17px; letter-spacing: -1px; font-weight: 750; }
+.product-heading p { font-size: 13px; line-height: 1.8; color: #b1bdd4; margin-top: 24px; max-width: 370px; }
+.auth-diagram { width: 100%; max-width: 460px; margin-top: 45px; }
+.auth-content { padding: 36px; position: relative; display: flex; align-items: center; justify-content: center; flex-direction: column; min-width: 0; }
+.auth-language { position: absolute; top: 28px; right: 32px; }.auth-language label { display: flex; align-items: center; gap: 9px; font-size: 11px; color: var(--muted); }.auth-language select { width: 112px; font-size: 12px; min-height: 32px; padding: 4px 8px; border: 0; }
+.auth-card { width: 100%; max-width: 400px; padding: 70px 0 35px; }
+@media (max-width: 850px) { .auth-frame { grid-template-columns: minmax(280px,.8fr) minmax(0,1.2fr); }.auth-product { padding: 32px 10%; }.auth-brand { margin-bottom: 50px; }.product-heading h2 { font-size: 29px; }.auth-content { padding: 24px; } }
+@media (max-width: 640px) { .auth-frame { display: block; }.auth-product { min-height: auto; padding: 23px 24px; }.auth-brand { margin: 0; font-size: 17px; }.auth-mark { width: 33px; height: 33px; font-size: 21px; }.product-heading,.auth-diagram { display: none; }.auth-content { padding: 20px 24px 40px; min-height: calc(100dvh - 79px); justify-content: flex-start; }.auth-language { top: 13px; right: 18px; }.auth-card { padding-top: 68px; } }
+</style>
