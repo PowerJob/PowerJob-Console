@@ -1,6 +1,6 @@
 {
   "name": "powerjob-console",
-  "version": "6.0.0-dev.1",
+  "version": "6.0.0-alpha.1",
   "private": true,
   "type": "module",
   "scripts": {

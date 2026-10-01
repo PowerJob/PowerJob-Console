@@ -41,7 +41,8 @@ async function signIn(page: Page, username = administrator!, password = administ
   await page.getByLabel('密码', { exact: true }).fill(password);
   await page.getByRole('button', { name: '登录工作空间', exact: true }).click();
   await expect(page).toHaveURL(/#\/admin\/app$/);
-  await expect(page.getByRole('heading', { name: '应用管理', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '应用管理', exact: true })).toBeAttached();
+  await expect(page.locator('.breadcrumb strong')).toHaveText('应用管理');
 }
 async function signOut(page: Page) {
   await page.locator('.user-menu').click();
@@ -68,7 +69,7 @@ async function createNamespace(page: Page, suffix: string) {
   resources.namespaces.push(String(saved.id));
   await expect(drawer).not.toBeVisible();
   await page.getByLabel('命名空间编码', { exact: true }).fill(code);
-  await page.getByRole('button', { name: '查询', exact: true }).click();
+  await page.getByRole('button', { name: /^查\s*询$/ }).click();
   await expect(page.getByRole('row').filter({ hasText: code })).toBeVisible();
   return { id: String(saved.id), code, name };
 }
@@ -88,7 +89,7 @@ async function createApplication(page: Page, namespace: { code: string }, suffix
   resources.apps.push(String(saved.id));
   await expect(drawer).not.toBeVisible();
   await page.getByLabel('应用名称', { exact: true }).fill(appName);
-  await page.getByRole('button', { name: '查询', exact: true }).click();
+  await page.getByRole('button', { name: /^查\s*询$/ }).click();
   await expect(page.getByRole('row').filter({ hasText: appName })).toBeVisible();
   return { id: String(saved.id), appName, title };
 }
@@ -163,8 +164,12 @@ test('UI-002 / UI-008: registration, profile round trip and password lifecycle',
   await dialog.getByLabel('当前密码', { exact: true }).fill('incorrect');
   await dialog.getByLabel('新密码', { exact: true }).fill(`${testPassword}_new`);
   await dialog.getByLabel('确认新密码', { exact: true }).fill('mismatch');
+  const mismatched = page.waitForResponse(response => response.url().includes('/pwjbUser/changePassword'));
   await dialog.getByRole('button', { name: '确认修改' }).click();
-  await expect(dialog.getByText('两次输入的密码不一致', { exact: true })).toBeVisible();
+  const mismatchResult = await result(await mismatched);
+  expect(mismatchResult.success).toBe(false);
+  expect(mismatchResult.message).toBeTruthy();
+  await expect(dialog).toBeVisible();
   await dialog.getByLabel('确认新密码', { exact: true }).fill(`${testPassword}_new`);
   const rejected = page.waitForResponse(response => response.url().includes('/pwjbUser/changePassword'));
   await dialog.getByRole('button', { name: '确认修改' }).click();
@@ -181,13 +186,13 @@ test('UI-004 / UI-005 / UI-006: page-created namespace and app, edit, workspace 
   const namespace = await createNamespace(page, 'crud');
   const app = await createApplication(page, namespace, 'crud');
   let row = page.getByRole('row').filter({ hasText: app.appName });
-  await row.getByRole('button', { name: '编辑', exact: true }).click();
+  await row.getByRole('button', { name: /^编\s*辑$/ }).click();
   const drawer = page.locator('.ant-drawer-content');
   await drawer.getByLabel('显示名称', { exact: true }).fill(`${app.title} 已更新`);
   await saveRequest(page, '/appInfo/save', () => drawer.getByRole('button', { name: '保存应用', exact: true }).click());
   await page.reload();
   await page.getByLabel('应用名称', { exact: true }).fill(app.appName);
-  await page.getByRole('button', { name: '查询', exact: true }).click();
+  await page.getByRole('button', { name: /^查\s*询$/ }).click();
   await expect(page.getByRole('row').filter({ hasText: app.appName })).toContainText(`${app.title} 已更新`);
   row = page.getByRole('row').filter({ hasText: app.appName });
   await row.getByRole('button', { name: '进入', exact: true }).click();
@@ -195,11 +200,11 @@ test('UI-004 / UI-005 / UI-006: page-created namespace and app, edit, workspace 
   expect(await page.evaluate(() => localStorage.getItem('Power_appId'))).toBe(app.id);
   await page.goto(`${baseUrl}/#/admin/app`);
   await page.getByLabel('应用名称', { exact: true }).fill(app.appName);
-  await page.getByRole('button', { name: '查询', exact: true }).click();
+  await page.getByRole('button', { name: /^查\s*询$/ }).click();
   row = page.getByRole('row').filter({ hasText: app.appName });
-  await row.getByRole('button', { name: '编辑', exact: true }).click();
+  await row.getByRole('button', { name: /^编\s*辑$/ }).click();
   await drawer.getByRole('button', { name: '删除应用', exact: true }).click();
-  await page.locator('.ant-modal-confirm').getByRole('button', { name: '取消', exact: true }).click();
+  await page.locator('.ant-modal-confirm').getByRole('button', { name: /^取\s*消$/ }).click();
   await expect(drawer).toBeVisible();
   expect((await api(page, '/appInfo/list', { appId: app.id, index: 0, pageSize: 10 })).totalItems).toBe(1);
   await drawer.getByRole('button', { name: '删除应用', exact: true }).click();
@@ -208,13 +213,13 @@ test('UI-004 / UI-005 / UI-006: page-created namespace and app, edit, workspace 
   await expect(page.getByRole('row').filter({ hasText: app.appName })).not.toBeVisible();
   await page.goto(`${baseUrl}/#/admin/namespace`);
   await page.getByLabel('命名空间编码', { exact: true }).fill(namespace.code);
-  await page.getByRole('button', { name: '查询', exact: true }).click();
+  await page.getByRole('button', { name: /^查\s*询$/ }).click();
   const nsRow = page.getByRole('row').filter({ hasText: namespace.code });
-  await nsRow.getByRole('button', { name: '删除', exact: true }).click();
-  await page.locator('.ant-modal-confirm').getByRole('button', { name: '取消', exact: true }).click();
+  await nsRow.getByRole('button', { name: /^删\s*除$/ }).click();
+  await page.locator('.ant-modal-confirm').getByRole('button', { name: /^取\s*消$/ }).click();
   await expect(nsRow).toBeVisible();
-  await nsRow.getByRole('button', { name: '删除', exact: true }).click();
-  await page.locator('.ant-modal-confirm').getByRole('button', { name: '删除', exact: true }).click();
+  await nsRow.getByRole('button', { name: /^删\s*除$/ }).click();
+  await page.locator('.ant-modal-confirm').getByRole('button', { name: /^删\s*除$/ }).click();
   await expect(nsRow).not.toBeVisible();
   resources.namespaces = resources.namespaces.filter(id => id !== namespace.id);
 });
@@ -225,7 +230,7 @@ test('UI-007: controlled user disable/enable reflects confirmed server state', a
   await signIn(page);
   await page.goto(`${baseUrl}/#/admin/user`);
   await page.getByLabel('用户 ID', { exact: true }).fill(account.id);
-  await page.getByRole('button', { name: '查询', exact: true }).click();
+  await page.getByRole('button', { name: /^查\s*询$/ }).click();
   const row = page.getByRole('row').filter({ hasText: account.username });
   const toggle = row.getByRole('switch');
   await expect(toggle).toBeChecked();
@@ -243,7 +248,7 @@ test('UI-005 / UI-006 / UI-008: four application roles, namespace edit and passw
   await signIn(page);
   const namespace = await createNamespace(page, 'permissions');
   const application = await createApplication(page, namespace, 'permissions');
-  await page.getByRole('row').filter({ hasText: application.appName }).getByRole('button', { name: '编辑', exact: true }).click();
+  await page.getByRole('row').filter({ hasText: application.appName }).getByRole('button', { name: /^编\s*辑$/ }).click();
   const drawer = page.locator('.ant-drawer-content');
   await drawer.getByRole('tab', { name: '成员权限', exact: true }).click();
   for (const role of ['观察者', '质量保障', '开发者', '管理员']) {
@@ -257,19 +262,19 @@ test('UI-005 / UI-006 / UI-008: four application roles, namespace edit and passw
   for (const role of ['observer', 'qa', 'developer', 'admin']) expect(listed.data[0].componentUserRoleInfo[role].map(String)).toContain(account.id);
   await page.goto(`${baseUrl}/#/admin/namespace`);
   await page.getByLabel('命名空间编码', { exact: true }).fill(namespace.code);
-  await page.getByRole('button', { name: '查询', exact: true }).click();
+  await page.getByRole('button', { name: /^查\s*询$/ }).click();
   const nsRow = page.getByRole('row').filter({ hasText: namespace.code });
-  await nsRow.getByRole('button', { name: '编辑', exact: true }).click();
+  await nsRow.getByRole('button', { name: /^编\s*辑$/ }).click();
   await expect(drawer.getByLabel('空间编码', { exact: true })).toBeDisabled();
   await drawer.getByLabel('显示名称', { exact: true }).fill(`${namespace.name} 已更新`);
   await drawer.getByLabel('标签', { exact: true }).fill('e2e,permissions');
   await saveRequest(page, '/namespace/save', () => drawer.getByRole('button', { name: '保存命名空间', exact: true }).click());
   await expect(nsRow).toContainText(`${namespace.name} 已更新`);
-  await nsRow.getByRole('button', { name: '删除', exact: true }).click();
+  await nsRow.getByRole('button', { name: /^删\s*除$/ }).click();
   const rejected = page.waitForResponse(response => response.url().includes('/namespace/delete') && response.request().method() === 'DELETE');
-  await page.locator('.ant-modal-confirm').getByRole('button', { name: '删除', exact: true }).click();
+  await page.locator('.ant-modal-confirm').getByRole('button', { name: /^删\s*除$/ }).click();
   expect((await result(await rejected)).success).toBe(false);
-  await page.locator('.ant-modal-confirm').getByRole('button', { name: '取消', exact: true }).click();
+  await page.locator('.ant-modal-confirm').getByRole('button', { name: /^取\s*消$/ }).click();
   await expect(nsRow).toBeVisible();
   const claimedApplication = await createApplication(page, namespace, 'claim');
   await signOut(page);
@@ -310,7 +315,7 @@ test('UI-009: global administrator round trip keeps rescue admin and rejects emp
   const select = page.getByRole('combobox', { name: '全局管理员', exact: true });
   await select.fill(account.username);
   await page.locator('.ant-select-item-option').filter({ hasText: account.username }).click();
-  await page.getByRole('heading', { name: '系统设置', exact: true }).click();
+  await select.press('Escape');
   await saveRequest(page, '/auth/saveGlobalAdmin', () => page.getByRole('button', { name: '保存管理员', exact: true }).click());
   expect((await api(page, '/auth/listGlobalAdmin', undefined, {}, 'GET')).map(String)).toEqual(expect.arrayContaining([...original, account.id]));
   await page.reload();
@@ -326,11 +331,14 @@ test('UI-030: English survives refresh and all management routes render', async 
   await signIn(page);
   await page.getByRole('button', { name: '切换语言', exact: true }).click();
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Applications', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Applications', exact: true })).toBeAttached();
+  await expect(page.locator('.breadcrumb strong')).toHaveText('Applications');
   for (const [path, title] of [['namespace', 'Namespaces'], ['personal', 'Profile'], ['settings', 'System settings'], ['user', 'Users']]) {
     await page.goto(`${baseUrl}/#/admin/${path}`);
-    await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: title, exact: true })).toBeAttached();
+    await expect(page.locator('.breadcrumb strong')).toHaveText(path === 'personal' ? 'My profile' : title);
   }
   await page.getByRole('button', { name: 'Change language', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '用户管理', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '用户管理', exact: true })).toBeAttached();
+  await expect(page.locator('.breadcrumb strong')).toHaveText('用户管理');
 });

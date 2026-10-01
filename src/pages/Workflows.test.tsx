@@ -29,12 +29,12 @@ async function fill(element: HTMLInputElement, value: string) { await act(async 
 async function mount() { await act(async () => root.render(<App><MemoryRouter initialEntries={['/oms/workflowEditor?workflowId=8']}><Workflows/></MemoryRouter></App>)); }
 
 beforeEach(() => {
-  vi.resetAllMocks(); container = document.createElement('div'); document.body.appendChild(container); root = createRoot(container);
+  vi.resetAllMocks(); localStorage.clear(); localStorage.setItem('PowerJwt', 'fixture-session-a'); container = document.createElement('div'); document.body.appendChild(container); root = createRoot(container);
   requests.get.mockImplementation((path: string) => path === '/user/list' ? Promise.resolve([]) : Promise.reject(new Error(`Unexpected GET ${path}`)));
   requests.post.mockResolvedValue({ data: [], totalItems: 0 });
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
 });
-afterEach(async () => { await act(async () => root.unmount()); container.remove(); });
+afterEach(async () => { await act(async () => root.unmount()); container.remove(); localStorage.clear(); });
 
 describe('workflow editor asynchronous readback', () => {
   it('prevents editing the copy while initial readback is pending, then preserves the editable draft', async () => {
@@ -83,5 +83,24 @@ describe('workflow editor asynchronous readback', () => {
     await act(async () => saveNode.reject(new Error('node save failed')));
     expect(input('workflowNode_nodeName').disabled).toBe(false); expect(input('workflowNode_nodeName').value).toBe('节点名称草稿');
     expect(input('workflowGlobal_wfName').disabled).toBe(false);
+  });
+  it('cancels the old identity save before the graph write and reloads the new identity draft', async () => {
+    const nodeSave = deferred<unknown>(); let fetchCount = 0;
+    requests.get.mockImplementation((path: string) => path === '/workflow/fetch' ? Promise.resolve(workflow(++fetchCount === 1 ? '旧身份原名称' : '新身份回读名称')) : Promise.resolve([]));
+    requests.post.mockImplementation((path: string) => path === '/workflow/saveNode' ? nodeSave.promise : Promise.resolve({ data: [], totalItems: 0 }));
+    await mount(); await fill(input('workflowGlobal_wfName'), '旧身份未保存草稿'); await act(async () => button('保存工作流').click());
+    const nodeRequest = requests.post.mock.calls.find(([path]) => path === '/workflow/saveNode')!;
+    localStorage.setItem('PowerJwt', 'fixture-session-b'); await mount();
+    expect(nodeRequest[2].signal.aborted).toBe(true); expect(input('workflowGlobal_wfName').value).toBe('新身份回读名称');
+    await act(async () => nodeSave.resolve([]));
+    expect(requests.post.mock.calls.some(([path]) => path === '/workflow/save')).toBe(false); expect(input('workflowGlobal_wfName').value).toBe('新身份回读名称'); expect(button('保存工作流').disabled).toBe(false);
+  });
+  it('does not hydrate the editor with a previous identity response after a same-app login change', async () => {
+    const oldLoad = deferred<ReturnType<typeof workflow>>(); let fetchCount = 0;
+    requests.get.mockImplementation((path: string) => path === '/workflow/fetch' ? ++fetchCount === 1 ? oldLoad.promise : Promise.resolve(workflow('新身份的工作流')) : Promise.resolve([]));
+    await mount(); localStorage.setItem('PowerJwt', 'fixture-session-b'); await mount();
+    expect(input('workflowGlobal_wfName').value).toBe('新身份的工作流');
+    await act(async () => oldLoad.resolve(workflow('已失效身份的工作流')));
+    expect(input('workflowGlobal_wfName').value).toBe('新身份的工作流');
   });
 });

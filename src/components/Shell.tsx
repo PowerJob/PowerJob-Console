@@ -4,7 +4,7 @@ import { ArrowLeftRight, ChevronDown, Command, Globe, Layers, LogOut, Menu, Pane
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { api, type PageResult } from '../lib/api';
 import { useConsole } from '../lib/console';
-import { useQuery } from '../lib/hooks';
+import { useSessionQuery, useSessionScope } from '../lib/sessionScope';
 import { activeNavigation, managementNavigation, navigationScope, workspaceNavigation, type NavigationScope } from '../lib/navigation';
 
 const SIDEBAR_KEY = 'Power_consoleSidebarCollapsed';
@@ -18,9 +18,10 @@ export default function Shell() {
   const lastScope = useRef<NavigationScope>(appId ? 'workspace' : 'organization');
   const lastRoute = useRef({ workspace: '/oms/home', organization: '/admin/app' });
   const previousApp = useRef(appId);
+  const session = useSessionScope();
   const scope = navigationScope(location.pathname, lastScope.current);
   const active = activeNavigation(location.pathname);
-  const apps = useQuery(() => api.post<PageResult>('/appInfo/list', { showMyRelated: true, index: 0, pageSize: 1000 }), [appId, location.pathname]);
+  const apps = useSessionQuery(session, () => api.post<PageResult>('/appInfo/list', { showMyRelated: true, index: 0, pageSize: 1000 }, session.options), [appId, location.pathname]);
 
   useEffect(() => { void refreshSession().catch(() => {}); }, []);
   useEffect(() => {

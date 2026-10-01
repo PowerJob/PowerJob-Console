@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Alert, App, Button, Form, Input, Modal, Segmented, Space, Spin } from 'antd';
 import { ArrowLeft, ArrowRight, Boxes, CircleCheck, Globe2, Workflow } from 'lucide-react';
 import { api, type DataRecord } from '../lib/api';
 import { useConsole } from '../lib/console';
-import { useQuery } from '../lib/hooks';
+import { useSessionQuery, useSessionScope } from '../lib/sessionScope';
 import './admin.css';
 
 export default function Login() {
@@ -12,6 +12,13 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { message } = App.useApp();
+  const scope = useSessionScope();
+  const mounted = useRef(true);
+  const actionVersion = useRef(0);
+  const loginSession = useRef<{ version: number; token: string } | null>(null);
+  const actionIsCurrent = (version: number) => mounted.current && actionVersion.current === version && (scope.current() || (loginSession.current?.version === version && localStorage.getItem('PowerJwt') === loginSession.current.token));
+  const currentPath = useRef(location.pathname); currentPath.current = location.pathname;
+  useEffect(() => () => { mounted.current = false; ++actionVersion.current; }, []);
   const [loginForm] = Form.useForm();
   const [registerForm] = Form.useForm();
   const [registerOpen, setRegisterOpen] = useState(false);
@@ -21,60 +28,73 @@ export default function Login() {
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState('');
   const internal = location.pathname === '/powerjobLogin';
-  const providers = useQuery(() => api.get<DataRecord[]>('/auth/supportLoginTypes'));
-  const finishLogin = async (result: DataRecord) => {
+  const providers = useSessionQuery(scope, () => api.get<DataRecord[]>('/auth/supportLoginTypes', undefined, scope.options));
+  const finishLogin = async (result: DataRecord, version: number, path: string) => {
+    if (!mounted.current || !scope.current() || actionVersion.current !== version || currentPath.current !== path) return;
     if (!result?.jwtToken) throw new Error(t('登录响应缺少有效凭证，请重试', 'The sign-in response did not include a session. Please retry.'));
+    loginSession.current = { version, token: result.jwtToken };
     localStorage.setItem('PowerJwt', result.jwtToken);
-    await refreshSession(); navigate('/admin/app', { replace: true });
+    try { await refreshSession(); } catch (failure) { if (actionIsCurrent(version)) { setError((failure as Error).message); setChecking(false); setBusy(false); } throw failure; }
+    if (mounted.current && actionVersion.current === version && currentPath.current === path && localStorage.getItem('PowerJwt') === result.jwtToken) navigate('/admin/app', { replace: true });
   };
   useEffect(() => {
+    // A token written by this login is already being finalized; do not repeat its callback.
+    if (loginSession.current?.token === scope.token && loginSession.current.version === actionVersion.current) return;
     let active = true;
+    const version = ++actionVersion.current;
+    setChecking(true); setBusy(false); setProviderBusy(''); setRegistering(false); setRegisterOpen(false); setError('');
+    const path = location.pathname;
     const initialize = async () => {
       try {
         const callback = window.location.search;
         if (callback) {
-          const result = await api.get<DataRecord>(`/auth/thirdPartyLoginCallback${callback}`);
-          if (!active) return;
+          const result = await api.get<DataRecord>(`/auth/thirdPartyLoginCallback${callback}`, undefined, scope.options);
+          if (!active || !scope.current() || actionVersion.current !== version || currentPath.current !== path) return;
           window.history.replaceState(null, '', `${window.location.pathname}${window.location.hash}`);
-          await finishLogin(result);
+          await finishLogin(result, version, path);
         } else {
-          const result = await api.get<DataRecord | null>('/auth/ifLogin', undefined, { quiet: true });
-          if (result && active) { await refreshSession(); navigate('/admin/app', { replace: true }); }
+          const result = await api.get<DataRecord | null>('/auth/ifLogin', undefined, { ...scope.options, quiet: true });
+          if (result && active && scope.current() && actionVersion.current === version && currentPath.current === path) { await refreshSession(); if (active && scope.current() && actionVersion.current === version && currentPath.current === path) navigate('/admin/app', { replace: true }); }
         }
-      } catch (failure) { if (active) setError((failure as Error).message); }
-      finally { if (active) setChecking(false); }
+      } catch (failure) { if (active && actionIsCurrent(version)) setError((failure as Error).message); }
+      finally { if (active && actionIsCurrent(version)) setChecking(false); }
     };
     void initialize();
     return () => { active = false; };
-  }, []);
-  const directLogin = (username: string, password: string) => api.post<DataRecord>('/auth/thirdPartyLoginDirect', { loginType: 'PWJB', originParams: JSON.stringify({ username, password, encryption: 'none' }) });
+  }, [scope]);
+  const directLogin = (username: string, password: string) => api.post<DataRecord>('/auth/thirdPartyLoginDirect', { loginType: 'PWJB', originParams: JSON.stringify({ username, password, encryption: 'none' }) }, scope.options);
   const login = async ({ username, password }: { username: string; password: string }) => {
-    if (busy) return;
+    if (busy || !scope.current()) return;
+    const version = ++actionVersion.current; const path = location.pathname;
     setBusy(true); setError('');
-    try { await finishLogin(await directLogin(username, password)); }
-    catch (failure) { setError((failure as Error).message); }
-    finally { setBusy(false); }
+    try { await finishLogin(await directLogin(username, password), version, path); }
+    catch (failure) { if (actionIsCurrent(version)) setError((failure as Error).message); }
+    finally { if (actionIsCurrent(version)) setBusy(false); }
   };
   const openProvider = async (provider: DataRecord) => {
-    if (providerBusy) return;
+    if (providerBusy || !scope.current()) return;
+    const version = ++actionVersion.current; const path = location.pathname;
     setProviderBusy(provider.type); setError('');
     try {
-      const result = String(await api.get('/auth/thirdPartyLoginUrl', { type: provider.type }));
+      const result = String(await api.get('/auth/thirdPartyLoginUrl', { type: provider.type }, scope.options));
+      if (!scope.current() || actionVersion.current !== version || currentPath.current !== path) return;
       if (result.startsWith('FE-REDIRECT:')) { navigate(`/${result.slice('FE-REDIRECT:'.length).replace(/^\/+/, '')}`); return; }
       window.location.assign(result);
-    } catch (failure) { setError((failure as Error).message); }
-    finally { setProviderBusy(''); }
+    } catch (failure) { if (actionIsCurrent(version)) setError((failure as Error).message); }
+    finally { if (scope.current() && actionVersion.current === version) setProviderBusy(''); }
   };
   const register = async (values: DataRecord) => {
-    if (registering) return;
+    if (registering || !scope.current()) return;
     setRegistering(true);
     try {
-      await api.post('/pwjbUser/create', values);
+      await api.post('/pwjbUser/create', values, scope.options);
+      if (!scope.current()) return;
       // The first direct login creates the framework User for the built-in account.
       await directLogin(values.username, values.password);
+      if (!scope.current()) return;
       setRegisterOpen(false); registerForm.resetFields(); loginForm.setFieldsValue({ username: values.username, password: '' });
       void message.success(t('账号已创建，请登录', 'Account created. You can sign in now.'));
-    } catch { /* Registration errors retain the fields and stay visible. */ } finally { setRegistering(false); }
+    } catch { /* Registration errors retain the fields and stay visible. */ } finally { if (scope.current()) setRegistering(false); }
   };
   return <main className="login-page">
     <section className="login-brand-panel" aria-label="PowerJob">
@@ -100,11 +120,11 @@ export default function Login() {
         <div className="login-footer-copy">{t('任务、工作流与团队，在同一个工作空间。', 'Your jobs, workflows and team in one workspace.')}</div>
       </div>
     </section>
-    <Modal title={t('创建 PowerJob 账号', 'Create a PowerJob account')} open={registerOpen} onCancel={() => setRegisterOpen(false)} destroyOnHidden width={520} footer={<Space><Button onClick={() => setRegisterOpen(false)}>{t('取消', 'Cancel')}</Button><Button type="primary" htmlType="submit" form="powerjob-register" loading={registering}>{t('创建账号', 'Create account')}</Button></Space>}>
-      <Form id="powerjob-register" name="powerjob-register" form={registerForm} layout="vertical" onFinish={register}>
+    <Modal title={t('创建 PowerJob 账号', 'Create a PowerJob account')} open={registerOpen} onCancel={() => { if (!registering) setRegisterOpen(false); }} closable={!registering} mask={{ closable: !registering }} keyboard={!registering} destroyOnHidden width={520} footer={<Space><Button disabled={registering} onClick={() => setRegisterOpen(false)}>{t('取消', 'Cancel')}</Button><Button type="primary" htmlType="submit" form="powerjob-register" loading={registering}>{t('创建账号', 'Create account')}</Button></Space>}>
+      <Form id="powerjob-register" name="powerjob-register" form={registerForm} layout="vertical" onFinish={register} disabled={registering}>
         <Form.Item name="username" label={t('账号', 'Username')} extra={t('账号是您的唯一标识。', 'Your username uniquely identifies your account.')} rules={[{ required: true, message: t('请输入账号', 'Enter a username') }]}><Input autoComplete="username" /></Form.Item>
         <Form.Item name="nick" label={t('昵称', 'Nickname')}><Input autoComplete="nickname" /></Form.Item>
-        <div className="register-contact-grid"><Form.Item name="phone" label={t('手机号', 'Phone number')}><Input autoComplete="tel" /></Form.Item><Form.Item name="email" label={t('邮箱', 'Email')} rules={[{ type: 'email', message: t('请输入正确的邮箱地址', 'Enter a valid email address') }]}><Input autoComplete="email" /></Form.Item></div>
+        <div className="register-contact-grid"><Form.Item name="phone" label={t('手机号', 'Phone number')}><Input autoComplete="tel" /></Form.Item><Form.Item name="email" label={t('邮箱', 'Email')}><Input autoComplete="email" /></Form.Item></div>
         <Form.Item name="webHook" label={t('通知 Webhook', 'Notification webhook')}><Input /></Form.Item>
         <Form.Item name="password" label={t('密码', 'Password')} rules={[{ required: true, message: t('请输入密码', 'Enter a password') }]}><Input.Password autoComplete="new-password" /></Form.Item>
         <Form.Item name="password2" label={t('确认密码', 'Confirm password')} dependencies={['password']} rules={[{ required: true, message: t('请再次输入密码', 'Confirm your password') }, ({ getFieldValue }) => ({ validator: (_, value) => !value || getFieldValue('password') === value ? Promise.resolve() : Promise.reject(new Error(t('两次输入的密码不一致', 'The passwords do not match'))) })]}><Input.Password autoComplete="new-password" /></Form.Item>

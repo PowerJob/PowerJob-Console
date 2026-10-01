@@ -20,6 +20,22 @@ describe('workflow saves and instance inspection', () => {
     await expect(persistWorkflow({ wfName: 'draft' }, nodes, [], '7', '1')).rejects.toMatchObject({ message: 'illegal DAG', nodesSaved: true }); expect(JSON.stringify(nodes)).toBe(snapshot);
     vi.mocked(api.post).mockReset().mockRejectedValueOnce(new Error('invalid node')); await expect(persistWorkflow({ wfName: 'draft' }, nodes, [], '7', '1')).rejects.toThrow('invalid node'); expect(api.post).toHaveBeenCalledTimes(1);
   });
+  it('does not issue the graph write after the identity changes during the node write', async () => {
+    let session = 'original'; let finish!: (value: unknown) => void; const controller = new AbortController();
+    vi.mocked(api.post).mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    const save = persistWorkflow({ wfName: 'old identity draft' }, nodes, [], '7', '1', { signal: controller.signal, current: () => session === 'original' });
+    expect(vi.mocked(api.post).mock.calls[0][2]?.signal).toBe(controller.signal);
+    session = 'replacement'; finish([]);
+    await expect(save).rejects.toMatchObject({ name: 'AbortError' }); expect(api.post).toHaveBeenCalledTimes(1);
+  });
+  it('does not start or continue a save after its owner is aborted or navigates away', async () => {
+    const controller = new AbortController(); controller.abort();
+    await expect(persistWorkflow({}, nodes, [], '7', '1', { signal: controller.signal, current: () => true })).rejects.toMatchObject({ name: 'AbortError' }); expect(api.post).not.toHaveBeenCalled();
+    let current = true; let finish!: (value: unknown) => void;
+    vi.mocked(api.post).mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    const save = persistWorkflow({}, nodes, [], '7', '1', { current: () => current }); current = false; finish([]);
+    await expect(save).rejects.toMatchObject({ name: 'AbortError' }); expect(api.post).toHaveBeenCalledTimes(1);
+  });
   it('keeps decision code, nested workflow references and independently saved node flags', () => {
     expect(nodePayload(nodes[0], '1')).toMatchObject({ type: 2, jobId: undefined, nodeParams: 'true', enable: true, skipWhenFailed: false });
     expect(nodePayload(nodes[1], '1')).toMatchObject({ type: 3, jobId: '9223372036854775803', nodeParams: '中文', enable: false, skipWhenFailed: true });

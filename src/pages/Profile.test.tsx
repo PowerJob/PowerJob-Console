@@ -31,6 +31,7 @@ async function mount() { await act(async () => root.render(<ConfigProvider theme
 
 beforeEach(() => {
   vi.resetAllMocks();
+  localStorage.setItem('PowerJwt', 'fixture-profile-session');
   Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true });
   storedProfile = { id: '9', username: 'PWJB_fixture-profile', originUsername: 'fixture-profile', accountType: 'PWJB', nick: '原昵称', phone: 'extension-109', email: 'legacy-internal-alias', webHook: 'https://example.invalid/profile', globalRoles: [] };
   requests.get.mockImplementation((path: string) => path === '/user/detail' ? Promise.resolve({ ...storedProfile }) : Promise.reject(new Error(`Unexpected GET ${path}`)));
@@ -52,13 +53,31 @@ describe('legacy personal profile and credential request values', () => {
     await fill(input('profile-details_nick'), '只修改昵称');
     await act(async () => {
       input('profile-details_nick').form!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-      await vi.waitFor(() => expect(requests.post).toHaveBeenCalledWith('/user/modify', { id: '9', nick: '只修改昵称', phone: 'extension-109', email: 'legacy-internal-alias', webHook: 'https://example.invalid/profile' }));
+      await vi.waitFor(() => expect(requests.post).toHaveBeenCalledWith('/user/modify', { id: '9', nick: '只修改昵称', phone: 'extension-109', email: 'legacy-internal-alias', webHook: 'https://example.invalid/profile' }, expect.objectContaining({ signal: expect.any(AbortSignal) })));
     });
     await act(async () => Promise.resolve());
     expect(requests.get.mock.calls.filter(([path]) => path === '/user/detail')).toHaveLength(2);
     expect(session.refreshSession).toHaveBeenCalledOnce();
     expect(input('profile-details_nick').value).toBe('只修改昵称');
     expect(input('profile-details_email').value).toBe('legacy-internal-alias');
+  });
+
+  it('ignores an old identity response and submits only the newly loaded account ID', async () => {
+    let release!: (profile: Record<string, unknown>) => void;
+    const old = { ...storedProfile };
+    requests.get.mockImplementationOnce(() => new Promise(resolve => { release = resolve; }));
+    await mount();
+    localStorage.setItem('PowerJwt', 'fixture-profile-session-b');
+    storedProfile = { ...storedProfile, id: '20', nick: '新会话用户', username: 'PWJB_fixture-next', originUsername: 'fixture-next' };
+    await mount();
+    await act(async () => { release(old); await Promise.resolve(); });
+    expect(input('profile-details_nick').value).toBe('新会话用户');
+    await fill(input('profile-details_nick'), '新会话修改');
+    await act(async () => {
+      input('profile-details_nick').form!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      await vi.waitFor(() => expect(requests.post).toHaveBeenCalledOnce());
+    });
+    expect(requests.post.mock.calls[0]![1]).toMatchObject({ id: '20', nick: '新会话修改' });
   });
 
   it.each(['untouched', 'empty', 'mismatched'] as const)('leaves %s password values to the existing server contract and retains the form after server rejection', async kind => {

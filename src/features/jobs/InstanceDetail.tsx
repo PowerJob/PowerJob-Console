@@ -5,13 +5,15 @@ import { api, downloadBlob, type DataRecord } from '../../lib/api';
 import { useConsole } from '../../lib/console';
 import { EnumTag } from '../../lib/enums';
 import { useQuery } from '../../lib/hooks';
+import { useSessionQuery, useSessionScope } from '../../lib/sessionScope';
 import { ErrorState, formatTime, StatusTag } from '../../components/ui';
 import { createAppRequestScope } from '../../lib/appRequestScope';
 import { nextLogPage } from './logFollow';
 
 export function InstanceDetailContent({ instanceId }: { instanceId: string | number }) {
   const { t, appId } = useConsole(); const [customQuery,setCustomQuery] = useState('status in (5, 6) order by last_modified_time desc'); const [sql,setSql]=useState(customQuery);
-  const detail=useQuery(()=>api.post<DataRecord>('/instance/detailPlus',{instanceId,customQuery:sql},{headers:{AppId:appId}}),[instanceId,sql,appId]);
+  const scope=useSessionScope();
+  const detail=useSessionQuery(scope,()=>api.post<DataRecord>('/instance/detailPlus',{instanceId,customQuery:sql},{...scope.options,headers:{AppId:appId}}),[instanceId,sql,appId]);
   const value=detail.data; const display=(v:any)=>v===null||v===undefined||v===''?'—':typeof v==='object'?JSON.stringify(v,null,2):String(v);
   const fields:[string,string][]=[['runningTimes',t('执行次数','Execution count')],['taskTrackerAddress','TaskTracker'],['expectedTriggerTime',t('预计触发','Expected trigger')],['actualTriggerTime',t('开始时间','Started')],['finishedTime',t('完成时间','Finished')],['jobParams',t('任务参数','Job parameters')],['instanceParams',t('实例参数','Instance parameters')],['taskDetail',t('任务明细','Task summary')],['result',t('执行结果','Result')]];
   return <div className="instance-detail"><Space className="detail-actions"><Button icon={<RefreshCw size={14}/>} loading={detail.loading} onClick={detail.refresh}>{t('刷新详情','Refresh details')}</Button><StatusTag status={value?.status??'—'}/><code>{instanceId}</code></Space><ErrorState error={detail.error} retry={detail.refresh}/><Descriptions bordered column={{xs:1,sm:2}} size="small" items={fields.map(([key,label])=>({key,label,span:['finishedTime','result','taskDetail','jobParams','instanceParams'].includes(key)?'filled' as const:1,children:<pre className="value-block">{display(value?.[key])}</pre>}))}/>

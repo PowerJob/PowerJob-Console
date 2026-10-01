@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const context = vi.hoisted(() => ({ appId: '1', appName: 'Scheduling', user: { nick: 'Test user' }, language: 'cn', refreshSession: vi.fn(async () => {}), setApp: vi.fn(), setLanguage: vi.fn(), logout: vi.fn(), t: (zh: string) => zh }));
 vi.mock('../lib/console', () => ({ useConsole: () => context }));
 vi.mock('../lib/api', () => ({ api: { post: vi.fn() } }));
-vi.mock('../lib/hooks', () => ({ useQuery: () => ({ data: { data: [{ id: '1', appName: 'Scheduling' }], totalItems: 1 } }) }));
+import { api } from '../lib/api';
 import Shell from './Shell';
 
 let container: HTMLDivElement; let root: Root;
@@ -17,7 +17,7 @@ function button(label: string) { return container.querySelector<HTMLButtonElemen
 async function click(element: HTMLElement) { await act(async () => element.click()); }
 const route = () => container.querySelector('[data-testid="route"]')?.textContent;
 
-beforeEach(() => { vi.clearAllMocks(); localStorage.clear(); context.appId = '1'; container = document.createElement('div'); document.body.appendChild(container); root = createRoot(container); Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true }); });
+beforeEach(() => { vi.clearAllMocks(); vi.mocked(api.post).mockResolvedValue({ data: [{ id: '1', appName: 'Scheduling' }], totalItems: 1 }); localStorage.clear(); context.appId = '1'; container = document.createElement('div'); document.body.appendChild(container); root = createRoot(container); Object.assign(globalThis, { IS_REACT_ACT_ENVIRONMENT: true }); });
 afterEach(async () => { await act(async () => root.unmount()); container.remove(); });
 
 describe('Console navigation scopes', () => {
@@ -79,5 +79,20 @@ describe('Console navigation scopes', () => {
     context.appId = '2'; await mount();
     expect(route()).toBe('/oms/home');
     expect(container.querySelector('a[aria-label="运行概览"]')?.getAttribute('aria-current')).toBe('page');
+  });
+  it('reloads applications after a session change and ignores the old account response', async () => {
+    let resolveOld!: (value: any) => void;
+    vi.mocked(api.post).mockImplementationOnce(() => new Promise(resolve => { resolveOld = resolve; }));
+    localStorage.setItem('PowerJwt', 'unit-old-session');
+    await mount();
+    expect(api.post).toHaveBeenCalledTimes(1);
+    vi.mocked(api.post).mockResolvedValue({ data: [{ id: '1', appName: 'New session application' }], totalItems: 1 });
+    localStorage.setItem('PowerJwt', 'unit-new-session');
+    await mount();
+    expect(api.post).toHaveBeenCalledTimes(2);
+    expect(container.textContent).toContain('New session application');
+    await act(async () => resolveOld({ data: [{ id: '1', appName: 'Old session application' }], totalItems: 1 }));
+    expect(container.textContent).toContain('New session application');
+    expect(container.textContent).not.toContain('Old session application');
   });
 });

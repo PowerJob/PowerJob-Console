@@ -1,16 +1,17 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Alert, App, Avatar, Button, Form, Input, Modal, Select, Space, Switch, Table } from 'antd';
 import { Pencil, Search, UsersRound } from 'lucide-react';
 import { api, type DataRecord } from '../lib/api';
 import { useConsole } from '../lib/console';
 import { EnumTag, enumLabel, enumMeta } from '../lib/enums';
-import { useQuery } from '../lib/hooks';
+import { useSessionQuery, useSessionScope } from '../lib/sessionScope';
 import { ErrorState, PageHeader, Panel, RefreshButton } from '../components/ui';
 import './admin.css';
 
 export default function Users() {
   const { t, language } = useConsole();
   const { message } = App.useApp();
+  const scope = useSessionScope();
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
   const [query, setQuery] = useState<DataRecord>({});
@@ -18,8 +19,9 @@ export default function Users() {
   const [editing, setEditing] = useState<DataRecord | null>(null);
   const [saving, setSaving] = useState(false);
   const [editError, setEditError] = useState('');
-  const users = useQuery(() => api.post<DataRecord[]>('/user/query', query), [query]);
-  const providers = useQuery(() => api.get<DataRecord[]>('/auth/supportLoginTypes'));
+  const users = useSessionQuery(scope, () => api.post<DataRecord[]>('/user/query', query, scope.options), [query]);
+  const providers = useSessionQuery(scope, () => api.get<DataRecord[]>('/auth/supportLoginTypes', undefined, scope.options));
+  useEffect(() => { setEditing(null); setSaving(false); setPending([]); setEditError(''); editForm.resetFields(); }, [scope, editForm]);
   const accountTypes = useMemo(() => {
     const types = new Map<string, string>();
     for (const provider of providers.data || []) {
@@ -35,23 +37,25 @@ export default function Users() {
     return Array.from(types, ([value, label]) => ({ value, label }));
   }, [providers.data, users.data, query.accountTypeEq, language]);
   const edit = (user: DataRecord) => {
+    if (saving || !scope.current()) return;
     editForm.resetFields();
     editForm.setFieldsValue({ id: String(user.id), username: user.username, nick: user.nick, phone: user.phone, email: user.email, webHook: user.webHook, extra: user.extra });
     setEditError(''); setEditing(user);
   };
   const save = async (values: DataRecord) => {
-    if (saving || !editing) return;
+    if (saving || !editing || !scope.current()) return;
     const id = editing.id;
     setSaving(true); setEditError('');
     try {
-      await api.post('/user/modify', { id, nick: values.nick, phone: values.phone, email: values.email, webHook: values.webHook, extra: values.extra });
-      void message.success(t('用户信息已保存', 'User details saved')); setEditing(null); await users.refresh();
-    } catch (failure) { setEditError((failure as Error).message); }
-    finally { setSaving(false); }
+      await api.post('/user/modify', { id, nick: values.nick, phone: values.phone, email: values.email, webHook: values.webHook, extra: values.extra }, scope.options);
+      if (scope.current()) { void message.success(t('用户信息已保存', 'User details saved')); setEditing(null); await users.refresh(); }
+    } catch (failure) { if (scope.current()) setEditError((failure as Error).message); }
+    finally { if (scope.current()) setSaving(false); }
   };
   const changeStatus = async (user: DataRecord, enabled: boolean) => {
+    if (!scope.current()) return;
     const id = String(user.id); setPending(previous => [...previous, id]);
-    try { await api.post(enabled ? '/user/enable' : '/user/disable', undefined, { params: { uid: id } }); void message.success(enabled ? t('用户已启用', 'User enabled') : t('用户已禁用', 'User disabled')); await users.refresh(); } catch { /* Controlled switches retain the last confirmed server state. */ } finally { setPending(previous => previous.filter(value => value !== id)); }
+    try { await api.post(enabled ? '/user/enable' : '/user/disable', undefined, { ...scope.options, params: { uid: id } }); if (scope.current()) { void message.success(enabled ? t('用户已启用', 'User enabled') : t('用户已禁用', 'User disabled')); await users.refresh(); } } catch { /* Controlled switches retain the last confirmed server state. */ } finally { if (scope.current()) setPending(previous => previous.filter(value => value !== id)); }
   };
   return <>
     <PageHeader title={t('用户管理', 'Users')} description={t('查看账号与联系方式，管理用户访问状态。', 'Review accounts and contact details, and manage user access.')} actions={<RefreshButton loading={users.loading} onClick={() => void users.refresh()}/>}/>
@@ -75,7 +79,7 @@ export default function Users() {
         <Alert type="error" showIcon title={editError} style={{ marginBottom: 16 }}/>
       )}
       <p className="form-section-note">{t('留空的字段将保留当前值。', 'Fields left blank keep their current values.')}</p>
-      <Form name="users-edit" form={editForm} layout="vertical" onFinish={save}>
+      <Form name="users-edit" form={editForm} layout="vertical" onFinish={save} disabled={saving}>
         <Form.Item name="id" label="ID"><Input readOnly /></Form.Item>
         <Form.Item name="username" label={t('用户名', 'Username')}><Input readOnly autoComplete="off" /></Form.Item>
         <Form.Item name="nick" label={t('昵称', 'Nickname')}><Input autoComplete="off" /></Form.Item>

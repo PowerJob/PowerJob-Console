@@ -30,10 +30,13 @@ export class WorkflowSaveError extends Error { readonly nodesSaved = true; const
 export function workflowPayload(values: DataRecord, nodes: WorkflowNode[], edges: WorkflowEdge[], workflowId: string, appId: Id) {
   return { id: workflowId || undefined, appId, ...values, lifeCycle: values.lifeCycle ? { start: values.lifeCycle[0]?.valueOf() ?? null, end: values.lifeCycle[1]?.valueOf() ?? null } : { start: null, end: null }, dag: { nodes: nodes.map(n => ({ nodeId: n.nodeId })), edges: edges.map(e => ({ from: e.from, to: e.to, ...(e.property ? { property: e.property } : {}) })) } };
 }
-export async function persistWorkflow(values: DataRecord, nodes: WorkflowNode[], edges: WorkflowEdge[], workflowId: string, appId: Id) {
-  const options = { headers: { AppId: String(appId) } };
+export async function persistWorkflow(values: DataRecord, nodes: WorkflowNode[], edges: WorkflowEdge[], workflowId: string, appId: Id, operation?: { signal?: AbortSignal; current: () => boolean }) {
+  const assertCurrent = () => { if (operation?.signal?.aborted || operation && !operation.current()) throw new DOMException('Workflow save was cancelled', 'AbortError'); };
+  const options = { headers: { AppId: String(appId) }, ...(operation ? { signal: operation.signal } : {}) };
+  assertCurrent();
   await api.post('/workflow/saveNode', nodes.map(node => nodePayload(node, appId)), options);
-  try { return responseId(await api.post('/workflow/save', workflowPayload(values, nodes, edges, workflowId, appId), options)); } catch (error) { throw new WorkflowSaveError(error); }
+  assertCurrent();
+  try { const id = await api.post('/workflow/save', workflowPayload(values, nodes, edges, workflowId, appId), options); assertCurrent(); return responseId(id); } catch (error) { if ((error as Error).name === 'AbortError') throw error; throw new WorkflowSaveError(error); }
 }
 export function formatWorkflowContext(context?: string) { if (!context) return '—'; try { return stringifyJson(parseJson(context), 2); } catch { return context; } }
 export function workflowNodeStartTime(node?: WorkflowNode, execution?: DataRecord): string {

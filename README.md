@@ -2,6 +2,17 @@
 
 A complete React and TypeScript console for PowerJob. Manage applications and permissions, schedules, job instances, workflow DAGs, Workers, containers and execution logs from one workspace.
 
+## Prerelease distributions
+
+Console 6.0.0-alpha.1 is an independent frontend prerelease, built for the existing PowerJob Server APIs. It does not imply a PowerJob Server 6 release or require a Worker/Client upgrade or database migration.
+
+- `powerjob-console-6.0.0-alpha.1-standalone.zip`: serve `dist/` from a static host and reverse-proxy `/api/` to your Server, stripping `/api`. Preserve the Server context path in the proxy destination and support WebSocket upgrades. Serve directories with a trailing slash so relative assets also work under a static subdirectory.
+- `powerjob-console-6.0.0-alpha.1-spring.zip`: `dist/` uses same-origin relative APIs. Use it as the Server's static-resource directory when packaging your own Server distribution. Back up the existing static files first and verify sign-in, scheduling, logs and container deployment in your environment.
+
+Verify the downloaded archives against `SHA256SUMS`. Roll back by restoring the previous Console static files and API proxy configuration. The original Vue 2 source is preserved by the backup tag below.
+
+This prerelease does not certify every Server version or authentication provider. Real third-party provider login and password-change journeys require further acceptance. PowerJob Server 5.1.6 omits nonempty servlet context paths from Worker container-JAR download URLs; use a Server at its root API path for that deployment feature. Its existing sole-application-administrator removal and exact-ID retrieval of deleted jobs are also unchanged Server behaviors.
+
 ## Development
 
 Node.js 22.12 or newer is required. Install the locked dependencies and start the development server:
@@ -34,7 +45,7 @@ The bundled Inter font, icons and code editor are served locally. The deployed c
 
 ## Browser regression tests
 
-`tests/e2e/management.spec.ts` contains regression journeys for an isolated disposable Server. Configure `POWERJOB_E2E_BASE_URL`, `POWERJOB_E2E_CREDENTIALS` and `POWERJOB_E2E_SERVER_URL`, then run `npm run test:e2e`. Credential files and browser output must stay outside version control. Browser results are separate from unit tests and builds.
+`tests/e2e/management.spec.ts` contains regression journeys for an isolated disposable Server. Configure `POWERJOB_E2E_BASE_URL`, `POWERJOB_E2E_USERNAME` and `POWERJOB_E2E_PASSWORD`, then run `npm run test:e2e`. `POWERJOB_E2E_API_PREFIX` defaults to `/api`; set it to an empty string for a Server-embedded Console. These tests create accounts and resources, change a test account password, and exercise permissions; use disposable credentials and an isolated database. Keep credentials and browser output outside version control. Browser results are separate from unit tests and builds.
 
 ## Docker
 
