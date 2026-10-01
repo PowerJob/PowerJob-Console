@@ -50,7 +50,7 @@ export default function Profile() {
         <Form name="profile-details" form={profileForm} layout="vertical" className="profile-form" onFinish={saveProfile}>
           <Form.Item name="nick" label={t('昵称', 'Nickname')}><Input autoComplete="nickname" /></Form.Item>
           <Form.Item name="phone" label={t('手机号', 'Phone number')}><Input autoComplete="tel" /></Form.Item>
-          <Form.Item name="email" label={t('邮箱', 'Email')} rules={[{ type: 'email', message: t('请输入正确的邮箱地址', 'Enter a valid email address') }]}><Input autoComplete="email" /></Form.Item>
+          <Form.Item name="email" label={t('邮箱', 'Email')}><Input autoComplete="email" /></Form.Item>
           <Form.Item name="webHook" label={t('通知 Webhook', 'Notification webhook')}><Input placeholder="https://…" /></Form.Item>
           <Space wrap><Button type="primary" htmlType="submit" loading={saving}>{t('保存个人信息', 'Save profile')}</Button>{user.accountType === 'PWJB' && <Button icon={<KeyRound size={15}/>} onClick={() => { passwordForm.resetFields(); setPasswordOpen(true); }}>{t('修改密码', 'Change password')}</Button>}</Space>
         </Form>
@@ -76,9 +76,9 @@ export default function Profile() {
       <p className="form-section-note">{t('修改成功后需要重新登录。', 'You will sign in again after changing your password.')}</p>
       <Form name="profile-password" form={passwordForm} layout="vertical" onFinish={changePassword}>
         <Form.Item label={t('账号', 'Account')}><Input value={user?.originUsername} readOnly /></Form.Item>
-        <Form.Item name="oldPassword" label={t('当前密码', 'Current password')} rules={[{ required: true, message: t('请输入当前密码', 'Enter your current password') }]}><Input.Password autoComplete="current-password" /></Form.Item>
-        <Form.Item name="newPassword" label={t('新密码', 'New password')} rules={[{ required: true, message: t('请输入新密码', 'Enter a new password') }]}><Input.Password autoComplete="new-password" /></Form.Item>
-        <Form.Item name="newPassword2" label={t('确认新密码', 'Confirm new password')} dependencies={['newPassword']} rules={[{ required: true, message: t('请再次输入新密码', 'Confirm your new password') }, ({ getFieldValue }) => ({ validator: (_, value) => !value || getFieldValue('newPassword') === value ? Promise.resolve() : Promise.reject(new Error(t('两次输入的密码不一致', 'The passwords do not match'))) })]}><Input.Password autoComplete="new-password" /></Form.Item>
+        <Form.Item name="oldPassword" label={t('当前密码', 'Current password')}><Input.Password autoComplete="current-password" /></Form.Item>
+        <Form.Item name="newPassword" label={t('新密码', 'New password')}><Input.Password autoComplete="new-password" /></Form.Item>
+        <Form.Item name="newPassword2" label={t('确认新密码', 'Confirm new password')}><Input.Password autoComplete="new-password" /></Form.Item>
       </Form>
     </Modal>
   </>;
