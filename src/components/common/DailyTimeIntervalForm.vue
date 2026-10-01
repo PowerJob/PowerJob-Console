@@ -1,5 +1,7 @@
 <template>
   <div>
+    <el-alert v-if="parseError" :title="$t('message.invalidDailyExpression')" type="error" :closable="false"/>
+    <el-button v-if="parseError" @click="loadExpression(null)">{{$t('message.reset')}}</el-button>
     <el-form ref="form" :model="dailyTimeIntervalExpress">
       <el-form-item :label="$t('message.interval')">
           <el-col :span="6">
@@ -53,6 +55,7 @@ export default {
   props: ["timeExpression"],
   data() {
     return {
+      parseError: false,
       dailyTimeIntervalExpress: {
         interval: undefined,
         startTimeOfDay: undefined,
@@ -72,17 +75,36 @@ export default {
     }
   },
   methods: {
+    loadExpression(value) {
+      this.parseError = false;
+      const defaults = { interval: undefined, startTimeOfDay: undefined, endTimeOfDay: undefined, intervalUnit: 'SECONDS', daysOfWeek: [] };
+      this.dailyTimeIntervalExpress = defaults;
+      if (value == null || !String(value).trim()) return;
+      // A CRON expression carried over while switching scheduling type is not a DAILY rule.
+      if (!String(value).trim().startsWith('{') && !String(value).trim().startsWith('[')) return;
+      try {
+        const parsed = JSON.parse(value);
+        if (!parsed || Array.isArray(parsed) || typeof parsed !== 'object') throw new Error('Invalid DAILY rule');
+        const expression = Object.assign({}, defaults, parsed);
+        if (parsed.daysOfWeek == null) expression.daysOfWeek = [];
+        else if (!Array.isArray(parsed.daysOfWeek)) throw new Error('Invalid weekdays');
+        this.dailyTimeIntervalExpress = expression;
+      } catch (error) {
+        this.parseError = true;
+        this.$message.error(this.$t('message.invalidDailyExpression'));
+      }
+    },
     onSubmit() {
+      if (this.parseError) return;
       //使用 $emit派发事件
       this.$emit("contentChanged", JSON.stringify(this.dailyTimeIntervalExpress));
     }
-  }
-  ,mounted() {
-      console.log("dailyTimeIntervalExpress:" + this.timeExpression);
-      if (this.timeExpression !== undefined && this.timeExpression !== null) {
-          this.dailyTimeIntervalExpress = JSON.parse(this.timeExpression);
-      }
-
+  },
+  mounted() {
+    this.loadExpression(this.timeExpression);
+  },
+  watch: {
+    timeExpression(value) { this.loadExpression(value); }
   }
 }
 </script>

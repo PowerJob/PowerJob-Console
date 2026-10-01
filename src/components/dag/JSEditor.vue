@@ -29,11 +29,20 @@ export default {
       randomKey: 1231231,
     }
   },
+  watch: {
+    code(value) { this.updateCode(value); }
+  },
   methods: {
     onMounted(editor) {
       this.editor = editor;
+      this.updateCode(this.code);
+    },
+    updateCode(value) {
+      const code = value == null ? '' : String(value);
+      if (this.editor && this.editor.getValue() !== code) this.editor.setValue(code);
     },
     onCodeChange() {
+      if (!this.editor) return;
       this.$emit('onCodeChange', this.editor.getValue());
     },
   }

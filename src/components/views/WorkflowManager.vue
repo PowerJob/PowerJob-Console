@@ -14,7 +14,7 @@
                     <el-input v-model="workflowQueryContent.keyword" :placeholder="$t('message.keyword')"/>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="listWorkflow">{{$t('message.query')}}</el-button>
+                    <el-button type="primary" @click="onClickQuery">{{$t('message.query')}}</el-button>
                     <el-button type="cancel" @click="onClickReset">{{$t('message.reset')}}</el-button>
                 </el-form-item>
             </el-form>
@@ -72,12 +72,14 @@
                 layout="prev, pager, next"
                 :total="this.workflowPageResult.totalItems"
                 :page-size="this.workflowPageResult.pageSize"
+                :current-page="workflowQueryContent.index + 1"
                 @current-change="onClickChangePage"
                 :hide-on-single-page="true"/>
     </el-row>
     <el-dialog
             :title="$t('message.runByParameter')"
             :visible="!!temporaryRowData"
+            @close="onClickRunCancel"
             width="50%"
         >
             <el-input
@@ -120,6 +122,7 @@
                 workflowObj: {
 
                 },
+                listRequestSequence: 0,
                 temporaryRowData: null,
                 // 运行参数
                 runParameter: null,
@@ -128,10 +131,16 @@
             }
         },
         methods: {
+            onClickQuery() {
+                this.workflowQueryContent.index = 0;
+                return this.listWorkflow();
+            },
             // 查询工作流
             listWorkflow() {
                 const that = this;
-                this.axios.post("/workflow/list", this.workflowQueryContent).then((res) => {
+                const sequence = ++this.listRequestSequence;
+                return this.axios.post("/workflow/list", Object.assign({}, this.workflowQueryContent)).then((res) => {
+                    if (sequence !== this.listRequestSequence) return;
                     that.workflowPageResult = res;
                 });
             },
@@ -143,6 +152,7 @@
             onClickReset() {
                 this.workflowQueryContent.workflowId = undefined;
                 this.workflowQueryContent.keyword = undefined;
+                this.onClickQuery();
             },
             // 开关工作流
             switchWorkflow(data) {
@@ -174,7 +184,7 @@
                 this.runLoading = true;
                 this.axios.get(url).then(() => {
                     that.$message.success(this.$t('message.success'))
-                    this.temporaryRowData = null;
+                    this.onClickRunCancel();
                     this.runLoading = false
                 }).catch(() => {
                     this.runLoading = false

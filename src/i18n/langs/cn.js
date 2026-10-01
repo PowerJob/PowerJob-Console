@@ -141,6 +141,7 @@ const cn = {
         'fixDelay': '固定延迟（毫秒）',
         'workflow': '工作流',
         'dailyTimeInterval': '每日固定间隔',
+        'invalidDailyExpression': '每日固定间隔表达式无效，请重置后重新填写',
         'validateTimeExpression': '校验定时参数',
         'javaContainer': 'Java（容器）',
         'runHistory': '运行记录',

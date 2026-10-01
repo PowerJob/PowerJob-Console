@@ -14,7 +14,7 @@
                         <el-input v-model="jobQueryContent.keyword" :placeholder="$t('message.keyword')"/>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="listJobInfos">{{$t('message.query')}}</el-button>
+                        <el-button type="primary" @click="onClickQuery">{{$t('message.query')}}</el-button>
                         <el-button type="cancel" @click="onClickReset">{{$t('message.reset')}}</el-button>
                     </el-form-item>
                 </el-form>
@@ -93,6 +93,7 @@
                     layout="prev, pager, next"
                     :total="this.jobInfoPageResult.totalItems"
                     :page-size="this.jobInfoPageResult.pageSize"
+                    :current-page="jobQueryContent.index + 1"
                     @current-change="onClickChangePage"
                     :hide-on-single-page="true"/>
         </el-row>
@@ -359,6 +360,7 @@
         <el-dialog
             :title="$t('message.runByParameter')"
             :visible="!!temporaryRowData"
+            @close="onClickRunCancel"
             width="50%"
         >
             <el-input
@@ -463,6 +465,7 @@
                 // 时间表达式编辑窗口
                 timeExpressionEditorVisible: false,
                 // 临时存储的行数据
+                listRequestSequence: 0,
                 temporaryRowData: null,
                 // 运行参数
                 runParameter: null,
@@ -476,13 +479,18 @@
             }
         },
         methods: {
+            onClickQuery() {
+                this.jobQueryContent.index = 0;
+                return this.listJobInfos();
+            },
             // 保存变更，包括新增和修改
             async saveJob() {
-                const { lifeCycle, alarmConfig } = this.modifiedJobForm;
+                const payload = Object.assign({}, this.modifiedJobForm);
+                const { lifeCycle, alarmConfig } = payload;
                 if (lifeCycle && Array.isArray(lifeCycle)) {
                     const start = lifeCycle[0];
                     const end = lifeCycle[1];
-                    this.modifiedJobForm.lifeCycle = {
+                    payload.lifeCycle = {
                         start,
                         end
                     }
@@ -496,8 +504,8 @@
                 if (!alarmConfig.silenceWindowLen) {
                     alarmConfig.silenceWindowLen = 0;
                 }
-                this.modifiedJobForm.alarmConfig = alarmConfig;
-                await this.axios.post("/job/save", this.modifiedJobForm);
+                payload.alarmConfig = alarmConfig;
+                await this.axios.post("/job/save", payload);
                 this.modifiedJobFormVisible = false;
                 this.$message.success(this.$t('message.success'));
                 this.listJobInfos();
@@ -505,7 +513,9 @@
             // 列出符合当前搜索条件的任务
             listJobInfos() {
                 const that = this;
-                this.axios.post("/job/list", this.jobQueryContent).then((res) => {
+                const sequence = ++this.listRequestSequence;
+                return this.axios.post("/job/list", Object.assign({}, this.jobQueryContent)).then((res) => {
+                    if (sequence !== this.listRequestSequence) return;
                     console.log(res);
                     if (res && res.data) {
                         res.data = res.data.map(item => {
@@ -580,7 +590,7 @@
                 this.runLoading = true;
                 this.axios.get(url).then(() => {
                     that.$message.success(this.$t('message.success'));
-                    this.temporaryRowData = null;
+                    this.onClickRunCancel();
                     this.runLoading = false
                 }).catch(() => {
                     this.runLoading = false
@@ -609,6 +619,10 @@
               let url = "/job/copy?jobId=" + data.id;
               let that = this;
               this.axios.post(url).then(res => {
+                const lifeCycle = res.lifeCycle;
+                res.lifeCycle = lifeCycle && lifeCycle.start && lifeCycle.end
+                  ? [lifeCycle.start, lifeCycle.end]
+                  : null;
                 that.modifiedJobForm = res
                 that.modifiedJobFormVisible = true;
               });
@@ -633,7 +647,7 @@
             onClickReset() {
                 this.jobQueryContent.keyword = undefined;
                 this.jobQueryContent.jobId = undefined;
-                this.listJobInfos();
+                this.onClickQuery();
             },
             verifyPlaceholder(processorType) {
                 let res;
