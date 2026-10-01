@@ -1,0 +1,92 @@
+import fs from 'node:fs/promises'
+import path from 'node:path'
+import { test, expect, enterSamples, selectors, fill, clickAndResponse, secretFill, id, ownedName, fileHash, observation, type RecordDTO } from './helpers'
+import { OwnedResources } from './owned'
+import { createJob } from './job-ui'
+
+test('UI-037 · previous released Console logs in, edits and runs the new Job, reads and runs the workflow, downloads exact logs and restores the new distribution', async ({ page, backend, credentials }, info) => {
+  const statePath = process.env.POWERJOB_E2E_ROLLBACK_STATE
+  const oldDist = process.env.POWERJOB_E2E_OLD_DIST
+  test.skip(!statePath || !oldDist, 'BLOCKED: supply the privately owned static host state and verified previous release distribution')
+  test.setTimeout(240_000)
+  const original = await fs.readFile(statePath!, 'utf8')
+  const settings = JSON.parse(original) as Record<string, unknown>
+  const ledger = new OwnedResources(backend)
+  const name = ownedName('released_rollback')
+  const proof: RecordDTO = { oldIndexSHA256: await fileHash(path.join(oldDist!, 'index.html')), newIndexSHA256: await fileHash(path.join(String(settings.root), 'index.html')), serverDeploymentAndDatabaseSchemaChanged: false, sameOwnedBusinessObjectsAcrossStaticDistributions: true }
+  try {
+    await enterSamples(page, credentials)
+    const job = await createJob(page, backend, ledger, name, 'tech.powerjob.samples.processors.StandaloneProcessorDemo', 'success')
+    const nodes = await backend.call<RecordDTO[]>('/workflow/saveNode', { method: 'POST', data: [{ appId: credentials.app_id, type: 1, jobId: id(job.id), nodeName: name, nodeParams: 'success', enable: true, skipWhenFailed: false }] })
+    await info.attach('original-rollback-fixture-nodes', { body: JSON.stringify(nodes), contentType: 'application/json' })
+    const workflowId = id(await backend.call('/workflow/save', { method: 'POST', data: { appId: credentials.app_id, wfName: name + '_wf', wfDescription: 'Standalone Console rollback', timeExpressionType: 'API', enable: true, maxWfInstanceNum: 1, notifyUserIds: [], lifeCycle: { start: null, end: null }, dag: { nodes: [{ nodeId: id(nodes[0]!.id) }], edges: [] } } }))
+    ledger.track('workflow', workflowId, name + '_wf')
+    await fs.writeFile(statePath!, JSON.stringify({ ...settings, root: oldDist, legacy: true }))
+    await page.evaluate(() => { localStorage.removeItem('PowerJwt'); localStorage.setItem('lang', 'en'); localStorage.setItem('oms_lang', 'en') })
+    await page.goto('/#/powerjobLogin')
+    await page.reload()
+    await secretFill(page.getByPlaceholder('Username', { exact: true }), credentials.admin_username)
+    await secretFill(page.getByPlaceholder('Password', { exact: true }), credentials.admin_password)
+    await page.getByRole('button', { name: 'Login', exact: true }).click()
+    await expect(page).toHaveURL(/#\/admin\/app/)
+    await page.locator('.el-form-item').filter({ has: page.locator('label').getByText('appName', { exact: true }) }).locator('input').fill(credentials.app_name)
+    await clickAndResponse(page, '/appInfo/list', () => page.getByRole('button', { name: 'Query', exact: true }).click())
+    await selectors.row(page, credentials.app_name).getByRole('button', { name: 'Enter', exact: true }).click()
+    await expect(page).toHaveURL(/#\/oms\/home/)
+    await page.goto('/#/oms/job')
+    await page.getByPlaceholder('Job ID', { exact: true }).fill(id(job.id))
+    await clickAndResponse(page, '/job/list', () => page.getByRole('button', { name: 'Query', exact: true }).click())
+    const oldJob = selectors.row(page, id(job.id))
+    await expect(oldJob).toContainText(name)
+    await oldJob.getByRole('button', { name: 'Edit', exact: true }).click()
+    const editor = page.getByRole('dialog').filter({ visible: true })
+    await editor.locator('.el-form-item').filter({ has: page.locator('label').getByText('Job name', { exact: true }) }).locator('input').fill(name + '_old_edit')
+    expect((await clickAndResponse(page, '/job/save', () => editor.getByRole('button', { name: 'Save', exact: true }).click())).success).toBe(true)
+    await expect(editor).not.toBeVisible()
+    expect((await backend.job(id(job.id)))?.jobName).toBe(name + '_old_edit')
+    const ran = await clickAndResponse(page, '/job/run', () => oldJob.getByRole('button', { name: 'Run', exact: true }).click())
+    expect(ran.success).toBe(true)
+    const instanceId = ledger.trackInstance(id(ran.data), id(job.id))
+    await backend.waitInstance(instanceId, [5])
+    await page.goto('/#/oms/workflow')
+    await page.getByPlaceholder('Workflow ID', { exact: true }).fill(workflowId)
+    await clickAndResponse(page, '/workflow/list', () => page.getByRole('button', { name: 'Query', exact: true }).click())
+    const oldWorkflow = selectors.row(page, workflowId)
+    await expect(oldWorkflow).toContainText(name + '_wf')
+    const workflowRun = await clickAndResponse(page, '/workflow/run', () => oldWorkflow.getByRole('button', { name: 'Run', exact: true }).click())
+    expect(workflowRun.success).toBe(true)
+    const wfInstanceId = ledger.trackInstance(id(workflowRun.data), workflowId, 'WF_INSTANCE')
+    await backend.waitWorkflowInstance(wfInstanceId, [4])
+    await page.goto('/#/oms/instance')
+    await page.getByPlaceholder('Instance ID', { exact: true }).fill(instanceId)
+    await clickAndResponse(page, '/instance/list', () => page.getByRole('button', { name: 'Query', exact: true }).click())
+    const oldInstance = selectors.row(page, instanceId)
+    await expect(oldInstance).toContainText('Success')
+    const log = page.getByRole('dialog').filter({ visible: true })
+    // The previous release reads once on opening. Wait for the exact real Worker archive,
+    // then independently assert the old page's original HTTP response and rendered text.
+    await expect.poll(async () => {
+      const result = await backend.call<{ data: string }>('/instance/log', { query: { instanceId, index: 0, appId: credentials.app_id } })
+      return result.data.includes('StandaloneProcessorDemo finished process,success: true')
+    }, { timeout: 120_000, intervals: [1500, 3000] }).toBe(true)
+    const actualOldLog = await clickAndResponse<{ data: string }>(page, '/instance/log', () => oldInstance.getByRole('button', { name: 'Log', exact: true }).click(), response => new URL(response.url()).searchParams.get('instanceId') === instanceId)
+    expect(actualOldLog.success).toBe(true)
+    expect(actualOldLog.data.data).toContain('StandaloneProcessorDemo finished process,success: true')
+    await expect(log).toContainText('StandaloneProcessorDemo finished process,success: true')
+    const originalLog = await backend.file('/instance/downloadLog4Console', { instanceId })
+    const download = page.waitForEvent('download')
+    await log.getByRole('button', { name: /Download$/ }).click()
+    const filename = info.outputPath('previous-console-original.log')
+    await (await download).saveAs(filename)
+    expect(await fileHash(filename)).toBe(originalLog.sha256)
+    proof.jobId = id(job.id); proof.instanceId = instanceId; proof.workflowId = workflowId; proof.workflowInstanceId = wfInstanceId; proof.oldLogSHA256 = originalLog.sha256
+    await fs.writeFile(statePath!, original)
+    await page.goto('/#/oms/instance?jobId=' + id(job.id))
+    await page.reload()
+    await expect(page.getByRole('heading', { name: 'Job instances', exact: true })).toBeVisible()
+    await fill(page, 'Instance ID', instanceId)
+    await clickAndResponse(page, '/instance/list', () => page.getByRole('button', { name: 'Search', exact: true }).click())
+    await expect(selectors.row(page, instanceId)).toContainText('Succeeded')
+    await observation(info, 'UI-037', 'rollback-old-console', proof)
+  } finally { await fs.writeFile(statePath!, original); await ledger.cleanup(info) }
+})
