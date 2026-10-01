@@ -14,11 +14,11 @@ vi.mock('../components/ui', () => ({
 }));
 vi.mock('antd', async importOriginal => {
   const actual = await importOriginal<typeof import('antd')>();
-  return { ...actual, Upload: { Dragger: ({ customRequest }: { customRequest: (options: unknown) => void }) => <button onClick={() => customRequest({ file: new File(['fixture-bytes'], 'fixture.jar'), onSuccess: requests.uploadSuccess, onError: requests.uploadError })}>上传回归 JAR</button> } };
+  return { ...actual, Upload: { Dragger: ({ customRequest, disabled }: { customRequest: (options: unknown) => void; disabled?: boolean }) => <button disabled={disabled} onClick={() => customRequest({ file: new File(['fixture-bytes'], 'fixture.jar'), onSuccess: requests.uploadSuccess, onError: requests.uploadError })}>上传回归 JAR</button> } };
 });
 import Containers, { ContainerTemplate } from './Containers';
 
-function deferred<T>() { let resolve!: (value: T) => void; const promise = new Promise<T>(yes => { resolve = yes; }); return { promise, resolve }; }
+function deferred<T>() { let resolve!: (value: T) => void; let reject!: (error: Error) => void; const promise = new Promise<T>((yes, no) => { resolve = yes; reject = no; }); return { promise, resolve, reject }; }
 const row = { id: '9', containerName: '隔离容器', sourceType: 'FatJar', sourceInfo: 'original-hash', status: 'ENABLE' };
 class FakeSocket {
   static connections: FakeSocket[] = [];
@@ -39,6 +39,17 @@ beforeEach(() => {
 afterEach(async () => { await act(async () => root.unmount()); container.remove(); localStorage.clear(); vi.unstubAllGlobals(); });
 
 describe('container session isolation', () => {
+  it('locks editing and uploads while saving, then restores the same draft after failure', async () => {
+    const save = deferred<unknown>(); requests.post.mockReturnValueOnce(save.promise).mockResolvedValueOnce(true);
+    await mount(); await act(async () => button('编辑').click()); await fill(input('containerEditor_containerName'), '需要保留的容器草稿'); await act(async () => button('保存容器').click());
+    expect(input('containerEditor_containerName').disabled).toBe(true); expect(button('上传回归JAR').disabled).toBe(true);
+    const sources = [...document.querySelectorAll<HTMLInputElement>('#containerEditor_sourceType input')]; expect(sources).toHaveLength(2); expect(sources.every(element => element.disabled)).toBe(true);
+    expect(requests.post.mock.calls[0][1]).toMatchObject({ containerName: '需要保留的容器草稿', sourceInfo: 'original-hash' });
+    await act(async () => save.reject(new Error('save rejected')));
+    expect(input('containerEditor_containerName').disabled).toBe(false); expect(input('containerEditor_containerName').value).toBe('需要保留的容器草稿'); expect(button('上传回归JAR').disabled).toBe(false);
+    await fill(input('containerEditor_containerName'), '拒绝后继续编辑的草稿'); await act(async () => button('保存容器').click());
+    expect(requests.post.mock.calls[1][1]).toMatchObject({ containerName: '拒绝后继续编辑的草稿', sourceInfo: 'original-hash' });
+  });
   it('aborts a pending upload and ignores its late artifact after identity replacement', async () => {
     const upload = deferred<string>(); requests.post.mockImplementation((path: string) => path === '/container/jarUpload' ? upload.promise : Promise.resolve(true));
     await mount(); await act(async () => button('编辑').click()); await act(async () => button('上传回归JAR').click());
