@@ -8,6 +8,7 @@ import Field from '../../shared/Field.vue'
 import Modal from '../../shared/Modal.vue'
 import Icon from '../../shared/Icon.vue'
 import { schedules, cronExpression, dailyExpression, draftFromCron } from './model'
+import { dailyDraft } from './daily-draft'
 const props=withDefaults(defineProps<{type:string;expression:string;lifeCycle:Entity|null;types?:string[]}>(),{types:()=>schedules})
 const emit=defineEmits<{'update:type':[value:string];'update:expression':[value:string];'update:lifeCycle':[value:Entity|null]}>()
 const quick=ref(false),daily=ref(false),validation=ref(false),checking=ref(false)
@@ -21,7 +22,7 @@ const presets=computed(()=>[{value:'minutes',label:t('每隔几分钟','Every N 
 function openQuick(){Object.assign(preset,draftFromCron(props.expression));quick.value=true}
 function applyQuick(){try{emit('update:expression',cronExpression(preset));quick.value=false}catch(error){toast((error as Error).message,'error')}}
 function openDaily(){
-  try{const parsed=props.expression?JSON.parse(props.expression):{};if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))throw new Error();dailyValue.value={interval:60,intervalUnit:'SECONDS',startTimeOfDay:'09:00:00',endTimeOfDay:'18:00:00',daysOfWeek:[1,2,3,4,5],...parsed};if(parsed.daysOfWeek)dailyValue.value.daysOfWeek=parsed.daysOfWeek.map(Number);daily.value=true}catch{toast(t('每日间隔不是有效 JSON，请先修正表达式','The daily interval is invalid JSON. Correct the expression.'),'error')}
+  try{dailyValue.value=dailyDraft(props.expression);daily.value=true}catch{toast(t('每日间隔不是有效 JSON，请先修正表达式','The daily interval is invalid JSON. Correct the expression.'),'error')}
 }
 function applyDaily(){try{emit('update:expression',dailyExpression(dailyValue.value));daily.value=false}catch(error){toast((error as Error).message,'error')}}
 function dateValue(value:unknown){if(value==null)return '';const date=new Date(Number(value));if(!Number.isFinite(date.getTime()))return '';return new Date(date.getTime()-date.getTimezoneOffset()*60000).toISOString().slice(0,19)}

@@ -1,6 +1,6 @@
 import { beforeEach,afterEach,describe,it,expect,vi } from 'vitest'
 import { session,establishSession,selectApp,signOut } from '../../src/core/session'
-import { api,endpoint,websocketUrl,parseJSON,saveBlob } from '../../src/core/api'
+import { api,endpoint,websocketUrl,parseJSON,saveBlob,download } from '../../src/core/api'
 
 function response(body:string,type='application/json',ok=true){return new Response(body,{status:ok?200:500,headers:{'Content-Type':type}})}
 beforeEach(()=>{localStorage.clear();signOut();establishSession('synthetic-current-jwt');selectApp({id:'9223372036854775806',appName:'synthetic-app'});vi.stubGlobal('fetch',vi.fn())})
@@ -25,6 +25,18 @@ describe('request wire contract',()=>{
   const form=new FormData();form.append('file',new Blob(['jar']),'fixture.jar');await api('/container/jarUpload',{body:form})
   const options=vi.mocked(fetch).mock.calls[0][1]!
   expect(options.body).toBe(form);expect((options.headers as Headers).has('Content-Type')).toBe(false)
+ })
+ it('reads the current app and session for JSON, namespace and file requests after context replacement',async()=>{
+  vi.mocked(fetch).mockImplementation(async()=>response('{"success":true,"data":null}'))
+  await api('/job/list',{body:{}})
+  establishSession('synthetic-replaced-jwt');selectApp({id:'42',appName:'replaced'})
+  await api('/namespace/list',{body:{},headers:{NamespaceId:'7'}})
+  vi.mocked(fetch).mockResolvedValueOnce(response('actual file bytes','application/octet-stream'))
+  await api('/instance/downloadLog4Console',{blob:true})
+  const calls=vi.mocked(fetch).mock.calls.map(([,options])=>options!.headers as Headers)
+  expect(calls[0].get('PowerJwt')).toBe('synthetic-current-jwt');expect(calls[0].get('AppId')).toBe('9223372036854775806')
+  for(const headers of calls.slice(1)){expect(headers.get('PowerJwt')).toBe('synthetic-replaced-jwt');expect(headers.get('AppId')).toBe('42')}
+  expect(calls[1].get('NamespaceId')).toBe('7');expect(calls[2].has('Content-Type')).toBe(false)
  })
  it.each([-100,'-100'])('rejects expired session code %s and clears only the current session',async(code)=>{
   vi.mocked(fetch).mockResolvedValue(response(JSON.stringify({success:false,code,message:'expired synthetic session'})) as Response)
@@ -56,6 +68,22 @@ describe('request wire contract',()=>{
  it.each(['application/octet-stream','application/zip','text/plain'])('preserves real %s download bytes',async(type)=>{
   const content='\0synthetic bytes 中文\n';vi.mocked(fetch).mockResolvedValue(response(content,type) as Response)
   expect(await (await api<Blob>('/download',{blob:true})).text()).toBe(content)
+ })
+ it('never creates a download for a failed HTTP response even when the MIME advertises binary bytes',async()=>{
+  const create=vi.spyOn(URL,'createObjectURL')
+  vi.mocked(fetch).mockResolvedValue(response('binary error bytes','application/octet-stream',false))
+  await expect(download('/instance/downloadLog4Console',{},'instance-42.log')).rejects.toThrow()
+  expect(create).not.toHaveBeenCalled();expect(document.querySelector('a[download]')).toBeNull()
+ })
+ it('uses the controlled caller filename instead of an unsafe server Content-Disposition value',async()=>{
+  vi.useFakeTimers()
+  const received=response('log bytes 中文😀','text/plain');received.headers.set('Content-Disposition','attachment; filename="../../unrelated.html"')
+  vi.mocked(fetch).mockResolvedValue(received)
+  vi.spyOn(URL,'createObjectURL').mockReturnValue('blob:synthetic')
+  const revoke=vi.spyOn(URL,'revokeObjectURL').mockImplementation(()=>{})
+  const click=vi.spyOn(HTMLAnchorElement.prototype,'click').mockImplementation(function(){expect(this.download).toBe('instance-42.log')})
+  await download('/instance/downloadLog4Console',{instanceId:'42'},'instance-42.log')
+  expect(click).toHaveBeenCalledOnce();vi.advanceTimersByTime(1000);expect(revoke).toHaveBeenCalledWith('blob:synthetic')
  })
  it('propagates cancellation, has a bounded default timeout and releases event listeners',async()=>{
   vi.useFakeTimers();vi.mocked(fetch).mockImplementation((_url,options)=>new Promise((_resolve,reject)=>options?.signal?.addEventListener('abort',()=>reject(new DOMException('aborted','AbortError')))))

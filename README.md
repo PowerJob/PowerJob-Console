@@ -31,7 +31,7 @@ npm run check
 npm run package
 ```
 
-The development server listens on `127.0.0.1:5197`. Its `/api` proxy targets `http://127.0.0.1:23700`; change the target in `vite.config.js` for your local Server. `VITE_API_BASE_URL` sets a build-time fallback; the external `config.js` takes priority. `npm run package` produces a versioned ZIP and SHA-256 file containing the static site, this README, and license notices.
+The development server listens on `127.0.0.1:5173`. Its `/api` proxy targets the default local Server at `http://127.0.0.1:7700`. Set `POWERJOB_DEV_API_TARGET` to use another development Server; Vite's `--port` option changes the development port. `VITE_API_BASE_URL` sets a build-time fallback; the external `config.js` takes priority. `npm run package` produces a versioned ZIP and SHA-256 file containing the static site, this README, and license notices.
 
 `src/core` contains routing, requests, and session state; `src/shared` contains native dialog/form/paging controls; `src/features` contains administration, authentication, jobs, instances, workflows, containers, and scheduling. Unit tests are in `tests/unit`; real browser regression tests are in `tests/e2e`. Browser tests require a separately configured isolated Server/Worker environment and private credentials, which are never included in this repository or the release.
 

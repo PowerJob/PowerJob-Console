@@ -48,7 +48,7 @@ export function lifeCyclePayload(value: LifeCycle | null | undefined): LifeCycle
 export function workflowPayload(workflow: Workflow, dag: Dag) {
   const invalid = validateDag(dag); if (invalid) throw new Error(invalid);
   if (!workflow.wfName.trim() || workflow.wfName.length > 255) throw new Error('name');
-  if (!Number.isInteger(workflow.maxWfInstanceNum) || workflow.maxWfInstanceNum < 1) throw new Error('parallel');
+  if (!Number.isInteger(workflow.maxWfInstanceNum) || workflow.maxWfInstanceNum < 0) throw new Error('parallel');
   return { ...copy(workflow), id: workflow.id || undefined, lifeCycle: lifeCyclePayload(workflow.lifeCycle), dag: wireDag(dag) };
 }
 export function removeNodes(dag: Dag, removed: Set<Id>): Dag { return { nodes: dag.nodes.filter(n => !removed.has(n.nodeId)), edges: dag.edges.filter(e => !removed.has(e.from) && !removed.has(e.to)) }; }

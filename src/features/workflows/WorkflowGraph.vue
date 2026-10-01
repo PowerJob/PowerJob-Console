@@ -45,7 +45,7 @@ function move(event: PointerEvent) {
   else if (gesture?.kind === 'box' && box.value) box.value.end = point;
 }
 function end(event: PointerEvent) {
-  if (gesture?.kind === 'connect' && connection.value) { const point = graphPoint(event); const target = positions.value.find(n => Math.abs(point.x - n.x) < (n.nodeType === 2 ? 102 : 120) && Math.abs(point.y - n.y) < 50); if (target) finishConnection(target.nodeId); else cancel(); }
+  if (gesture?.kind === 'connect' && connection.value) { const point = graphPoint(event); const target = positions.value.find(n => { const port = inputPoint(n); return Math.hypot(point.x - port.x, point.y - port.y) <= 8 || (Math.abs(point.x - n.x) < (n.nodeType === 2 ? 102 : 120) && Math.abs(point.y - n.y) < 50); }); if (target) finishConnection(target.nodeId); else cancel(); }
   if (gesture?.kind === 'box' && boxBounds.value) { const bounds = boxBounds.value; selected.value = positions.value.filter(n => n.x >= bounds.x && n.x <= bounds.x + bounds.width && n.y >= bounds.y && n.y <= bounds.y + bounds.height).map(n => n.nodeId); emit('select', selected.value.at(-1) || null); box.value = null; }
   gesture = null; if (svg.value?.hasPointerCapture(event.pointerId)) svg.value.releasePointerCapture(event.pointerId); if (needsFit) { needsFit = false; fit(); }
 }

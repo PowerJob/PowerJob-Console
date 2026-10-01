@@ -26,6 +26,8 @@ watch(mobile,async open=>{await nextTick();if(open)rail.value?.querySelector<HTM
 onScopeDispose(()=>{media.removeEventListener('change',mediaChange);document.removeEventListener('keydown',keyboard)})
 const admin = computed(() => route.path.startsWith('/admin'))
 const authentication = computed(() => route.path.startsWith('/login') || route.path==='/powerjobLogin')
+const authenticationKey=ref(0)
+watch(()=>session.jwt,()=>authenticationKey.value++,{flush:'sync'})
 const workspace = computed(() => admin.value ? t('管理中心','Administration') : session.appName)
 const menu = computed(() => admin.value ? [
   {path:'/admin/app',icon:'app',label:t('应用','Apps')},{path:'/admin/namespace',icon:'grid',label:t('空间','Spaces')},{path:'/admin/user',icon:'users',label:t('用户','Users')},{path:'/admin/personal',icon:'users',label:t('个人','Profile')},{path:'/admin/settings',icon:'settings',label:t('设置','Settings')},
@@ -42,7 +44,7 @@ watch(() => session.revision, () => {
 function logout() {signOut();router.replace('/loginHomepage')}
 </script>
 <template>
-  <template v-if="authentication"><RouterView :key="session.jwt||''"/></template>
+  <template v-if="authentication"><RouterView :key="authenticationKey"/></template>
   <div v-else class="app-frame" :class="{'rail-expanded':expanded&&!narrow}">
     <a class="skip-link" href="#main-content">{{t('跳到主要内容','Skip to content')}}</a>
     <button v-if="mobile" class="rail-backdrop" :aria-label="t('关闭导航','Close navigation')" @click="mobile=false"/>
@@ -55,7 +57,7 @@ function logout() {signOut();router.replace('/loginHomepage')}
       <div class="workspace-ident"><button ref="menuButton" class="icon-button mobile-menu" :aria-label="t('展开导航','Open navigation')" :aria-expanded="mobile" @click="mobile=!mobile"><Icon name="menu"/></button><RouterLink class="workspace-app" to="/admin/app" :aria-label="t('切换应用','Switch application')"><Icon name="app"/><span>{{workspace}}</span><small>⌄</small></RouterLink><span class="workspace-title">{{title}}</span></div>
       <div class="workspace-tools"><select :value="locale" :aria-label="t('语言','Language')" @change="setLocale(($event.target as HTMLSelectElement).value as 'zh'|'en')"><option value="zh">简体中文</option><option value="en">English</option></select><details class="details-menu"><summary :aria-label="t('账户','Account')"><span class="avatar">{{String(session.user?.username||'P').slice(0,1).toUpperCase()}}</span></summary><div><RouterLink to="/admin/personal"><Icon name="users"/>{{t('个人中心','Profile')}}</RouterLink><RouterLink to="/admin/app"><Icon name="app"/>{{t('应用管理','Applications')}}</RouterLink><button @click="logout"><Icon name="logout"/>{{t('退出登录','Sign out')}}</button></div></details></div>
     </header>
-    <main id="main-content" class="main-content" :inert="narrow&&mobile||undefined"><RouterView :key="String(route.path.startsWith('/oms') ? session.appId : '') + ':' + session.jwt+':'+session.revision"/></main>
+    <main id="main-content" class="main-content" :inert="narrow&&mobile||undefined"><RouterView :key="String(route.path.startsWith('/oms') ? session.appId : '') + ':' +session.revision"/></main>
   </div>
   <div class="notice-stack" aria-live="polite"><div v-for="notice in notices" :key="notice.id" class="notice" :class="notice.type" :role="notice.type==='error'?'alert':'status'"><span>{{notice.message}}</span><button class="icon-button" :aria-label="t('关闭','Close')" @click="notices.splice(notices.indexOf(notice),1)">×</button></div></div>
   <Modal v-model="confirmation.open" :title="t('确认操作','Confirm action')" @closed="answerConfirmation(false)"><p>{{confirmation.message}}</p><template #footer><button class="btn" @click="answerConfirmation(false)">{{t('取消','Cancel')}}</button><button class="btn btn-primary" @click="answerConfirmation(true)">{{t('确认','Confirm')}}</button></template></Modal>

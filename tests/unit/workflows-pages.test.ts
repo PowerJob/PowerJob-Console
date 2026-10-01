@@ -17,6 +17,11 @@ function saveButton(wrapper: ReturnType<typeof editorMount>) { return wrapper.fi
 
 beforeEach(() => { transport.mockReset(); session.appId = '1'; });
 describe('workflow list mutation feedback', () => {
+  it('shows a persisted zero parallel limit as unlimited rather than disabled or missing', async () => {
+    transport.mockResolvedValue({ index: 0, pageSize: 10, totalPages: 1, totalItems: 1, data: [{ ...fixture(), maxWfInstanceNum: 0 }] });
+    const router = createRouter({ history: createMemoryHistory(), routes: [{ path: '/oms/workflow', component: Workflows }] }); await router.push('/oms/workflow'); await router.isReady();
+    const wrapper = mount(Workflows, { global: { plugins: [router] } }); await flushPromises(); expect(wrapper.get('tbody tr td:nth-child(3)').text()).toMatch(/Unlimited|不限/); wrapper.unmount();
+  });
   it('restores a controlled enabled switch after a real mutation rejection', async () => {
     const row = { id: '91', wfName: 'Workflow', enable: true, timeExpressionType: 'API', maxWfInstanceNum: 1 };
     transport.mockImplementation((path: string) => path === '/workflow/list' ? Promise.resolve({ index: 0, pageSize: 10, totalPages: 1, totalItems: 1, data: [row] }) : Promise.reject(new Error('Permission denied')));
@@ -26,6 +31,11 @@ describe('workflow list mutation feedback', () => {
 });
 
 describe('workflow editor metadata and stale route protection', () => {
+  it('accepts native zero input and keeps returned unlimited metadata on a name-only save', async () => {
+    const original = { ...fixture(), maxWfInstanceNum: 0 }; transport.mockImplementation((path: string) => Promise.resolve(path === '/workflow/fetch' ? original : path === '/workflow/save' ? '91' : []));
+    const router = await editorRouter(), wrapper = editorMount(router); await flushPromises(); const limit = wrapper.get('input[type="number"]'); expect(limit.attributes('min')).toBe('0'); expect(limit.element).toHaveProperty('value', '0'); expect(wrapper.text()).toMatch(/0 means unlimited|0 表示不限/);
+    await wrapper.get('.settings-identity input').setValue('Renamed unlimited'); await saveButton(wrapper).trigger('click'); await flushPromises(); expect(transport.mock.calls.find(call => call[0] === '/workflow/save')?.[1].body).toMatchObject({ id: '91', wfName: 'Renamed unlimited', maxWfInstanceNum: 0, notifyUserIds: null, enable: false, futureDTO: { keep: true }, lifeCycle: { start: 123, end: null, futureBoundary: 'unchanged' } }); wrapper.unmount();
+  });
   it('keeps returned null alarms/description/expression, future fields and partial lifecycle on a name-only save', async () => {
     transport.mockImplementation((path: string) => Promise.resolve(path === '/workflow/fetch' ? fixture() : path === '/workflow/save' ? '91' : [])); const router = await editorRouter(), wrapper = editorMount(router); await flushPromises(); await wrapper.get('.settings-identity input').setValue('Renamed'); await saveButton(wrapper).trigger('click'); await flushPromises();
     const body = transport.mock.calls.find(call => call[0] === '/workflow/save')![1].body; expect(body).toMatchObject({ wfName: 'Renamed', wfDescription: null, timeExpression: null, notifyUserIds: null, enable: false, maxWfInstanceNum: 3, futureDTO: { keep: true }, lifeCycle: { start: 123, end: null, futureBoundary: 'unchanged' }, dag: { nodes: [{ nodeId: '11' }], edges: [] } }); wrapper.unmount();

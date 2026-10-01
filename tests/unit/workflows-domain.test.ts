@@ -24,6 +24,13 @@ describe('workflow wire contract against Server d928', () => {
     expect(result).toMatchObject({ wfName: 'Renamed', wfDescription: null, enable: false, timeExpression: '', maxWfInstanceNum: 7, notifyUserIds: ['9007199254740997'], futureDto: { retained: true }, lifeCycle: { start: null, end: null } });
     expect(draft.lifeCycle).toBeNull();
   });
+  it('preserves a returned zero parallel limit as the Server unlimited setting on a name-only save', () => {
+    const draft = { ...workflow(), wfName: 'Renamed unlimited workflow', maxWfInstanceNum: 0 };
+    expect(workflowPayload(draft, basic()).maxWfInstanceNum).toBe(0);
+  });
+  it.each([-1, 0.5, Number.POSITIVE_INFINITY, Number.NaN])('rejects an invalid parallel limit without producing a save payload: %s', maxWfInstanceNum => {
+    expect(() => workflowPayload({ ...workflow(), maxWfInstanceNum }, basic())).toThrow('parallel');
+  });
   it('clears an existing lifecycle with explicit null bounds and preserves either partial bound', () => {
     expect(lifeCyclePayload(null)).toEqual({ start: null, end: null });
     expect(lifeCyclePayload({ start: '1700000000000', end: null, future: 'keep' })).toEqual({ start: 1700000000000, end: null, future: 'keep' });
