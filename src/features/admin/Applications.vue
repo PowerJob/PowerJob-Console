@@ -101,7 +101,7 @@ onMounted(() => { void load(); void loadChoices() })
     <TableState :loading="list.loading.value" :empty="!list.data.value.data.length">
       <div class="table-scroll" tabindex="0" :aria-label="t('应用表格，可横向滚动', 'Applications table, scroll horizontally')"><table class="data-table"><thead><tr><th>ID</th><th>{{ t('应用名', 'Application') }}</th><th>{{ t('描述', 'Description') }}</th><th>{{ t('命名空间', 'Namespace') }}</th><th>{{ t('创建时间', 'Created') }}</th><th>{{ t('修改时间', 'Modified') }}</th><th>{{ t('创建者', 'Creator') }}</th><th>{{ t('修改者', 'Modifier') }}</th><th>{{ t('操作', 'Actions') }}</th></tr></thead><tbody><tr v-for="row in list.data.value.data" :key="String(row.id)"><td class="code">{{ row.id }}</td><td><strong>{{ row.appName }}</strong></td><td>{{ row.title || '—' }}</td><td>{{ row.namespaceName || '—' }}</td><td>{{ row.gmtCreateStr || '—' }}</td><td>{{ row.gmtModifiedStr || '—' }}</td><td data-private>{{ row.creatorShowName || '—' }}</td><td data-private>{{ row.modifierShowName || '—' }}</td><td><div class="row-actions"><button class="btn btn-quiet btn-small" @click="edit(row)">{{ t('编辑', 'Edit') }}</button><button class="btn btn-primary btn-small" @click="enter(row)">{{ t('进入', 'Enter') }}</button></div></td></tr></tbody></table></div>
     </TableState>
-    <Pagination :index="query.index" :size="query.pageSize" :total="list.data.value.totalItems" @change="page"/>
+    <Pagination hide-on-single-page :index="query.index" :size="query.pageSize" :total="list.data.value.totalItems" @change="page"/>
   </section>
   <Modal v-model="open" :title="draft.id == null ? t('新建应用', 'New application') : t('编辑应用', 'Edit application')" wide>
     <form id="application-form" @submit.prevent="save"><div class="form-grid">

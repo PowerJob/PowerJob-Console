@@ -1,6 +1,6 @@
 # PowerJob Console
 
-PowerJob Console `5.1.6_fev3-rc.1` is a standalone administration UI for PowerJob Server 5.1.6. This edition is rebuilt in Vue 3 and TypeScript with native controls, a compact workspace, a workflow canvas, and shared scheduling tools.
+PowerJob Console `5.1.6_fev3-rc.2` is a standalone administration UI for PowerJob Server 5.1.6. This edition is rebuilt in Vue 3 and TypeScript with native controls, a compact workspace, a workflow canvas, and shared scheduling tools.
 
 The Server version is the release prefix. `fev3` identifies this frontend generation. Installing this Console does not upgrade Server, Worker, or Client, or replace the Console bundled in the Server JAR.
 
@@ -37,7 +37,7 @@ The development server listens on `127.0.0.1:5173`. Its `/api` proxy targets the
 
 ## Prerelease scope
 
-The backend API and persisted DTO contract remain compatible with Server 5.1.6. The UI includes application/namespace permissions, account management, all existing job schedules and execution modes, workflow nodes and execution controls, online/archived logs, Git/FatJar containers, and Java 8/11 templates. CRON quick setup supports six common Quartz rules; complex expressions remain editable.
+The backend API and persisted DTO contract remain compatible with Server 5.1.6. The UI includes application/namespace permissions, account management, all existing job schedules and execution modes, workflow nodes and execution controls, online/archived logs, Git/FatJar containers, and Java 8/11 templates. CRON quick setup supports six common Quartz rules; complex expressions remain editable. Application, namespace, user, job, and workflow lists hide pagination when the result fits on one page; instance lists retain their pagination controls.
 
 This is a prerelease. Real third-party OAuth sign-in still requires configured provider accounts and callback infrastructure for final acceptance. Server 5.1.6's Worker JAR download limitation with a nonempty Server context path remains a backend limitation; Console static-subdirectory hosting is a separate capability. Consult the release notes for the actual tested scope.
 
