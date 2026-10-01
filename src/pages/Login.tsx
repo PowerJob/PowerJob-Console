@@ -100,8 +100,8 @@ export default function Login() {
         <div className="login-footer-copy">{t('任务、工作流与团队，在同一个工作空间。', 'Your jobs, workflows and team in one workspace.')}</div>
       </div>
     </section>
-    <Modal title={t('创建 PowerJob 账号', 'Create a PowerJob account')} open={registerOpen} onCancel={() => setRegisterOpen(false)} destroyOnHidden width={520} footer={<Space><Button onClick={() => setRegisterOpen(false)}>{t('取消', 'Cancel')}</Button><Button type="primary" loading={registering} onClick={() => registerForm.submit()}>{t('创建账号', 'Create account')}</Button></Space>}>
-      <Form name="powerjob-register" form={registerForm} layout="vertical" onFinish={register}>
+    <Modal title={t('创建 PowerJob 账号', 'Create a PowerJob account')} open={registerOpen} onCancel={() => setRegisterOpen(false)} destroyOnHidden width={520} footer={<Space><Button onClick={() => setRegisterOpen(false)}>{t('取消', 'Cancel')}</Button><Button type="primary" htmlType="submit" form="powerjob-register" loading={registering}>{t('创建账号', 'Create account')}</Button></Space>}>
+      <Form id="powerjob-register" name="powerjob-register" form={registerForm} layout="vertical" onFinish={register}>
         <Form.Item name="username" label={t('账号', 'Username')} extra={t('账号是您的唯一标识。', 'Your username uniquely identifies your account.')} rules={[{ required: true, message: t('请输入账号', 'Enter a username') }]}><Input autoComplete="username" /></Form.Item>
         <Form.Item name="nick" label={t('昵称', 'Nickname')}><Input autoComplete="nickname" /></Form.Item>
         <div className="register-contact-grid"><Form.Item name="phone" label={t('手机号', 'Phone number')}><Input autoComplete="tel" /></Form.Item><Form.Item name="email" label={t('邮箱', 'Email')} rules={[{ type: 'email', message: t('请输入正确的邮箱地址', 'Enter a valid email address') }]}><Input autoComplete="email" /></Form.Item></div>
