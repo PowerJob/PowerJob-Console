@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { assessClock, CLOCK_STALE_MS, formatClockTime, formatServerClock, sampleServerClock, type ServerClockResponse } from './clock';
+import { assessClock, CLOCK_STALE_MS, compareTimezones, formatClockTime, formatServerClock, formatUtcOffset, sampleServerClock, type ServerClockResponse } from './clock';
 
 const epoch = Date.UTC(2026, 9, 2, 0, 0, 0);
 const response = (serverEpoch: number, zoneOffsetHours = 8): ServerClockResponse => ({
@@ -74,5 +74,20 @@ describe('server and browser clock comparison', () => {
       expect(assessClock(reading, reading.received).status).toBe('aligned');
       expect(formatServerClock(reading, assessClock(reading, reading.received))).toBe('2026-10-02 00:00:00');
     }
+  });
+
+  it('compares civil timezone offsets with the correct browser sign, including quarter-hour zones', () => {
+    expect(compareTimezones(8 * 3_600_000, -480)).toEqual({ localOffsetMs: 8 * 3_600_000, differenceMs: 0 });
+    expect(compareTimezones(0, -480)).toEqual({ localOffsetMs: 8 * 3_600_000, differenceMs: -8 * 3_600_000 });
+    expect(compareTimezones(-7 * 3_600_000, 420)).toEqual({ localOffsetMs: -7 * 3_600_000, differenceMs: 0 });
+    expect(compareTimezones(5.75 * 3_600_000, -345)).toEqual({ localOffsetMs: 5.75 * 3_600_000, differenceMs: 0 });
+    expect(formatUtcOffset(compareTimezones(0, -345).localOffsetMs!)).toBe('UTC+05:45');
+    expect(formatUtcOffset(compareTimezones(0, 210).localOffsetMs!)).toBe('UTC-03:30');
+  });
+
+  it('retains the local offset but never guesses a timezone difference without valid server metadata', () => {
+    expect(compareTimezones(undefined, -480)).toEqual({ localOffsetMs: 8 * 3_600_000, differenceMs: undefined });
+    expect(compareTimezones(NaN, -480)).toEqual({ localOffsetMs: 8 * 3_600_000, differenceMs: undefined });
+    expect(compareTimezones(0, NaN)).toEqual({});
   });
 });

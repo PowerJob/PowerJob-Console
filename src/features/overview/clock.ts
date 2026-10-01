@@ -109,3 +109,10 @@ export function formatUtcOffset(offsetMs: number): string {
   const minutes = Math.round(Math.abs(offsetMs) / 60_000);
   return `UTC${offsetMs < 0 ? '-' : '+'}${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
 }
+
+export function compareTimezones(serverOffsetMs: number | undefined, browserTimezoneOffsetMinutes: number): { localOffsetMs?: number; differenceMs?: number } {
+  // Date.getTimezoneOffset is UTC minus local time; civil offsets use the opposite sign.
+  if (!Number.isFinite(browserTimezoneOffsetMinutes)) return {};
+  const localOffsetMs = -browserTimezoneOffsetMinutes * 60_000;
+  return { localOffsetMs, differenceMs: serverOffsetMs !== undefined && Number.isFinite(serverOffsetMs) ? serverOffsetMs - localOffsetMs : undefined };
+}

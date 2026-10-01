@@ -8,7 +8,7 @@
 .overview-time-pair small{display:block;margin-top:4px;font-size:11px;line-height:1.6;color:var(--muted);overflow-wrap:anywhere}
 .overview-time-status{display:flex;gap:6px;align-items:flex-start;margin:12px 0 4px;font-size:12px;line-height:1.6;color:var(--muted)}
 .overview-time-status svg{flex-shrink:0;margin-top:2px}
-.overview-time-warning{color:#a44425}
+.overview-time-warning,.overview-time-timezone-difference{color:#a44425}
 .overview-time-aligned{color:#346f57}
 .overview-time-note{display:block;font-size:10px;line-height:1.65;color:var(--muted)}
 .overview-time-warning-help{display:block;font-size:11px;line-height:1.65;color:#a44425;margin-bottom:4px}
