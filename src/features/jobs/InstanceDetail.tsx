@@ -1,0 +1,27 @@
+import { useEffect, useState } from 'react';
+import { Button, Descriptions, Drawer, Input, Pagination, Space, Table, Tabs } from 'antd';
+import { Download, RefreshCw } from 'lucide-react';
+import { api, downloadBlob, type DataRecord } from '../../lib/api';
+import { useConsole } from '../../lib/console';
+import { useQuery } from '../../lib/hooks';
+import { ErrorState, formatTime, StatusTag } from '../../components/ui';
+
+export function InstanceDetailContent({ instanceId }: { instanceId: string | number }) {
+  const { t, appId } = useConsole(); const [customQuery,setCustomQuery] = useState('status in (5, 6) order by last_modified_time desc'); const [sql,setSql]=useState(customQuery);
+  const detail=useQuery(()=>api.post<DataRecord>('/instance/detailPlus',{instanceId,customQuery:sql},{headers:{AppId:appId}}),[instanceId,sql,appId]);
+  const value=detail.data; const display=(v:any)=>v===null||v===undefined||v===''?'—':typeof v==='object'?JSON.stringify(v,null,2):String(v);
+  const fields:[string,string][]=[['runningTimes',t('执行次数','Execution count')],['taskTrackerAddress','TaskTracker'],['expectedTriggerTime',t('预计触发','Expected trigger')],['actualTriggerTime',t('开始时间','Started')],['finishedTime',t('完成时间','Finished')],['jobParams',t('任务参数','Job parameters')],['instanceParams',t('实例参数','Instance parameters')],['taskDetail',t('任务明细','Task summary')],['result',t('执行结果','Result')]];
+  return <div className="instance-detail"><Space className="detail-actions"><Button icon={<RefreshCw size={14}/>} loading={detail.loading} onClick={detail.refresh}>{t('刷新详情','Refresh details')}</Button><StatusTag status={value?.status??'—'}/><code>{instanceId}</code></Space><ErrorState error={detail.error} retry={detail.refresh}/><Descriptions bordered column={{xs:1,sm:2}} size="small" items={fields.map(([key,label])=>({key,label,span:['finishedTime','result','taskDetail','jobParams','instanceParams'].includes(key)?'filled' as const:1,children:<pre className="value-block">{display(value?.[key])}</pre>}))}/>
+    {value?.subInstanceDetails && <><h3>{t('秒级子实例','Frequent sub-instances')}</h3><Table<DataRecord> rowKey={r=>String(r.subInstanceId)} dataSource={value.subInstanceDetails} scroll={{x:700}} columns={[{title:t('子实例 ID','Sub-instance ID'),dataIndex:'subInstanceId'},{title:t('开始','Started'),dataIndex:'startTime',render:formatTime},{title:t('完成','Finished'),dataIndex:'finishedTime',render:formatTime},{title:t('状态','Status'),dataIndex:'status',render:s=><StatusTag status={s}/>},{title:t('结果','Result'),dataIndex:'result'}]}/></>}
+    <h3>{t('分片与子任务','Shards and tasks')}</h3><div className="query-bar"><Input aria-label={t('分片查询条件','Task query condition')} className="code-input" prefix="WHERE" value={customQuery} onChange={e=>setCustomQuery(e.target.value)} onPressEnter={()=>setSql(customQuery)}/><Button type="primary" onClick={()=>{if(sql===customQuery)void detail.refresh();else setSql(customQuery);}}>{t('查询分片','Query tasks')}</Button></div><Table<DataRecord> rowKey={r=>String(r.taskId)} size="small" dataSource={value?.queriedTaskDetailInfoList||[]} scroll={{x:1400}} columns={[
+      {title:'Task ID',dataIndex:'taskId',width:150},{title:t('任务名称','Task name'),dataIndex:'taskName',width:160},{title:t('内容','Content'),dataIndex:'taskContent',width:200,ellipsis:true},{title:t('Worker','Worker'),dataIndex:'processorAddress',width:180},{title:t('失败次数','Failures'),dataIndex:'failedCnt',width:100},{title:t('状态','Status'),dataIndex:'statusStr',width:130},{title:t('创建','Created'),dataIndex:'createdTimeStr',width:170},{title:t('更新','Updated'),dataIndex:'lastModifiedTimeStr',width:170},{title:t('最后上报','Last report'),dataIndex:'lastReportTimeStr',width:170},{title:t('结果','Result'),dataIndex:'result',width:250,render:v=><pre className="value-block">{display(v)}</pre>}
+    ]}/>
+  </div>;
+}
+export function LogViewer({ instanceId,open,onClose }: { instanceId:string|number; open:boolean; onClose:()=>void }) {
+  const { appId,t }=useConsole();const [index,setIndex]=useState(0);const [downloading,setDownloading]=useState(false); const log=useQuery<DataRecord>(()=>open?api.get<DataRecord>('/instance/log',{instanceId,index,appId},{headers:{AppId:appId}}):Promise.resolve({}),[instanceId,index,open,appId]);
+  useEffect(()=>setIndex(0),[instanceId,open]);
+  const download=async()=>{setDownloading(true);try{const blob=await api.get<Blob>('/instance/downloadLog4Console',{instanceId},{responseType:'blob',timeout:75000,headers:{AppId:appId}});downloadBlob(blob,`powerjob-instance-${instanceId}.log`);}catch{}finally{setDownloading(false);}};
+  return <Drawer title={t('运行日志','Execution log')+' #'+instanceId} open={open} onClose={onClose} size={1000} extra={<Space><Button icon={<RefreshCw size={15}/>} loading={log.loading} onClick={log.refresh}>{t('刷新','Refresh')}</Button><Button icon={<Download size={15}/>} loading={downloading} onClick={download}>{t('下载日志','Download log')}</Button></Space>}><ErrorState error={log.error} retry={log.refresh}/><pre className="log-viewer">{log.data?.data||t('暂无日志。运行中实例可刷新查看最新输出。','No logs yet. Refresh to see the latest output.')}</pre><Pagination current={index+1} pageSize={1} total={log.data?.totalPages||0} showSizeChanger={false} onChange={p=>setIndex(p-1)}/></Drawer>;
+}
+export default function InstanceDetail({instanceId,open=true,onClose=()=>{}}:{instanceId:string|number;open?:boolean;onClose?:()=>void}) {const {t}=useConsole();return <Drawer title={t('实例详情','Instance details')} open={open} onClose={onClose} size={1080}><InstanceDetailContent instanceId={instanceId}/></Drawer>;}

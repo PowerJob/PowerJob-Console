@@ -41,3 +41,8 @@ build/
 *.log
 */.DS_Store
 .DS_Store
+# Local configuration and test output
+.env.local
+.env.*.local
+test-results/
+playwright-report/
