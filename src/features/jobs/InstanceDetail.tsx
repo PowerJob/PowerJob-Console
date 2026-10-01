@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
-import { Button, Descriptions, Drawer, Input, Pagination, Space, Table, Tabs } from 'antd';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Button, Descriptions, Drawer, Input, Pagination, Space, Switch, Table } from 'antd';
 import { Download, RefreshCw } from 'lucide-react';
 import { api, downloadBlob, type DataRecord } from '../../lib/api';
 import { useConsole } from '../../lib/console';
 import { useQuery } from '../../lib/hooks';
 import { ErrorState, formatTime, StatusTag } from '../../components/ui';
+import { createAppRequestScope } from '../../lib/appRequestScope';
 
 export function InstanceDetailContent({ instanceId }: { instanceId: string | number }) {
   const { t, appId } = useConsole(); const [customQuery,setCustomQuery] = useState('status in (5, 6) order by last_modified_time desc'); const [sql,setSql]=useState(customQuery);
@@ -19,9 +20,24 @@ export function InstanceDetailContent({ instanceId }: { instanceId: string | num
   </div>;
 }
 export function LogViewer({ instanceId,open,onClose }: { instanceId:string|number; open:boolean; onClose:()=>void }) {
-  const { appId,t }=useConsole();const [index,setIndex]=useState(0);const [downloading,setDownloading]=useState(false); const log=useQuery<DataRecord>(()=>open?api.get<DataRecord>('/instance/log',{instanceId,index,appId},{headers:{AppId:appId}}):Promise.resolve({}),[instanceId,index,open,appId]);
-  useEffect(()=>setIndex(0),[instanceId,open]);
-  const download=async()=>{setDownloading(true);try{const blob=await api.get<Blob>('/instance/downloadLog4Console',{instanceId},{responseType:'blob',timeout:75000,headers:{AppId:appId}});downloadBlob(blob,`powerjob-instance-${instanceId}.log`);}catch{}finally{setDownloading(false);}};
-  return <Drawer title={t('运行日志','Execution log')+' #'+instanceId} open={open} onClose={onClose} size={1000} extra={<Space><Button icon={<RefreshCw size={15}/>} loading={log.loading} onClick={log.refresh}>{t('刷新','Refresh')}</Button><Button icon={<Download size={15}/>} loading={downloading} onClick={download}>{t('下载日志','Download log')}</Button></Space>}><ErrorState error={log.error} retry={log.refresh}/><pre className="log-viewer">{log.data?.data||t('暂无日志。运行中实例可刷新查看最新输出。','No logs yet. Refresh to see the latest output.')}</pre><Pagination current={index+1} pageSize={1} total={log.data?.totalPages||0} showSizeChanger={false} onChange={p=>setIndex(p-1)}/></Drawer>;
+  const { appId,t }=useConsole();
+  const [index,setIndex]=useState(0);const [downloading,setDownloading]=useState(false);const [automatic,setAutomatic]=useState(true);
+  const token=localStorage.getItem('PowerJwt');
+  const scope=useMemo(()=>createAppRequestScope(appId,token),[appId,token,instanceId]);
+  useEffect(()=>()=>scope.dispose(),[scope]);
+  const log=useQuery<DataRecord>(()=>open?api.get<DataRecord>('/instance/log',{instanceId,index,appId},{...scope.options,quiet:true}):Promise.resolve({}),[instanceId,index,open,scope]);
+  const loading=useRef(log.loading);loading.current=log.loading;
+  const viewport=useRef<HTMLPreElement>(null);const followTail=useRef(true);
+  useEffect(()=>{setIndex(0);followTail.current=true;},[instanceId,open]);
+  useEffect(()=>{if(followTail.current&&viewport.current)viewport.current.scrollTop=viewport.current.scrollHeight;},[log.data]);
+  useEffect(()=>{
+    if(!open||!automatic)return;
+    let active=true;let timer:number;
+    const poll=async()=>{if(!loading.current&&scope.current())await log.refresh();if(active)timer=window.setTimeout(()=>void poll(),3000);};
+    timer=window.setTimeout(()=>void poll(),3000);
+    return()=>{active=false;window.clearTimeout(timer);};
+  },[open,automatic,scope,index,log.refresh]);
+  const download=async()=>{if(downloading||!scope.current())return;setDownloading(true);try{const blob=await api.get<Blob>('/instance/downloadLog4Console',{instanceId},{...scope.options,responseType:'blob',timeout:75000});if(scope.current())downloadBlob(blob,`powerjob-instance-${instanceId}.log`);}catch{}finally{if(scope.current())setDownloading(false);}};
+  return <Drawer title={t('运行日志','Execution log')+' #'+instanceId} open={open} onClose={onClose} size={1000} extra={<Space wrap><Space><Switch size="small" checked={automatic} aria-label={t('自动刷新日志','Automatically refresh logs')} onChange={setAutomatic}/><span>{t('自动刷新','Auto refresh')}</span></Space><Button icon={<RefreshCw size={15}/>} loading={log.loading} onClick={log.refresh}>{t('刷新','Refresh')}</Button><Button icon={<Download size={15}/>} loading={downloading} onClick={download}>{t('下载日志','Download log')}</Button></Space>}><ErrorState error={log.error} retry={log.refresh}/><pre ref={viewport} className="log-viewer" onScroll={event=>{const el=event.currentTarget;followTail.current=el.scrollHeight-el.scrollTop-el.clientHeight<40;}}>{log.data?.data||t('暂无日志。运行中实例可刷新查看最新输出。','No logs yet. Refresh to see the latest output.')}</pre><Pagination current={index+1} pageSize={1} total={log.data?.totalPages||0} showSizeChanger={false} onChange={p=>setIndex(p-1)}/></Drawer>;
 }
 export default function InstanceDetail({instanceId,open=true,onClose=()=>{}}:{instanceId:string|number;open?:boolean;onClose?:()=>void}) {const {t}=useConsole();return <Drawer title={t('实例详情','Instance details')} open={open} onClose={onClose} size={1080}><InstanceDetailContent instanceId={instanceId}/></Drawer>;}
