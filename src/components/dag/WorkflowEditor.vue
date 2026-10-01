@@ -6,7 +6,7 @@
         <div class="settings-grid">
           <el-form-item :label="$t('message.wfName')" required><el-input v-model="workflowInfo.wfName" maxlength="255" /></el-form-item>
           <el-form-item :label="$t('message.wfDescription')"><el-input v-model="workflowInfo.wfDescription" /></el-form-item>
-          <el-form-item :label="$t('message.scheduleInfo')"><div class="schedule-fields"><el-select v-model="workflowInfo.timeExpressionType" style="width:120px"><el-option label="API" value="API" /><el-option label="CRON" value="CRON" /></el-select><el-input v-model="workflowInfo.timeExpression" :placeholder="$t('message.wfTimeExpressionPLH')" /><el-button @click="timeExpressionValidatorVisible = true">{{ $t('message.validateTimeExpression') }}</el-button></div></el-form-item>
+          <el-form-item :label="$t('message.scheduleInfo')"><div class="schedule-fields"><el-select v-model="workflowInfo.timeExpressionType" style="width:120px"><el-option label="API" value="API" /><el-option label="CRON" value="CRON" /></el-select><el-input v-model="workflowInfo.timeExpression" :placeholder="$t('message.wfTimeExpressionPLH')" data-testid="workflow-time-expression" /><CronQuickStart v-if="workflowInfo.timeExpressionType === 'CRON'" v-model="workflowInfo.timeExpression" /><el-button @click="timeExpressionValidatorVisible = true">{{ $t('message.validateTimeExpression') }}</el-button></div></el-form-item>
           <el-form-item :label="$t('message.lifeCycle')"><LifeCycleFields v-model="workflowInfo.lifeCycle" /></el-form-item>
           <el-form-item :label="$t('message.maxInstanceNum')"><el-input-number v-model="workflowInfo.maxWfInstanceNum" :min="1" /></el-form-item>
           <el-form-item :label="$t('message.alarmConfig')"><el-select v-model="workflowInfo.notifyUserIds" multiple filterable :placeholder="$t('message.alarmSelectorPLH')" style="width:100%"><el-option v-for="user in userList" :key="user.id" :label="user.username" :value="user.id" /></el-select></el-form-item>
@@ -37,6 +37,7 @@
 </template>
 <script>
 import { markRaw, defineAsyncComponent } from 'vue';
+import CronQuickStart from '../common/CronQuickStart.vue';
 import TimeExpressionValidator from '../common/TimeExpressionValidator.vue';
 import PowerWorkflow from './PowerWorkflow.vue';
 import WorkflowManager from '../views/WorkflowManager.vue';
@@ -45,7 +46,7 @@ import { lifeCycleForSave } from '../../services/jobs.js';
 import { serializeDag, validateDag } from './workflow-model.js';
 const emptyWorkflowInfo = () => ({ id:'', appId:window.localStorage.getItem('Power_appId'), enable:true, maxWfInstanceNum:1, notifyUserIds:[], timeExpression:'', timeExpressionType:'API', wfDescription:'', wfName:'', lifeCycle:null });
 export default {
-  name: 'WorkflowEditor', components: { JSEditor: defineAsyncComponent(() => import('./JSEditor.vue')), TimeExpressionValidator, PowerWorkflow, WorkflowManager, LifeCycleFields },
+  name: 'WorkflowEditor', components: { CronQuickStart, JSEditor: defineAsyncComponent(() => import('./JSEditor.vue')), TimeExpressionValidator, PowerWorkflow, WorkflowManager, LifeCycleFields },
   data() { return {
     workflowInfo: emptyWorkflowInfo(),
     peworkflowDAG: { nodes: [], edges: [] }, nodeInfo: null, powerFlow: null, selectedId: null, pendingNodes: {}, userList: [],
@@ -141,7 +142,29 @@ export default {
 };
 </script>
 <style scoped>
-.editor-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; }.editor-heading h2 { margin:0; font-size:24px; }.editor-heading p { margin:7px 0 0; color:var(--el-text-color-secondary); font-size:13px; }
-.workflow-settings { margin-bottom:20px; border-radius:16px; }.settings-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 24px; }.schedule-fields { width:100%; display:flex; gap:8px; }.schedule-fields :deep(.el-input) { flex:1; }.node-panel h3 { font-size:16px; margin:0 0 20px; }.node-panel :deep(.code-edit) { width:100%; }.workflow-editor :deep(.el-pagination) { margin-top:20px; }
-@media(max-width:1050px) { .settings-grid { grid-template-columns:1fr; } .schedule-fields { flex-wrap:wrap; } }
+.workflow-editor { min-width:0; color:var(--pj-text); }
+.editor-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; }
+.editor-heading > div:first-child { flex:1; min-width:0; }
+.editor-heading > div:last-child { display:flex; align-items:center; flex-shrink:0; gap:8px; }
+.editor-heading :deep(.el-button + .el-button) { margin-left:0; }
+.editor-heading h2 { margin:0; font-size:24px; font-weight:600; line-height:1.3; overflow-wrap:anywhere; }
+.editor-heading p { margin:7px 0 0; color:var(--pj-muted); font-size:12px; line-height:1.5; }
+.workflow-settings { margin-bottom:24px; padding-top:20px; border:0; border-top:1px solid var(--pj-border); border-radius:0; box-shadow:none; }
+.workflow-settings :deep(.el-card__body) { padding:0; }
+.settings-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 24px; }
+.settings-grid :deep(.el-form-item) { min-width:0; margin-bottom:18px; }
+.schedule-fields { width:100%; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+.schedule-fields :deep(.el-input) { flex:1 1 160px; min-width:120px; }
+.node-panel { min-width:0; }
+.node-panel h3 { font-size:14px; font-weight:600; margin:0 0 18px; }
+.node-panel :deep(.code-edit) { width:100%; }
+.workflow-editor :deep(.el-pagination) { margin-top:20px; }
+@media(max-width:1050px) { .settings-grid { grid-template-columns:1fr; } }
+@media(max-width:760px) {
+  .editor-heading { flex-wrap:wrap; gap:12px; }
+  .editor-heading > div:first-child { flex-basis:100%; }
+  .editor-heading > div:last-child { width:100%; justify-content:flex-end; }
+  .editor-heading h2 { font-size:22px; }
+  .workflow-settings { padding-top:16px; margin-bottom:20px; }
+}
 </style>

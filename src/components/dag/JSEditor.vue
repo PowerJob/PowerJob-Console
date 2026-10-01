@@ -33,7 +33,7 @@ export default {
 };
 </script>
 <style scoped>
-.code-edit { border:1px solid var(--el-border-color); border-radius:10px; overflow:hidden; }
-.code-toolbar { display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:var(--el-fill-color-light); font-size:12px; color:var(--el-text-color-secondary); }
+.code-edit { border:1px solid var(--pj-border); border-radius:4px; overflow:hidden; }
+.code-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 12px; background:var(--pj-nav-bg); border-bottom:1px solid var(--pj-border); font-size:12px; color:var(--pj-muted); }
 .monaco-container { height:300px; }
 </style>

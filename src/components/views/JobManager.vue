@@ -1,41 +1,17 @@
 <template>
-    <div id="job_manager">
-    <div class="page-heading"><h1>{{$t('message.tabJobManage')}}</h1><p>{{$t('message.jobsDescription')}}</p></div>
+    <div id="job_manager" class="list-page">
+    <div class="page-heading list-heading"><div><h1>{{$t('message.tabJobManage')}}</h1><p>{{$t('message.jobsDescription')}}</p></div><div class="toolbar-actions"><el-button @click="onClickJobInputButton">{{$t('message.inputJob')}}</el-button><el-button type="primary" @click="onClickNewJob">{{$t('message.newJob')}}</el-button></div></div>
 
-        <!--第一行，条件搜索栏（row布局：gutter代表栅格间隔，span代表占用格数）-->
-        <el-row :gutter="20">
-
-            <!-- 左侧搜索栏，占地面积 16/24 -->
-            <el-col :span="16">
-                <el-form :inline="true" :model="jobQueryContent" class="el-form--inline">
-                    <el-form-item :label="$t('message.jobId')">
-                        <el-input v-model="jobQueryContent.jobId" :placeholder="$t('message.jobId')"/>
-                    </el-form-item>
-                    <el-form-item :label="$t('message.keyword')">
-                        <el-input v-model="jobQueryContent.keyword" :placeholder="$t('message.keyword')"/>
-                    </el-form-item>
-                    <el-form-item>
-                        <el-button type="primary" @click="searchJobs">{{$t('message.query')}}</el-button>
-                        <el-button type="default" @click="onClickReset">{{$t('message.reset')}}</el-button>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-
-            <!-- 右侧新增任务按钮，占地面积 4/24 -->
-            <el-col :span="4">
-                <div style="float:right;">
-                    <el-button type="success" @click="onClickJobInputButton">{{$t('message.inputJob')}}</el-button>
-                </div>
-            </el-col>
-            <el-col :span="4">
-                <div style="float:right;padding-right:10px">
-                <el-button type="primary" @click="onClickNewJob">{{$t('message.newJob')}}</el-button>
-                </div>
-            </el-col>
-        </el-row>
+        <div class="list-toolbar">
+            <el-form :inline="true" :model="jobQueryContent" class="filter-form" @submit.prevent="searchJobs">
+                <el-form-item :label="$t('message.jobId')"><el-input v-model="jobQueryContent.jobId" clearable :placeholder="$t('message.jobId')" /></el-form-item>
+                <el-form-item :label="$t('message.keyword')"><el-input v-model="jobQueryContent.keyword" clearable :placeholder="$t('message.keyword')" /></el-form-item>
+                <el-form-item class="filter-actions"><el-button type="primary" :loading="listLoading" @click="searchJobs">{{$t('message.query')}}</el-button><el-button @click="onClickReset">{{$t('message.reset')}}</el-button></el-form-item>
+            </el-form>
+        </div>
 
         <!--第二行，任务数据表格-->
-        <el-row>
+        <div class="list-surface">
             <el-table v-loading="listLoading" :data="jobInfoPageResult.data" style="width: 100%">
                 <el-table-column prop="id" :label="$t('message.jobId')" width="80"/>
                 <el-table-column prop="jobName" :label="$t('message.jobName')" />
@@ -56,7 +32,7 @@
                 </el-table-column>
                 <el-table-column :label="$t('message.status')" width="80">
                     <template #default="scope">
-                        <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="changeJobStatus(scope.row)"/>
+                        <el-switch v-model="scope.row.enable" @change="changeJobStatus(scope.row)"/>
                     </template>
                 </el-table-column>
                 <el-table-column :label="$t('message.operation')" width="150">
@@ -86,17 +62,17 @@
                     </template>
                 </el-table-column>
             </el-table>
-        </el-row>
+        </div>
 
         <!-- 第三行，分页插件 -->
-        <el-row>
+        <div class="list-footer">
             <el-pagination
                     layout="prev, pager, next" :current-page="jobQueryContent.index + 1"
                     :total="jobInfoPageResult.totalItems"
                     :page-size="jobInfoPageResult.pageSize"
                     @current-change="onClickChangePage"
                     :hide-on-single-page="true"/>
-        </el-row>
+        </div>
 
 
         <el-dialog :close-on-click-modal="false" v-model="modifiedJobFormVisible" :title="$t(modifiedJobForm.id ? 'message.edit' : 'message.newJob')" width="960px">
@@ -112,29 +88,16 @@
                     <el-input v-model="modifiedJobForm.jobParams" type="textarea"/>
                 </el-form-item>
                 <el-form-item :label="$t('message.scheduleInfo')">
-                    <el-row>
-                        <el-col :span="8">
-                            <el-select v-model="modifiedJobForm.timeExpressionType" :placeholder="$t('message.timeExpressionType')">
-                                <el-option
-                                        v-for="item in timeExpressionTypeOptions"
-                                        :key="item.key"
-                                        :label="item.label"
-                                        :value="item.key">
-                                </el-option>
-                            </el-select>
-                        </el-col>
-                        <el-col :span="12">
-                            <el-input v-model="modifiedJobForm.timeExpression" :placeholder="$t('message.timeExpressionPlaceHolder')" v-if="['CRON', 'FIXED_DELAY', 'FIXED_RATE'].includes(modifiedJobForm.timeExpressionType)" />
-                            <el-button type="primary" @click="onClickEditTimeExpression"  v-if="['DAILY_TIME_INTERVAL'].includes(modifiedJobForm.timeExpressionType)">{{$t('message.edit')}}</el-button>
-                        </el-col>
-                        <el-col :span="4">
-                            <el-button type="text" @click="onClickValidateTimeExpression" style="padding-left: 10px">{{$t('message.validateTimeExpression')}}</el-button>
-                        </el-col>
-                    </el-row>
+                    <div class="job-schedule-fields">
+                        <el-select v-model="modifiedJobForm.timeExpressionType" :placeholder="$t('message.timeExpressionType')" class="schedule-type"><el-option v-for="item in timeExpressionTypeOptions" :key="item.key" :label="item.label" :value="item.key" /></el-select>
+                        <el-input v-if="['CRON','FIXED_DELAY','FIXED_RATE'].includes(modifiedJobForm.timeExpressionType)" v-model="modifiedJobForm.timeExpression" :placeholder="$t('message.timeExpressionPlaceHolder')" data-testid="job-time-expression" class="schedule-expression" />
+                        <CronQuickStart v-if="modifiedJobForm.timeExpressionType === 'CRON'" v-model="modifiedJobForm.timeExpression" />
+                        <el-button v-if="modifiedJobForm.timeExpressionType === 'DAILY_TIME_INTERVAL'" @click="onClickEditTimeExpression">{{$t('message.edit')}}</el-button>
+                        <el-button @click="onClickValidateTimeExpression">{{$t('message.validateTimeExpression')}}</el-button>
+                    </div>
                 </el-form-item>
-              <el-form-item :label="$t('message.lifeCycle')">
-                <LifeCycleFields v-model="modifiedJobForm.lifeCycle"/>
-              </el-form-item>
+
+                <el-form-item :label="$t('message.lifeCycle')"><LifeCycleFields v-model="modifiedJobForm.lifeCycle" /></el-form-item>
                 <el-form-item :label="$t('message.executeConfig')">
                     <el-row>
                         <el-col :span="5">
@@ -371,13 +334,14 @@
 
 <script>
     import { newJob, jobForEditor, jobForSave, validJob } from "../../services/jobs.js";
+    import CronQuickStart from "../common/CronQuickStart.vue";
     import TimeExpressionValidator from "../common/TimeExpressionValidator.vue";
     import DailyTimeIntervalForm from "../common/DailyTimeIntervalForm.vue";
     import LifeCycleFields from "../common/LifeCycleFields.vue";
     import Exporter from "../common/Exporter.vue";
     export default {
         name: "JobManager",
-        components: {LifeCycleFields, Exporter, TimeExpressionValidator, DailyTimeIntervalForm},
+        components: {CronQuickStart, LifeCycleFields, Exporter, TimeExpressionValidator, DailyTimeIntervalForm},
         data() {
             return {
       listGeneration: 0, listLoading: false,
@@ -624,45 +588,20 @@
 }
 </script>
 
+<style scoped src="./page-layout.css"></style>
 <style scoped>
+.job-schedule-fields{display:flex;flex-wrap:wrap;gap:8px;width:100%;align-items:center}.job-schedule-fields .schedule-type{flex:0 0 160px;width:160px}.job-schedule-fields .schedule-expression{flex:1 1 200px;min-width:160px}.job-schedule-fields :deep(.el-button+.el-button){margin-left:0}
+
 .job-editor :deep(.el-form-item__content) { min-width: 0; }
 .job-editor :deep(.el-row) { width: 100%; gap: 12px; }
 .job-editor :deep(.el-col) { min-width: 0; max-width: 100%; flex: 1 1 220px; }
 .job-editor :deep(.el-select) { width: 100%; }
 .job-editor :deep(.el-input-group) { display: flex; flex-direction: column; }
-.job-editor :deep(.el-input-group__prepend) { width: 100%; justify-content: flex-start; white-space: normal; line-height: 1.5; padding: 6px 10px; box-shadow: none; border: 1px solid var(--pj-border); border-bottom: 0; border-radius: 7px 7px 0 0; font-size: 12px; }
-.job-editor :deep(.el-input-group > .el-input__wrapper) { width: 100%; border-radius: 0 0 7px 7px; }
+.job-editor :deep(.el-input-group__prepend) { width: 100%; justify-content: flex-start; white-space: normal; line-height: 1.5; padding: 0 0 6px; box-shadow: none; border: 0; background: transparent; color: var(--pj-muted); border-radius: 0; font-size: 12px; }
+.job-editor :deep(.el-input-group > .el-input__wrapper) { width: 100%; border-radius: 5px; }
 @media (max-width: 760px) {
   .job-editor :deep(.el-form-item) { display: block; }
   .job-editor :deep(.el-form-item__label) { width: auto !important; height: auto; display: block; text-align: left; line-height: 1.5; padding: 0 0 7px; }
   .job-editor :deep(.el-form-item__content) { margin-left: 0 !important; }
 }
-.job-editor-number {
-    display: flex;
-}
-.job-input-number {
-    background-color: #F5F7FA;
-    color: #909399;
-    /* vertical-align: middle; */
-    /* display: table-cell; */
-    position: relative;
-    border: 1px solid #DCDFE6;
-    border-radius: 4px;
-    padding: 0 20px;
-    /* width: 1px; */
-    white-space: nowrap;
-    display: block;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-    line-height: 38px;
-    width: auto;
-}
-.el-input-number {
-    width: 100px;
-}
-
-.el-input-number .el-input {
-    width: 1000px;
-}
-
 </style>

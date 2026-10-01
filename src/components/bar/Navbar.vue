@@ -1,10 +1,9 @@
 <template>
   <header class="workspace-header">
     <div class="header-context">
-      <button class="nav-toggle" :aria-label="$t('message.navigation')" @click="$emit('toggle-nav')"><PjIcon name="menu"/></button>
-      <span class="breadcrumb-root">{{ $t($route.path.startsWith('/admin') ? 'message.workspaceAdmin' : 'message.workspace') }}</span>
-      <span class="breadcrumb-divider">/</span><strong>{{ pageTitle }}</strong>
-      <el-tag v-if="appName && !$route.path.startsWith('/admin')" class="application-tag" effect="plain">{{ appName }}</el-tag>
+      <button class="nav-toggle" :aria-label="$t(navigationExpanded ? 'message.collapseNavigation' : 'message.expandNavigation')" aria-controls="workspace-navigation" :aria-expanded="navigationExpanded" @click="$emit('toggle-nav', $event)"><PjIcon name="menu"/></button>
+      <el-tag v-if="appName && !$route.path.startsWith('/admin')" class="application-tag" :title="appName" size="small" effect="plain">{{ appName }}</el-tag>
+      <div class="header-location"><span v-if="$route.path.startsWith('/admin')" class="breadcrumb-root">{{ $t('message.workspaceAdmin') }}</span><span class="breadcrumb-divider" aria-hidden="true">/</span><strong>{{ pageTitle }}</strong></div>
     </div>
     <div class="header-actions">
       <el-dropdown @command="common.switchLanguage">
@@ -12,7 +11,7 @@
         <template #dropdown><el-dropdown-menu><el-dropdown-item command="cn">简体中文</el-dropdown-item><el-dropdown-item command="en">English</el-dropdown-item></el-dropdown-menu></template>
       </el-dropdown>
       <el-dropdown @command="handleSettings">
-        <button class="header-button account-button"><span class="avatar"><PjIcon name="user"/></span><span>{{ $t('message.account') }}</span><PjIcon name="arrow"/></button>
+        <button class="header-button account-button" :aria-label="$t('message.account')"><span class="avatar"><PjIcon name="user"/></span><span class="account-label">{{ $t('message.account') }}</span><PjIcon name="arrow"/></button>
         <template #dropdown><el-dropdown-menu><el-dropdown-item command="back2Home">{{ $t('message.back2Home') }}</el-dropdown-item><el-dropdown-item command="profile">{{ $t('message.tabPersonal') }}</el-dropdown-item><el-dropdown-item command="logout" divided>{{ $t('message.logout') }}</el-dropdown-item></el-dropdown-menu></template>
       </el-dropdown>
     </div>
@@ -24,6 +23,7 @@ import { useAppStore } from '../../store.js'
 export default {
   name: 'Navbar',
   components: { PjIcon },
+  props: { navigationExpanded: { type: Boolean, default: true } },
   emits: ['toggle-nav'],
   computed: {
     appName() { return useAppStore().appInfo.title || useAppStore().appInfo.appName || localStorage.getItem('Power_appName') },

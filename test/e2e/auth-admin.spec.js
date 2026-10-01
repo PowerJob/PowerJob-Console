@@ -235,7 +235,7 @@ test('UI-007/008/009 · user filters, profile readback and settings safety', asy
   await page.getByRole('button', { name: 'Reset', exact: true }).click()
   await expect(page.locator('.el-table__body-wrapper tr').first()).toBeVisible()
   await page.goto('/#/admin/personal')
-  await expect(page.locator('.account-label')).toContainText(String(profile.id))
+  await expect(page.locator('main .account-label')).toContainText(String(profile.id))
   await expect(page.getByLabel('Username', { exact: true })).toBeDisabled()
   await expect(page.getByLabel('Nick', { exact: true })).toHaveValue(profile.nick || '')
   await page.goto('/#/admin/settings')

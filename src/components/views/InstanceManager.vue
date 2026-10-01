@@ -1,10 +1,8 @@
 <template>
-  <div id="instance_manager">
-    <div class="page-heading"><h1>{{$t('message.tabJobInstance')}}</h1><p>{{$t('message.instancesDescription')}}</p></div>
-    <!-- 第一行，搜索区 -->
-    <el-row>
-      <el-col :span="22">
-        <el-form :inline="true" :model="instanceQueryContent" class="el-form--inline">
+  <div id="instance_manager" class="list-page">
+    <div class="page-heading list-heading"><div><h1>{{$t('message.tabJobInstance')}}</h1><p>{{$t('message.instancesDescription')}}</p></div><el-button :loading="listLoading" @click="listInstanceInfos"><PjIcon name="refresh"/>{{$t('message.refresh')}}</el-button></div>
+    <div class="list-toolbar">
+        <el-form :inline="true" :model="instanceQueryContent" class="filter-form">
           <el-form-item :label="$t('message.jobId')">
             <el-input v-model="instanceQueryContent.jobId" :placeholder="$t('message.jobId')" />
           </el-form-item>
@@ -34,34 +32,28 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item>
+          <el-form-item class="filter-actions">
             <el-button type="primary" @click="searchInstances">{{$t('message.query')}}</el-button>
             <el-button type="default" @click="onClickRest">{{$t('message.reset')}}</el-button>
           </el-form-item>
         </el-form>
-      </el-col>
-      <el-col :span="2">
-        <div style="float:right;padding-right:10px">
-          <el-button type="primary" @click="listInstanceInfos">{{$t('message.refresh')}}</el-button>
-        </div>
-      </el-col>
-    </el-row>
+    </div>
 
+    <section class="list-surface">
     <!-- 第二行，切换器 -->
-    <el-tabs type="card" v-model="instanceQueryContent.type" @tab-change="changeInstanceTab">
+    <el-tabs class="instance-tabs" v-model="instanceQueryContent.type" @tab-change="changeInstanceTab">
       <el-tab-pane :label="$t('message.normalInstance')" name="NORMAL" />
       <el-tab-pane :label="$t('message.wfInstance')" name="WORKFLOW" />
     </el-tabs>
 
     <!-- 第三行，表单 -->
-    <el-row>
       <el-table
-        :data="instancePageResult.data"
+        v-loading="listLoading" :data="instancePageResult.data"
         style="width: 100%"
         :row-class-name="instanceTableRowClassName"
       >
         <el-table-column :show-overflow-tooltip="true" prop="jobId" :label="$t('message.jobId')" width="80" />
-        <el-table-column :show-overflow-tooltip="true" prop="jobName" :label="$t('message.jobName')" />
+        <el-table-column :show-overflow-tooltip="true" prop="jobName" :label="$t('message.jobName')"  min-width="170"/>
         <el-table-column
           v-if="instanceQueryContent.type === 'WORKFLOW'"
           :show-overflow-tooltip="true"
@@ -69,7 +61,7 @@
           :label="$t('message.wfInstanceId')"
           width="155"
         />
-        <el-table-column :show-overflow-tooltip="true" prop="instanceId" :label="$t('message.instanceId')" />
+        <el-table-column :show-overflow-tooltip="true" prop="instanceId" :label="$t('message.instanceId')"  min-width="190"/>
         <el-table-column prop="status" :label="$t('message.status')" width="160">
           <template #default="scope">{{fetchStatus(scope.row.status)}}</template>
         </el-table-column>
@@ -78,22 +70,22 @@
 
         <el-table-column :label="$t('message.operation')" width="285">
           <template #default="scope">
-            <el-button
+            <el-button link
               size="small"
               type="primary"
               @click="onClickShowDetail(scope.row)"
             >{{$t('message.detail')}}</el-button>
-            <el-button
+            <el-button link
               size="small"
               type="success"
               @click="onClickShowLog(scope.row)"
             >{{$t('message.log')}}</el-button>
-            <el-button
+            <el-button link
               size="small"
               type="warning"
               @click="onClickRetryJob(scope.row)"
             >{{$t('message.reRun')}}</el-button>
-            <el-button
+            <el-button link
               size="small"
               type="danger"
               @click="onClickStop(scope.row)"
@@ -101,19 +93,16 @@
           </template>
         </el-table-column>
       </el-table>
-    </el-row>
 
-    <!-- 第四行，分页插件 -->
-    <el-row>
-      <el-col :span="24">
+    <div class="list-footer">
         <el-pagination
           :total="instancePageResult.totalItems"
           :page-size="instancePageResult.pageSize"
           @current-change="onClickChangeInstancePage"
-          layout="prev, pager, next" :current-page="instanceQueryContent.index + 1"
+          layout="total, prev, pager, next" :current-page="instanceQueryContent.index + 1"
         />
-      </el-col>
-    </el-row>
+    </div>
+    </section>
 
     <!--  任务实例详情弹出框 -->
     <el-dialog v-model="instanceDetailVisible" v-if="instanceDetailVisible" width="80%">
@@ -337,8 +326,9 @@ export default {
 };
 </script>
 
+<style scoped src="./page-layout.css"></style>
 <style scoped>
-.log-output { white-space: pre-wrap; background: #18263b; color: #e4eeea; padding: 20px; border-radius: 8px; font: 12px/1.8 monospace; }
+.log-output { white-space: pre-wrap; overflow-wrap:anywhere; background:var(--pj-log-bg); color:var(--pj-log-text); padding:16px; border-radius:4px; font:12px/1.8 ui-monospace,SFMono-Regular,monospace; }
 .title {
   display: inline-block;
   margin: 5px 0;

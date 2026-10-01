@@ -54,5 +54,28 @@ export default {
 };
 </script>
 <style scoped>
-.instance-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:20px; }.instance-heading h2 { margin:0; font-size:22px; }.instance-heading h2 span { color:var(--el-text-color-secondary); font-size:14px; }.instance-heading p { margin:8px 0 0; color:var(--el-text-color-secondary); }.instance-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; }.instance-actions :deep(.el-button + .el-button) { margin-left:0; }.instance-summary { margin-bottom:20px; border-radius:16px; }.instance-summary pre { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; }.instance-summary :deep(.el-collapse) { border:0; }.instance-summary :deep(.el-collapse-item__header) { border:0; height:28px; }.condition-code p { font-size:13px; color:var(--el-text-color-secondary); }
+.workflow-instance { min-width:0; color:var(--pj-text); }
+.instance-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; margin-bottom:20px; }
+.instance-heading > div:first-child { flex:1; min-width:0; }
+.instance-heading h2 { margin:0; font-size:24px; font-weight:600; line-height:1.3; overflow-wrap:anywhere; }
+.instance-heading h2 span { color:var(--pj-muted); font-size:14px; font-weight:400; }
+.instance-heading p { margin:8px 0 0; color:var(--pj-muted); font-size:12px; }
+.instance-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; max-width:100%; }
+.instance-actions :deep(.el-button + .el-button) { margin-left:0; }
+.instance-summary { margin-bottom:24px; border:0; border-radius:0; box-shadow:none; }
+.instance-summary :deep(.el-card__body) { padding:0; }
+.instance-summary pre { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; }
+.instance-summary :deep(.el-descriptions__table) { table-layout:fixed; }
+.instance-summary :deep(.el-descriptions__cell) { overflow-wrap:anywhere; }
+.instance-summary :deep(.el-collapse) { border:0; }
+.instance-summary :deep(.el-collapse-item__header) { border:0; height:28px; color:var(--pj-text); }
+.condition-code p { font-size:12px; color:var(--pj-muted); }
+@media(max-width:760px) {
+  .instance-heading > div:first-child { flex-basis:100%; }
+  .instance-heading h2 { font-size:22px; }
+  .instance-actions { width:100%; }
+  .instance-summary :deep(.el-descriptions__table),.instance-summary :deep(.el-descriptions__table tbody) { display:block; width:100%; }
+  .instance-summary :deep(.el-descriptions__table tr) { display:grid; grid-template-columns:minmax(105px,38%) minmax(0,1fr); }
+  .instance-summary :deep(.el-descriptions__cell) { display:block; min-width:0; width:auto; }
+}
 </style>

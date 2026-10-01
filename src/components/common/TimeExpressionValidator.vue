@@ -22,4 +22,4 @@ export default {
   mounted() { this.checkTimeExpression() },
 }
 </script>
-<style scoped>.trigger-time{padding:10px;font-family:monospace;border-bottom:1px solid var(--pj-border)}.el-button{margin-top:16px}</style>
+<style scoped>.trigger-time{padding:10px 14px;font-variant-numeric:tabular-nums;color:var(--pj-text);background:var(--pj-subtle);border-left:3px solid var(--pj-primary);margin:4px 0}.el-button{margin-top:16px}</style>

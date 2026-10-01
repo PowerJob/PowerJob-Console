@@ -1,0 +1,43 @@
+import { test, expect, selectors, choose, enterSamples, login } from './support.js'
+
+// Regression for a real short-window failure: the quick builder's Apply/Cancel
+// controls fell outside the viewport when the schedule input was near its centre.
+for (const viewport of [{ width: 1440, height: 680 }, { width: 390, height: 520 }]) {
+  test(`UI-041 · CRON builder remains usable in ${viewport.width}×${viewport.height}`, async ({ page, credentials }, info) => {
+    await page.setViewportSize(viewport)
+    await login(page, credentials)
+    await enterSamples(page, credentials)
+    await page.goto('/#/oms/job')
+    await page.getByRole('button', { name: 'New job', exact: true }).click()
+    const editor = selectors.dialog(page)
+    await choose(page, editor, 'Schedule info', 'CRON')
+    const expression = editor.locator('input[data-testid="job-time-expression"]')
+    const original = await expression.inputValue()
+    const builder = page.getByTestId('cron-builder').filter({ visible: true })
+    await editor.getByTestId('cron-quick-trigger').click()
+    await expect(builder).toBeVisible()
+    await builder.getByTestId('cron-cadence').click()
+    await page.getByRole('option', { name: 'Weekly', exact: true }).click()
+    await builder.getByTestId('cron-hour').locator('input').fill('0')
+    await builder.getByTestId('cron-hour').locator('input').press('Tab')
+    await builder.getByTestId('cron-weekday').click()
+    await page.getByRole('option', { name: 'Sunday', exact: true }).click()
+    await expect(builder.getByTestId('cron-generated')).toHaveText('0 0 0 ? * 1')
+    const popover = page.locator('.el-popper').filter({ has: page.getByTestId('cron-builder'), visible: true })
+    const bounds = await popover.boundingBox()
+    expect(bounds.x).toBeGreaterThanOrEqual(0)
+    expect(bounds.y).toBeGreaterThanOrEqual(0)
+    expect(bounds.x + bounds.width).toBeLessThanOrEqual(viewport.width)
+    expect(bounds.y + bounds.height).toBeLessThanOrEqual(viewport.height)
+    await builder.getByRole('button', { name: 'Cancel', exact: true }).click()
+    await expect(builder).not.toBeVisible()
+    await expect(expression).toHaveValue(original)
+    await editor.getByTestId('cron-quick-trigger').click()
+    await builder.getByTestId('cron-apply').click()
+    await expect(builder).not.toBeVisible()
+    await expect(expression).toHaveValue('0 0/5 * * * ?')
+    await editor.getByRole('button', { name: 'Cancel', exact: true }).click()
+    await expect(editor).not.toBeVisible()
+    await info.attach('short-viewport-proof', { body: JSON.stringify({ caseId: 'UI-041', variantId: `short-window-${viewport.width}`, status: 'PASS', viewport, popover: bounds, noServerObjectsCreated: true }), contentType: 'application/json' })
+  })
+}

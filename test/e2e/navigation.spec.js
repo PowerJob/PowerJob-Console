@@ -152,8 +152,8 @@ for (const width of [1440, 1024, 768, 390]) {
     await page.getByRole('dialog').getByRole('button', { name: 'Cancel', exact: true }).scrollIntoViewIfNeeded()
     await expect(page.getByRole('dialog').getByRole('button', { name: 'Cancel', exact: true })).toBeInViewport()
     await page.getByRole('dialog').getByRole('button', { name: 'Cancel', exact: true }).click()
-    if (await page.getByRole('button', { name: 'Navigation', exact: true }).isVisible()) {
-      await page.getByRole('button', { name: 'Navigation', exact: true }).click()
+    if (width <= 760 && await page.locator('.nav-toggle').isVisible()) {
+      await page.locator('.nav-toggle').click()
       await expect(page.locator('nav').getByRole('link', { name: 'Job management', exact: true })).toBeInViewport()
       await page.locator('nav').getByRole('link', { name: 'Job management', exact: true }).click()
       await expect(page).toHaveURL(/oms\/job/)

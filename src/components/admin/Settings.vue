@@ -5,7 +5,7 @@
       <p>{{ $t('message.settingsDescription') }}</p>
     </header>
     <section class="settings-card" v-loading="loading">
-      <div class="card-heading"><span class="card-icon" aria-hidden="true">◎</span><h2>{{ $t('message.globalAdmin') }}</h2></div>
+      <div class="card-heading"><h2>{{ $t('message.globalAdmin') }}</h2></div>
       <el-form label-position="top" @submit.prevent="saveGlobalAdmins">
         <el-form-item :label="$t('message.globalAdmin')">
           <el-select multiple filterable v-model="adminUserIds" :placeholder="$t('message.globalAdmin')"
@@ -61,14 +61,20 @@ export default {
 </script>
 
 <style scoped>
-.page-heading { margin-bottom: 22px; }
-.page-heading h1 { font-size: 25px; font-weight: 650; letter-spacing: -.6px; color: var(--pj-text); margin: 0 0 8px; }
-.page-heading p { color: var(--pj-muted); font-size: 13px; margin: 0; line-height: 1.6; }
-.settings-card { padding: 26px; border: 1px solid var(--pj-border); border-radius: 14px; background: var(--pj-surface); max-width: 800px; }
-.card-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
-.card-heading h2 { color: var(--pj-text); font-size: 16px; margin: 0; font-weight: 600; }
-.card-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: var(--pj-primary); background: #edf5ef; font-size: 23px; }
-.el-select { width: 100%; }
-.settings-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
-@media (max-width: 650px) { .settings-card { padding: 20px; } .page-heading h1 { font-size: 22px; } }
+.settings-page { width: 100%; min-width: 0; }
+.page-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+.page-heading > div { min-width: 0; }
+.page-heading h1 { color: var(--pj-text); font-size: 24px; line-height: 1.3; font-weight: 600; margin: 0 0 6px; }
+.page-heading p { color: var(--pj-muted); font-size: 13px; line-height: 1.6; max-width: 72ch; margin: 0; }
+.page-heading > .el-button { flex-shrink: 0; }
+.settings-page .page-heading { display: block; }
+.settings-card { padding: 24px 0; border-top: 1px solid var(--pj-border); background: var(--pj-surface); }
+.card-heading { margin-bottom: 20px; }
+.card-heading h2 { color: var(--pj-text); font-size: 14px; line-height: 1.5; margin: 0; font-weight: 600; }
+.settings-card :deep(.el-form) { display: grid; grid-template-columns: minmax(0, 640px) max-content; align-items: end; gap: 16px; }
+.settings-card :deep(.el-form-item) { min-width: 0; margin: 0; }
+.settings-card :deep(.el-select) { width: 100%; }
+.settings-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.settings-actions .el-button { margin: 0; }
+@media (max-width: 760px) { .settings-card :deep(.el-form) { grid-template-columns: 1fr; } .page-heading h1 { font-size: 22px; } }
 </style>

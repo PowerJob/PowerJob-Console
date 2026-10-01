@@ -1,14 +1,18 @@
-# PowerJob Console 5.1.6_fev2-rc.1
+# PowerJob Console 5.1.6_fev2-rc.2
 
-An independent Vue 3 console for PowerJob. This release refreshes the application layout, forms, tables, workflow editor and execution details while preserving the existing Server API and hash routes.
+An independent Vue 3 console for PowerJob. This release introduces a light scheduling workspace with collapsible navigation, integrated list filters, clearer Worker status and consistent forms. IBM Plex Sans fonts are served locally, including in offline deployments. Jobs and workflows include a CRON quick setup for common intervals and calendar schedules. Existing Server APIs and hash routes are preserved.
 
-The release prefix follows the validated PowerJob Server version: **5.1.6**. `fev2` denotes the second frontend generation, implemented with **Vue 3**. The public release/tag is `5.1.6_fev2-rc.1`; the private npm package uses the equivalent valid SemVer `5.1.6-fev2.rc.1`.
+The release prefix follows the validated PowerJob Server version: **5.1.6**. `fev2` denotes the second frontend generation, implemented with **Vue 3**. The public release/tag is `5.1.6_fev2-rc.2`; package metadata uses the equivalent valid SemVer `5.1.6-fev2.rc.2`.
 
-This is a prerelease. Real third-party OAuth login and provider callbacks have not yet been accepted against a configured provider; their automated request/encoding contract tests do not replace that acceptance.
+This is a prerelease. Real third-party OAuth login, provider callbacks and provider-account settings/password visibility have not yet been accepted against a configured provider; their automated request/encoding contract tests do not replace that acceptance.
 
 PowerJob Server 5.1.6 has a known container deployment limitation when `server.servlet.context-path` is nonempty: the JAR download URL sent to Workers omits that path. Console preserves the configured context path for uploads and WebSockets, but cannot correct the Server-generated download URL. Use the default Server context path for EXTERNAL container deployment with this Server version. Deployment progress means the Server has dispatched requests; check the Worker list for each deployment result.
 
 Console has its own version and release artifacts. Installing it does not require changing PowerJob Server, Worker or Java SDK versions. The validated Server/browser combinations are listed in the release notes; other combinations need separate verification.
+
+## CRON quick setup
+
+Choose CRON in a job or workflow schedule, then select **Quick setup** beside the expression. Configure minutes, hours, daily, weekdays, weekly or monthly schedules, review the generated expression, and select **Apply expression**. Cancel or Escape leaves your expression unchanged. Advanced expressions remain manually editable. Use the existing validation action to check the next trigger times in the Server timezone; months without a selected day are skipped.
 
 ## Development
 

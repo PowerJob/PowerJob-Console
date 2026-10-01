@@ -1,12 +1,12 @@
 <template>
   <div class="container-page">
-    <div class="page-heading"><div><h1>{{ $t('message.tabContainerManager') }}</h1><p>{{ $t('message.containersDescription') }}</p></div><div><el-button @click="listContainers">{{ $t('message.refresh') }}</el-button><el-button type="primary" @click="newContainer">{{ $t('message.newContainer') }}</el-button></div></div>
+    <div class="page-heading container-heading"><div><h1>{{ $t('message.tabContainerManager') }}</h1><p>{{ $t('message.containersDescription') }}</p></div><div class="toolbar-actions"><el-button :loading="loading" @click="listContainers"><PjIcon name="refresh"/>{{ $t('message.refresh') }}</el-button><el-button type="primary" @click="newContainer"><PjIcon name="plus"/>{{ $t('message.newContainer') }}</el-button></div></div>
     <div v-loading="loading" class="container-grid">
       <el-empty v-if="!loading && !containerList.length" :description="$t('message.noData')"/>
       <article v-for="item in containerList" :key="item.id" class="container-card">
-        <div class="container-card-heading"><span class="container-symbol"><PjIcon name="container"/></span><div><h2>{{ item.containerName }}</h2><span class="container-id">#{{ item.id }}</span></div><el-tag effect="plain">{{ item.sourceType }}</el-tag></div>
+        <div class="container-card-heading"><span class="container-symbol"><PjIcon name="container"/></span><div class="container-identity"><h2 :title="item.containerName">{{ item.containerName }}</h2><span class="container-id">#{{ item.id }}</span></div><el-tag effect="plain">{{ item.sourceType }}</el-tag></div>
         <dl><dt>{{ $t('message.containerVersion') }}</dt><dd>{{ item.version || '—' }}</dd><dt>{{ $t('message.deployTime') }}</dt><dd>{{ item.lastDeployTime || '—' }}</dd><dt>{{ $t('message.status') }}</dt><dd>{{ item.status }}</dd></dl>
-        <div class="container-actions"><el-button type="primary" @click="arrangeItem(item)">{{ $t('message.deploy') }}</el-button><el-button @click="editItem(item)">{{ $t('message.edit') }}</el-button><el-dropdown trigger="click"><el-button>{{ $t('message.more') }}</el-button><template #dropdown><el-dropdown-menu><el-dropdown-item @click="listOfItem(item)">{{ $t('message.deployedWorkerList') }}</el-dropdown-item><el-dropdown-item @click="deleteItem(item)">{{ $t('message.delete') }}</el-dropdown-item></el-dropdown-menu></template></el-dropdown></div>
+        <div class="container-actions"><el-button type="primary" plain @click="arrangeItem(item)">{{ $t('message.deploy') }}</el-button><el-button @click="editItem(item)">{{ $t('message.edit') }}</el-button><el-dropdown trigger="click"><el-button>{{ $t('message.more') }}</el-button><template #dropdown><el-dropdown-menu><el-dropdown-item @click="listOfItem(item)">{{ $t('message.deployedWorkerList') }}</el-dropdown-item><el-dropdown-item @click="deleteItem(item)">{{ $t('message.delete') }}</el-dropdown-item></el-dropdown-menu></template></el-dropdown></div>
       </article>
     </div>
     <el-dialog :title="$t(id ? 'message.edit' : 'message.newContainer')" v-model="dialogVisible" width="640px" @closed="closeEdit" destroy-on-close>
@@ -108,5 +108,32 @@ export default {
 }
 </script>
 <style scoped>
-.page-heading{display:flex;align-items:center;justify-content:space-between;gap:20px}.container-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:20px;min-height:160px}.container-card{background:#fff;border:1px solid var(--pj-border);border-radius:10px;padding:22px}.container-card-heading{display:flex;align-items:center;gap:12px}.container-symbol{width:44px;height:44px;display:grid;place-items:center;background:#edf5f2;color:var(--pj-primary);border-radius:10px}.container-card-heading h2{font-size:16px;margin:0 0 4px}.container-id{font-size:11px;color:var(--pj-muted)}.container-card-heading .el-tag{margin-left:auto}.container-card dl{display:grid;grid-template-columns:100px 1fr;gap:12px;margin:24px 0;font-size:12px}.container-card dt{color:var(--pj-muted)}.container-card dd{margin:0;word-break:break-word}.container-actions{display:flex;gap:8px;padding-top:18px;border-top:1px solid var(--pj-border)}.container-actions .el-button{margin:0}.deployment-log{background:#17263b;color:#e6efeb;border-radius:8px;min-height:180px;max-height:55vh;overflow:auto;white-space:pre-wrap;padding:20px;font:12px/1.8 monospace}.artifact-ready{display:block;color:var(--pj-primary);font-size:12px}.el-upload{width:100%}@media(max-width:760px){.page-heading{align-items:flex-start;flex-direction:column}.container-grid{grid-template-columns:1fr}}
+.container-page { min-width:0; color:var(--pj-text); }
+.container-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.container-heading > div:first-child { min-width:0; }
+.toolbar-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.toolbar-actions .el-button { margin:0; }
+.toolbar-actions .pj-icon { width:15px; height:15px; margin-right:6px; }
+.container-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr)); gap:24px; min-height:100px; }
+.container-grid > .el-empty { grid-column:1/-1; }
+.container-card { background:var(--pj-surface); border:0; border-top:1px solid var(--pj-border); border-radius:0; padding:18px 0; min-width:0; }
+.container-card-heading { display:flex; align-items:flex-start; gap:10px; min-width:0; }
+.container-symbol { width:30px; height:30px; display:grid; place-items:center; color:var(--pj-primary); flex-shrink:0; }
+.container-symbol .pj-icon { width:20px; height:20px; }
+.container-identity { min-width:0; flex:1; }
+.container-card-heading h2 { font-size:14px; line-height:1.4; font-weight:600; margin:0 0 3px; overflow-wrap:anywhere; }
+.container-id { font-size:11px; color:var(--pj-muted); font-variant-numeric:tabular-nums; }
+.container-card-heading .el-tag { flex-shrink:0; }
+.container-card dl { display:grid; grid-template-columns:auto minmax(0,1fr); gap:9px 12px; margin:16px 0; font-size:12px; line-height:1.5; }
+.container-card dt { color:var(--pj-muted); }
+.container-card dd { margin:0; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
+.container-actions { display:flex; align-items:center; gap:8px; padding-top:12px; flex-wrap:wrap; }
+.container-actions .el-button { margin:0; }
+.deployment-log { background:var(--pj-log-bg); color:var(--pj-log-text); border-radius:4px; min-height:180px; max-height:55vh; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; padding:16px; font:12px/1.75 ui-monospace,SFMono-Regular,monospace; }
+.artifact-ready { display:block; color:var(--pj-primary); font-size:12px; }
+.el-upload { width:100%; }
+@media(max-width:760px) {
+  .container-heading { align-items:flex-start; flex-wrap:wrap; gap:12px; }
+  .container-grid { grid-template-columns:1fr; gap:8px; }
+}
 </style>

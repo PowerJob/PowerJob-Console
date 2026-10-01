@@ -1,7 +1,25 @@
 <template>
   <main class="login-page">
+    <section class="login-story">
+      <router-link class="brand" to="/loginHomepage"><PowerJobMark class="brand-mark" /> PowerJob</router-link>
+      <div class="story-content">
+        <h2>{{ $t('message.consoleTagline') }}</h2>
+        <div class="schedule-visual" aria-hidden="true">
+          <svg viewBox="0 0 520 260" class="schedule-diagram">
+            <g class="diagram-route"><path d="M73 130h83m52 0h25V60h23m-23 70v70h23m68-140h44v70h60m-104 70h44v-70"/><path d="M208 130h220"/></g>
+            <path class="diagram-accent" d="M73 130h83m52 0h25V60h23m68 0h44v70h60"/>
+            <circle class="diagram-node" cx="56" cy="130" r="17"/>
+            <rect class="diagram-node" x="156" y="104" width="52" height="52" rx="9"/>
+            <rect class="diagram-node" x="256" y="34" width="68" height="52" rx="9"/>
+            <rect class="diagram-node" x="256" y="174" width="68" height="52" rx="9"/>
+            <rect class="diagram-node" x="428" y="104" width="52" height="52" rx="9"/>
+            <g class="diagram-detail"><path d="M49 130h14m-7-7v14M172 123h20m-20 7h20m-20 7h12M273 53h34m-34 8h34m-34 8h22M273 193h34m-34 8h34m-34 8h22M442 123h24m-24 7h24m-24 7h16"/></g>
+            <g class="diagram-junction"><circle cx="233" cy="130" r="3"/><circle cx="368" cy="130" r="3"/></g>
+          </svg>
+        </div>
+      </div>
+    </section>
     <div class="login-shell">
-      <router-link class="brand" to="/loginHomepage"><span>P</span> PowerJob</router-link>
       <div class="login-card">
         <h1>{{ $t('message.login') }}</h1>
         <p class="intro">{{ $t('message.signInDescription') }}</p>
@@ -23,7 +41,6 @@
           <el-button link type="primary" @click="openRegister">{{ $t('message.userRegister') }}</el-button>
         </div>
       </div>
-      <p class="footer">PowerJob Console</p>
     </div>
 
     <el-dialog :title="$t('message.userRegister')" v-model="userRegisterFormVisible"
@@ -66,10 +83,12 @@
 
 <script>
 import { useAppStore } from '../../store.js'
+import PowerJobMark from '../common/PowerJobMark.vue'
 
 const emptyRegistration = () => ({ username: '', nick: '', phone: '', email: '', webHook: '', password: '', password2: '' })
 export default {
   name: 'PowerJobThirdPartyLogin',
+  components: { PowerJobMark },
   data() {
     return {
       login_info: { username: '', password: '' },
@@ -167,19 +186,31 @@ export default {
 </script>
 
 <style scoped>
-.login-page { min-height: 100vh; display: grid; place-items: center; padding: 40px 20px; box-sizing: border-box; background: radial-gradient(ellipse at 20% 10%, #e2ede7, transparent 48%), var(--pj-bg, #f4f6f9); }
-.login-shell { width: min(100%, 430px); }
-.brand { display: flex; justify-content: center; align-items: center; gap: 12px; color: var(--pj-text, #1b2c44); font-size: 25px; font-weight: 750; text-decoration: none; margin-bottom: 28px; }
-.brand span { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 11px; background: var(--pj-primary, #24756c); color: #fff; }
-.login-card { padding: 36px; background: var(--pj-surface, #fff); border: 1px solid var(--pj-border, #e2e8ef); border-radius: 18px; box-shadow: 0 16px 45px #173f3b08; }
-.login-card h1 { margin: 0 0 10px; color: var(--pj-text, #1b2c44); font-size: 27px; }
-.intro { color: var(--pj-muted, #76859b); line-height: 1.6; margin: 0 0 26px; font-size: 14px; }
-.submit-login { width: 100%; margin-top: 7px; }
+.login-page { min-height: 100vh; min-height: 100svh; display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); background: var(--pj-bg, #fff); }
+.login-story { min-width: 0; display: flex; flex-direction: column; padding: 40px clamp(28px, 5vw, 80px); background: var(--pj-nav-bg, #f3f7fa); border-right: 1px solid var(--pj-border, #dce6ed); }
+.brand { flex: 0 0 auto; display: inline-flex; align-items: center; align-self: flex-start; gap: 12px; color: var(--pj-text, #19374a); font-size: 23px; line-height: 1.3; font-weight: 600; text-decoration: none; }
+.story-content { width: 100%; margin: auto 0; padding: 64px 0; }
+.story-content h2 { max-width: 16ch; color: var(--pj-text, #19374a); font-size: clamp(30px, 3.1vw, 46px); line-height: 1.2; font-weight: 500; margin: 0; }
+.brand-mark { flex: 0 0 auto; width: 38px; height: 38px; }
+.schedule-visual { width: min(100%, 520px); margin-top: 32px; }
+.schedule-diagram { display: block; width: 100%; height: auto; overflow: visible; }
+.diagram-route { fill: none; stroke: var(--pj-border, #dce6ed); stroke-width: 2; stroke-linejoin: round; }
+.diagram-accent { fill: none; stroke: var(--pj-primary, #007a98); stroke-width: 2; stroke-linejoin: round; }
+.diagram-node { fill: var(--pj-bg, #fff); stroke: var(--pj-border, #dce6ed); stroke-width: 1.5; }
+.diagram-detail { fill: none; stroke: var(--pj-muted, #607787); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.diagram-junction { fill: var(--pj-primary, #007a98); }
+.login-shell { min-width: 0; display: grid; place-items: center; padding: 48px 32px; }
+.login-card { width: min(100%, 380px); padding: 0; background: var(--pj-surface, #fff); }
+.login-card h1 { margin: 0 0 10px; color: var(--pj-text, #19374a); font-size: 28px; font-weight: 600; line-height: 1.3; }
+.intro { color: var(--pj-muted, #607787); line-height: 1.6; margin: 0 0 30px; font-size: 14px; }
+.submit-login { width: 100%; min-height: 44px; margin-top: 8px; }
 .registration-notice { margin-bottom: 20px; }
-.login-links { margin-top: 23px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 12px; }
+.login-links { margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--pj-border); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 13px; }
 .login-links a { color: var(--pj-muted); text-decoration: none; }
 .login-links a:hover { color: var(--pj-primary); }
-.footer { text-align: center; font-size: 12px; color: var(--pj-muted); margin: 25px 0 0; }
+.brand:focus-visible, .login-links a:focus-visible { outline: 2px solid var(--pj-primary); outline-offset: 6px; }
 .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 18px; }
-@media (max-width: 540px) { .login-card { padding: 27px; } .form-grid { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .login-page { grid-template-columns: 1fr; align-content: start; } .login-story { padding: 24px; border-right: 0; border-bottom: 1px solid var(--pj-border); } .story-content { padding: 32px 0 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, .7fr); align-items: center; gap: 18px; } .story-content h2 { font-size: 27px; max-width: 18ch; } .schedule-visual { margin-top: 0; } .login-shell { padding: 36px 24px 48px; } }
+@media (max-width: 540px) { .form-grid { grid-template-columns: 1fr; } }
+@media (max-width: 420px) { .story-content { display: none; } .login-story { padding-top: 20px; padding-bottom: 20px; } .login-shell { padding-top: 28px; } }
 </style>
