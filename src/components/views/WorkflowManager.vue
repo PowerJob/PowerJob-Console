@@ -1,81 +1,65 @@
 <template>
-<div id="workflow_manager">
-    <div class="page-heading"><h1>{{$t('message.tabWorkflowManage')}}</h1><p>{{$t('message.workflowsDescription')}}</p></div>
+<div id="workflow_manager" class="list-page">
+    <div class="page-heading list-heading"><div><h1>{{$t('message.tabWorkflowManage')}}</h1><p>{{$t('message.workflowsDescription')}}</p></div><el-button v-if="!isWorkflow" type="primary" @click="onClickNewWorkflow"><PjIcon name="plus"/>{{$t('message.newWorkflow')}}</el-button></div>
 
-    <!--第一行，条件搜索栏-->
-    <el-row :gutter="20">
-
-        <!-- 左侧搜索栏，占地面积 20/24 -->
-        <el-col :span="20">
-            <el-form :inline="true" :model="workflowQueryContent" class="el-form--inline">
-                <el-form-item :label="$t('message.wfId')">
-                    <el-input v-model="workflowQueryContent.workflowId" :placeholder="$t('message.wfId')"/>
-                </el-form-item>
-                <el-form-item :label="$t('message.keyword')">
-                    <el-input v-model="workflowQueryContent.keyword" :placeholder="$t('message.keyword')"/>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="searchWorkflows">{{$t('message.query')}}</el-button>
-                    <el-button type="default" @click="onClickReset">{{$t('message.reset')}}</el-button>
-                </el-form-item>
-            </el-form>
-        </el-col>
-
-        <!-- 右侧新增任务按钮，占地面积 4/24 -->
-        <el-col :span="4" v-if="!isWorkflow">
-            <div style="float:right;padding-right:10px">
-                <el-button type="primary" @click="onClickNewWorkflow">{{$t('message.newWorkflow')}}</el-button>
-            </div>
-        </el-col>
-    </el-row>
+    <div class="list-toolbar">
+        <el-form :inline="true" :model="workflowQueryContent" class="filter-form">
+            <el-form-item :label="$t('message.wfId')"><el-input v-model="workflowQueryContent.workflowId" :placeholder="$t('message.wfId')"/></el-form-item>
+            <el-form-item :label="$t('message.keyword')"><el-input v-model="workflowQueryContent.keyword" :placeholder="$t('message.keyword')"/></el-form-item>
+            <el-form-item class="filter-actions">
+                <el-button type="primary" @click="searchWorkflows">{{$t('message.query')}}</el-button>
+                <el-button @click="onClickReset">{{$t('message.reset')}}</el-button>
+            </el-form-item>
+        </el-form>
+    </div>
 
     <!--第二行，工作流数据表格-->
-    <el-row>
+    <section class="list-surface">
         <el-table v-loading="listLoading" :data="workflowPageResult.data" style="width: 100%" :type="isWorkflow ? 'selection' : null">
             <el-table-column :show-overflow-tooltip="true" prop="id" :label="$t('message.wfId')" width="120"/>
-            <el-table-column :show-overflow-tooltip="true" prop="wfName" :label="$t('message.wfName')"/>
-            <el-table-column :show-overflow-tooltip="true" :label="$t('message.scheduleInfo')" >
+            <el-table-column :show-overflow-tooltip="true" prop="wfName" :label="$t('message.wfName')" min-width="180"/>
+            <el-table-column :show-overflow-tooltip="true" :label="$t('message.scheduleInfo')" min-width="180" >
                 <template #default="scope">
                     {{scope.row.timeExpressionType}}  {{scope.row.timeExpression}}
                 </template>
             </el-table-column>
             <el-table-column :show-overflow-tooltip="true" :label="$t('message.status')" width="80" v-if="!isWorkflow">
                 <template #default="scope">
-                    <el-switch v-model="scope.row.enable" active-color="#13ce66" inactive-color="#ff4949" @change="switchWorkflow(scope.row)"/>
+                    <el-switch v-model="scope.row.enable" @change="switchWorkflow(scope.row)"/>
                 </template>
             </el-table-column>
             <el-table-column :show-overflow-tooltip="true" :label="$t('message.operation')" :width="isWorkflow ? 100 : 300">
                 <template #default="scope">
                     <div v-if="!isWorkflow">
-                        <el-button size="small" @click="onClickModifyWorkflow(scope.row)">{{$t('message.edit')}}</el-button>
-                        <el-button size="small" @click="onClickCopy(scope.row)" :loading="copyLoading">{{$t('message.copy')}}</el-button>
+                        <el-button link size="small" @click="onClickModifyWorkflow(scope.row)">{{$t('message.edit')}}</el-button>
+                        <el-button link size="small" @click="onClickCopy(scope.row)" :loading="copyLoading">{{$t('message.copy')}}</el-button>
                         <el-dropdown>
-                            <el-button :style="{marginRight: '10px', marginLeft: '10px'}" size="small" @click="onClickRunWorkflow(scope.row)">{{$t('message.run')}}</el-button>
+                            <el-button link :style="{marginRight: '10px', marginLeft: '10px'}" size="small" @click="onClickRunWorkflow(scope.row)">{{$t('message.run')}}</el-button>
                             <template #dropdown><el-dropdown-menu>
                                 <el-dropdown-item>
-                                    <el-button size="small" type="text" @click="onClickRunByParameter(scope.row)">{{$t('message.runByParameter')}}</el-button>
+                                    <el-button link size="small" type="text" @click="onClickRunByParameter(scope.row)">{{$t('message.runByParameter')}}</el-button>
                                 </el-dropdown-item>
                             </el-dropdown-menu></template>
                         </el-dropdown>
-                        <el-button size="small" type="danger" @click="onClickDeleteWorkflow(scope.row)">{{$t('message.delete')}}</el-button>
+                        <el-button link size="small" type="danger" @click="onClickDeleteWorkflow(scope.row)">{{$t('message.delete')}}</el-button>
                     </div>
                     <div v-if="isWorkflow">
-                        <el-button size="small" @click="onImportNode(scope.row)">引入</el-button>
+                        <el-button link size="small" @click="onImportNode(scope.row)">引入</el-button>
                     </div>
                 </template>
             </el-table-column>
         </el-table>
-    </el-row>
 
     <!-- 第三行，分页插件 -->
-    <el-row>
+    <div class="list-footer">
         <el-pagination
-                layout="prev, pager, next" :current-page="workflowQueryContent.index + 1"
+                layout="total, prev, pager, next" :current-page="workflowQueryContent.index + 1"
                 :total="workflowPageResult.totalItems"
                 :page-size="workflowPageResult.pageSize"
                 @current-change="onClickChangePage"
                 :hide-on-single-page="true"/>
-    </el-row>
+    </div>
+    </section>
     <el-dialog
             :title="$t('message.runByParameter')"
             :model-value="!!temporaryRowData" @close="onClickRunCancel"
@@ -244,6 +228,4 @@
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped src="./page-layout.css"></style>

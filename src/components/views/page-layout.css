@@ -1,0 +1,36 @@
+.list-page { min-width: 0; }
+.list-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.list-heading > div { min-width: 0; }
+.list-heading > .el-button { flex-shrink: 0; }
+.list-heading .pj-icon, .toolbar-actions .pj-icon { width: 15px; height: 15px; margin-right: 6px; }
+.list-toolbar { background: var(--pj-surface); border-block: 1px solid var(--pj-border); padding: 14px 0; margin-bottom: 0; }
+.filter-form { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.filter-form :deep(.el-form-item) { margin: 0; min-width: 0; }
+.filter-form :deep(.el-form-item__label) { font-size: 12px; padding-right: 8px; }
+.filter-form :deep(.el-input), .filter-form :deep(.el-select) { width: 174px; }
+.filter-form :deep(.filter-actions) { margin-left: 0; }
+.filter-actions :deep(.el-form-item__content) { flex-wrap: nowrap; }
+.list-surface { min-width: 0; background: var(--pj-surface); border-bottom: 1px solid var(--pj-border); overflow: hidden; }
+.list-surface :deep(.el-table) { border: 0; border-radius: 0; }
+.list-surface :deep(.el-table th.el-table__cell) { padding: 6px 0; }
+.list-surface :deep(.el-table td.el-table__cell) { padding: 6px 0; }
+.list-surface :deep(.el-button + .el-button) { margin-left: 6px; }
+.list-footer { padding: 12px 0; }
+.list-footer :deep(.el-pagination) { margin-top: 0; justify-content: flex-end; flex-wrap: wrap; gap: 5px; }
+.instance-tabs { padding: 0; }
+.instance-tabs :deep(.el-tabs__header) { margin: 0; }
+.instance-tabs :deep(.el-tabs__nav-wrap::after) { height: 1px; }
+@media (max-width: 760px) {
+  .list-heading { align-items: flex-start; }
+  .list-toolbar { padding: 12px 0; }
+  .filter-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .filter-form :deep(.el-form-item) { display: block; }
+  .filter-form :deep(.el-form-item__label) { float: none; display: block; width: auto; height: auto; line-height: 1.4; margin-bottom: 5px; text-align: left; }
+  .filter-form :deep(.el-input), .filter-form :deep(.el-select) { width: 100%; min-width: 0; }
+  .filter-form :deep(.filter-actions) { grid-column: 1 / -1; }
+  .list-footer { padding: 12px 0; }
+  .list-footer :deep(.el-pagination__total) { margin-right: auto; }
+}
+@media (max-width: 420px) {
+  .list-heading { flex-wrap: wrap; gap: 10px; }
+}

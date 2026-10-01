@@ -1,13 +1,11 @@
 <template>
-  <div id="wf_instance_manager">
-    <div class="page-heading"><h1>{{$t('message.tabWfInstance')}}</h1><p>{{$t('message.wfInstancesDescription')}}</p></div>
-    <!-- 第一行，搜索区 -->
-    <el-row>
-      <el-col :span="20">
+  <div id="wf_instance_manager" class="list-page">
+    <div class="page-heading list-heading"><div><h1>{{$t('message.tabWfInstance')}}</h1><p>{{$t('message.wfInstancesDescription')}}</p></div><el-button :loading="listLoading" @click="listWfInstances"><PjIcon name="refresh"/>{{$t('message.refresh')}}</el-button></div>
+    <div class="list-toolbar">
         <el-form
           :inline="true"
           :model="wfInstanceQueryContent"
-          class="el-form--inline">
+          class="filter-form">
 
           <el-form-item :label="$t('message.wfId')">
             <el-input
@@ -34,67 +32,56 @@
             </el-select>
           </el-form-item>
 
-          <el-form-item>
+          <el-form-item class="filter-actions">
             <el-button type="primary" @click="searchWfInstances">{{$t('message.query')}}</el-button>
             <el-button type="default" @click="onClickRest">{{$t('message.reset')}}</el-button>
           </el-form-item>
         </el-form>
-      </el-col>
-      <el-col :span="4">
-        <div style="float:right;padding-right:10px">
-          <el-button type="primary" @click="listWfInstances"
-            >{{$t('message.refresh')}}</el-button
-          >
-        </div>
-      </el-col>
-    </el-row>
+    </div>
 
     <!-- 第二行，表单 -->
-    <el-row>
+    <section class="list-surface">
       <el-table
-        :data="wfInstancePageResult.data"
+        v-loading="listLoading" :data="wfInstancePageResult.data"
         
         style="width: 100%"
         :row-class-name="wfInstanceTableRowClassName"
       >
         <el-table-column :show-overflow-tooltip="true" prop="workflowId" :label="$t('message.wfId')" width="110" />
-        <el-table-column :show-overflow-tooltip="true" prop="workflowName" :label="$t('message.wfName')" />
-        <el-table-column :show-overflow-tooltip="true" prop="wfInstanceId" :label="$t('message.wfInstanceId')" />
+        <el-table-column :show-overflow-tooltip="true" prop="workflowName" :label="$t('message.wfName')"  min-width="170"/>
+        <el-table-column :show-overflow-tooltip="true" prop="wfInstanceId" :label="$t('message.wfInstanceId')"  min-width="190"/>
         <el-table-column :show-overflow-tooltip="true" prop="status" :label="$t('message.status')" width="160">
           <template #default="scope">
             {{fetchWFStatus(scope.row.status)}}
           </template>
         </el-table-column>
-        <el-table-column :show-overflow-tooltip="true" prop="actualTriggerTime" :label="$t('message.triggerTime')" />
-        <el-table-column :show-overflow-tooltip="true" prop="finishedTime" :label="$t('message.finishedTime')" />
+        <el-table-column :show-overflow-tooltip="true" prop="actualTriggerTime" :label="$t('message.triggerTime')"  min-width="170"/>
+        <el-table-column :show-overflow-tooltip="true" prop="finishedTime" :label="$t('message.finishedTime')"  min-width="170"/>
 
         <el-table-column :show-overflow-tooltip="true" :label="$t('message.operation')" width="225">
           <template #default="scope">
-            <el-button type="primary" size="small" @click="onClickShowDetail(scope.row)"
+            <el-button link type="primary" size="small" @click="onClickShowDetail(scope.row)"
               >{{$t('message.detail')}}</el-button
             >
-            <el-button type="danger" size="small" @click="onClickStop(scope.row)"
+            <el-button link type="danger" size="small" @click="onClickStop(scope.row)"
               >{{$t('message.stop')}}</el-button
             >
-            <el-button type="warning" size="small" @click="restart(scope.row)"
+            <el-button link type="warning" size="small" @click="restart(scope.row)"
               >{{$t('message.reRun')}}</el-button
             >
           </template>
         </el-table-column>
       </el-table>
-    </el-row>
 
-    <!-- 第三行，分页插件 -->
-    <el-row>
-      <el-col :span="24">
+    <div class="list-footer">
         <el-pagination
           :total="wfInstancePageResult.totalItems"
           :page-size="wfInstancePageResult.pageSize"
           @current-change="onClickChangeInstancePage"
-          layout="prev, pager, next" :current-page="wfInstanceQueryContent.index + 1"
+          layout="total, prev, pager, next" :current-page="wfInstanceQueryContent.index + 1"
         />
-      </el-col>
-    </el-row>
+    </div>
+    </section>
   </div>
 </template>
 
@@ -210,4 +197,5 @@ export default {
 };
 </script>
 
+<style scoped src="./page-layout.css"></style>
 <style scoped></style>

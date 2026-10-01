@@ -13,6 +13,11 @@ for (const prefix of ['/', '/console/']) {
     await expect(page.getByRole('heading', { name: 'Job management', exact: true })).toBeVisible()
     const packageRoot = process.env.POWERJOB_E2E_RELEASE_ROOT
     const apiRequests = []
+    const fontResponses = []
+    page.on('response', response => {
+      const url = new URL(response.url())
+      if (url.pathname.endsWith('.woff2')) fontResponses.push({ origin: url.origin, pathname: url.pathname, status: response.status() })
+    })
     page.on('request', request => {
       const url = new URL(request.url())
       if (url.pathname.includes('/api/')) apiRequests.push(url.pathname)
@@ -63,9 +68,17 @@ for (const prefix of ['/', '/console/']) {
       expect(await fs.readFile(filename, 'utf8')).toContain('StandaloneProcessorDemo finished process,success: true')
       await page.reload()
       await expect(selectors.row(page, String(run.data))).toContainText('Success')
+      const loadedFonts = await page.evaluate(async () => {
+        await document.fonts.ready
+        return [...document.fonts].filter(font => font.family.includes('IBM Plex Sans') && font.status === 'loaded').map(font => font.weight)
+      })
+      expect(loadedFonts.length).toBeGreaterThanOrEqual(2)
+      expect(fontResponses.length).toBeGreaterThanOrEqual(2)
+      const origin = new URL(page.url()).origin
+      expect(fontResponses.every(font => font.origin === origin && font.pathname.startsWith(prefix + 'fonts/') && font.status === 200)).toBe(true)
       expect(apiRequests.length).toBeGreaterThan(3)
       expect(apiRequests.every(url => url.startsWith(prefix + 'api/'))).toBe(true)
-      await testInfo.attach('static-release-proof', { body: JSON.stringify({ prefix, indexSha256: await fileHash(path.join(packageRoot, 'index.html')), configSha256: await fileHash(path.join(packageRoot, 'config.js')), logSha256: await fileHash(filename), instanceId: String(run.data), status: instance.status }), contentType: 'application/json' })
+      await testInfo.attach('static-release-proof', { body: JSON.stringify({ prefix, indexSha256: await fileHash(path.join(packageRoot, 'index.html')), configSha256: await fileHash(path.join(packageRoot, 'config.js')), logSha256: await fileHash(filename), instanceId: String(run.data), status: instance.status, loadedFontWeights: loadedFonts, fontResponses }), contentType: 'application/json' })
     } finally { if (id) await backend.deleteOwnedJob(id) }
   })
 }

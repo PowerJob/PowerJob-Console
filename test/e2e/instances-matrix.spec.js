@@ -1,6 +1,13 @@
 import { test, expect, runId, selectors, input, choose, enterSamples, demoProcessor, saveDialog, clickAndResponse } from './support.js'
 import fs from 'node:fs/promises'
 
+// Initial list requests can still be in flight when the user submits a filter.
+// Match the submitted query, rather than treating the first same-path response as it.
+const submittedQuery = expected => response => {
+  const actual = response.request().postDataJSON()
+  return Object.entries(expected).every(([key, value]) => String(actual?.[key] ?? '') === String(value ?? ''))
+}
+
 async function proof(info, caseId, variantId, actual) {
   const result = { caseId, variantId, status: 'PASS', actual, testTitle: info.title, timestamp: new Date().toISOString() }
   await fs.writeFile(info.outputPath(`variant-${caseId}-${variantId}.json`), JSON.stringify(result, null, 2))
@@ -33,17 +40,17 @@ test('UI-016/017 · eleven real page runs, instance filter axes and pagination/r
     for (const instance of instanceIds) await backend.waitInstance(instance, [5])
     await page.goto('/#/oms/instance')
     await input(page.locator('main'), 'Job ID', id)
-    let response = await clickAndResponse(page, '/instance/list', () => page.locator('#instance_manager').getByRole('button', { name: 'Query', exact: true }).first().click())
+    let response = await clickAndResponse(page, '/instance/list', () => page.locator('#instance_manager').getByRole('button', { name: 'Query', exact: true }).first().click(), submittedQuery({ jobId: id, type: 'NORMAL', index: 0 }))
     expect(response.data.totalItems).toBe(11)
     await expect(page.locator('.el-table__body-wrapper tr')).toHaveCount(10)
     const first = response.data.data.map(item => String(item.instanceId))
-    response = await clickAndResponse(page, '/instance/list', () => page.locator('.el-pager li').getByText('2', { exact: true }).click())
+    response = await clickAndResponse(page, '/instance/list', () => page.locator('.el-pager li').getByText('2', { exact: true }).click(), submittedQuery({ jobId: id, type: 'NORMAL', index: 1 }))
     expect(response.data.index).toBe(1)
     expect(response.data.data).toHaveLength(1)
     expect(first).not.toContain(String(response.data.data[0].instanceId))
     await expect(page.locator('.el-pager li.is-active')).toHaveText('2')
     await input(page.locator('main'), 'Instance ID', instanceIds[0])
-    response = await clickAndResponse(page, '/instance/list', () => page.locator('#instance_manager').getByRole('button', { name: 'Query', exact: true }).first().click())
+    response = await clickAndResponse(page, '/instance/list', () => page.locator('#instance_manager').getByRole('button', { name: 'Query', exact: true }).first().click(), submittedQuery({ jobId: id, instanceId: instanceIds[0], type: 'NORMAL', index: 0 }))
     expect(response.data.data).toHaveLength(1)
     expect(String(response.data.data[0].instanceId)).toBe(instanceIds[0])
     await expect(selectors.row(page, instanceIds[0])).toContainText('Success')
@@ -51,7 +58,7 @@ test('UI-016/017 · eleven real page runs, instance filter axes and pagination/r
     await input(page.locator('main'), 'Instance ID', '')
     for (const [label, status] of [['ALL', ''], ['Waiting dispatch', 'WAITING_DISPATCH'], ['Waiting receive', 'WAITING_WORKER_RECEIVE'], ['Canceled', 'CANCELED'], ['Running', 'RUNNING'], ['Failed', 'FAILED'], ['Success', 'SUCCEED'], ['Stopped', 'STOPPED']]) {
       await choose(page, page.locator('main'), 'Status', label)
-      response = await clickAndResponse(page, '/instance/list', () => page.locator('#instance_manager').getByRole('button', { name: 'Query', exact: true }).first().click())
+      response = await clickAndResponse(page, '/instance/list', () => page.locator('#instance_manager').getByRole('button', { name: 'Query', exact: true }).first().click(), submittedQuery({ jobId: id, instanceId: '', type: 'NORMAL', status, index: 0 }))
       const api = await backend.call('/instance/list', { method: 'POST', data: { appId: credentials.app_id, jobId: id, type: 'NORMAL', status, index: 0, pageSize: 10 } })
       expect(response.data.totalItems).toBe(api.totalItems)
       if (label === 'Success' || label === 'ALL') expect(response.data.totalItems).toBe(11)
@@ -78,9 +85,9 @@ test('UI-024 · eleven real workflow instances, filter axes, paging/reset/refres
     await page.getByRole('button', { name: 'New workflow', exact: true }).click()
     await input(page.locator('main'), 'Workflow name', name)
     await page.locator('.canvas-toolbar').getByRole('button', { name: /Import job/ }).click()
-    const drawer = selectors.dialog(page)
+    const drawer = page.locator('.el-drawer:visible')
     await input(drawer, 'Job ID', jobId)
-    await drawer.getByRole('button', { name: 'Query', exact: true }).click()
+    await clickAndResponse(page, '/job/list', () => drawer.getByRole('button', { name: 'Query', exact: true }).click(), submittedQuery({ jobId }))
     await clickAndResponse(page, '/workflow/saveNode', () => selectors.row(page, String(jobId)).getByRole('button', { name: 'Import', exact: true }).click())
     await expect(drawer).not.toBeVisible()
     const saved = await clickAndResponse(page, '/workflow/save', () => page.locator('.editor-heading').getByRole('button', { name: 'Save', exact: true }).click())
@@ -102,19 +109,19 @@ test('UI-024 · eleven real workflow instances, filter axes, paging/reset/refres
     expect(response.data.totalItems).toBe(11)
     await expect(page.locator('.el-table__body-wrapper tr')).toHaveCount(10)
     const first = response.data.data.map(item => String(item.wfInstanceId))
-    response = await clickAndResponse(page, '/wfInstance/list', () => page.locator('.el-pager li').getByText('2', { exact: true }).click())
+    response = await clickAndResponse(page, '/wfInstance/list', () => page.locator('.el-pager li').getByText('2', { exact: true }).click(), submittedQuery({ workflowId, index: 1 }))
     expect(response.data.index).toBe(1)
     expect(response.data.data).toHaveLength(1)
     expect(first).not.toContain(String(response.data.data[0].wfInstanceId))
     await input(page.locator('main'), 'WorkflowInstanceId', instanceIds[0])
-    response = await clickAndResponse(page, '/wfInstance/list', () => page.getByRole('button', { name: 'Query', exact: true }).click())
+    response = await clickAndResponse(page, '/wfInstance/list', () => page.getByRole('button', { name: 'Query', exact: true }).click(), submittedQuery({ workflowId, wfInstanceId: instanceIds[0], index: 0 }))
     expect(response.data.data).toHaveLength(1)
     expect(String(response.data.data[0].wfInstanceId)).toBe(instanceIds[0])
     await expect(selectors.row(page, instanceIds[0])).toContainText('Success')
     await input(page.locator('main'), 'WorkflowInstanceId', '')
     for (const [label, status] of [['ALL', ''], ['Waiting dispatch', 'WAITING'], ['Running', 'RUNNING'], ['Failed', 'FAILED'], ['Success', 'SUCCEED'], ['Stopped', 'STOPPED']]) {
       await choose(page, page.locator('main'), 'Status', label)
-      response = await clickAndResponse(page, '/wfInstance/list', () => page.getByRole('button', { name: 'Query', exact: true }).click())
+      response = await clickAndResponse(page, '/wfInstance/list', () => page.getByRole('button', { name: 'Query', exact: true }).click(), submittedQuery({ workflowId, wfInstanceId: '', status, index: 0 }))
       const api = await backend.call('/wfInstance/list', { method: 'POST', data: { appId: credentials.app_id, workflowId, status, index: 0, pageSize: 10 } })
       expect(response.data.totalItems).toBe(api.totalItems)
     }
@@ -127,7 +134,7 @@ test('UI-024 · eleven real workflow instances, filter axes, paging/reset/refres
     const childId = String(tabResponse.data.data[0].instanceId)
     await input(page.locator('main'), 'Job ID', jobId)
     await input(page.locator('main'), 'Instance ID', childId)
-    tabResponse = await clickAndResponse(page, '/instance/list', () => page.locator('#instance_manager').getByRole('button', { name: 'Query', exact: true }).first().click())
+    tabResponse = await clickAndResponse(page, '/instance/list', () => page.locator('#instance_manager').getByRole('button', { name: 'Query', exact: true }).first().click(), submittedQuery({ jobId, instanceId: childId, wfInstanceId: instanceIds[0], type: 'WORKFLOW', index: 0 }))
     expect(tabResponse.data.data).toHaveLength(1)
     expect(String(tabResponse.data.data[0].instanceId)).toBe(childId)
     await proof(info, 'UI-016', 'instance-id-filters', { jobId: true, instanceId: true, wfInstanceId: true, actualWorkflowChild: true })

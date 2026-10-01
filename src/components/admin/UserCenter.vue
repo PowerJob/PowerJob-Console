@@ -15,11 +15,13 @@
             <el-form-item :label="$t('message.originUsername')"><el-input disabled v-model="userDetailInfo.originUsername" /></el-form-item>
             <el-form-item :label="$t('message.accountType')"><el-input disabled v-model="userDetailInfo.accountType" /></el-form-item>
             <el-form-item :label="$t('message.globalRoles')"><el-input disabled :model-value="globalRolesText" /></el-form-item>
+          </div>
+          <div class="form-grid profile-contact">
             <el-form-item :label="$t('message.nick')"><el-input v-model="userDetailInfo.nick" /></el-form-item>
             <el-form-item :label="$t('message.phone')"><el-input v-model="userDetailInfo.phone" autocomplete="tel" /></el-form-item>
-          </div>
           <el-form-item :label="$t('message.email')"><el-input v-model="userDetailInfo.email" autocomplete="email" /></el-form-item>
           <el-form-item :label="$t('message.webhook')"><el-input v-model="userDetailInfo.webHook" /></el-form-item>
+          </div>
           <div class="profile-actions">
             <el-button v-if="userDetailInfo.accountType === 'PWJB'" :disabled="loading || !userLoaded" @click="onClickChangePassword">{{ $t('message.changePassword') }}</el-button>
             <el-button type="primary" :loading="saving" :disabled="loading || !userLoaded" @click="onClickSaveNewUserInfo">{{ $t('message.save') }}</el-button>
@@ -28,7 +30,7 @@
         </el-form>
       </section>
       <section class="profile-card app-admin-card">
-        <div class="card-heading"><span class="card-icon" aria-hidden="true">◇</span><h2>{{ $t('message.appAdmin') }}</h2></div>
+        <div class="card-heading"><h2>{{ $t('message.appAdmin') }}</h2></div>
         <el-form ref="appAdminForm" :model="appAssertRequest" label-position="top" @submit.prevent="onClickAuthThenBecomeAdmin">
           <el-form-item label="appName" prop="appName" :rules="requiredRule"><el-input v-model="appAssertRequest.appName" /></el-form-item>
           <el-form-item :label="$t('message.password')" prop="password" :rules="requiredRule">
@@ -167,22 +169,28 @@ export default {
 </script>
 
 <style scoped>
-.page-heading { margin-bottom: 22px; }
-.page-heading h1 { font-size: 25px; font-weight: 650; letter-spacing: -.6px; color: var(--pj-text); margin: 0 0 8px; }
-.page-heading p { color: var(--pj-muted); font-size: 13px; margin: 0; line-height: 1.6; }
-.profile-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr); gap: 22px; align-items: start; }
-.profile-card { background: var(--pj-surface); border: 1px solid var(--pj-border); border-radius: 14px; padding: 26px; }
-.profile-summary { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; padding-bottom: 24px; border-bottom: 1px solid var(--pj-border); }
-.avatar { flex-shrink: 0; display: grid; place-items: center; width: 51px; height: 51px; border-radius: 15px; background: #e7f1e9; color: var(--pj-primary); font-size: 25px; font-weight: 650; }
-.profile-summary h2 { color: var(--pj-text); font-weight: 600; font-size: 19px; margin: 0 0 6px; overflow-wrap: anywhere; }
-.account-label { color: var(--pj-muted); font-size: 12px; }
-.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 18px; }
-.profile-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; padding-top: 10px; }
+.profile-page { width: 100%; min-width: 0; }
+.page-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+.page-heading > div { min-width: 0; }
+.page-heading h1 { color: var(--pj-text); font-size: 24px; line-height: 1.3; font-weight: 600; margin: 0 0 6px; }
+.page-heading p { color: var(--pj-muted); font-size: 13px; line-height: 1.6; max-width: 72ch; margin: 0; }
+.page-heading > .el-button { flex-shrink: 0; }
+.profile-page .page-heading { display: block; }
+.profile-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .46fr); gap: 32px; align-items: start; border-top: 1px solid var(--pj-border); }
+.profile-card { min-width: 0; padding: 24px 0; background: var(--pj-surface); }
+.profile-summary { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.profile-summary > div { min-width: 0; }
+.avatar { flex-shrink: 0; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--pj-border); border-radius: 50%; background: var(--pj-subtle, #f3f7fa); color: var(--pj-primary); font-size: 22px; font-weight: 500; }
+.profile-summary h2 { color: var(--pj-text); font-weight: 600; font-size: 18px; line-height: 1.4; margin: 0 0 3px; overflow-wrap: anywhere; }
+.account-label { color: var(--pj-muted); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; }
+.profile-contact { padding-top: 20px; margin-top: 4px; border-top: 1px solid var(--pj-border); }
+.profile-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; padding-top: 12px; }
 .profile-actions .el-button { margin: 0; }
-.card-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
-.card-heading h2 { color: var(--pj-text); font-size: 16px; margin: 0; font-weight: 600; }
-.card-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; color: var(--pj-primary); background: #edf5ef; font-size: 23px; }
-.app-admin-card :deep(.el-button) { width: 100%; }
-@media (max-width: 950px) { .profile-grid { grid-template-columns: 1fr; } }
-@media (max-width: 540px) { .profile-card { padding: 20px; } .form-grid { grid-template-columns: 1fr; } .page-heading h1 { font-size: 22px; } }
+.app-admin-card { padding-left: 28px; border-left: 1px solid var(--pj-border); }
+.card-heading { margin-bottom: 22px; }
+.card-heading h2 { color: var(--pj-text); font-size: 14px; line-height: 1.5; margin: 0; font-weight: 600; }
+.app-admin-card :deep(.el-button) { max-width: 100%; height: auto; min-height: 32px; padding-top: 8px; padding-bottom: 8px; white-space: normal; }
+@media (max-width: 950px) { .profile-grid { grid-template-columns: 1fr; gap: 0; } .app-admin-card { border-left: 0; border-top: 1px solid var(--pj-border); padding-left: 0; max-width: 560px; } }
+@media (max-width: 540px) { .form-grid { grid-template-columns: 1fr; } .page-heading h1 { font-size: 22px; } .profile-card { padding: 20px 0; } }
 </style>

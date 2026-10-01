@@ -1,9 +1,10 @@
 <template>
-  <section class="admin-page">
+  <section class="admin-page app-manager">
     <header class="page-heading">
       <div><h1>{{ $t('message.tabAppManage') }}</h1><p>{{ $t('message.applicationsDescription') }}</p></div>
       <el-button type="primary" @click="onClickNewApps">{{ $t('message.add') }}</el-button>
     </header>
+    <section class="admin-data-surface">
     <div class="filter-panel">
       <el-form :inline="true" :model="queryAppRequest" @submit.prevent="searchApps">
         <el-form-item label="ID"><el-input v-model="queryAppRequest.appId" clearable placeholder="ID" @keyup.enter="searchApps" /></el-form-item>
@@ -14,7 +15,7 @@
             <el-option v-for="item in namespaceList" :key="item.id" :label="item.showName" :value="item.id" />
           </el-select>
         </el-form-item>
-        <el-form-item :label="$t('message.showMyRelated')"><el-switch v-model="queryAppRequest.showMyRelated" @change="searchApps" /></el-form-item>
+        <el-form-item class="filter-toggle" :label="$t('message.showMyRelated')"><el-switch v-model="queryAppRequest.showMyRelated" @change="searchApps" /></el-form-item>
         <el-form-item class="filter-actions">
           <el-button type="primary" native-type="submit" :loading="loading">{{ $t('message.query') }}</el-button>
           <el-button @click="onClickReset">{{ $t('message.reset') }}</el-button>
@@ -43,6 +44,8 @@
                        :current-page="queryAppRequest.index + 1" @current-change="onClickChangePage" :hide-on-single-page="true" />
       </div>
     </div>
+
+    </section>
 
     <el-dialog :title="$t(modifiedAppForm.id == null ? 'message.add' : 'message.edit')"
                v-model="modifiedAppFormVisible" :close-on-click-modal="false" :close-on-press-escape="!saving && !deleting"
@@ -179,20 +182,30 @@ export default {
 </script>
 
 <style scoped>
-.admin-page { width: 100%; }
-.page-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 22px; }
-.page-heading h1 { font-size: 25px; font-weight: 650; letter-spacing: -.6px; color: var(--pj-text); margin: 0 0 8px; }
-.page-heading p { color: var(--pj-muted); font-size: 13px; margin: 0; line-height: 1.6; }
-.filter-panel, .data-panel { background: var(--pj-surface); border: 1px solid var(--pj-border); border-radius: 13px; }
-.filter-panel { padding: 20px 20px 2px; margin-bottom: 18px; }
-.filter-panel :deep(.el-form-item) { margin-right: 16px; margin-bottom: 18px; }
-.filter-panel :deep(.el-input), .filter-panel :deep(.el-select) { width: 170px; }
-.data-panel { overflow: hidden; }
-.pagination { display: flex; justify-content: flex-end; padding: 14px 18px; }
+.admin-page { width: 100%; min-width: 0; }
+.page-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+.page-heading > div { min-width: 0; }
+.page-heading h1 { color: var(--pj-text); font-size: 24px; line-height: 1.3; font-weight: 600; margin: 0 0 6px; }
+.page-heading p { color: var(--pj-muted); font-size: 13px; line-height: 1.6; max-width: 72ch; margin: 0; }
+.page-heading > .el-button { flex-shrink: 0; }
+.admin-data-surface { border-top: 1px solid var(--pj-border); background: var(--pj-surface); }
+.filter-panel { padding: 16px 12px; border-bottom: 1px solid var(--pj-border); }
+.filter-panel :deep(.el-form) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) max-content; align-items: end; gap: 12px; }
+.filter-panel :deep(.el-form-item) { display: flex; flex-direction: column; align-items: stretch; min-width: 0; margin: 0; }
+.filter-panel :deep(.el-form-item__label) { display: block; height: auto; padding: 0; margin: 0 0 6px; color: var(--pj-muted); font-size: 12px; line-height: 20px; text-align: left; white-space: normal; }
+.filter-panel :deep(.el-form-item__content) { min-width: 0; min-height: 32px; margin-left: 0; flex-wrap: nowrap; }
+.filter-panel :deep(.el-input), .filter-panel :deep(.el-select) { width: 100%; }
+.filter-actions :deep(.el-form-item__content) { gap: 8px; }
+.filter-actions :deep(.el-button + .el-button) { margin-left: 0; }
+.app-manager .filter-panel :deep(.el-form) { grid-template-columns: minmax(88px, .65fr) minmax(130px, 1fr) minmax(115px, .8fr) minmax(156px, 1.15fr) minmax(135px, .9fr) max-content; }
+.data-panel { min-width: 0; overflow: hidden; }
+.pagination { display: flex; justify-content: flex-end; padding: 14px 12px; }
 .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 20px; }
 .form-grid .el-select { width: 100%; }
 .dialog-actions { display: flex; align-items: center; gap: 8px; }
 .dialog-actions .el-button { margin: 0; }
 .action-spacer { flex: 1; }
-@media (max-width: 650px) { .page-heading { align-items: flex-start; } .page-heading h1 { font-size: 22px; } .form-grid { grid-template-columns: 1fr; } .filter-panel :deep(.el-form-item), .filter-panel :deep(.el-form-item__content) { width: 100%; margin-right: 0; } .filter-panel :deep(.el-input), .filter-panel :deep(.el-select) { width: 100%; } .pagination { padding: 12px 8px; } }
+@media (max-width: 1100px) { .app-manager .filter-panel :deep(.el-form) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .page-heading { gap: 12px; margin-bottom: 20px; } .page-heading h1 { font-size: 22px; } .filter-panel { padding: 14px 0; } .app-manager .filter-panel :deep(.el-form), .filter-panel :deep(.el-form) { grid-template-columns: repeat(2, minmax(0, 1fr)); } .pagination { padding: 12px 0; } }
+@media (max-width: 480px) { .app-manager .filter-panel :deep(.el-form), .filter-panel :deep(.el-form) { grid-template-columns: 1fr; } .form-grid { grid-template-columns: 1fr; } .filter-actions { padding-top: 2px; } .pagination { justify-content: flex-start; } }
 </style>

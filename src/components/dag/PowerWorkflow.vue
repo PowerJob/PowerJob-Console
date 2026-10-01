@@ -1,38 +1,38 @@
 <template>
   <section ref="root" class="workflow-canvas" tabindex="0" @keydown="onKeydown">
     <div class="canvas-toolbar">
-      <el-button v-if="editable && onClickImportNode" @click="onClickImportNode">＋ {{ $t('message.importJob') }}</el-button>
+      <el-button v-if="editable && onClickImportNode" type="primary" plain @click="onClickImportNode">＋ {{ $t('message.importJob') }}</el-button>
       <el-button v-if="editable" @click="onClickImportSpecialNode?.({ type: 2 })">◇ {{ $t('message.condition') }}</el-button>
       <el-button v-if="editable" @click="onClickImportSpecialNode?.({ type: 3 })">▣ {{ $t('message.workflowChild') }}</el-button>
       <el-button v-if="editable" :disabled="!selectedId || !!selectedEdgeId" :type="connecting ? 'primary' : 'default'" @click="beginConnection">↗ {{ $t('message.workflowConnect') }}</el-button>
       <el-button v-if="editable" :disabled="!selectedId && !selectedEdgeId" @click="deleteSelection">{{ $t('message.delete') }}</el-button>
       <slot name="tool" />
       <span class="toolbar-spacer" />
-      <el-button :aria-label="$t('message.zoomOut')" @click="setZoom(zoom - .1)">−</el-button>
-      <span class="zoom-label">{{ Math.round(zoom * 100) }}%</span>
-      <el-button :aria-label="$t('message.zoomIn')" @click="setZoom(zoom + .1)">＋</el-button>
-      <el-button @click="autoLayout">{{ $t('message.autoFit') }}</el-button>
-      <el-button @click="fullScreen">⛶ {{ $t('message.fullScreen') }}</el-button>
+      <div class="canvas-navigation">
+        <div class="canvas-zoom"><el-button :aria-label="$t('message.zoomOut')" @click="setZoom(zoom - .1)">−</el-button><span class="zoom-label">{{ Math.round(zoom * 100) }}%</span><el-button :aria-label="$t('message.zoomIn')" @click="setZoom(zoom + .1)">＋</el-button></div>
+        <el-button @click="autoLayout">{{ $t('message.autoFit') }}</el-button>
+        <el-button @click="fullScreen">⛶ {{ $t('message.fullScreen') }}</el-button>
+      </div>
     </div>
     <p v-if="editable" class="canvas-help">{{ $t('message.workflowCanvasHelp') }}</p>
     <div class="canvas-body">
       <div ref="canvasContainer" class="canvas-surface">
         <svg ref="svg" class="dag-svg" :viewBox="`0 0 ${size.width} ${size.height}`" @pointerdown="startPan" @pointermove="movePointer" @pointerup="endPointer" @pointercancel="cancelPointer" @wheel.prevent="onWheel" @dblclick.self="autoLayout">
           <defs>
-            <pattern :id="`${canvasId}-grid`" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#d9e2ef" /></pattern>
-            <marker :id="`${canvasId}-arrow`" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8192ae" /></marker>
+            <pattern :id="`${canvasId}-grid`" width="24" height="24" patternUnits="userSpaceOnUse"><circle class="grid-dot" cx="1" cy="1" r="1" /></pattern>
+            <marker :id="`${canvasId}-arrow`" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="edge-arrow" d="M 0 0 L 10 5 L 0 10 z" /></marker>
           </defs>
           <rect width="100%" height="100%" :fill="`url(#${canvasId}-grid)`" />
           <g :transform="`translate(${pan.x},${pan.y}) scale(${zoom})`">
             <g v-for="edge in dag.edges" :key="edge.id" class="dag-edge" :class="{ selected: selectedEdgeId === edge.id, disabled: edge.enable === false }" @pointerdown.stop="selectEdge(edge)">
               <path class="edge-hit" :d="edgePath(edge)" />
               <path class="edge-line" :d="edgePath(edge)" :marker-end="`url(#${canvasId}-arrow)`" />
-              <g v-if="edge.label" :transform="`translate(${edgeMiddle(edge).x},${edgeMiddle(edge).y})`"><rect x="-14" y="-12" width="28" height="24" rx="8" fill="white" /><text class="branch-label" text-anchor="middle" dominant-baseline="central">{{ edge.label }}</text></g>
+              <g v-if="edge.label" :transform="`translate(${edgeMiddle(edge).x},${edgeMiddle(edge).y})`"><rect class="branch-background" x="-14" y="-12" width="28" height="24" rx="3" /><text class="branch-label" text-anchor="middle" dominant-baseline="central">{{ edge.label }}</text></g>
             </g>
             <path v-if="connecting && connectionPoint" class="connection-preview" :d="connectionPath" />
             <g v-for="node in dag.nodes" :key="node.id" class="dag-node" :class="[statusClass(node), { selected: selectedId === node.id, disabled: node.enable === false || node.disableByControlNode }]" :transform="`translate(${node.x},${node.y})`" :data-node-id="node.id" role="button" tabindex="0" :aria-label="node.nodeName || $t('message.condition')" @keydown.enter.stop="selectNode(node)" @pointerdown.stop="startNodeDrag($event, node)">
               <path v-if="node.nodeType === 2" class="node-shape condition-shape" d="M 0 -49 L 100 0 L 0 49 L -100 0 Z" />
-              <rect v-else class="node-shape" x="-122" y="-42" width="244" height="84" rx="14" />
+              <rect v-else class="node-shape" x="-122" y="-42" width="244" height="84" rx="4" />
               <text v-if="node.nodeType !== 2" x="-106" y="-19" class="node-kind">{{ node.nodeType === 3 ? $t('message.workflowChild') : $t('message.jobId') }} · {{ node.jobId }}</text>
               <text class="node-name" :x="node.nodeType === 2 ? 0 : -106" :y="node.nodeType === 2 ? 3 : 4" :text-anchor="node.nodeType === 2 ? 'middle' : 'start'">{{ shortName(node.nodeName || $t('message.condition'), node.nodeType === 2 ? 128 : 208) }}<title>{{ node.nodeName }}</title></text>
               <text v-if="node.nodeType !== 2" x="-106" y="26" class="node-status">{{ node.status ? statusText(node) : $t('message.enable') + ': ' + $t(node.enable === false ? 'message.no' : 'message.yes') }}{{ node.skipWhenFailed ? ' · ' + $t('message.skipWhenFailed') : '' }}</text>
@@ -161,19 +161,49 @@ export default {
 };
 </script>
 <style scoped>
-.workflow-canvas { width:100%; border:1px solid var(--el-border-color-light); border-radius:16px; background:var(--el-bg-color); overflow:hidden; outline:none; }
-.canvas-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:8px; padding:14px; border-bottom:1px solid var(--el-border-color-light); }
-.canvas-toolbar :deep(.el-button + .el-button) { margin-left:0; } .toolbar-spacer { flex:1; } .zoom-label { font-size:12px; color:var(--el-text-color-secondary); min-width:38px; text-align:center; }
-.canvas-help { margin:0; padding:10px 16px; font-size:12px; color:var(--el-text-color-secondary); background:var(--el-fill-color-light); }
-.canvas-body { display:flex; min-height:600px; } .canvas-surface { position:relative; flex:1; min-width:240px; height:600px; background:#f8fafd; overflow:hidden; }
-.dag-svg { display:block; width:100%; height:100%; touch-action:none; user-select:none; border:0; }
-.canvas-details { flex-shrink:0; padding:16px; border-left:1px solid var(--el-border-color-light); overflow:auto; max-height:600px; box-sizing:border-box; }
+.workflow-canvas { width:100%; border:1px solid var(--pj-border); border-radius:4px; background:var(--pj-surface); overflow:hidden; outline:none; }
+.workflow-canvas:focus-visible { outline:2px solid var(--pj-primary); outline-offset:3px; }
+.canvas-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:6px; padding:10px 12px; border-bottom:1px solid var(--pj-border); }
+.canvas-toolbar :deep(.el-button + .el-button) { margin-left:0; }
+.canvas-toolbar :deep(.el-button) { height:30px; min-height:30px; padding:6px 10px; }
+.toolbar-spacer { flex:1; }
+.canvas-navigation,.canvas-zoom { display:flex; align-items:center; gap:6px; }
+.canvas-navigation { flex-wrap:wrap; margin-left:auto; }
+.canvas-zoom { flex-shrink:0; }
+.zoom-label { font-size:12px; color:var(--pj-muted); min-width:38px; text-align:center; font-variant-numeric:tabular-nums; }
+.canvas-help { margin:0; padding:8px 12px; font-size:12px; line-height:1.5; color:var(--pj-muted); }
+.canvas-body { display:flex; min-height:600px; }
+.canvas-surface { position:relative; flex:1; min-width:240px; height:600px; background:var(--pj-nav-bg); overflow:hidden; }
+.dag-svg { display:block; width:100%; height:100%; touch-action:none; user-select:none; border:0; font-family:inherit; }
+.canvas-details { flex-shrink:0; padding:18px; border-left:1px solid var(--pj-border); overflow:auto; max-height:600px; box-sizing:border-box; }
 .canvas-empty { position:absolute; inset:100px 20px auto; pointer-events:none; }
-.edge-line { stroke:#8192ae; fill:none; stroke-width:2; } .edge-hit { stroke:transparent; stroke-width:18; fill:none; cursor:pointer; }.dag-edge.selected .edge-line { stroke:var(--el-color-primary); stroke-width:3; }.dag-edge.disabled .edge-line { stroke-dasharray:7 5; opacity:.5; }
-.branch-label { font-size:12px; font-weight:700; fill:#576a87; }.connection-preview { stroke:var(--el-color-primary); stroke-width:2; stroke-dasharray:6 5; fill:none; }
-.dag-node { cursor:grab; outline:none; }.dag-node:active { cursor:grabbing; }.node-shape { fill:#fff; stroke:#cfd9e8; stroke-width:1.5; filter:drop-shadow(0 3px 4px #1c3f6e0a); }.dag-node.selected .node-shape,.dag-node:focus .node-shape { stroke:var(--el-color-primary); stroke-width:2.5; }.dag-node.running .node-shape { fill:#eff6ff; stroke:#79a9f9; }.dag-node.failed .node-shape { fill:#fff2f1; stroke:#f28e87; }.dag-node.succeeded .node-shape { fill:#effbf5; stroke:#7dcfa4; }.dag-node.disabled { opacity:.55; }
-.dag-node.canceled .node-shape,.dag-node.stopped .node-shape { fill:#f0f2f5; stroke:#aeb7c5; }.node-instance { fill:#74829b; font-size:10px; }
-.condition-shape { fill:#fff9ef; stroke:#e9c58f; }.node-kind { fill:#8492aa; font-size:11px; }.node-name { fill:#243654; font-size:13px; font-weight:600; }.node-status { fill:#74829b; font-size:10px; }.input-anchor { fill:white; stroke:#b1bfd3; }.output-anchor { fill:var(--el-color-primary); stroke:white; stroke-width:2; cursor:crosshair; }.output-anchor:hover { r:9; }.anchor-label { fill:#8b7446; font-size:10px; pointer-events:none; }
+.grid-dot { fill:var(--pj-border); }
+.edge-arrow { fill:var(--pj-muted); }
+.edge-line { stroke:var(--pj-muted); fill:none; stroke-width:2; }
+.edge-hit { stroke:transparent; stroke-width:18; fill:none; cursor:pointer; }
+.dag-edge.selected .edge-line { stroke:var(--pj-primary); stroke-width:3; }
+.dag-edge.disabled .edge-line { stroke-dasharray:7 5; opacity:.5; }
+.branch-background { fill:var(--pj-surface); }
+.branch-label { font-size:12px; font-weight:600; fill:var(--pj-primary); }
+.connection-preview { stroke:var(--pj-primary); stroke-width:2; stroke-dasharray:6 5; fill:none; }
+.dag-node { cursor:grab; outline:none; }
+.dag-node:active { cursor:grabbing; }
+.node-shape { fill:var(--pj-surface); stroke:var(--pj-border); stroke-width:1.5; }
+.dag-node.selected .node-shape,.dag-node:focus .node-shape { stroke:var(--pj-primary); stroke-width:2.5; }
+.dag-node.running .node-shape { fill:var(--el-color-primary-light-9); stroke:var(--pj-primary); }
+.dag-node.failed .node-shape { fill:var(--el-color-danger-light-9); stroke:var(--el-color-danger); }
+.dag-node.succeeded .node-shape { fill:var(--el-color-success-light-9); stroke:var(--el-color-success); }
+.dag-node.disabled { opacity:.55; }
+.dag-node.canceled .node-shape,.dag-node.stopped .node-shape { fill:var(--pj-nav-bg); stroke:var(--pj-muted); }
+.condition-shape { fill:var(--el-color-primary-light-9); stroke:var(--pj-primary); }
+.node-kind { fill:var(--pj-muted); font-size:11px; }
+.node-name { fill:var(--pj-text); font-size:13px; font-weight:600; }
+.node-status,.node-instance { fill:var(--pj-muted); font-size:10px; }
+.input-anchor { fill:var(--pj-surface); stroke:var(--pj-muted); }
+.output-anchor { fill:var(--pj-primary); stroke:var(--pj-surface); stroke-width:2; cursor:crosshair; }
+.output-anchor:hover { r:9; }
+.anchor-label { fill:var(--pj-primary); font-size:10px; pointer-events:none; }
 .workflow-canvas:fullscreen { border-radius:0; }.workflow-canvas:fullscreen .canvas-surface { height:calc(100vh - 130px); }.workflow-canvas:fullscreen .canvas-details { max-height:calc(100vh - 130px); }
-@media(max-width:1000px) { .canvas-body { flex-direction:column; }.canvas-details { width:100%!important; max-height:none; border-left:0; border-top:1px solid var(--el-border-color-light); }.canvas-surface { flex:auto; height:500px; } }
+@media(max-width:1000px) { .canvas-body { flex-direction:column; }.canvas-details { width:100%!important; max-height:none; border-left:0; border-top:1px solid var(--pj-border); }.canvas-surface { flex:auto; height:500px; } }
+@media(max-width:760px) { .canvas-toolbar { padding:10px; }.toolbar-spacer { display:none; }.canvas-navigation { width:100%; justify-content:flex-end; border-top:1px solid var(--pj-border); padding-top:8px; margin-top:2px; }.canvas-details { padding:16px; } }
 </style>
