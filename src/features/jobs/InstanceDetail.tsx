@@ -6,6 +6,7 @@ import { useConsole } from '../../lib/console';
 import { useQuery } from '../../lib/hooks';
 import { ErrorState, formatTime, StatusTag } from '../../components/ui';
 import { createAppRequestScope } from '../../lib/appRequestScope';
+import { nextLogPage } from './logFollow';
 
 export function InstanceDetailContent({ instanceId }: { instanceId: string | number }) {
   const { t, appId } = useConsole(); const [customQuery,setCustomQuery] = useState('status in (5, 6) order by last_modified_time desc'); const [sql,setSql]=useState(customQuery);
@@ -21,15 +22,28 @@ export function InstanceDetailContent({ instanceId }: { instanceId: string | num
 }
 export function LogViewer({ instanceId,open,onClose }: { instanceId:string|number; open:boolean; onClose:()=>void }) {
   const { appId,t }=useConsole();
-  const [index,setIndex]=useState(0);const [downloading,setDownloading]=useState(false);const [automatic,setAutomatic]=useState(true);
+  const [index,setIndex]=useState(0);const [downloading,setDownloading]=useState(false);const [automatic,setAutomatic]=useState(true);const [following,setFollowing]=useState(true);
   const token=localStorage.getItem('PowerJwt');
-  const scope=useMemo(()=>createAppRequestScope(appId,token),[appId,token,instanceId]);
+  const scope=useMemo(()=>createAppRequestScope(appId,token),[appId,token,instanceId,open]);
   useEffect(()=>()=>scope.dispose(),[scope]);
-  const log=useQuery<DataRecord>(()=>open?api.get<DataRecord>('/instance/log',{instanceId,index,appId},{...scope.options,quiet:true}):Promise.resolve({}),[instanceId,index,open,scope]);
+  const viewport=useRef<HTMLPreElement>(null);const followTail=useRef(true);const pages=useRef<number|undefined>(undefined);const interaction=useRef(0);
+  useEffect(()=>{setIndex(0);followTail.current=true;setFollowing(true);pages.current=undefined;++interaction.current;},[scope]);
+  const log=useQuery(async()=>{
+    const before=pages.current;const version=interaction.current;const follow=followTail.current;
+    const page=open?await api.get<DataRecord>('/instance/log',{instanceId,index,appId},{...scope.options,quiet:true}):{};
+    return {page,scope,index,before,version,follow};
+  },[index,open,scope]);
+  const current=log.data?.scope===scope&&log.data.index===index?log.data:undefined;
+  const page=current?.page;
   const loading=useRef(log.loading);loading.current=log.loading;
-  const viewport=useRef<HTMLPreElement>(null);const followTail=useRef(true);
-  useEffect(()=>{setIndex(0);followTail.current=true;},[instanceId,open]);
-  useEffect(()=>{if(followTail.current&&viewport.current)viewport.current.scrollTop=viewport.current.scrollHeight;},[log.data]);
+  useEffect(()=>{
+    if(!open||!current||!scope.current())return;
+    const total=Number(current.page.totalPages||0);pages.current=total;
+    const follow=current.follow&&followTail.current&&current.version===interaction.current;
+    const next=nextLogPage(index,current.before,total,follow);
+    if(next!==index)setIndex(next);
+    else if(follow&&viewport.current)viewport.current.scrollTop=viewport.current.scrollHeight;
+  },[current,index,open,scope]);
   useEffect(()=>{
     if(!open||!automatic)return;
     let active=true;let timer:number;
@@ -37,7 +51,9 @@ export function LogViewer({ instanceId,open,onClose }: { instanceId:string|numbe
     timer=window.setTimeout(()=>void poll(),3000);
     return()=>{active=false;window.clearTimeout(timer);};
   },[open,automatic,scope,index,log.refresh]);
+  const latest=()=>{++interaction.current;followTail.current=true;setFollowing(true);const last=Math.max(0,(pages.current||0)-1);if(index===last)void log.refresh();else setIndex(last);};
+  const selectPage=(selected:number)=>{++interaction.current;followTail.current=false;setFollowing(false);setIndex(selected-1);};
   const download=async()=>{if(downloading||!scope.current())return;setDownloading(true);try{const blob=await api.get<Blob>('/instance/downloadLog4Console',{instanceId},{...scope.options,responseType:'blob',timeout:75000});if(scope.current())downloadBlob(blob,`powerjob-instance-${instanceId}.log`);}catch{}finally{if(scope.current())setDownloading(false);}};
-  return <Drawer title={t('运行日志','Execution log')+' #'+instanceId} open={open} onClose={onClose} size={1000} extra={<Space wrap><Space><Switch size="small" checked={automatic} aria-label={t('自动刷新日志','Automatically refresh logs')} onChange={setAutomatic}/><span>{t('自动刷新','Auto refresh')}</span></Space><Button icon={<RefreshCw size={15}/>} loading={log.loading} onClick={log.refresh}>{t('刷新','Refresh')}</Button><Button icon={<Download size={15}/>} loading={downloading} onClick={download}>{t('下载日志','Download log')}</Button></Space>}><ErrorState error={log.error} retry={log.refresh}/><pre ref={viewport} className="log-viewer" onScroll={event=>{const el=event.currentTarget;followTail.current=el.scrollHeight-el.scrollTop-el.clientHeight<40;}}>{log.data?.data||t('暂无日志。运行中实例可刷新查看最新输出。','No logs yet. Refresh to see the latest output.')}</pre><Pagination current={index+1} pageSize={1} total={log.data?.totalPages||0} showSizeChanger={false} onChange={p=>setIndex(p-1)}/></Drawer>;
+  return <Drawer title={t('运行日志','Execution log')+' #'+instanceId} open={open} onClose={onClose} size={1000} extra={<Space wrap><Space><Switch size="small" checked={automatic} aria-label={t('自动刷新日志','Automatically refresh logs')} onChange={setAutomatic}/><span>{t('自动刷新','Auto refresh')}</span></Space><Button type={following?'primary':'default'} aria-pressed={following} onClick={latest}>{following?t('实时跟随','Following live'):t('最新页','Latest page')}</Button><Button icon={<RefreshCw size={15}/>} loading={log.loading} onClick={log.refresh}>{t('刷新','Refresh')}</Button><Button icon={<Download size={15}/>} loading={downloading} onClick={download}>{t('下载日志','Download log')}</Button></Space>}><ErrorState error={log.error} retry={log.refresh}/><pre ref={viewport} className="log-viewer" onScroll={event=>{const el=event.currentTarget;if(followTail.current&&el.scrollHeight-el.scrollTop-el.clientHeight>=40){++interaction.current;followTail.current=false;setFollowing(false);}}}>{page?.data||t('暂无日志。运行中实例可刷新查看最新输出。','No logs yet. Refresh to see the latest output.')}</pre><Pagination current={index+1} pageSize={1} total={page?.totalPages||0} showSizeChanger={false} onChange={selectPage}/></Drawer>;
 }
 export default function InstanceDetail({instanceId,open=true,onClose=()=>{}}:{instanceId:string|number;open?:boolean;onClose?:()=>void}) {const {t}=useConsole();return <Drawer title={t('实例详情','Instance details')} open={open} onClose={onClose} size={1080}><InstanceDetailContent instanceId={instanceId}/></Drawer>;}
