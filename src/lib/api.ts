@@ -18,7 +18,8 @@ export const endpoint = (path: string, params?: Record<string, any>) => {
 export function websocketUrl(path: string) { const url = endpoint(path); url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'; return url.toString(); }
 async function request<T>(method: string, path: string, body?: unknown, options: RequestOptions = {}): Promise<T> {
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), options.timeout ?? 15000);
+  let timedOut = false;
+  const timeout = window.setTimeout(() => { timedOut = true; controller.abort(); }, options.timeout ?? 15000);
   const abort = () => controller.abort();
   options.signal?.addEventListener('abort', abort, { once: true });
   if (options.signal?.aborted) controller.abort();
@@ -42,7 +43,7 @@ async function request<T>(method: string, path: string, body?: unknown, options:
     if (options.responseType === 'blob') throw new ApiError('服务未返回有效的日志文件 / Server did not return a valid log file', undefined, response.status);
     return (result && typeof result === 'object' && 'success' in result ? result.data : result) as T;
   } catch (error) {
-    const failure = error instanceof Error ? error : new Error(String(error));
+    const failure = timedOut && !options.signal?.aborted ? new ApiError('请求超时，请重试 / Request timed out', 'TIMEOUT') : error instanceof Error ? error : new Error(String(error));
     if (!options.quiet && !options.signal?.aborted && (currentSessionExpired || localStorage.getItem('PowerJwt') === token)) window.dispatchEvent(new CustomEvent('powerjob:error', { detail: failure.name === 'AbortError' ? '请求超时，请重试 / Request timed out' : failure.message }));
     throw failure;
   } finally { clearTimeout(timeout); options.signal?.removeEventListener('abort', abort); }
