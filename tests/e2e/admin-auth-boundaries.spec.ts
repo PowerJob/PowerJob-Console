@@ -12,6 +12,7 @@ test('auth boundaries · supported methods, wrong/empty/Enter login, duplicate r
   try {
     const account = await fixtures.user('boundary_account', { phone: '100800100', email: 'initial@example.invalid', webHook: 'https://example.invalid/initial' })
     await logout(page)
+    await expect(page.getByRole('button', { name: 'PowerJob account', exact: true })).toBeVisible()
     const supported = await clickAndResponse<RecordDTO[]>(page, '/auth/supportLoginTypes', () => page.reload()); expect(supported.success).toBe(true)
     for (const provider of supported.data) await expect(page.getByRole('button', { name: provider.type === 'PWJB' ? 'PowerJob account' : String(provider.name), exact: true })).toBeVisible()
     await page.getByRole('button', { name: 'PowerJob account', exact: true }).click(); await expect(page).toHaveURL(/#\/powerjobLogin$/)

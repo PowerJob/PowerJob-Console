@@ -10,6 +10,7 @@ export function dailyDraft(expression: string): Entity {
     daysOfWeek: [1, 2, 3, 4, 5],
   }
   const source = expression.trim()
+  if (source === 'null') throw new Error('Invalid daily rule')
   // A previous CRON/fixed schedule may still be present after changing the type.
   // Keep that raw value in the parent until the user explicitly applies this draft.
   if (!source || !(source.startsWith('{') || source.startsWith('['))) return defaults
