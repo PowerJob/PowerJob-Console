@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { App, Button, Drawer, Form, Input, Space, Table, Tabs, Tag } from 'antd';
-import { FolderTree, Plus, Search } from 'lucide-react';
+import { FolderTree, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { api, type DataRecord, type PageResult } from '../lib/api';
 import { useConsole } from '../lib/console';
+import { EnumTag } from '../lib/enums';
 import { useQuery } from '../lib/hooks';
 import { ErrorState, PageHeader, Panel, RefreshButton } from '../components/ui';
 import RoleEditor, { emptyRoles, normalizeRoles } from './RoleEditor';
@@ -31,11 +32,11 @@ export default function Namespaces() {
   const remove = (value: DataRecord) => modal.confirm({ title: t('删除命名空间', 'Delete namespace'), content: t(`确认删除命名空间「${value.name || value.code}」？包含应用的命名空间不能删除。`, `Delete “${value.name || value.code}”? A namespace containing applications cannot be deleted.`), okText: t('删除', 'Delete'), cancelText: t('取消', 'Cancel'), okButtonProps: { danger: true }, onOk: async () => { await api.delete('/namespace/delete', { id: value.id }, { headers: { NamespaceId: String(value.id) } }); void message.success(t('命名空间已删除', 'Namespace deleted')); await namespaces.refresh(); } });
   const columns = [
     { title: t('命名空间', 'Namespace'), key: 'namespace', width: 260, render: (_: unknown, row: DataRecord) => <div className="resource-cell"><span className="resource-symbol violet"><FolderTree size={18}/></span><div><strong>{row.name || row.code}</strong><span>{row.code} <span className="muted">#{row.id}</span></span></div></div> },
-    { title: t('状态', 'Status'), key: 'status', width: 110, render: (_: unknown, row: DataRecord) => <Tag color={Number(row.status) === 1 ? 'success' : 'default'}>{row.statusStr || '—'}</Tag> },
+    { title: t('状态', 'Status'), key: 'status', width: 110, render: (_: unknown, row: DataRecord) => <EnumTag kind="resourceStatus" value={row.status ?? row.statusStr}/> },
     { title: t('标签', 'Tags'), dataIndex: 'tags', width: 170, render: (tags?: string) => tags ? <Space size={[4, 4]} wrap>{tags.split(',').filter(Boolean).map(tag => <Tag key={tag}>{tag}</Tag>)}</Space> : '—' },
     { title: t('创建信息', 'Created'), key: 'created', width: 180, render: (_: unknown, row: DataRecord) => <div className="metadata-cell"><span>{row.gmtCreateStr || '—'}</span><small>{row.creatorShowName || '—'}</small></div> },
     { title: t('更新信息', 'Updated'), key: 'updated', width: 180, render: (_: unknown, row: DataRecord) => <div className="metadata-cell"><span>{row.gmtModifiedStr || '—'}</span><small>{row.modifierShowName || '—'}</small></div> },
-    { title: t('操作', 'Actions'), key: 'actions', width: 150, render: (_: unknown, row: DataRecord) => <Space><Button size="small" onClick={() => edit(row)}>{t('编辑', 'Edit')}</Button><Button type="text" danger size="small" onClick={() => remove(row)}>{t('删除', 'Delete')}</Button></Space> },
+    { title: t('操作', 'Actions'), key: 'actions', width: 180, render: (_: unknown, row: DataRecord) => <Space><Button size="small" icon={<Pencil size={14}/>} onClick={() => edit(row)}>{t('编辑', 'Edit')}</Button><Button type="text" danger size="small" icon={<Trash2 size={14}/>} onClick={() => remove(row)}>{t('删除', 'Delete')}</Button></Space> },
   ];
   return <>
     <PageHeader title={t('命名空间', 'Namespaces')} description={t('按照团队或业务组织应用，在同一空间管理成员权限。', 'Organize applications by team or business and manage shared member permissions.')} actions={<Space><RefreshButton loading={namespaces.loading} onClick={() => void namespaces.refresh()}/><Button type="primary" icon={<Plus size={16}/>} onClick={() => edit()}>{t('新建命名空间', 'New namespace')}</Button></Space>}/>

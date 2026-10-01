@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { App, Avatar, Button, Form, Select, Tag } from 'antd';
+import { App, Avatar, Button, Form, Select } from 'antd';
 import { ShieldCheck } from 'lucide-react';
 import { api, type DataRecord } from '../lib/api';
 import { useConsole } from '../lib/console';
+import { EnumTag } from '../lib/enums';
 import { useQuery } from '../lib/hooks';
 import { ErrorState, PageHeader, Panel, RefreshButton } from '../components/ui';
 import './admin.css';
@@ -29,7 +30,7 @@ export default function System() {
         <Form.Item name="admin" label={t('管理员成员', 'Administrator members')} rules={[{ required: true, type: 'array', min: 1, message: t('至少保留一位全局管理员', 'Keep at least one global administrator') }]}><Select mode="multiple" aria-label={t('全局管理员', 'Global administrators')} showSearch optionFilterProp="label" loading={users.loading || admins.loading} placeholder={t('选择管理员成员', 'Select administrator members')} options={(users.data || []).map(user => ({ value: String(user.id), label: user.showName || user.username || String(user.id) }))}/></Form.Item>
         <Button type="primary" htmlType="submit" loading={saving}>{t('保存管理员', 'Save administrators')}</Button>
       </Form>
-      <div className="current-admins">{(admins.data || []).map(id => { const user = (users.data || []).find(value => String(value.id) === String(id)); return <div className="current-admin" key={String(id)}><Avatar size={34}>{(user?.nick || user?.username || '?').slice(0, 1).toUpperCase()}</Avatar><div><strong>{user?.showName || user?.username || `#${id}`}</strong><span>{t('全局管理员', 'Global administrator')}</span></div><Tag color="blue">ADMIN</Tag></div>; })}</div>
+      <div className="current-admins">{(admins.data || []).map(id => { const user = (users.data || []).find(value => String(value.id) === String(id)); return <div className="current-admin" key={String(id)}><Avatar size={34}>{(user?.nick || user?.username || '?').slice(0, 1).toUpperCase()}</Avatar><div><strong>{user?.showName || user?.username || `#${id}`}</strong><span>{t('全局管理员', 'Global administrator')}</span></div><EnumTag kind="role" value="ADMIN"/></div>; })}</div>
     </Panel>
   </>;
 }

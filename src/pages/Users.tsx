@@ -1,14 +1,15 @@
 import { useMemo, useState } from 'react';
-import { Alert, App, Avatar, Button, Form, Input, Modal, Select, Space, Switch, Table, Tag } from 'antd';
-import { Search, UsersRound } from 'lucide-react';
+import { Alert, App, Avatar, Button, Form, Input, Modal, Select, Space, Switch, Table } from 'antd';
+import { Pencil, Search, UsersRound } from 'lucide-react';
 import { api, type DataRecord } from '../lib/api';
 import { useConsole } from '../lib/console';
+import { EnumTag, enumLabel, enumMeta } from '../lib/enums';
 import { useQuery } from '../lib/hooks';
 import { ErrorState, PageHeader, Panel, RefreshButton } from '../components/ui';
 import './admin.css';
 
 export default function Users() {
-  const { t } = useConsole();
+  const { t, language } = useConsole();
   const { message } = App.useApp();
   const [form] = Form.useForm();
   const [editForm] = Form.useForm();
@@ -22,14 +23,17 @@ export default function Users() {
   const accountTypes = useMemo(() => {
     const types = new Map<string, string>();
     for (const provider of providers.data || []) {
-      if (provider.type) types.set(String(provider.type), provider.name ? `${provider.type} · ${provider.name}` : String(provider.type));
+      if (provider.type) {
+        const meta = enumMeta('accountType', provider.type, language);
+        types.set(String(provider.type), meta.known ? meta.label : provider.name || meta.label);
+      }
     }
     for (const user of users.data || []) {
-      if (user.accountType && !types.has(String(user.accountType))) types.set(String(user.accountType), String(user.accountType));
+      if (user.accountType && !types.has(String(user.accountType))) types.set(String(user.accountType), enumLabel('accountType', user.accountType, language));
     }
-    if (query.accountTypeEq && !types.has(String(query.accountTypeEq))) types.set(String(query.accountTypeEq), String(query.accountTypeEq));
+    if (query.accountTypeEq && !types.has(String(query.accountTypeEq))) types.set(String(query.accountTypeEq), enumLabel('accountType', query.accountTypeEq, language));
     return Array.from(types, ([value, label]) => ({ value, label }));
-  }, [providers.data, users.data, query.accountTypeEq]);
+  }, [providers.data, users.data, query.accountTypeEq, language]);
   const edit = (user: DataRecord) => {
     editForm.resetFields();
     editForm.setFieldsValue({ id: String(user.id), username: user.username, nick: user.nick, phone: user.phone, email: user.email, webHook: user.webHook, extra: user.extra });
@@ -60,11 +64,11 @@ export default function Users() {
     </Form><ErrorState error={users.error} retry={() => void users.refresh()}/><Table rowKey={row => String(row.id)} dataSource={users.data || []} loading={users.loading} scroll={{ x: 1150 }} pagination={{ pageSize: 20, showSizeChanger: true, showTotal: total => t(`共 ${total} 位用户`, `${total} users`) }} columns={[
       { title: t('用户', 'User'), key: 'user', width: 270, render: (_: unknown, row: DataRecord) => <div className="resource-cell"><Avatar icon={<UsersRound size={16}/>} className="user-avatar">{(row.nick || row.username || '?').slice(0, 1).toUpperCase()}</Avatar><div><strong>{row.nick || row.username}</strong><span>{row.username}</span></div></div> },
       { title: 'ID', dataIndex: 'id', width: 100 },
-      { title: t('账号类型', 'Account type'), dataIndex: 'accountType', width: 120, render: (value: string) => <Tag>{value}</Tag> },
+      { title: t('账号类型', 'Account type'), dataIndex: 'accountType', width: 120, render: (value: string) => <EnumTag kind="accountType" value={value}/> },
       { title: t('手机号', 'Phone'), dataIndex: 'phone', width: 170, render: (value: string) => value || '—' },
       { title: t('邮箱', 'Email'), dataIndex: 'email', width: 240, render: (value: string) => value || '—' },
-      { title: t('访问状态', 'Access'), key: 'status', width: 140, render: (_: unknown, row: DataRecord) => <Switch aria-label={t(`启用用户 ${row.username}`, `Enable user ${row.username}`)} checked={Boolean(row.enable)} loading={pending.includes(String(row.id))} checkedChildren={t('启用', 'Enabled')} unCheckedChildren={t('禁用', 'Disabled')} onChange={enabled => void changeStatus(row, enabled)}/> },
-      { title: t('操作', 'Actions'), key: 'actions', width: 100, render: (_: unknown, row: DataRecord) => <Button size="small" onClick={() => edit(row)}>{t('编辑', 'Edit')}</Button> },
+      { title: t('访问状态', 'Access'), key: 'status', width: 160, render: (_: unknown, row: DataRecord) => <Space size={6}><EnumTag kind="access" value={Boolean(row.enable)}/><Switch aria-label={t(`启用用户 ${row.username}`, `Enable user ${row.username}`)} checked={Boolean(row.enable)} loading={pending.includes(String(row.id))} onChange={enabled => void changeStatus(row, enabled)}/></Space> },
+      { title: t('操作', 'Actions'), key: 'actions', width: 100, render: (_: unknown, row: DataRecord) => <Button size="small" icon={<Pencil size={14}/>} onClick={() => edit(row)}>{t('编辑', 'Edit')}</Button> },
     ]}/></Panel>
     <Modal title={t('编辑用户', 'Edit user')} open={editing !== null} onCancel={() => setEditing(null)} destroyOnHidden closable={!saving} mask={{ closable: !saving }} keyboard={!saving} footer={<Space><Button disabled={saving} onClick={() => setEditing(null)}>{t('取消', 'Cancel')}</Button><Button type="primary" loading={saving} onClick={() => editForm.submit()}>{t('保存用户', 'Save user')}</Button></Space>}>
       {editError && (

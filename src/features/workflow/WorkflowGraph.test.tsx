@@ -2,13 +2,13 @@
 import React, { act, useEffect, useState } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Node, NodeChange } from '@xyflow/react';
+import type { Edge, Node, NodeChange } from '@xyflow/react';
 import type { WorkflowNode } from './model';
 
 const graph = vi.hoisted(() => ({ fitView: vi.fn(), mounted: vi.fn(), unmounted: vi.fn(), warning: vi.fn() }));
-const translate = (zh: string) => zh;
-vi.mock('../../lib/console', () => ({ useConsole: () => ({ t: translate }) }));
-vi.mock('../../components/ui', () => ({ StatusTag: () => null }));
+const locale = vi.hoisted(() => ({ language: 'cn' as 'cn' | 'en' }));
+const translate = (zh: string, en: string) => locale.language === 'en' ? en : zh;
+vi.mock('../../lib/console', () => ({ useConsole: () => ({ t: translate, language: locale.language }) }));
 vi.mock('antd', () => ({
   App: { useApp: () => ({ message: { warning: graph.warning } }) },
   Button: ({ icon, children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { icon?: React.ReactNode }) => <button {...props}>{icon}{children}</button>,
@@ -18,6 +18,7 @@ vi.mock('antd', () => ({
 type TestNode = Node<{ model: WorkflowNode; view: boolean }>;
 type TestFlowProps = {
   nodes: TestNode[];
+  edges: Edge[];
   onNodesChange: (changes: NodeChange<TestNode>[]) => void;
   onNodeClick: (event: React.MouseEvent, node: TestNode) => void;
   children?: React.ReactNode;
@@ -29,13 +30,14 @@ vi.mock('@xyflow/react', async () => {
     ReactFlowProvider: ({ children }: { children: React.ReactNode }) => children,
     useReactFlow: () => ({ fitView: graph.fitView }),
     Background: () => null, Controls: () => null,
-    ReactFlow: ({ nodes, onNodesChange, onNodeClick, children }: TestFlowProps) => {
+    ReactFlow: ({ nodes, edges, onNodesChange, onNodeClick, children }: TestFlowProps) => {
       const [draft, setDraft] = useState('local viewport draft');
       useEffect(() => { graph.mounted(); return () => { graph.unmounted(); }; }, []);
       return <div data-testid="flow">
         <input aria-label="flow local draft" value={draft} onChange={event => setDraft(event.target.value)}/>
         <button onClick={() => onNodesChange([{ type: 'position', id: 'A', position: { x: 93, y: 217 } }])}>Move first node</button>
         {nodes.map(node => <button key={node.id} data-node-id={node.id} data-position={JSON.stringify(node.position)} data-selected={String(node.selected)} onClick={event => onNodeClick(event, node)}>{node.data.model.nodeName}</button>)}
+        {edges.map(edge => <span key={edge.id} data-edge-id={edge.id} data-source-handle={edge.sourceHandle || ''}>{edge.label}</span>)}
         {children}
       </div>;
     },
@@ -59,7 +61,7 @@ async function click(name: string) { await act(async () => button(name).click())
 function restore(object: object, key: string, descriptor?: PropertyDescriptor) { if (descriptor) Object.defineProperty(object, key, descriptor); else Reflect.deleteProperty(object, key); }
 
 beforeEach(() => {
-  vi.clearAllMocks(); nativeElement = null;
+  vi.clearAllMocks(); locale.language = 'cn'; nativeElement = null;
   requestNative = vi.fn().mockRejectedValue(new TypeError('not granted'));
   exitNative = vi.fn().mockImplementation(async () => { nativeElement = null; nativeChange(); });
   Object.defineProperty(document.documentElement, 'requestFullscreen', { configurable: true, value: requestNative });
@@ -75,6 +77,23 @@ afterEach(async () => {
 });
 
 describe('workflow fullscreen interactions', () => {
+  it('updates decision branch labels with the display language while preserving handles, selection and draft positions', async () => {
+    const decisionNodes: WorkflowNode[] = [{ ...nodes[0], nodeType: 2 }, { ...nodes[0], nodeId: 'B', nodeName: '成立节点' }, { ...nodes[0], nodeId: 'C', nodeName: '不成立节点' }];
+    const decisionEdges = [{ from: 'A', to: 'B', property: 'true' }, { from: 'A', to: 'C', property: 'false' }];
+    const onSelect = vi.fn();
+    const render = () => root.render(<WorkflowGraph nodes={decisionNodes} edges={decisionEdges} editable selectedId="A" onSelect={onSelect}/>);
+    await act(async () => render()); await click('Move first node');
+    const originalNode = selected();
+    expect([...document.querySelectorAll('[data-edge-id]')].map(edge => edge.textContent)).toEqual(['成立', '不成立']);
+    expect([...document.querySelectorAll('[data-edge-id]')].map(edge => edge.getAttribute('data-source-handle'))).toEqual(['true', 'false']);
+    locale.language = 'en'; await act(async () => render());
+    expect([...document.querySelectorAll('[data-edge-id]')].map(edge => edge.textContent)).toEqual(['True', 'False']);
+    expect([...document.querySelectorAll('[data-edge-id]')].map(edge => edge.getAttribute('data-source-handle'))).toEqual(['true', 'false']);
+    expect(selected()).toBe(originalNode); expect(selected().dataset.position).toBe('{"x":93,"y":217}');
+    expect(selected().dataset.selected).toBe('true'); expect(graph.mounted).toHaveBeenCalledOnce();
+    expect(graph.fitView).not.toHaveBeenCalled();
+  });
+
   it('handles browser rejection with a body-level canvas and restores the same graph on explicit exit', async () => {
     const onSelect = await mount(); await click('Move first node');
     const originalHost = host(); const originalNode = selected();

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { App, Avatar, Button, Descriptions, Form, Input, Modal, Space, Spin, Tag } from 'antd';
+import { App, Avatar, Button, Descriptions, Form, Input, Modal, Space, Spin } from 'antd';
 import { KeyRound, ShieldCheck, UserRound } from 'lucide-react';
 import { api, type DataRecord } from '../lib/api';
 import { useConsole } from '../lib/console';
+import { EnumTag } from '../lib/enums';
 import { useQuery } from '../lib/hooks';
 import { ErrorState, PageHeader, Panel, RefreshButton } from '../components/ui';
 import './admin.css';
@@ -35,17 +36,16 @@ export default function Profile() {
     setGranting(true);
     try { await api.post('/appInfo/becomeAdmin', values); void message.success(t('已获得应用管理权限', 'Application administrator access granted')); grantForm.resetFields(); await profile.refresh(); } catch { /* The server owns the grant decision. */ } finally { setGranting(false); }
   };
-  const roleLabel = (role: string) => ({ OBSERVER: t('观察者', 'Observer'), QA: t('质量保障', 'QA'), DEVELOPER: t('开发者', 'Developer'), ADMIN: t('管理员', 'Administrator') }[role] || role);
   return <>
     <PageHeader title={t('个人设置', 'Profile')} description={t('维护个人资料、通知方式与访问权限。', 'Manage your profile, notification preferences and access.')} actions={<RefreshButton loading={profile.loading} onClick={() => void profile.refresh()}/>}/>
     <ErrorState error={profile.error} retry={() => void profile.refresh()}/>
     {profile.loading && !user ? <div className="admin-loading"><Spin /></div> : user && <div className="profile-grid">
       <Panel title={t('个人信息', 'Personal information')}>
-        <div className="profile-summary"><Avatar size={58} icon={<UserRound size={25}/>} /><div><h2>{user.nick || user.username}</h2><p>{user.username}</p></div><Tag>{user.accountType}</Tag></div>
+        <div className="profile-summary"><Avatar size={58} icon={<UserRound size={25}/>} /><div><h2>{user.nick || user.username}</h2><p>{user.username}</p></div><EnumTag kind="accountType" value={user.accountType}/></div>
         <Descriptions size="small" column={1} className="profile-identifiers" items={[
           { key: 'id', label: 'ID', children: String(user.id) },
           { key: 'origin', label: t('原始账号', 'Original account'), children: user.originUsername || '—' },
-          { key: 'roles', label: t('全局角色', 'Global roles'), children: (user.globalRoles || []).length ? <Space wrap>{user.globalRoles.map((role: string) => <Tag key={role} color="blue">{roleLabel(role)}</Tag>)}</Space> : t('普通用户', 'Member') },
+          { key: 'roles', label: t('全局角色', 'Global roles'), children: (user.globalRoles || []).length ? <Space wrap>{user.globalRoles.map((role: string) => <EnumTag key={role} kind="role" value={role}/>)}</Space> : t('普通用户', 'Member') },
         ]}/>
         <Form name="profile-details" form={profileForm} layout="vertical" className="profile-form" onFinish={saveProfile}>
           <Form.Item name="nick" label={t('昵称', 'Nickname')}><Input autoComplete="nickname" /></Form.Item>
@@ -59,7 +59,7 @@ export default function Profile() {
         <Panel title={t('访问权限', 'Access permissions')}>
           <div className="permission-summary"><ShieldCheck size={20}/><p>{t('以下权限由管理员授予，或通过应用密码验证获取。', 'Access is granted by administrators or by verifying an application password.')}</p></div>
           {['role2NamespaceList', 'role2AppList'].map(key => <section className="permission-list" key={key}><h3>{key === 'role2NamespaceList' ? t('命名空间', 'Namespaces') : t('应用', 'Applications')}</h3>
-            {Object.entries(user[key] || {}).some(([, items]) => Array.isArray(items) && items.length) ? Object.entries(user[key] || {}).flatMap(([role, items]) => (items as DataRecord[]).map(item => <div className="permission-item" key={`${role}-${item.id}`}><span>{item.name || item.title || item.appName || item.code}<small>#{item.id}</small></span><Tag>{roleLabel(role)}</Tag></div>)) : <span className="muted">{t('暂无直接授权', 'No direct grants')}</span>}
+            {Object.entries(user[key] || {}).some(([, items]) => Array.isArray(items) && items.length) ? Object.entries(user[key] || {}).flatMap(([role, items]) => (items as DataRecord[]).map(item => <div className="permission-item" key={`${role}-${item.id}`}><span>{item.name || item.title || item.appName || item.code}<small>#{item.id}</small></span><EnumTag kind="role" value={role}/></div>)) : <span className="muted">{t('暂无直接授权', 'No direct grants')}</span>}
           </section>)}
         </Panel>
         <Panel title={t('获取应用管理权', 'Claim application access')}>

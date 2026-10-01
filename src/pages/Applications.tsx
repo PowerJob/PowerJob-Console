@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { App, Button, Drawer, Form, Input, Select, Space, Switch, Table, Tabs, Tag, Typography } from 'antd';
-import { ArrowUpRight, Boxes, Plus, Search } from 'lucide-react';
+import { ArrowUpRight, Boxes, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { api, type DataRecord, type PageResult } from '../lib/api';
 import { useConsole } from '../lib/console';
 import { useQuery } from '../lib/hooks';
@@ -45,7 +45,7 @@ export default function Applications() {
     { title: t('标签', 'Tags'), dataIndex: 'tags', width: 160, render: (tags?: string) => tags ? <Space size={[4, 4]} wrap>{tags.split(',').filter(Boolean).map(tag => <Tag key={tag}>{tag}</Tag>)}</Space> : '—' },
     { title: t('创建信息', 'Created'), key: 'created', width: 170, render: (_: unknown, row: DataRecord) => <div className="metadata-cell"><span>{row.gmtCreateStr || '—'}</span><small>{row.creatorShowName || '—'}</small></div> },
     { title: t('更新信息', 'Updated'), key: 'updated', width: 170, render: (_: unknown, row: DataRecord) => <div className="metadata-cell"><span>{row.gmtModifiedStr || '—'}</span><small>{row.modifierShowName || '—'}</small></div> },
-    { title: t('操作', 'Actions'), key: 'actions', width: 170, render: (_: unknown, row: DataRecord) => <Space><Button size="small" onClick={() => edit(row)}>{t('编辑', 'Edit')}</Button><Button size="small" type="link" icon={<ArrowUpRight size={14}/>} onClick={() => { setApp(row); navigate('/oms/home'); }}>{t('进入', 'Open')}</Button></Space> },
+    { title: t('操作', 'Actions'), key: 'actions', width: 185, render: (_: unknown, row: DataRecord) => <Space><Button size="small" icon={<Pencil size={14}/>} onClick={() => edit(row)}>{t('编辑', 'Edit')}</Button><Button size="small" type="link" icon={<ArrowUpRight size={14}/>} onClick={() => { setApp(row); navigate('/oms/home'); }}>{t('进入', 'Open')}</Button></Space> },
   ];
   return <>
     <PageHeader title={t('应用管理', 'Applications')} description={t('连接团队、Worker 与任务，让每个应用独立运行。', 'Connect teams, workers and jobs in dedicated application workspaces.')} actions={<Space><RefreshButton loading={apps.loading} onClick={() => void apps.refresh()}/><Button type="primary" icon={<Plus size={16}/>} onClick={() => edit()}>{t('新建应用', 'New application')}</Button></Space>}/>
@@ -59,7 +59,7 @@ export default function Applications() {
     </Form><ErrorState error={apps.error} retry={() => void apps.refresh()}/>
       <Table rowKey={row => String(row.id)} columns={columns} dataSource={apps.data?.data || []} loading={apps.loading} scroll={{ x: 1110 }} pagination={{ current: Number(query.index) + 1, pageSize: Number(query.pageSize), total: apps.data?.totalItems || 0, showSizeChanger: true, showTotal: total => t(`共 ${total} 个应用`, `${total} applications`), onChange: (page, size) => setQuery({ ...query, index: page - 1, pageSize: size }) }}/>
     </Panel>
-    <Drawer title={editing?.id ? t('编辑应用', 'Edit application') : t('新建应用', 'New application')} open={editing !== null} onClose={() => setEditing(null)} size={680} destroyOnHidden footer={<div className="drawer-footer"><div>{editing?.id && <Button danger onClick={() => remove(editing)}>{t('删除应用', 'Delete application')}</Button>}</div><Space><Button onClick={() => setEditing(null)}>{t('取消', 'Cancel')}</Button><Button type="primary" loading={busy} onClick={() => form.submit()}>{t('保存应用', 'Save application')}</Button></Space></div>}>
+    <Drawer title={editing?.id ? t('编辑应用', 'Edit application') : t('新建应用', 'New application')} open={editing !== null} onClose={() => setEditing(null)} size={680} destroyOnHidden footer={<div className="drawer-footer"><div>{editing?.id && <Button danger icon={<Trash2 size={14}/>} onClick={() => remove(editing)}>{t('删除应用', 'Delete application')}</Button>}</div><Space><Button onClick={() => setEditing(null)}>{t('取消', 'Cancel')}</Button><Button type="primary" loading={busy} onClick={() => form.submit()}>{t('保存应用', 'Save application')}</Button></Space></div>}>
       <Form name={editing?.id == null ? 'applications-create' : 'applications-edit'} form={form} layout="vertical" onFinish={save} preserve><Tabs items={[
         { key: 'base', label: t('基本信息', 'General'), children: <>
           <Form.Item name="namespaceId" label={t('命名空间', 'Namespace')} rules={[{ required: true, message: t('请选择命名空间', 'Select a namespace') }]}><Select aria-label={editing?.id == null ? t('新建应用命名空间', 'New application namespace') : t('编辑应用命名空间', 'Edit application namespace')} showSearch optionFilterProp="label" placeholder={t('选择命名空间', 'Select a namespace')} options={(namespaces.data || []).map(ns => ({ value: String(ns.id), label: ns.showName || ns.name || ns.code }))}/></Form.Item>
